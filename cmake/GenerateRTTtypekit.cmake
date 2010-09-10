@@ -8,7 +8,7 @@ foreach( FILE ${MSGS} )
   set(ROSMSGTYPE "${_project}::${ROSMSGNAME}")
   set(ROSMSGBOOSTHEADER "${_project}/boost/${ROSMSGNAME}.h")
 
-  rosbuild_invoke_rospack(orocos_rtt_ros_integration RTT INTEGRATION_PATH find)
+  rosbuild_invoke_rospack(rtt_ros_integration RTT INTEGRATION_PATH find)
   
   configure_file( ${RTT_INTEGRATION_PATH}/src/ros_msg_typekit_plugin.cpp.in 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp
@@ -50,7 +50,7 @@ endmacro(rosbuild_get_msgs_external)
 macro(ros_generate_rtt_typekit_external package)
 
 rosbuild_invoke_rospack(${package} ${package} PATH find)
-rosbuild_invoke_rospack(ros_integration RTT INTEGRATION_PATH find)
+rosbuild_invoke_rospack(rtt_ros_integration RTT INTEGRATION_PATH find)
   
 if(NOT EXISTS ${${package}_PATH}/msg_gen/cpp/include/${package}/boost)
  #generate boost headers
