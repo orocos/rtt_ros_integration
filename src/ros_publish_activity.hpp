@@ -32,36 +32,36 @@ namespace ros_integration{
     }
     
     void loop(){
-      Logger::In in("RosPublishActivity");
-      RosPublisher* chan;
-      log(Debug)<<"execute"<<endlog();
-      while(pending_queue.dequeue(chan))
-	chan->publish();
+        //Logger::In in("RosPublishActivity");
+        //log(Debug)<<"execute"<<endlog();
+        RosPublisher* chan;
+        while(pending_queue.dequeue(chan))
+            chan->publish();
     }
     
   public:
-    
-    static RosPublishActivity::shared_ptr Instance() {
-      if ( !ros_pub_act ) {
-	ros_pub_act.reset(new RosPublishActivity("RosPublishActivity"));
-	ros_pub_act->start();
+      
+      static RosPublishActivity::shared_ptr Instance() {
+          if ( !ros_pub_act ) {
+              ros_pub_act.reset(new RosPublishActivity("RosPublishActivity"));
+              ros_pub_act->start();
+          }
+          return ros_pub_act;
       }
-      return ros_pub_act;
-    }
-
-    bool requestPublish(RosPublisher* chan){
-      Logger::In in("RosPublishActivity");
-      log(Debug)<<"Requesting publish"<<endlog();
-      bool retval = pending_queue.enqueue(chan);
-      return retval&&this->trigger();
-    }
-    ~RosPublishActivity() {
-      Logger::In in("RosPublishActivity");
-      log(Info) << "RosPublishActivity cleans up: no more work."<<endlog();
-      stop();
-    }
-    
+      
+      bool requestPublish(RosPublisher* chan){
+          //Logger::In in("RosPublishActivity");
+          //log(Debug)<<"Requesting publish"<<endlog();
+          bool retval = pending_queue.enqueue(chan);
+          return retval&&this->trigger();
+      }
+      ~RosPublishActivity() {
+          Logger::In in("RosPublishActivity");
+          log(Info) << "RosPublishActivity cleans up: no more work."<<endlog();
+          stop();
+      }
+      
   };//class
 }//namespace
 #endif
-    
+

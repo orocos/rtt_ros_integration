@@ -88,8 +88,8 @@ namespace ros_integration {
      * @return true if publishing succeeded
      */
     bool signal(){
-      Logger::In in(topicname);
-      log(Debug)<<"Requesting publish"<<endlog();
+      //Logger::In in(topicname);
+      //log(Debug)<<"Requesting publish"<<endlog();
       return act->requestPublish(this);
     }
     
