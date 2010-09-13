@@ -5,31 +5,6 @@
 #include <ros/ros.h>
 
 using namespace RTT;
-/*
-class Spinner : public RTT::TaskContext 
-{
-public:
-  static Spinner& Instance(){
-    static Spinner spinner;
-    return spinner;
-  }
-private:
-  Spinner(): RTT::TaskContext("rtt"),
-	     spinner(1)
-  {
-  
-  }
-  bool startHook(){
-    spinner.start();
-    log(Debug)<<"ROS Spinner started"<<endlog();
-    return true;
-  }
-  ~Spinner(){
-    log(Debug)<<"ROS Spinner destructed"<<endlog();
-  }
-  
-};
-*/
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
     log(Info)<<"Initializing ROS node"<<endlog();
@@ -37,7 +12,13 @@ extern "C" {
       int argc=0;
       char* argv[0];
       ros::init(argc,argv,"rtt",ros::init_options::AnonymousName);
-      ros::start();
+      if(ros::master::check())
+          ros::start();
+      else{
+          log(Error)<<"No ros::master available"<<endlog();
+          ros::shutdown();
+          return false;
+      }
     }
     static ros::AsyncSpinner spinner(1); // Use 1 threads
     spinner.start();
