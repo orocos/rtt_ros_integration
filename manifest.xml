@@ -13,10 +13,9 @@
   <depend package="ocl"/>
   <depend package="rosbuild"/>
 
-  <depend package="rosbuild"/>
   <export>
     <rosbuild cmake_directory="${prefix}/cmake"/>
-    <cpp cflags="-I${prefix}/src"/>
+    <cpp cflags="-I${prefix}/src -I${prefix}/include"/>
   </export>
 </package>
 

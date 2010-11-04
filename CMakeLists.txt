@@ -20,11 +20,18 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 #common commands for building c++ executables and libraries
 rosbuild_add_library(${PROJECT_NAME} src/ros_plugin.cpp src/ros_publish_activity.cpp)
 set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/orocos/plugins)
 
+rosbuild_include(rtt_ros_integration GenerateRTTtypekit)
+ros_generate_rtt_typekit(roslib)
+
+rosbuild_add_library( rtt-ros-time-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_time_typekit_plugin.cpp )
+set_target_properties( rtt-ros-time-typekit PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/orocos/types)
+  
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
