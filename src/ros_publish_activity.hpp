@@ -19,7 +19,9 @@ namespace ros_integration{
   
   
   class RosPublishActivity : public RTT::Activity{
+  public:
     typedef boost::shared_ptr<RosPublishActivity> shared_ptr;
+  private:
     static shared_ptr ros_pub_act;
     
     internal::MWSRQueue<RosPublisher*> pending_queue;
