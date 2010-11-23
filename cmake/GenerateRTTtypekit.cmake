@@ -17,11 +17,10 @@ endmacro(rosbuild_get_msgs_external)
 
 macro(ros_generate_rtt_typekit package)
 
-rosbuild_invoke_rospack(${package} ${package} PATH find)
-rosbuild_invoke_rospack(rtt_ros_integration RTT INTEGRATION_PATH find)
+rosbuild_find_ros_package(rtt_ros_integration)
   
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/include/${package}/boost)
-   execute_process(COMMAND ${RTT_INTEGRATION_PATH}/scripts/create_boost_headers.py ${package}
+   execute_process(COMMAND ${rtt_ros_integration_PACKAGE_PATH}/scripts/create_boost_headers.py ${package}
      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 endif()
 #endif()
@@ -35,17 +34,15 @@ foreach( FILE ${MSGS} )
   set(ROSMSGTYPE "${package}::${ROSMSGNAME}")
   set(ROSMSGBOOSTHEADER "${package}/boost/${ROSMSGNAME}.h")
 
-  configure_file( ${RTT_INTEGRATION_PATH}/src/ros_msg_typekit_plugin.cpp.in 
+  configure_file( ${rtt_ros_integration_PACKAGE_PATH}/src/ros_msg_typekit_plugin.cpp.in 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp @ONLY )
   
-  configure_file( ${RTT_INTEGRATION_PATH}/src/ros_msg_transport_plugin.cpp.in 
+  configure_file( ${rtt_ros_integration_PACKAGE_PATH}/src/ros_msg_transport_plugin.cpp.in 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_transport_plugin.cpp @ONLY )
   
-  rosbuild_add_library( rtt-ros-${ROSMSGNAME}-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp )
-  set_target_properties( rtt-ros-${ROSMSGNAME}-typekit PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/orocos/types)
-  rosbuild_add_library( rtt-ros-${ROSMSGNAME}-transport ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_transport_plugin.cpp )
-  set_target_properties( rtt-ros-${ROSMSGNAME}-transport PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/orocos/types)
-  
+  orocos_typekit( rtt-ros-${ROSMSGNAME}-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp )
+  orocos_typekit( rtt-ros-${ROSMSGNAME}-transport ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_transport_plugin.cpp )
+
 #  set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp)
 #  set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_transport_plugin.cpp)
 
