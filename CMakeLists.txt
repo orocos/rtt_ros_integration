@@ -16,7 +16,6 @@ find_package(Orocos-RTT HINTS ${rtt_PACKAGE_PATH}/install )
 # Defines the orocos_* cmake macros. See that file for additional
 # documentation.
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #common commands for building c++ executables and libraries
 orocos_plugin(${PROJECT_NAME} src/ros_plugin.cpp src/ros_publish_activity.cpp)
