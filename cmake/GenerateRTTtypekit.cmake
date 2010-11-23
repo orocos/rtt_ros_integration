@@ -18,6 +18,12 @@ endmacro(rosbuild_get_msgs_external)
 macro(ros_generate_rtt_typekit package)
 
 rosbuild_find_ros_package(rtt_ros_integration)
+rosbuild_find_ros_package(rtt )
+find_package(Orocos-RTT HINTS ${rtt_PACKAGE_PATH}/install )
+
+# Defines the orocos_* cmake macros. See that file for additional
+# documentation.
+include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
   
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/include/${package}/boost)
    execute_process(COMMAND ${rtt_ros_integration_PACKAGE_PATH}/scripts/create_boost_headers.py ${package}
