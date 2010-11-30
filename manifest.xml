@@ -15,7 +15,7 @@
 
   <export>
     <rosbuild cmake_directory="${prefix}/cmake"/>
-    <cpp cflags="-I${prefix}/src -I${prefix}/include" lflags="-L${prefix}/lib/orocos/plugins -lrtt_ros_integration-gnulinux"/>
+    <cpp cflags="-I${prefix}/src -I${prefix}/include" lflags="-L${prefix}/lib/orocos/plugins"/>
   </export>
 </package>
 
