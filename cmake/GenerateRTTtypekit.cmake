@@ -48,7 +48,7 @@ foreach( FILE ${MSGS} )
   
   orocos_typekit( rtt-ros-${ROSMSGNAME}-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp )
   orocos_typekit( rtt-ros-${ROSMSGNAME}-transport ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_transport_plugin.cpp )
-  target_link_libraries( rtt-ros-${ROSMSGNAME}-transport rtt_ros_integration)
+  target_link_libraries( rtt-ros-${ROSMSGNAME}-transport rtt_ros_integration-gnulinux)
 
 #  set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp)
 #  set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_transport_plugin.cpp)
