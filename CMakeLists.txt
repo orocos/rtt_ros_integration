@@ -22,9 +22,6 @@ orocos_plugin(${PROJECT_NAME} src/ros_plugin.cpp src/ros_publish_activity.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-rosbuild_include(rtt_ros_integration GenerateRTTtypekit)
-ros_generate_rtt_typekit(roslib)
-
 orocos_typekit( rtt-ros-time-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_time_typekit_plugin.cpp )
   
 #target_link_libraries(${PROJECT_NAME} another_library)
