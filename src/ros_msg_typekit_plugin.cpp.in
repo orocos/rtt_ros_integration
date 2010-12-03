@@ -1,6 +1,7 @@
 #include <@ROSMSGBOOSTHEADER@>
 #include <rtt/types/TypekitPlugin.hpp>
 #include <rtt/types/StructTypeInfo.hpp>
+#include <rtt/types/SequenceTypeInfo.hpp>
 
 namespace ros_integration {
   using namespace RTT;
@@ -18,6 +19,7 @@ namespace ros_integration {
 
       virtual bool loadTypes() {
 	RTT::types::Types()->addType( new types::StructTypeInfo<@ROSMSGTYPE@>("@ROSMSGNAME@") );
+	RTT::types::Types()->addType( new types::SequenceTypeInfo< std::vector< @ROSMSGTYPE@ > >("@ROSMSGNAME@[]") );
 	return true;
       }
       virtual bool loadOperators() { return true; }
