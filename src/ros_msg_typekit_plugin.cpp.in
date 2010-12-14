@@ -2,30 +2,12 @@
 #include <rtt/types/TypekitPlugin.hpp>
 #include <rtt/types/StructTypeInfo.hpp>
 #include <rtt/types/SequenceTypeInfo.hpp>
+#include <vector>
 
 namespace ros_integration {
   using namespace RTT;
-   
-    /**
-     * This interface defines the types of the realTime package.
-     */
-    class ROS@ROSMSGNAME@TypekitPlugin
-      : public types::TypekitPlugin
-    {
-    public:
-      virtual std::string getName(){
-	return std::string("ros-")+"@ROSMSGNAME@";
-      }
-
-      virtual bool loadTypes() {
-	RTT::types::Types()->addType( new types::StructTypeInfo<@ROSMSGTYPE@>("@ROSMSGNAME@") );
-	RTT::types::Types()->addType( new types::SequenceTypeInfo< std::vector< @ROSMSGTYPE@ > >("@ROSMSGNAME@[]") );
-	return true;
-      }
-      virtual bool loadOperators() { return true; }
-      virtual bool loadConstructors() { return true; }
-    };
+    // Factory function
+    @ROSMSGTYPELINE@
+    
 }
-
-ORO_TYPEKIT_PLUGIN( ros_integration::ROS@ROSMSGNAME@TypekitPlugin )
 
