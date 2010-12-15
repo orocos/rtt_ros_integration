@@ -8,6 +8,10 @@ else()
   include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
   add_definitions( -DRTT_COMPONENT )
 endif()
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE MinSizeRel)
+endif(NOT CMAKE_BUILD_TYPE)
+
 
 macro(rosbuild_get_msgs_external package msgs)
   rosbuild_find_ros_package(${package})
@@ -79,7 +83,7 @@ macro(ros_generate_rtt_typekit package)
   
   orocos_typekit( rtt-ros-${package}-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
   orocos_typekit( rtt-ros-${package}-transport ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp )
-  #target_link_libraries(rtt-ros-${package}-transport rtt_ros_integration)
+  target_link_libraries(rtt-ros-${package}-transport rtt_ros_integration-${OROCOS_TARGET})
   
 endmacro(ros_generate_rtt_typekit)
 
