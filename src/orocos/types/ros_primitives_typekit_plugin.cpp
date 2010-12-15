@@ -29,29 +29,41 @@
 #include <ros/time.h>
 #include <rtt/types/TypekitPlugin.hpp>
 #include <rtt/types/TemplateTypeInfo.hpp>
+#include <rtt/types/SequenceTypeInfo.hpp>
 
 namespace ros_integration {
   using namespace RTT;
    
-    /**
-     * This interface defines the types of the realTime package.
-     */
-    class ROStimeTypekitPlugin
-      : public types::TypekitPlugin
-    {
+  /**
+   * This interface defines the primitive ROS msg types to the realTime package.
+   */
+  class ROSPrimitivesTypekitPlugin
+    : public types::TypekitPlugin
+  {
     public:
       virtual std::string getName(){
-	return std::string("ros-")+"time";
+	      return std::string("ros-")+"primitives";
       }
 
       virtual bool loadTypes() {
-	RTT::types::Types()->addType( new types::TemplateTypeInfo<ros::Time>("time") );
-	return true;
+	      RTT::types::Types()->addType( new types::TemplateTypeInfo<ros::Time>("time") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<uint8_t,true>("uint8") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<int8_t,true>("int8") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<int16_t,true>("int16") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<uint16_t,true>("uint16") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<int32_t,true>("int32") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<uint32_t,true>("uint32") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<int64_t,true>("int64") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<uint64_t,true>("uint64") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<float,true>("float32") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<double,true>("float64") );
+        RTT::types::Types()->addType( new types::TemplateTypeInfo<std::string,true>("string") );
+	      return true;
       }
       virtual bool loadOperators() { return true; }
       virtual bool loadConstructors() { return true; }
     };
 }
 
-ORO_TYPEKIT_PLUGIN( ros_integration::ROStimeTypekitPlugin )
+ORO_TYPEKIT_PLUGIN( ros_integration::ROSPrimitivesTypekitPlugin )
 

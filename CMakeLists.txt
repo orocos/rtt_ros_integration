@@ -22,7 +22,7 @@ orocos_plugin(${PROJECT_NAME} src/ros_plugin.cpp src/ros_publish_activity.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-orocos_typekit( rtt-ros-time-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_time_typekit_plugin.cpp )
+orocos_typekit( rtt-ros-primitives-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_primitives_typekit_plugin.cpp )
   
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
