@@ -44,20 +44,20 @@ namespace ros_integration {
       virtual std::string getName(){
 	      return std::string("ros-")+"primitives";
       }
-
+ 
       virtual bool loadTypes() {
 	      RTT::types::Types()->addType( new types::TemplateTypeInfo<ros::Time>("time") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<uint8_t,true>("uint8") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<int8_t,true>("int8") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<int16_t,true>("int16") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<uint16_t,true>("uint16") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<int32_t,true>("int32") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<uint32_t,true>("uint32") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<int64_t,true>("int64") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<uint64_t,true>("uint64") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<float,true>("float32") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<double,true>("float64") );
-        RTT::types::Types()->addType( new types::TemplateTypeInfo<std::string,true>("string") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<uint8_t>("uint8") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<int8_t>("int8") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<int16_t>("int16") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<uint16_t>("uint16") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<int32_t>("int32") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<uint32_t>("uint32") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<int64_t>("int64") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<uint64_t>("uint64") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<float>("float32") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<double>("float64") );
+        RTT::types::Types()->addType( new types::StdStringTypeInfo("string") );
 	      return true;
       }
       virtual bool loadOperators() { return true; }
