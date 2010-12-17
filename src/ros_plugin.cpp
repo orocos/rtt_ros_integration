@@ -30,6 +30,7 @@
 #include <rtt/TaskContext.hpp>
 #include <rtt/Activity.hpp>
 #include <rtt/Logger.hpp>
+#include <rtt/os/startstop.h>
 #include <ros/ros.h>
 
 using namespace RTT;
@@ -37,9 +38,9 @@ extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
     log(Info)<<"Initializing ROS node"<<endlog();
     if(!ros::isInitialized()){
-      int argc=0;
-      char* argv[0];
-      ros::init(argc,argv,"rtt",ros::init_options::AnonymousName);
+        int argc =__os_main_argc();
+        char ** argv = __os_main_argv();
+        ros::init(argc,argv,"rtt",ros::init_options::AnonymousName);
       if(ros::master::check())
           ros::start();
       else{
