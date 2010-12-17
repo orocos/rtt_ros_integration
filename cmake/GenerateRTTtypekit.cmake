@@ -1,7 +1,7 @@
 
 rosbuild_find_ros_package( rtt )
 set( RTT_HINTS HINTS ${rtt_PACKAGE_PATH}/install )
-find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling ${RTT_HINTS})
+find_package(Orocos-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling ${RTT_HINTS})
 if (NOT OROCOS-RTT_FOUND)
   message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
 else()
