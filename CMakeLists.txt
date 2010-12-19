@@ -22,7 +22,20 @@ orocos_plugin(${PROJECT_NAME} src/ros_plugin.cpp src/ros_publish_activity.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-orocos_typekit( rtt-ros-primitives-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_primitives_typekit_plugin.cpp )
+orocos_typekit( rtt-ros-primitives-typekit
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_primitives_typekit_plugin.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_time_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint8_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int8_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint16_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int16_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint32_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int32_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint64_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int64_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float32_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float64_type.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_string_type.cpp )
   
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()

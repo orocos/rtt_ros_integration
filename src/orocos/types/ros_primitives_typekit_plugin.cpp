@@ -1,40 +1,43 @@
-/***************************************************************************
-  tag: Ruben Smits  Tue Nov 16 09:19:02 CET 2010  ros_time_typekit_plugin.cpp
+/******************************************************************************
+*                 This file is part of the OROCOS toolchain ROS project       *
+*                                                                             *
+*        (C) 2010 Ruben Smits, ruben.smits@mech.kuleuven.be                   *
+*                 Steven Bellens, steven.bellens@mech.kuleuven.be             *
+*                    Department of Mechanical Engineering,                    *
+*                   Katholieke Universiteit Leuven, Belgium.                  *
+*                                                                             *
+*       You may redistribute this software and/or modify it under either the  *
+*       terms of the GNU Lesser General Public License version 2.1 (LGPLv2.1  *
+*       <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html>) or (at your *
+*       discretion) of the Modified BSD License:                              *
+*       Redistribution and use in source and binary forms, with or without    *
+*       modification, are permitted provided that the following conditions    *
+*       are met:                                                              *
+*       1. Redistributions of source code must retain the above copyright     *
+*       notice, this list of conditions and the following disclaimer.         *
+*       2. Redistributions in binary form must reproduce the above copyright  *
+*       notice, this list of conditions and the following disclaimer in the   *
+*       documentation and/or other materials provided with the distribution.  *
+*       3. The name of the author may not be used to endorse or promote       *
+*       products derived from this software without specific prior written    *
+*       permission.                                                           *
+*       THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR  *
+*       IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED        *
+*       WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE    *
+*       ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,*
+*       INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES    *
+*       (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS       *
+*       OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) *
+*       HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,   *
+*       STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING *
+*       IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE    *
+*       POSSIBILITY OF SUCH DAMAGE.                                           *
+*                                                                             *
+*******************************************************************************/
 
-                        ros_time_typekit_plugin.cpp -  description
-                           -------------------
-    begin                : Tue November 16 2010
-    copyright            : (C) 2010 Ruben Smits
-    email                : first.last@mech.kuleuven.be
-
- ***************************************************************************
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU Lesser General Public            *
- *   License as published by the Free Software Foundation; either          *
- *   version 2.1 of the License, or (at your option) any later version.    *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU Lesser General Public      *
- *   License along with this library; if not, write to the Free Software   *
- *   Foundation, Inc., 59 Temple Place,                                    *
- *   Suite 330, Boston, MA  02111-1307  USA                                *
- *                                                                         *
- ***************************************************************************/
-
-
-#include <ros/time.h>
-#include <rtt/types/TypekitPlugin.hpp>
-#include <rtt/typekit/StdTypeInfo.hpp>
-#include <rtt/typekit/StdStringTypeInfo.hpp>
-#include <rtt/types/TemplateConstructor.hpp>
+#include "ros_primitives_typekit_plugin.hpp"
 
 namespace ros_integration {
-    using namespace RTT;
-    using namespace RTT::types;
 
     double float_to_double( float val ) {return double(val);}
     float double_to_float( double val ) {return float(val);}
@@ -63,95 +66,111 @@ namespace ros_integration {
         }
     };
 
+    void loadTimeTypes();
 
-   
-  /**
-   * This interface defines the primitive ROS msg types to the realTime package.
-   */
-  class ROSPrimitivesTypekitPlugin
-    : public types::TypekitPlugin
-  {
-    public:
-      virtual std::string getName(){
-	      return std::string("ros-")+"primitives";
-      }
+    void loadUInt8Types();
+    void loadInt8Types();
+
+    void loadUInt16Types();
+    void loadInt16Types();
+
+    void loadUInt32Types();
+    void loadInt32Types();
+
+    void loadUInt64Types();
+    void loadInt64Types();
+
+    void loadFloat32Types();
+    void loadFloat64Types();
+
+    void loadStringTypes();
+
+    std::string ROSPrimitivesTypekitPlugin::getName(){
+	    return std::string("ros-")+"primitives";
+    }
  
-      virtual bool loadTypes() {
-	      RTT::types::Types()->addType( new types::TemplateTypeInfo<ros::Time>("time") );
-        RTT::types::Types()->addType( new types::StdTypeInfo<uint8_t>("uint8") );
-        RTT::types::Types()->addType( new types::StdTypeInfo<int8_t>("int8") );
-        RTT::types::Types()->addType( new types::StdTypeInfo<int16_t>("int16") );
-        RTT::types::Types()->addType( new types::StdTypeInfo<uint16_t>("uint16") );
-        RTT::types::Types()->addType( new types::StdTypeInfo<int32_t>("int32") );
-        RTT::types::Types()->addType( new types::StdTypeInfo<uint32_t>("uint32") );
-        RTT::types::Types()->addType( new types::StdTypeInfo<int64_t>("int64") );
-        RTT::types::Types()->addType( new types::StdTypeInfo<uint64_t>("uint64") );
-        RTT::types::Types()->addType( new types::StdTypeInfo<float>("float32") );
-        RTT::types::Types()->addType( new types::StdTypeInfo<double>("float64") );
-        RTT::types::Types()->addType( new types::StdStringTypeInfo() );
-	      return true;
-      }
-      virtual bool loadOperators() { return true; }
-      virtual bool loadConstructors() { 
-          types::TypeInfoRepository::shared_ptr ti = types::TypeInfoRepository::Instance();
-          // x to float64
-          ti->type("float64")->addConstructor( newConstructor( &float_to_double, true ));
-          ti->type("float64")->addConstructor( newConstructor( &int_to_double, true ));
+    bool ROSPrimitivesTypekitPlugin::loadTypes() {
+      loadTimeTypes();
 
-          // x to float
-          ti->type("float")->addConstructor( newConstructor( &int_to_float, true ));
-          ti->type("float")->addConstructor( newConstructor( &double_to_float, true ));
+      loadInt8Types();
+      loadUInt8Types();
 
-          // x to int
-          ti->type("int32")->addConstructor( newConstructor( &float_to_int, false ));
-          ti->type("int32")->addConstructor( newConstructor( &double_to_int, false ));
+      loadInt16Types();
+      loadUInt16Types();
 
-          // we certainly need int32/uint32 to 8/16 since the RTT parser only knows 32bit wide ints.
+      loadInt32Types();
+      loadUInt32Types();
 
-          // x to uint8_t (ROS' bool)
-          ti->type("uint8")->addConstructor( newConstructor( &a_to_b<int8_t,uint8_t>, false ));
-          ti->type("uint8")->addConstructor( newConstructor( &a_to_b<int16_t,uint8_t>, false ));
-          ti->type("uint8")->addConstructor( newConstructor( &a_to_b<int32_t,uint8_t>, false ));
-          ti->type("uint8")->addConstructor( newConstructor( &a_to_b<uint16_t,uint8_t>, false ));
-          ti->type("uint8")->addConstructor( newConstructor( &a_to_b<uint32_t,uint8_t>, false ));
+      loadInt64Types();
+      loadUInt64Types();
 
-          ti->type("int8")->addConstructor( newConstructor( &a_to_b<uint8_t,int8_t>, false ));
-          ti->type("int8")->addConstructor( newConstructor( &a_to_b<uint16_t,int8_t>, false ));
-          ti->type("int8")->addConstructor( newConstructor( &a_to_b<uint32_t,int8_t>, false ));
-          ti->type("int8")->addConstructor( newConstructor( &a_to_b<int16_t,int8_t>, false ));
-          ti->type("int8")->addConstructor( newConstructor( &a_to_b<int32_t,int8_t>, false ));
+      loadFloat32Types();
+      loadFloat64Types();
 
-          // x to uint16_t
-          ti->type("uint16")->addConstructor( newConstructor( &a_to_b<int8_t,uint16_t>, false ));
-          ti->type("uint16")->addConstructor( newConstructor( &a_to_b<int16_t,uint16_t>, false ));
-          ti->type("uint16")->addConstructor( newConstructor( &a_to_b<int32_t,uint16_t>, false ));
-          ti->type("uint16")->addConstructor( newConstructor( &a_to_b<uint8_t,uint16_t>, true ));
-          ti->type("uint16")->addConstructor( newConstructor( &a_to_b<uint32_t,uint16_t>, false ));
+      loadStringTypes();
 
-          ti->type("int16")->addConstructor( newConstructor( &a_to_b<uint8_t,int16_t>, true ));
-          ti->type("int16")->addConstructor( newConstructor( &a_to_b<uint16_t,int16_t>, false ));
-          ti->type("int16")->addConstructor( newConstructor( &a_to_b<uint32_t,int16_t>, false ));
-          ti->type("int16")->addConstructor( newConstructor( &a_to_b<int8_t,int16_t>, true ));
-          ti->type("int16")->addConstructor( newConstructor( &a_to_b<int32_t,int16_t>, false ));
+	    return true;
+    }
+    bool ROSPrimitivesTypekitPlugin::loadOperators() { return true; }
+    bool ROSPrimitivesTypekitPlugin::loadConstructors() { 
+        types::TypeInfoRepository::shared_ptr ti = types::TypeInfoRepository::Instance();
+        // x to float64
+        ti->type("float64")->addConstructor( newConstructor( &float_to_double, true ));
+        ti->type("float64")->addConstructor( newConstructor( &int_to_double, true ));
 
-          // x to uint32_t
-          ti->type("uint32")->addConstructor( newConstructor( &a_to_b<int8_t,uint32_t>, false ));
-          ti->type("uint32")->addConstructor( newConstructor( &a_to_b<int16_t,uint32_t>, false ));
-          ti->type("uint32")->addConstructor( newConstructor( &a_to_b<int32_t,uint32_t>, true ));
-          ti->type("uint32")->addConstructor( newConstructor( &a_to_b<uint8_t,uint32_t>, true ));
-          ti->type("uint32")->addConstructor( newConstructor( &a_to_b<uint16_t,uint32_t>, true ));
+        // x to float
+        ti->type("float")->addConstructor( newConstructor( &int_to_float, true ));
+        ti->type("float")->addConstructor( newConstructor( &double_to_float, true ));
 
-          ti->type("int32")->addConstructor( newConstructor( &a_to_b<uint8_t,int32_t>, true ));
-          ti->type("int32")->addConstructor( newConstructor( &a_to_b<uint16_t,int32_t>, true ));
-          ti->type("int32")->addConstructor( newConstructor( &a_to_b<uint32_t,int32_t>, true ));
-          ti->type("int32")->addConstructor( newConstructor( &a_to_b<int8_t,int32_t>, true ));
-          ti->type("int32")->addConstructor( newConstructor( &a_to_b<int16_t,int32_t>, true ));
+        // x to int
+        ti->type("int32")->addConstructor( newConstructor( &float_to_int, false ));
+        ti->type("int32")->addConstructor( newConstructor( &double_to_int, false ));
 
-          ti->type("string")->addConstructor( newConstructor( string_ctor() ) );
-          return true; 
-      }
-    };
-}
+        // we certainly need int32/uint32 to 8/16 since the RTT parser only knows 32bit wide ints.
+
+        // x to uint8_t (ROS' bool)
+        ti->type("uint8")->addConstructor( newConstructor( &a_to_b<int8_t,uint8_t>, false ));
+        ti->type("uint8")->addConstructor( newConstructor( &a_to_b<int16_t,uint8_t>, false ));
+        ti->type("uint8")->addConstructor( newConstructor( &a_to_b<int32_t,uint8_t>, false ));
+        ti->type("uint8")->addConstructor( newConstructor( &a_to_b<uint16_t,uint8_t>, false ));
+        ti->type("uint8")->addConstructor( newConstructor( &a_to_b<uint32_t,uint8_t>, false ));
+
+        ti->type("int8")->addConstructor( newConstructor( &a_to_b<uint8_t,int8_t>, false ));
+        ti->type("int8")->addConstructor( newConstructor( &a_to_b<uint16_t,int8_t>, false ));
+        ti->type("int8")->addConstructor( newConstructor( &a_to_b<uint32_t,int8_t>, false ));
+        ti->type("int8")->addConstructor( newConstructor( &a_to_b<int16_t,int8_t>, false ));
+        ti->type("int8")->addConstructor( newConstructor( &a_to_b<int32_t,int8_t>, false ));
+
+        // x to uint16_t
+        ti->type("uint16")->addConstructor( newConstructor( &a_to_b<int8_t,uint16_t>, false ));
+        ti->type("uint16")->addConstructor( newConstructor( &a_to_b<int16_t,uint16_t>, false ));
+        ti->type("uint16")->addConstructor( newConstructor( &a_to_b<int32_t,uint16_t>, false ));
+        ti->type("uint16")->addConstructor( newConstructor( &a_to_b<uint8_t,uint16_t>, true ));
+        ti->type("uint16")->addConstructor( newConstructor( &a_to_b<uint32_t,uint16_t>, false ));
+
+        ti->type("int16")->addConstructor( newConstructor( &a_to_b<uint8_t,int16_t>, true ));
+        ti->type("int16")->addConstructor( newConstructor( &a_to_b<uint16_t,int16_t>, false ));
+        ti->type("int16")->addConstructor( newConstructor( &a_to_b<uint32_t,int16_t>, false ));
+        ti->type("int16")->addConstructor( newConstructor( &a_to_b<int8_t,int16_t>, true ));
+        ti->type("int16")->addConstructor( newConstructor( &a_to_b<int32_t,int16_t>, false ));
+
+        // x to uint32_t
+        ti->type("uint32")->addConstructor( newConstructor( &a_to_b<int8_t,uint32_t>, false ));
+        ti->type("uint32")->addConstructor( newConstructor( &a_to_b<int16_t,uint32_t>, false ));
+        ti->type("uint32")->addConstructor( newConstructor( &a_to_b<int32_t,uint32_t>, true ));
+        ti->type("uint32")->addConstructor( newConstructor( &a_to_b<uint8_t,uint32_t>, true ));
+        ti->type("uint32")->addConstructor( newConstructor( &a_to_b<uint16_t,uint32_t>, true ));
+
+        ti->type("int32")->addConstructor( newConstructor( &a_to_b<uint8_t,int32_t>, true ));
+        ti->type("int32")->addConstructor( newConstructor( &a_to_b<uint16_t,int32_t>, true ));
+        ti->type("int32")->addConstructor( newConstructor( &a_to_b<uint32_t,int32_t>, true ));
+        ti->type("int32")->addConstructor( newConstructor( &a_to_b<int8_t,int32_t>, true ));
+        ti->type("int32")->addConstructor( newConstructor( &a_to_b<int16_t,int32_t>, true ));
+
+        ti->type("string")->addConstructor( newConstructor( string_ctor() ) );
+        return true; 
+    }
+};
 
 ORO_TYPEKIT_PLUGIN( ros_integration::ROSPrimitivesTypekitPlugin )
 
