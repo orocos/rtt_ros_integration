@@ -43,6 +43,6 @@ namespace ros_integration{
   void loadInt64Types(){
 
         RTT::types::Types()->addType( new types::StdTypeInfo<int64_t>("int64") );
-        RTT::types::Types()->addType( new types::StructTypeInfo< std::vector<int64_t> >("int64[]") );
+        RTT::types::Types()->addType( new types::SequenceTypeInfo< std::vector<int64_t> >("int64[]") );
   }
 }

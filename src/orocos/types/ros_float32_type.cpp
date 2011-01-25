@@ -43,6 +43,6 @@ namespace ros_integration{
   void loadFloat32Types(){
 
         RTT::types::Types()->addType( new types::StdTypeInfo<float>("float32") );
-        RTT::types::Types()->addType( new types::StructTypeInfo< std::vector<float> >("float32[]") );
+        RTT::types::Types()->addType( new types::SequenceTypeInfo< std::vector<float> >("float32[]") );
   }
 }

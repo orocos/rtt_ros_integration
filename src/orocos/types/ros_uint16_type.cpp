@@ -43,6 +43,6 @@ namespace ros_integration{
   void loadUInt16Types(){
 
         RTT::types::Types()->addType( new types::StdTypeInfo<uint16_t>("uint16") );
-        RTT::types::Types()->addType( new types::StructTypeInfo< std::vector<uint16_t> >("uint16[]") );
+        RTT::types::Types()->addType( new types::SequenceTypeInfo< std::vector<uint16_t> >("uint16[]") );
   }
 }
