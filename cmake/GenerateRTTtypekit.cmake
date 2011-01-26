@@ -48,6 +48,7 @@ macro(ros_generate_rtt_typekit package)
   #Get all .msg files
   rosbuild_get_msgs_external(${package} MSGS)
   
+  set(ROSPACKAGE ${package})
   foreach( FILE ${MSGS} )
     string(REGEX REPLACE "\(.+\).msg" "\\1" ROSMSGNAME ${FILE})
     
@@ -61,25 +62,34 @@ macro(ros_generate_rtt_typekit package)
     set(ROSMSGTRANSPORTS "${ROSMSGTRANSPORTS}         if(name == \"${ROSMSGTYPENAME}\")
               return ti->addProtocol(ORO_ROS_PROTOCOL_ID,new RosMsgTransporter<${ROSMSGTYPE}>());
 ")
+    set(ROSMSGTYPESHEADERS "${ROSMSGTYPESHEADERS}#include \"${ROSMSGNAME}_Types.hpp\"\n")
     
     
+    # TypeInfo object:
     configure_file( ${rtt_ros_integration_PACKAGE_PATH}/src/ros_msg_typekit_plugin.cpp.in 
       ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp @ONLY )
     
+    # Transport for ROS:
     configure_file( ${rtt_ros_integration_PACKAGE_PATH}/src/ros_msg_transport_plugin.cpp.in 
       ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_transport_plugin.cpp @ONLY )
+    
+    # Types.hpp helper for extern templates:
+    configure_file( ${rtt_ros_integration_PACKAGE_PATH}/src/msg_Types.hpp.in 
+      ${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/typekit/${ROSMSGNAME}_Types.hpp @ONLY )
     
     list(APPEND ROSMSG_TYPEKIT_PLUGINS ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp )
     list(APPEND ROSMSG_TRANSPORT_PLUGIN ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_transport_plugin.cpp )
     
   endforeach( FILE ${MSGS} )
   
-  set(ROSPACKAGE ${package})
   configure_file( ${rtt_ros_integration_PACKAGE_PATH}/src/ros_msg_typekit_package.cpp.in 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp @ONLY )
   
   configure_file( ${rtt_ros_integration_PACKAGE_PATH}/src/ros_msg_transport_package.cpp.in 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp @ONLY )
+  
+  configure_file( ${rtt_ros_integration_PACKAGE_PATH}/src/Types.hpp.in 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/typekit/Types.hpp @ONLY )
   
   orocos_typekit( rtt-ros-${package}-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
   orocos_typekit( rtt-ros-${package}-transport ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp )
