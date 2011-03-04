@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: orocos-rtt_tf
+Description: Orocos @PkgName@ Component
+Requires: rtt
+Version: 1.0.0
+
+Libs: -L${libdir} -L${libdir}/orocos -l${libdir}/orocos/librtt_tf-@OROCOS_TARGET@.so
+Libs.private:
+Cflags: -I${includedir}
