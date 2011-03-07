@@ -56,6 +56,9 @@ orocos_component(rtt_tf rtt_tf-component.hpp rtt_tf-component.cpp) # ...you may 
 #
 # You may only have *ONE* orocos_typegen_headers statement !
 
+rosbuild_include(rtt_ros_integration GenerateRTTtypekit)
+
+ros_generate_rtt_typekit(tf)
 
 #
 # Building a normal library (optional):
