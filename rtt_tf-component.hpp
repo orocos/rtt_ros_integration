@@ -19,7 +19,7 @@ class RTT_TF: public RTT::TaskContext
 
     RTT::InputPort<tf::tfMessage> port_tf_in;
 
-    tf::Transform lookupTransform(const std::string& parent,
+    geometry_msgs::TransformStamped lookupTransform(const std::string& parent,
             const std::string& child);
 
 public:

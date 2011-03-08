@@ -134,12 +134,16 @@ void RTT_TF::updateHook()
     }
 }
 
-tf::Transform RTT_TF::lookupTransform(const std::string& target,
+geometry_msgs::TransformStamped RTT_TF::lookupTransform(const std::string& target,
         const std::string& source)
 {
     tf::StampedTransform stamped_tf;
-    m_transformer->lookupTransform(target, source, ros::Time::now(), stamped_tf);
-    return stamped_tf;
+    ros::Time common_time;
+    m_transformer->getLatestCommonTime(source, target, common_time,NULL);
+    m_transformer->lookupTransform(target, source, common_time, stamped_tf);
+    geometry_msgs::TransformStamped msg;
+    tf::transformStampedTFToMsg(stamped_tf,msg);
+    return msg;
 }
 
 }//namespace
