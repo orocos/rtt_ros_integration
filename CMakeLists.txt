@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 2.4.6)
+
+project(rtt_ros_integration)
+
 include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Set the build type.  Options are:
@@ -42,3 +45,5 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_string_type.cpp )
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
+
+orocos_generate_package()
