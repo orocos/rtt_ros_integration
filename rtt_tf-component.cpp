@@ -127,7 +127,7 @@ void RTT_TF::updateHook()
             }
         }
 
-    } catch (std::runtime_error& ex)
+    } catch (std::exception& ex)
     {
         log(Error) << ex.what() << endlog();
     }
