@@ -86,7 +86,9 @@ bool RTT_TF::configureHook()
 void RTT_TF::updateHook()
 {
     Logger::In(this->getName());
+#ifndef NDEBUG
     log(Debug) << "In update" << endlog();
+#endif
     try
     {
         tf::tfMessage msg_in;
@@ -113,9 +115,6 @@ void RTT_TF::updateHook()
                     {
                         authority = it->second;
                     }
-                    log(Debug) << "Setting transform from "
-                            << msg_in.transforms[i].child_frame_id << " to "
-                            << msg_in.transforms[i].header.frame_id << endlog();
                     m_transformer->setTransform(trans, authority);
                 } catch (TransformException& ex)
                 {
