@@ -42,19 +42,10 @@ include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 # Creates a component library librtt_tf-<target>.so
 # and installs in the directory lib/orocos/rtt_tf/
 #
-orocos_component(rtt_tf rtt_tf-component.hpp rtt_tf-component.cpp) # ...you may add multiple source files
+orocos_component(rtt_tf rtt_tf-component.cpp) # ...you may add multiple source files
 #
 # You may add multiple orocos_component statements.
 
-#
-# Building a typekit (recommended):
-#
-# Creates a typekit library librtt_tf-types-<target>.so
-# and installs in the directory lib/orocos/rtt_tf/types/
-#
-#orocos_typegen_headers(rtt_tf-types.hpp) # ...you may add multiple header files
-#
-# You may only have *ONE* orocos_typegen_headers statement !
 
 rosbuild_include(rtt_ros_integration GenerateRTTtypekit)
 
