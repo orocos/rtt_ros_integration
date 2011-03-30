@@ -27,7 +27,7 @@ public:
 
     bool configureHook();
 
-    bool startHook(){};
+    bool startHook(){return true;};
 
     void updateHook();
 
