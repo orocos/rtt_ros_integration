@@ -52,12 +52,13 @@ macro(ros_generate_rtt_typekit package)
     string(REGEX REPLACE "\(.+\).msg" "\\1" ROSMSGNAME ${FILE})
     
     set(ROSMSGTYPE "${package}::${ROSMSGNAME}")
+    set(ROSMSGTYPENAME "/${package}/${ROSMSGNAME}")
     set(ROSMSGBOOSTHEADER "${package}/boost/${ROSMSGNAME}.h")
     set(ROSMSGBOOSTHEADERS "${ROSMSGBOOSTHEADERS}#include <${package}/${ROSMSGNAME}.h>\n")
     set(ROSMSGTYPES       "${ROSMSGTYPES}        rtt_ros_addType_${ROSMSGNAME}(); // factory function for adding TypeInfo.\n")
     set(ROSMSGTYPEDECL "${ROSMSGTYPEDECL}        void rtt_ros_addType_${ROSMSGNAME}();\n")
-    set(ROSMSGTYPELINE "        void rtt_ros_addType_${ROSMSGNAME}() { RTT::types::Types()->addType( new types::StructTypeInfo<${ROSMSGTYPE}>(\"${ROSMSGNAME}\") ); RTT::types::Types()->addType( new types::SequenceTypeInfo<std::vector<${ROSMSGTYPE}> >(\"${ROSMSGNAME}[]\") ); }\n")
-    set(ROSMSGTRANSPORTS "${ROSMSGTRANSPORTS}         if(name == \"${ROSMSGNAME}\")
+    set(ROSMSGTYPELINE "        void rtt_ros_addType_${ROSMSGNAME}() { RTT::types::Types()->addType( new types::StructTypeInfo<${ROSMSGTYPE}>(\"${ROSMSGTYPENAME}\") ); RTT::types::Types()->addType( new types::SequenceTypeInfo<std::vector<${ROSMSGTYPE}> >(\"${ROSMSGTYPENAME}[]\") ); }\n")
+    set(ROSMSGTRANSPORTS "${ROSMSGTRANSPORTS}         if(name == \"${ROSMSGTYPENAME}\")
               return ti->addProtocol(ORO_ROS_PROTOCOL_ID,new RosMsgTransporter<${ROSMSGTYPE}>());
 ")
     
@@ -82,7 +83,6 @@ macro(ros_generate_rtt_typekit package)
   
   orocos_typekit( rtt-ros-${package}-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
   orocos_typekit( rtt-ros-${package}-transport ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp )
-  target_link_libraries(rtt-ros-${package}-transport rtt_ros_integration-${OROCOS_TARGET})
 
   set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp")
   

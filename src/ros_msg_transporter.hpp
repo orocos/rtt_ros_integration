@@ -157,7 +157,8 @@ namespace ros_integration {
     ros::NodeHandle ros_node;
     ros::Subscriber ros_sub;
     bool newdata,init;
-    T m_msg;
+    base::DataObjectLockFree<T> m_msg;
+    
   public:
     /** 
      * Contructor of to create ROS subscriber ChannelElement, it will
@@ -188,7 +189,7 @@ namespace ros_integration {
      * @param msg The received message
      */
     void newData(const T& msg){
-      m_msg = msg;
+      m_msg.Set(msg);
       newdata=true;
       init=true;
       this->signal();
@@ -203,9 +204,9 @@ namespace ros_integration {
      */
     FlowStatus read(typename base::ChannelElement<T>::reference_t sample)
     {
-      if(!init)
-	return NoData;
-      sample=m_msg;
+        if(!init)
+            return NoData;
+        sample=m_msg.Get();
       
       if(newdata){
 	newdata=false;
