@@ -145,7 +145,7 @@ namespace ros_integration {
       typename base::ChannelElement<T>::value_t sample; // XXX: real-time !
       // this read should always succeed since signal() means 'data available in a data element'.
       typename base::ChannelElement<T>::shared_ptr input = this->getInput();
-      if( input && (input->read(sample) == NewData) )
+      if( input && (input->read(sample,true) == NewData) )
           ros_pub.publish(sample);
     }
     
@@ -202,24 +202,26 @@ namespace ros_integration {
      * 
      * @return FlowStatus for the port
      */
-    FlowStatus read(typename base::ChannelElement<T>::reference_t sample)
+    FlowStatus read(typename base::ChannelElement<T>::reference_t sample, bool copy_old_data)
     {
-        if(!init)
-            return NoData;
-        sample=m_msg.Get();
-      
+      if(!init)
+        return NoData;
+
       if(newdata){
-	newdata=false;
-	return NewData;
+        newdata=false;
+        sample=m_msg.Get();
+        return NewData;
       }
       else
-	return OldData;
+        if(copy_old_data)
+          sample=m_msg.Get();
+        return OldData;
     }
   };
-    
+
   template <class T>
   class RosMsgTransporter : public RTT::types::TypeTransporter{
-    virtual base::ChannelElementBase * createStream (base::PortInterface *port, const ConnPolicy &policy, bool is_sender) const{
+    virtual base::ChannelElementBase::shared_ptr createStream (base::PortInterface *port, const ConnPolicy &policy, bool is_sender) const{
       if(is_sender){
 	base::ChannelElementBase* buf = internal::ConnFactory::buildDataStorage<T>(policy);
 	base::ChannelElementBase::shared_ptr tmp = base::ChannelElementBase::shared_ptr(new RosPubChannelElement<T>(port,policy));
