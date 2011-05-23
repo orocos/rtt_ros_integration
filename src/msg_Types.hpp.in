@@ -8,18 +8,20 @@
 
 // All these classes were generated in the typekit library:
 #ifdef CORELIB_DATASOURCE_HPP
+    extern template class RTT::internal::DataSourceTypeInfo< @ROSMSGTYPE@ >;
     extern template class RTT::internal::DataSource< @ROSMSGTYPE@ >;
     extern template class RTT::internal::AssignableDataSource< @ROSMSGTYPE@ >;
+    extern template class RTT::internal::AssignCommand< @ROSMSGTYPE@ >;
 #endif
 #ifdef ORO_CORELIB_DATASOURCES_HPP
     extern template class RTT::internal::ValueDataSource< @ROSMSGTYPE@ >;
     extern template class RTT::internal::ConstantDataSource< @ROSMSGTYPE@ >;
     extern template class RTT::internal::ReferenceDataSource< @ROSMSGTYPE@ >;
 #endif
-#ifdef ORO_INPUT_PORT_HPP
+#ifdef ORO_OUTPUT_PORT_HPP
     extern template class RTT::OutputPort< @ROSMSGTYPE@ >;
 #endif
-#ifdef ORO_OUTPUT_PORT_HPP
+#ifdef ORO_INPUT_PORT_HPP
     extern template class RTT::InputPort< @ROSMSGTYPE@ >;
 #endif
 #ifdef ORO_PROPERTY_HPP
