@@ -8,9 +8,8 @@ else()
   include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
   add_definitions( -DRTT_COMPONENT )
 endif()
-if (NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE MinSizeRel)
-endif(NOT CMAKE_BUILD_TYPE)
+set(ROS_BUILD_TYPE MinSizeRel)
+set(CMAKE_BUILD_TYPE MinSizeRel)
 include(AddFileDependencies)
 
 macro(rosbuild_get_msgs_external package msgs)
@@ -57,7 +56,7 @@ macro(ros_generate_rtt_typekit package)
     set(ROSMSGTRANSPORTS "${ROSMSGTRANSPORTS}         if(name == \"${ROSMSGTYPENAME}\")
               return ti->addProtocol(ORO_ROS_PROTOCOL_ID,new RosMsgTransporter<${ROSMSGTYPE}>());
 ")
-    set(ROSMSGTYPESHEADERS "${ROSMSGTYPESHEADERS}#include \"${ROSMSGNAME}_Types.hpp\"\n")
+    set(ROSMSGTYPESHEADERS "${ROSMSGTYPESHEADERS}#include \"${ROSMSGNAME}.hpp\"\n")
 
     # Necessary for create_boost_headers.py command below
     list(APPEND ROSMSGS_GENERATED_BOOST_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/${ROSMSGBOOSTHEADER}")
@@ -72,7 +71,7 @@ macro(ros_generate_rtt_typekit package)
     
     # Types.hpp helper for extern templates:
     configure_file( ${rtt_ros_integration_PACKAGE_PATH}/src/msg_Types.hpp.in 
-      ${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/typekit/${ROSMSGNAME}_Types.hpp @ONLY )
+      ${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/typekit/${ROSMSGNAME}.hpp @ONLY )
     
     list(APPEND ROSMSG_TYPEKIT_PLUGINS ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp )
     list(APPEND ROSMSG_TRANSPORT_PLUGIN ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_transport_plugin.cpp )
@@ -83,7 +82,6 @@ macro(ros_generate_rtt_typekit package)
   add_custom_command(OUTPUT ${ROSMSGS_GENERATED_BOOST_HEADERS} COMMAND ${rtt_ros_integration_PACKAGE_PATH}/scripts/create_boost_headers.py ${package}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} DEPENDS ${MSGS} VERBATIM)
   #set_source_files_properties(${ROSMSGS_GENERATED_BOOST_HEADERS} PROPERTIES GENERATED TRUE)
-  message( "boost headers: ${ROSMSGS_GENERATED_BOOST_HEADERS}" )
 
   configure_file( ${rtt_ros_integration_PACKAGE_PATH}/src/ros_msg_typekit_package.cpp.in 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp @ONLY )
@@ -98,7 +96,11 @@ macro(ros_generate_rtt_typekit package)
   orocos_typekit( rtt-ros-${package}-transport ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp )
   add_file_dependencies( ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
   add_file_dependencies( ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
-  
+  if (CMAKE_COMPILER_IS_GNUCXX)
+    set_target_properties( rtt-ros-${package}-typekit PROPERTIES COMPILE_FLAGS "-fvisibility=hidden" )
+    set_target_properties( rtt-ros-${package}-transport PROPERTIES COMPILE_FLAGS "-fvisibility=hidden" )
+  endif()
+
   set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp;${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/boost")
 
   orocos_generate_package()
