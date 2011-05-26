@@ -34,6 +34,9 @@
 *                                                                             *
 *******************************************************************************/
 
+#ifndef ROS_PRIMITIVES_TYPEKIT_PLUGIN_HPP
+#define ROS_PRIMITIVES_TYPEKIT_PLUGIN_HPP
+
 #include <ros/time.h>
 #include <rtt/types/TypekitPlugin.hpp>
 #include <rtt/typekit/StdTypeInfo.hpp>
@@ -58,3 +61,4 @@ namespace ros_integration {
       virtual bool loadOperators();
   };
 }
+#endif
