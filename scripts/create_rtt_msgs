@@ -1,0 +1,64 @@
+#!/bin/bash
+
+function help
+{
+    echo
+    echo "Creates an Orocos typekit package from a ROS msgs package."
+    echo " Usage: $(basename $0) [-f] ros_msgs_package_name "
+    echo
+    echo "Example:"
+    echo " $(basename $0) std_msgs "
+    echo "   Creates the rtt_std_msgs package derived from the ROS std_msgs package."
+    echo
+}
+
+if [ x$1 = x ]; then
+    help
+    exit 1
+fi
+
+cwd="$(pwd)"
+abspath=$(dirname "$(cd "${0%/*}" 2>/dev/null; echo "$PWD"/"${0##*/}")")
+
+# Parse arguments
+force=
+for arg in $*; do
+    case "$arg" in
+	-f)
+	    force=-p
+	    ;;
+	-h|--help)
+	    help
+	    exit 1
+	    ;;
+	*)
+	    pkglist="$pkglist $arg"
+	    ;;
+    esac
+done
+
+# Locate the template directory.
+templatedir="$(rospack find rtt_ros_integration)/scripts/rtt_msgs"
+
+# final check:
+if [ ! -d "$templatedir" ]; then
+    echo "Could not find templates at $templatedir !"
+    exit 1
+else
+    echo "Using templates at $templatedir..."
+fi
+
+
+for pkgname in $pkglist; do
+    mkdir $force rtt_$pkgname || { echo "Package already exists, use -f to force creation." ; exit 1; }
+    
+    # process template files:
+    files="$(find $templatedir -maxdepth 1 -type f)"
+    allcappkgname=$(echo $pkgname | tr [:lower:] [:upper:])
+    cappkgname=$(echo $allcappkgname | cut -c1)$(echo $pkgname | cut -c2-)
+    for i in $files; do
+	tgtname=$(echo $(basename "$i") | sed -e "s/pkgname/$pkgname/g;s/Pkgname/$cappkgname/g;")
+	cat "$i" | sed -e "s/@PKGNAME@/$allcappkgname/g;s/@pkgname@/$pkgname/g;s/@Pkgname@/$cappkgname/g;" > rtt_$pkgname/$tgtname
+    done
+
+done
