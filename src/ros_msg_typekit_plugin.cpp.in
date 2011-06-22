@@ -4,6 +4,21 @@
 #include <rtt/types/SequenceTypeInfo.hpp>
 #include <vector>
 
+// Note: we need to put these up-front or we get gcc compiler warnings:
+// <<warning: type attributes ignored after type is already defined>>        
+template class RTT_EXPORT RTT::internal::DataSourceTypeInfo< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::internal::DataSource< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::internal::AssignableDataSource< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::internal::AssignCommand< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::internal::ValueDataSource< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::internal::ConstantDataSource< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::internal::ReferenceDataSource< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::OutputPort< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::InputPort< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::Property< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::Attribute< @ROSMSGTYPE@ >;
+template class RTT_EXPORT RTT::Constant< @ROSMSGTYPE@ >;
+
 namespace ros_integration {
   using namespace RTT;
     // Factory function

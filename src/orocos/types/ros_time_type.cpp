@@ -36,11 +36,18 @@
 
 #include "ros_primitives_typekit_plugin.hpp"
 
+namespace RTT{
+  std::istream& operator>>(std::istream& os, ros::Time& t)
+  {
+    return os;
+  }
+}
+
 namespace ros_integration{
     using namespace RTT;
     using namespace RTT::types;
 
   void loadTimeTypes(){
-	     RTT::types::Types()->addType( new types::TemplateTypeInfo<ros::Time>("time") );
+	     RTT::types::Types()->addType( new types::TemplateTypeInfo<ros::Time,true>("time") );
   }
 }
