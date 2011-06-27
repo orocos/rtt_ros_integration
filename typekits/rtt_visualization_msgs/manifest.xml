@@ -21,6 +21,8 @@
   <url>http://ros.org/wiki/rtt_rosnode</url>
   <depend package="rtt_rosnode"/>
   <depend package="visualization_msgs"/>
+  <depend package="rtt_geometry_msgs"/>
+  <depend package="rtt_std_msgs"/>
 
   <export>
     <cpp cflags="-I${prefix}/include"/>

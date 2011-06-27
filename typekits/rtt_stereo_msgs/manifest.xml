@@ -21,6 +21,7 @@
   <url>http://ros.org/wiki/rtt_rosnode</url>
   <depend package="rtt_rosnode"/>
   <depend package="stereo_msgs"/>
+  <depend package="rtt_sensor_msgs"/>
 
   <export>
     <cpp cflags="-I${prefix}/include"/>
