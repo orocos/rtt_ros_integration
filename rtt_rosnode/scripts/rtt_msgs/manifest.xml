@@ -18,8 +18,8 @@
   <author>create_rtt_msgs Generator</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/rtt_ros_integration</url>
-  <depend package="rtt_ros_integration"/>
+  <url>http://ros.org/wiki/rtt_rosnode</url>
+  <depend package="rtt_rosnode"/>
   <depend package="@pkgname@"/>
 
   <export>

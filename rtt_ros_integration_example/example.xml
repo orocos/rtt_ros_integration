@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "cpf.dtd">
+<properties>
+<simple name="Import" type="string"><value>rtt_ros_integration_example</value></simple>
+
+<struct name="ROSConFloatOut" type="ConnPolicy">
+  <simple name="type" type="short"><value>0</value></simple><!-- type of connection: 0 means Data -->
+  <simple name="size" type="short"><value>1</value></simple><!-- buffer size -->
+  <simple name="transport" type="short"><value>3</value></simple><!--3 means ROS-->
+  <simple name="name_id" type="string"><value>float_rtt</value></simple><!-- topic name -->
+</struct>
+
+<struct name="ROSConFloatIn" type="ConnPolicy">
+  <simple name="type" type="short"><value>0</value></simple><!-- type of connection: 0 means Data -->
+  <simple name="size" type="short"><value>1</value></simple><!-- buffer size -->
+  <simple name="transport" type="short"><value>3</value></simple><!--3 means ROS-->
+  <simple name="name_id" type="string"><value>float_ros</value></simple><!-- topic name -->
+</struct>
+
+<struct name="ROSConStringOut" type="ConnPolicy">
+  <simple name="type" type="short"><value>0</value></simple><!-- type of connection: 0 means Data -->
+  <simple name="size" type="short"><value>1</value></simple><!-- buffer size -->
+  <simple name="transport" type="short"><value>3</value></simple><!--3 means ROS-->
+  <simple name="name_id" type="string"><value>string_rtt</value></simple><!-- topic name -->
+</struct>
+<struct name="ROSConStringIn" type="ConnPolicy">
+  <simple name="type" type="short"><value>0</value></simple><!-- type of connection: 0 means Data -->
+  <simple name="size" type="short"><value>1</value></simple><!-- buffer size -->
+  <simple name="transport" type="short"><value>3</value></simple><!--3 means ROS-->
+  <simple name="name_id" type="string"><value>string_ros</value></simple><!-- topic name -->
+</struct>
+
+
+<struct name="HelloRobot" type="HelloRobot">
+  <struct name="Activity" type="PeriodicActivity">
+    <simple name="Period" type="double"><value>1</value></simple>
+    <simple name="Priority" type="short"><value>0</value></simple>
+    <simple name="Scheduler" type="string"><value>ORO_SCHED_RT</value></simple>
+  </struct>
+  <simple name="AutoConf" type="boolean"><value>1</value></simple>
+  <simple name="AutoStart" type="boolean"><value>1</value></simple>
+  <struct name="Ports" type="PropertyBag">
+    <simple name="float_out" type="string"><value> ROSConFloatOut </value></simple>
+    <simple name="string_out" type="string"><value> ROSConStringOut </value></simple>
+    <simple name="float_in" type="string"><value> ROSConFloatIn </value></simple>
+    <simple name="string_in" type="string"><value> ROSConStringIn </value></simple>
+  </struct>
+  <simple name="Service" type="string"><value>rosparam</value></simple>
+</struct>
+
+
+</properties>

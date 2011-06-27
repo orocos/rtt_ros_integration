@@ -1,13 +1,13 @@
 <package>
-  <description brief="rtt_ros_integration">
+  <description brief="rtt_rosnode">
 
-     rtt_ros_integration provides an RTT plugin to add a ROS node to the RTT process, and the necessary template files and cmake macros for automatic rtt typekit and transport generation from ROS msg files
+     rtt_rosnode provides an RTT plugin to add a ROS node to the RTT process, and the necessary template files and cmake macros for automatic rtt typekit and transport generation from ROS msg files
 
   </description>
   <author>Ruben Smits, ruben.smits@mech.kuleuven.be</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/rtt_ros_integration</url>
+  <url>http://ros.org/wiki/rtt_rosnode</url>
   <depend package="roscpp"/>
   <depend package="rtt"/>
   <depend package="ocl"/>

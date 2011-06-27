@@ -38,7 +38,7 @@ for arg in $*; do
 done
 
 # Locate the template directory.
-templatedir="$(rospack find rtt_ros_integration)/scripts/rtt_msgs"
+templatedir="$(rospack find rtt_rosnode)/scripts/rtt_msgs"
 
 # final check:
 if [ ! -d "$templatedir" ]; then

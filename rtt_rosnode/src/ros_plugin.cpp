@@ -33,6 +33,9 @@
 #include <rtt/os/startstop.h>
 #include <ros/ros.h>
 
+void loadROSTopicService();
+void loadROSPackService();
+
 using namespace RTT;
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
@@ -52,6 +55,9 @@ extern "C" {
     static ros::AsyncSpinner spinner(1); // Use 1 threads
     spinner.start();
     log(Info)<<"ROS node spinner started"<<endlog();
+
+    loadROSTopicService();
+    loadROSPackService();
     return true;
   }
   std::string getRTTPluginName (){

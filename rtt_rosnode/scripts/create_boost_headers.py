@@ -2,7 +2,7 @@
 import sys
 
 import roslib
-roslib.load_manifest("rtt_ros_integration");
+roslib.load_manifest("rtt_rosnode");
 
 import roscpp
 import roscpp.msg_gen 

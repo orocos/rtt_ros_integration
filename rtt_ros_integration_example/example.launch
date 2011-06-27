@@ -1,0 +1,3 @@
+<launch>
+<node name="Example" pkg="ocl" type="deployer-gnulinux" args="-s $(find rtt_ros_integration_example)/example.xml -linfo --" output="screen"/>
+</launch>
