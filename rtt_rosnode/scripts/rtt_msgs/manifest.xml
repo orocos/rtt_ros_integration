@@ -1,6 +1,6 @@
 <package>
   <description brief="rtt_@pkgname@">
-    
+
     Provides an rtt typekit for ROS @pkgname@ messages.
 
     It allows you to use ROS messages transparently in
@@ -13,7 +13,7 @@
 		See the http://ros.org/wiki/@pkgname@ documentation
 		for the documentation of the ROS messages in this
 		typekit.
-    
+
   </description>
   <author>create_rtt_msgs Generator</author>
   <license>BSD</license>
