@@ -17,7 +17,7 @@ rosbuild_find_ros_package(rtt )
 rosbuild_find_ros_package( ocl )
 set( RTT_HINTS HINTS ${rtt_PACKAGE_PATH}/install )
 set( OCL_HINTS HINTS ${ocl_PACKAGE_PATH}/install )
-find_package(Orocos-RTT REQUIRED ${RTT_HINTS})
+find_package(OROCOS-RTT REQUIRED ${RTT_HINTS})
 list(APPEND CMAKE_MODULE_PATH ${ocl_PACKAGE_PATH}/config)
 find_package(RTTPlugin REQUIRED rtt-marshalling)
 
