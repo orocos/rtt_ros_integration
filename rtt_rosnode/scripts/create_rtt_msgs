@@ -32,10 +32,23 @@ for arg in $*; do
 	    exit 1
 	    ;;
 	*)
-	    pkglist="$pkglist $arg"
+	    if [ -n "$pkgname" ]; then
+		echo "ERROR: '$arg': please provide only one ros package name."
+		exit 1;
+	    fi
+	    if [ -z "$(rospack find $arg)" ]; then
+		echo "ERROR: could not find ros package '$arg'"
+		exit 1;
+	    fi
+	    if [[ $arg =~ rtt_.* ]]; then
+		echo "ERROR: You're giving a package name that starts with 'rtt_'. Use the ROS/non-RTT package name instead."
+		exit 1;
+	    fi
+	    pkgname="$arg"
 	    ;;
     esac
 done
+
 
 # Locate the template directory.
 templatedir="$(rospack find rtt_rosnode)/scripts/rtt_msgs"
@@ -48,8 +61,14 @@ else
     echo "Using templates at $templatedir..."
 fi
 
+for dep in $(rospack depends $pkgname | grep "_msgs$"); do
+    if [ -z "$(rospack find -q rtt_$dep)" ]; then
+	echo "WARNING: The package 'rtt_$dep' does not exist yet, however, 'rtt_$pkgname' will depend on it !"
+	echo "         Use '$(basename $0) $dep' to create this missing package..."
+    fi
+    deplist="$deplist  <depend package=\"rtt_$dep\"/>\n"
+done
 
-for pkgname in $pkglist; do
     mkdir $force rtt_$pkgname || { echo "Package already exists, use -f to force creation." ; exit 1; }
     
     # process template files:
@@ -58,7 +77,7 @@ for pkgname in $pkglist; do
     cappkgname=$(echo $allcappkgname | cut -c1)$(echo $pkgname | cut -c2-)
     for i in $files; do
 	tgtname=$(echo $(basename "$i") | sed -e "s/pkgname/$pkgname/g;s/Pkgname/$cappkgname/g;")
-	cat "$i" | sed -e "s/@PKGNAME@/$allcappkgname/g;s/@pkgname@/$pkgname/g;s/@Pkgname@/$cappkgname/g;" > rtt_$pkgname/$tgtname
+	cat "$i" | sed -e "s/@PKGNAME@/$allcappkgname/g;s/@pkgname@/$pkgname/g;s/@Pkgname@/$cappkgname/g;s|@deplist@|$deplist|g" > rtt_$pkgname/$tgtname
     done
 
-done
+echo "Successfully created rtt_$pkgname."
