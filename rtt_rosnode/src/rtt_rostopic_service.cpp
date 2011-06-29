@@ -17,7 +17,7 @@ public:
      * @param owner The owner or null in case of global.
      */
     ROSTopicService(TaskContext* owner) 
-        : Service("ros", owner),
+        : Service("rostopic", owner),
           protocol_id(ORO_ROS_PROTOCOL_ID)
     {
         // stream("Simulation.ctrl", ros.topic("/cmd_vel") )
