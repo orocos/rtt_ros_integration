@@ -12,4 +12,6 @@
   <depend stack="ros_comm" />
   <depend stack="common_msgs" />
   <depend stack="geometry" />
+  <depend stack="orocos_toolchain" />
+  <depend stack="rtt_ros_integration" />
 </stack>
