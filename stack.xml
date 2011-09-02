@@ -1,11 +1,9 @@
 <stack>
-  <description brief="orocos_toolchain_ros">
+  <description brief="rtt_ros_integration">
 
-      This stack contains all software necessary to build
-      systems using both Orocos and ROS infrastructures. The complete
-      <a href="http://www.orocos.org/toolchain">Orocos Toolchain</a> is integrated in the ROS build system and the
-      rtt_rosnode package allows easy communication between Orocos components
-      and ROS nodes.
+      This stack contains all software necessary to build systems using both Orocos and ROS infrastructures.
+      It depends on the <a href="http://www.orocos.org/toolchain">Orocos Toolchain</a>.
+      The rtt_rosnode package allows easy communication between Orocos components and ROS nodes.
   
   </description>
   <author>Maintained by Ruben Smits - Steven Bellens</author>
@@ -16,4 +14,5 @@
   <depend stack="ros_comm" />
   <depend stack="common_msgs" />
   <depend stack="geometry" />
+  <depend stack="orocos_toolchain" />
 </stack>
