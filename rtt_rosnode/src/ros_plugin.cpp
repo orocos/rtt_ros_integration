@@ -33,7 +33,7 @@
 #include <rtt/os/startstop.h>
 #include <ros/ros.h>
 
-void loadROSTopicService();
+void loadROSService();
 void loadROSPackService();
 
 using namespace RTT;
@@ -56,7 +56,7 @@ extern "C" {
     spinner.start();
     log(Info)<<"ROS node spinner started"<<endlog();
 
-    loadROSTopicService();
+    loadROSService();
     loadROSPackService();
     return true;
   }

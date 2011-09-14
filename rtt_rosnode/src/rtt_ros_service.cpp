@@ -9,20 +9,21 @@ using namespace std;
 /**
  * The globally loadable ROS service.
  */
-class ROSTopicService : public RTT::Service {
+class ROSService : public RTT::Service {
 public:
     int protocol_id;
     /**
      * Instantiates this service.
      * @param owner The owner or null in case of global.
      */
-    ROSTopicService(TaskContext* owner) 
-        : Service("rostopic", owner),
+    ROSService(TaskContext* owner) 
+        : Service("ros", owner),
           protocol_id(ORO_ROS_PROTOCOL_ID)
     {
+        this->doc("The main ROS helper service for RTT. See also the 'rosparam' service which can be added to a component and the 'rospack' global service for finding ros packages.");
         // stream("Simulation.ctrl", ros.topic("/cmd_vel") )
-        this->addOperation("topic", &ROSTopicService::topic, this).doc("Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last sample is kept.").arg("name", "The ros topic name");
-        this->addOperation("topicBuffer", &ROSTopicService::topicBuffer, this).doc("Creates a ConnPolicy for subscribing to or publishing a topic.").arg("name", "The ros topic name").arg("size","The size of the buffer.");
+        this->addOperation("topic", &ROSService::topic, this).doc("Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last sample is kept.").arg("name", "The ros topic name");
+        this->addOperation("topicBuffer", &ROSService::topicBuffer, this).doc("Creates a ConnPolicy for subscribing to or publishing a topic.").arg("name", "The ros topic name").arg("size","The size of the buffer.");
         this->addConstant("protocol_id", protocol_id );
     }
 
@@ -50,7 +51,7 @@ public:
     }
 };
 
-void loadROSTopicService(){
-  RTT::Service::shared_ptr rts(new ROSTopicService(0));
+void loadROSService(){
+  RTT::Service::shared_ptr rts(new ROSService(0));
   RTT::internal::GlobalService::Instance()->addService(rts);
 }
