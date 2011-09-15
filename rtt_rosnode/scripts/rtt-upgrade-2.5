@@ -1,0 +1,33 @@
+#!/bin/bash -e
+
+echo "Processing all ROS packages under $(pwd)..."
+
+stack=`find . -name stack.xml`
+manif=`find . -name manifest.xml`
+cmake=`find . -name CMakeLists.txt`
+
+if [ -z "$manif" ]; then echo "No manifest.xml files found!"; exit 1; fi
+
+echo "Renaming rtt_ros_integration to rtt_rosnode..."
+
+for i in `grep -l rtt_ros_integration $manif`; do echo "$i..."; sed -i $i -e"s/package=\"rtt_ros_integration\"/package=\"rtt_rosnode\"/g"; done
+
+for i in `grep -l rtt_ros_integration $manif`; do echo "$i..."; sed -i $i -e"s/package=\"rtt_ros_integration_/package=\"rtt_/g"; done
+
+if [ -n "$cmake" ]; then
+    for i in `grep -l rtt_ros_integration $cmake`; do echo "$i..."; sed -i $i -e"s/rtt_ros_integration/rtt_rosnode/g"; done
+fi
+
+if [ -n "$stack" ]; then
+    for i in `grep -l orocos_toolchain_ros $stack`; do echo "$i..."; sed -i $i -e"s/orocos_toolchain_ros/rtt_ros_integration/g"; done
+fi
+
+echo "Removing all lib/orocos dirs..."
+
+for i in `find . -type d -path "*/lib/orocos"`; do echo "Pruning $i..."; rm -rf $i; done
+
+done
+
+echo ">>>  Run 'rosmake --pre-clean' in a stack or package dir after you converted all your stacks and packages..."
+
+echo "All done (no errors)."
