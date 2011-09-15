@@ -56,7 +56,7 @@ macro(ros_generate_rtt_typekit package)
     set(ROSMSGTRANSPORTS "${ROSMSGTRANSPORTS}         if(name == \"${ROSMSGTYPENAME}\")
               return ti->addProtocol(ORO_ROS_PROTOCOL_ID,new RosMsgTransporter<${ROSMSGTYPE}>());
 ")
-    set(ROSMSGTYPESHEADERS "${ROSMSGTYPESHEADERS}#include \"${ROSMSGNAME}.hpp\"\n")
+    set(ROSMSGTYPESHEADERS "${ROSMSGTYPESHEADERS}#include \"${ROSMSGNAME}.h\"\n")
 
     # Necessary for create_boost_headers.py command below
     list(APPEND ROSMSGS_GENERATED_BOOST_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/${ROSMSGBOOSTHEADER}")
@@ -71,7 +71,7 @@ macro(ros_generate_rtt_typekit package)
     
     # Types.hpp helper for extern templates:
     configure_file( ${rtt_rosnode_PACKAGE_PATH}/src/msg_Types.hpp.in 
-      ${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/typekit/${ROSMSGNAME}.hpp @ONLY )
+      ${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/typekit/${ROSMSGNAME}.h @ONLY )
     
     list(APPEND ROSMSG_TYPEKIT_PLUGINS ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_typekit_plugin.cpp )
     list(APPEND ROSMSG_TRANSPORT_PLUGIN ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${ROSMSGNAME}_transport_plugin.cpp )
@@ -89,8 +89,11 @@ macro(ros_generate_rtt_typekit package)
   configure_file( ${rtt_rosnode_PACKAGE_PATH}/src/ros_msg_transport_package.cpp.in 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp @ONLY )
   
+  # Both are equivalent:
   configure_file( ${rtt_rosnode_PACKAGE_PATH}/src/Types.hpp.in 
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/typekit/Types.hpp @ONLY )
+  configure_file( ${rtt_rosnode_PACKAGE_PATH}/src/Types.h.in 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/typekit/Types.h @ONLY )
   
   orocos_typekit( rtt-${package}-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
   orocos_typekit( rtt-${package}-ros-transport ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp )
