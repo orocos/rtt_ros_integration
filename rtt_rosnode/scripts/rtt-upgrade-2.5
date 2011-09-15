@@ -6,6 +6,11 @@ stack=`find . -name stack.xml`
 manif=`find . -name manifest.xml`
 cmake=`find . -name CMakeLists.txt`
 
+if [ `rosversion -d` != electric ]; then
+    echo "Error: this script only works for electric. You are using: " `rosversion -d`
+    exit 1
+fi
+
 if [ -z "$manif" ]; then echo "No manifest.xml files found!"; exit 1; fi
 
 echo "Renaming rtt_ros_integration to rtt_rosnode..."
