@@ -4,7 +4,7 @@ import("rtt_ros_integration_example")
 loadComponent("HelloRobot","HelloRobot")
 
 # Give it a periodic activity
-setActivity("HelloRobot",1.0,HighestPriority,ORO_SCHED_RT)
+setActivity("HelloRobot",0.0,HighestPriority,ORO_SCHED_RT)
 
 # Create connections
 stream("HelloRobot.float_out", ros.topic("float_out"))
@@ -12,3 +12,8 @@ stream("HelloRobot.float_in", ros.topic("float_in"))
 stream("HelloRobot.string_out", ros.topic("string_out"))
 stream("HelloRobot.string_in", ros.topic("string_in"))
 
+# Configure the HelloRobot component
+HelloRobot.configure()
+
+# Start it
+HelloRobot.start()
