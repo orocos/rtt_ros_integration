@@ -32,13 +32,7 @@ endmacro(rosbuild_get_msgs_external)
 macro(ros_generate_rtt_typekit package)
 
   rosbuild_find_ros_package(rtt_rosnode)
-  rosbuild_find_ros_package(rtt )
-  find_package(OROCOS-RTT HINTS ${rtt_PACKAGE_PATH}/../install )
-  
-  # Defines the orocos_* cmake macros. See that file for additional
-  # documentation.
-  include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
-  
+
   #Get all .msg files
   rosbuild_get_msgs_external(${package} MSGS )
   
