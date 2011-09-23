@@ -100,8 +100,15 @@ function(ros_generate_rtt_typekit package)
   add_file_dependencies( ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
   add_file_dependencies( ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
   if (CMAKE_COMPILER_IS_GNUCXX)
-    set_target_properties( rtt-${package}-typekit PROPERTIES COMPILE_FLAGS "-fvisibility=hidden" )
-    set_target_properties( rtt-${package}-ros-transport PROPERTIES COMPILE_FLAGS "-fvisibility=hidden" )
+    #
+    # This fails on Ubuntu Lucid with gcc Ubuntu 4.4.3-4ubuntu5 and ld/binutils 2.20.1-system.20100303 and ld/binutils-gold 2.20.1-system.20100303) 1.9
+    # This works on Ubuntu Maverick with gcc Ubuntu/Linaro 4.4.4-14ubuntu5 and ld/binutils 2.20.51-system.20100908
+    # Main suspect is the compiler, but this has not been proven. We could enable this flag from gcc 4.5 on to be on the safe side.
+    #
+    # The failure is that a DataSource<T> of one .so can not be dynamic_cast'ed to a DataSource<T> of another .so
+    #
+    #set_target_properties( rtt-${package}-typekit PROPERTIES COMPILE_FLAGS "-fvisibility=hidden" )
+    #set_target_properties( rtt-${package}-ros-transport PROPERTIES COMPILE_FLAGS "-fvisibility=hidden" )
   endif()
 
   set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_typekit.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_${package}_transport.cpp;${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/boost")
