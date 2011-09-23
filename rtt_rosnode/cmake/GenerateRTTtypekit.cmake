@@ -12,7 +12,7 @@ set(ROS_BUILD_TYPE MinSizeRel)
 set(CMAKE_BUILD_TYPE MinSizeRel)
 include(AddFileDependencies)
 
-macro(rosbuild_get_msgs_external package msgs)
+function(rosbuild_get_msgs_external package msgs)
   rosbuild_find_ros_package(${package})
   
   file(GLOB _msg_files RELATIVE "${${package}_PACKAGE_PATH}/msg" "${${package}_PACKAGE_PATH}/msg/*.msg")
@@ -26,16 +26,22 @@ macro(rosbuild_get_msgs_external package msgs)
       list(APPEND ${msgs} "${${package}_PACKAGE_PATH}/msg/${_msg}")
     endif(${_msg} MATCHES "^[^\\.].*\\.msg$")
   endforeach(_msg)
-endmacro(rosbuild_get_msgs_external)
+endfunction(rosbuild_get_msgs_external)
 
 
-macro(ros_generate_rtt_typekit package)
+function(ros_generate_rtt_typekit package)
 
   rosbuild_find_ros_package(rtt_rosnode)
 
   #Get all .msg files
   rosbuild_get_msgs_external(${package} MSGS )
   
+  #Return if nothing to do:
+  if ( NOT MSGS )
+    message("ros_generate_rtt_typekit: could not find any .msg files in your package.")
+    return()
+  endif()
+
   set(ROSPACKAGE ${package})
   foreach( FILE ${MSGS} )
     string(REGEX REPLACE ".+/msg/\(.+\).msg" "\\1" ROSMSGNAME ${FILE})
@@ -102,5 +108,5 @@ macro(ros_generate_rtt_typekit package)
 
   orocos_generate_package()
   
-endmacro(ros_generate_rtt_typekit)
+endfunction(ros_generate_rtt_typekit)
 
