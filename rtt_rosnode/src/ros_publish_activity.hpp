@@ -30,7 +30,8 @@
 #define _ROS_MSG_ACTIVITY_HPP_
 
 #include <rtt/Activity.hpp>
-#include <rtt/internal/MWSRQueue.hpp>
+#include <rtt/os/Mutex.hpp>
+#include <rtt/os/MutexLock.hpp>
 #include <boost/shared_ptr.hpp>
 #include <rtt/Logger.hpp>
 
@@ -39,51 +40,101 @@
 namespace ros_integration{
   using namespace RTT;
   
+    /**
+     * The interface a channel element must implement in
+     * order to publish data to a ROS topic.
+     */
   struct RosPublisher
   {
   public:
-    virtual void publish()=0;
+      /**
+       * Publish all data in the channel to a ROS topic.
+       */
+      virtual void publish()=0;
   };
   
-  
-  class RosPublishActivity : public RTT::Activity{
+
+    /**
+     * A process wide thread that handles all publishing of
+     * ROS topics of the current process.
+     * There is no strong reason why only one publisher should
+     * exist, in later implementations, one publisher thread per
+     * channel may exist as well. See the usage recommendations
+     * for Instance() 
+     */
+  class RosPublishActivity : public RTT::Activity {
   public:
-    typedef boost::shared_ptr<RosPublishActivity> shared_ptr;
+      typedef boost::shared_ptr<RosPublishActivity> shared_ptr;
   private:
-    static shared_ptr ros_pub_act;
+      typedef boost::weak_ptr<RosPublishActivity> weak_ptr;
+      //! This pointer may not be refcounted since it would prevent cleanup.
+      static weak_ptr ros_pub_act;
     
-    internal::MWSRQueue<RosPublisher*> pending_queue;
+      //! A map keeping track of all publishers in the current
+      //! process. It must be guarded by the mutex since 
+      //! insertion/removal happens concurrently.
+      typedef std::map< RosPublisher*, bool> Publishers;
+      Publishers publishers;
+      os::Mutex map_lock;
 
     RosPublishActivity( const std::string& name)
-      : Activity(0, name),pending_queue(128)
+      : Activity(0, name)
     {
       Logger::In in("RosPublishActivity");
       log(Debug)<<"Creating RosPublishActivity"<<endlog();
     }
-    
+
     void loop(){
-        //Logger::In in("RosPublishActivity");
-        //log(Debug)<<"execute"<<endlog();
-        RosPublisher* chan;
-        while(pending_queue.dequeue(chan))
-            chan->publish();
+        os::MutexLock lock(map_lock);
+        for(Publishers::const_iterator it = publishers.begin(); it != publishers.end(); ++it)
+            if (it->second)
+                it->first->publish();
     }
     
   public:
-      
-      static RosPublishActivity::shared_ptr Instance() {
-          if ( !ros_pub_act ) {
-              ros_pub_act.reset(new RosPublishActivity("RosPublishActivity"));
-              ros_pub_act->start();
+
+      /**
+       * Returns the single instance of the RosPublisher. This function
+       * is not thread-safe when it creates the RosPublisher object.
+       * Therefor, it is advised to cache the object which Intance() returns
+       * such that, in the unlikely event that two publishers exist,
+       * you consistently keep using the same instance, which is fine then.
+       */
+      static shared_ptr Instance() {
+          shared_ptr ret = ros_pub_act.lock();
+          if ( !ret ) {
+              ret.reset(new RosPublishActivity("RosPublishActivity"));
+              ros_pub_act = ret;
+              ret->start();
           }
-          return ros_pub_act;
+          return ret;
       }
       
+      void addPublisher(RosPublisher* pub) {
+          os::MutexLock lock(map_lock);
+          publishers[pub] = false;
+      }
+
+      void removePublisher(RosPublisher* pub) {
+          os::MutexLock lock(map_lock);
+          publishers.erase(pub);
+      }
+    
+      /**
+       * Requests to publish the data of a given channel.
+       * Note that multiple calls to requestPublish may 
+       * cause only a single call to RosPublisher::publish().
+       */
       bool requestPublish(RosPublisher* chan){
-          //Logger::In in("RosPublishActivity");
-          //log(Debug)<<"Requesting publish"<<endlog();
-          bool retval = pending_queue.enqueue(chan);
-          return retval&&this->trigger();
+          // flag that data is available in a channel:
+          {
+              os::MutexLock lock(map_lock);
+              assert(publishers.find(chan) != publishers.end() );
+              publishers.find(chan)->second = true;
+          }
+          // trigger loop()
+          this->trigger();
+          return true;
       }
       ~RosPublishActivity() {
           Logger::In in("RosPublishActivity");
