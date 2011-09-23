@@ -12,7 +12,7 @@ set(ROS_BUILD_TYPE MinSizeRel)
 set(CMAKE_BUILD_TYPE MinSizeRel)
 include(AddFileDependencies)
 
-function(rosbuild_get_msgs_external package msgs)
+macro(rosbuild_get_msgs_external package msgs)
   rosbuild_find_ros_package(${package})
   
   file(GLOB _msg_files RELATIVE "${${package}_PACKAGE_PATH}/msg" "${${package}_PACKAGE_PATH}/msg/*.msg")
@@ -26,7 +26,7 @@ function(rosbuild_get_msgs_external package msgs)
       list(APPEND ${msgs} "${${package}_PACKAGE_PATH}/msg/${_msg}")
     endif(${_msg} MATCHES "^[^\\.].*\\.msg$")
   endforeach(_msg)
-endfunction(rosbuild_get_msgs_external)
+endmacro(rosbuild_get_msgs_external)
 
 
 function(ros_generate_rtt_typekit package)
@@ -37,8 +37,8 @@ function(ros_generate_rtt_typekit package)
   rosbuild_get_msgs_external(${package} MSGS )
   
   #Return if nothing to do:
-  if ( NOT MSGS )
-    message("ros_generate_rtt_typekit: could not find any .msg files in your package.")
+  if ( "${MSGS}" STREQUAL "" )
+    message("ros_generate_rtt_typekit: could not find any .msg files in the ${package} package.")
     return()
   endif()
 
