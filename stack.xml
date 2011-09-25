@@ -7,12 +7,13 @@
   
   </description>
   <author>Maintained by Ruben Smits - Steven Bellens</author>
-  <license>BSD,GPL + runtime exception,LGPL</license>  
+  <license>GPL,BSD,LGPL,GPL + runtime exception</license>  
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/orocos_toolchain_ros</url>
-  <depend stack="ros" />
-  <depend stack="ros_comm" />
-  <depend stack="common_msgs" />
-  <depend stack="geometry" />
-  <depend stack="orocos_toolchain" />
+  <url>http://ros.org/wiki/rtt_ros_integration</url>
+  <depend stack="common_msgs" /> <!-- geometry_msgs -->
+  <depend stack="geometry" /> <!-- tf -->
+  <depend stack="orocos_toolchain" /> <!-- rtt, ocl -->
+  <depend stack="ros" /> <!-- rosbuild -->
+  <depend stack="ros_comm" /> <!-- std_msgs, roscpp -->
+
 </stack>
