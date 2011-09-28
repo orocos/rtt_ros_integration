@@ -7,8 +7,8 @@
     <author>Ruben Smits, ruben.smits@mech.kuleuven.be</author>
     <depend package="rtt" />
     <depend package="tf" />
-    <depend package="rtt_ros_integration" />
-    <depend package="rtt_ros_integration_geometry_msgs" />
+    <depend package="rtt_rosnode" />
+    <depend package="rtt_geometry_msgs" />
     
 </package>
 
