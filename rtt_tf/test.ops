@@ -1,4 +1,0 @@
-import("rtt_tf")
-loadComponent("tf","rtt_tf::RTT_TF")
-tf.configure()
-tf.start()
