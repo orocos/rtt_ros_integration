@@ -10,6 +10,6 @@
   <url>http://ros.org/wiki/rtt_ros_integration_example</url>
   <depend package="rtt"/>
   <depend package="rtt_rosnode"/>
-  <depend package="rtt_std_msgs"/>
+  <depend package="std_msgs"/>
 
 </package>

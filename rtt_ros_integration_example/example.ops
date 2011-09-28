@@ -1,4 +1,5 @@
 import("rtt_ros_integration_example")
+import("rtt_std_msgs")
 
 # Load a HelloRobot component
 loadComponent("HelloRobot","HelloRobot")
