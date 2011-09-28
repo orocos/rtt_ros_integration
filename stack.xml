@@ -1,0 +1,14 @@
+<stack>
+  <description brief="rtt_geometry">rtt_geometry</description>
+  <author>Maintained by Ruben Smits</author>
+  <license>GPL,LGPL / BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rtt_geometry</url>
+  <depend stack="geometry" /> <!-- tf -->
+  <depend stack="orocos_kinematics_dynamics" /> <!-- orocos_kdl -->
+  <depend stack="orocos_toolchain" /> <!-- rtt, ocl -->
+  <depend stack="ros" />
+  <depend stack="rtt_common_msgs" /> <!-- rtt_geometry_msgs -->
+  <depend stack="rtt_ros_integration" /> <!-- rtt_rosnode -->
+
+</stack>
