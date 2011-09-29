@@ -42,5 +42,6 @@ namespace ros_integration{
 
   void loadStringTypes(){
         RTT::types::Types()->addType( new types::StdStringTypeInfo() );
+	RTT::types::Types()->addType( new types::SequenceTypeInfo< std::vector< std::string> >("string[]") );
   }
 }
