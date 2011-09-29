@@ -39,9 +39,11 @@
 
 #include <ros/time.h>
 #include <rtt/types/TypekitPlugin.hpp>
-#include <rtt/typekit/StdTypeInfo.hpp>
+#include <rtt/typekit/StdPrimitiveTypeInfo.hpp>
 #include <rtt/types/StructTypeInfo.hpp>
+#include <rtt/types/PrimitiveSequenceTypeInfo.hpp>
 #include <rtt/typekit/StdStringTypeInfo.hpp>
+#include <rtt/types/CArrayTypeInfo.hpp>
 #include <rtt/types/TemplateConstructor.hpp>
 
 namespace ros_integration {

@@ -42,7 +42,8 @@ namespace ros_integration{
 
   void loadFloat32Types(){
 
-        RTT::types::Types()->addType( new types::StdTypeInfo<float>("float32") );
-        RTT::types::Types()->addType( new types::SequenceTypeInfo< std::vector<float> >("float32[]") );
+        RTT::types::Types()->addType( new types::StdPrimitiveTypeInfo<float>("float32") );
+        RTT::types::Types()->addType( new types::PrimitiveSequenceTypeInfo< std::vector<float> >("float32[]") );
+        RTT::types::Types()->addType( new types::CArrayTypeInfo< RTT::types::carray<float> >("cfloat32[]") );
   }
 }

@@ -1,7 +1,8 @@
 #include <@ROSMSGBOOSTHEADER@>
 #include <rtt/types/TypekitPlugin.hpp>
 #include <rtt/types/StructTypeInfo.hpp>
-#include <rtt/types/SequenceTypeInfo.hpp>
+#include <rtt/types/PrimitiveSequenceTypeInfo.hpp>
+#include <rtt/types/CArrayTypeInfo.hpp>
 #include <vector>
 
 // Note: we need to put these up-front or we get gcc compiler warnings:

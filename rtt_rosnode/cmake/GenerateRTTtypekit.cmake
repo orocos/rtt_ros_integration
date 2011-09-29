@@ -48,11 +48,18 @@ function(ros_generate_rtt_typekit package)
     
     set(ROSMSGTYPE "${package}::${ROSMSGNAME}")
     set(ROSMSGTYPENAME "/${package}/${ROSMSGNAME}")
+    set(ROSMSGCTYPENAME "/${package}/c${ROSMSGNAME}")
     set(ROSMSGBOOSTHEADER "${package}/boost/${ROSMSGNAME}.h")
     set(ROSMSGBOOSTHEADERS "${ROSMSGBOOSTHEADERS}#include <${package}/${ROSMSGNAME}.h>\n")
     set(ROSMSGTYPES       "${ROSMSGTYPES}        rtt_ros_addType_${ROSMSGNAME}(); // factory function for adding TypeInfo.\n")
     set(ROSMSGTYPEDECL "${ROSMSGTYPEDECL}        void rtt_ros_addType_${ROSMSGNAME}();\n")
-    set(ROSMSGTYPELINE "        void rtt_ros_addType_${ROSMSGNAME}() { RTT::types::Types()->addType( new types::StructTypeInfo<${ROSMSGTYPE}>(\"${ROSMSGTYPENAME}\") ); RTT::types::Types()->addType( new types::SequenceTypeInfo<std::vector<${ROSMSGTYPE}> >(\"${ROSMSGTYPENAME}[]\") ); }\n")
+    set(ROSMSGTYPELINE "
+        void rtt_ros_addType_${ROSMSGNAME}() {
+             // Only the .msg type is sent over ports. The msg[] (variable size) and  cmsg[] (fixed size) exist only as members of larger messages
+             RTT::types::Types()->addType( new types::StructTypeInfo<${ROSMSGTYPE}>(\"${ROSMSGTYPENAME}\") );
+             RTT::types::Types()->addType( new types::PrimitiveSequenceTypeInfo<std::vector<${ROSMSGTYPE}> >(\"${ROSMSGTYPENAME}[]\") );
+             RTT::types::Types()->addType( new types::CArrayTypeInfo<RTT::types::carray<${ROSMSGTYPE}> >(\"${ROSMSGCTYPENAME}[]\") );
+        }\n")
     set(ROSMSGTRANSPORTS "${ROSMSGTRANSPORTS}         if(name == \"${ROSMSGTYPENAME}\")
               return ti->addProtocol(ORO_ROS_PROTOCOL_ID,new RosMsgTransporter<${ROSMSGTYPE}>());
 ")

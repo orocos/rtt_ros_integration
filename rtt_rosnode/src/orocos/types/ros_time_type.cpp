@@ -36,24 +36,50 @@
 
 #include "ros_primitives_typekit_plugin.hpp"
 
-namespace RTT{
-  std::istream& operator>>(std::istream& os, ros::Time& t)
-  {
-    return os;
-  }
-  std::istream& operator>>(std::istream& os, ros::Duration& t)
-  {
-    return os;
-  }
-
-}
-
 namespace ros_integration{
     using namespace RTT;
     using namespace RTT::types;
 
+    // This class works around the ROS time representation.
+    class RosTimeTypeInfo : public types::PrimitiveTypeInfo<ros::Time,false>
+    {
+    public:
+        RosTimeTypeInfo() : types::PrimitiveTypeInfo<ros::Time,false>("time") {}
+
+        virtual std::ostream& write( std::ostream& os, base::DataSourceBase::shared_ptr in ) const {
+            typename internal::DataSource<ros::Time>::shared_ptr d = boost::dynamic_pointer_cast< internal::DataSource<ros::Time> >( in );
+            if ( d ) {
+                double tm = d->rvalue().sec + double(d->rvalue().nsec)/1000000000.0;
+                os << tm;
+            } else {
+                std::string output = std::string("(")+ in->getTypeName() +")";
+                os << output;
+            }
+            return os;
+        }
+    };
+
+    // This class works around the ROS time representation.
+    class RosDurationTypeInfo : public types::PrimitiveTypeInfo<ros::Duration,false>
+    {
+    public:
+        RosDurationTypeInfo() : types::PrimitiveTypeInfo<ros::Duration,false>("duration") {}
+
+        virtual std::ostream& write( std::ostream& os, base::DataSourceBase::shared_ptr in ) const {
+            typename internal::DataSource<ros::Duration>::shared_ptr d = boost::dynamic_pointer_cast< internal::DataSource<ros::Duration> >( in );
+            if ( d ) {
+                double tm = d->rvalue().sec + double(d->rvalue().nsec)/1000000000.0;
+                os << tm;
+            } else {
+                std::string output = std::string("(")+ in->getTypeName() +")";
+                os << output;
+            }
+            return os;
+        }
+    };
+
   void loadTimeTypes(){
-	     RTT::types::Types()->addType( new types::TemplateTypeInfo<ros::Time,true>("time") );
-	     RTT::types::Types()->addType( new types::TemplateTypeInfo<ros::Duration,true>("duration") );
+	     RTT::types::Types()->addType( new RosTimeTypeInfo );
+	     RTT::types::Types()->addType( new RosDurationTypeInfo );
   }
 }
