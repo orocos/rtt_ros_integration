@@ -41,6 +41,11 @@ namespace RTT{
   {
     return os;
   }
+  std::istream& operator>>(std::istream& os, ros::Duration& t)
+  {
+    return os;
+  }
+
 }
 
 namespace ros_integration{
@@ -49,5 +54,6 @@ namespace ros_integration{
 
   void loadTimeTypes(){
 	     RTT::types::Types()->addType( new types::TemplateTypeInfo<ros::Time,true>("time") );
+	     RTT::types::Types()->addType( new types::TemplateTypeInfo<ros::Duration,true>("duration") );
   }
 }

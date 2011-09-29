@@ -168,6 +168,8 @@ namespace ros_integration {
         ti->type("int32")->addConstructor( newConstructor( &a_to_b<int16_t,int32_t>, true ));
 
         ti->type("string")->addConstructor( newConstructor( string_ctor() ) );
+        ti->type("duration")->addConstructor( newConstructor ( &a_to_b<double,ros::Duration>, true));
+        ti->type("time")->addConstructor( newConstructor ( &a_to_b<double,ros::Time>, true));
         return true; 
     }
 };
