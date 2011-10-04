@@ -47,7 +47,7 @@ namespace ros_integration{
         RosTimeTypeInfo() : types::PrimitiveTypeInfo<ros::Time,false>("time") {}
 
         virtual std::ostream& write( std::ostream& os, base::DataSourceBase::shared_ptr in ) const {
-            typename internal::DataSource<ros::Time>::shared_ptr d = boost::dynamic_pointer_cast< internal::DataSource<ros::Time> >( in );
+            internal::DataSource<ros::Time>::shared_ptr d = boost::dynamic_pointer_cast< internal::DataSource<ros::Time> >( in );
             if ( d ) {
                 double tm = d->rvalue().sec + double(d->rvalue().nsec)/1000000000.0;
                 os << tm;
@@ -66,7 +66,7 @@ namespace ros_integration{
         RosDurationTypeInfo() : types::PrimitiveTypeInfo<ros::Duration,false>("duration") {}
 
         virtual std::ostream& write( std::ostream& os, base::DataSourceBase::shared_ptr in ) const {
-            typename internal::DataSource<ros::Duration>::shared_ptr d = boost::dynamic_pointer_cast< internal::DataSource<ros::Duration> >( in );
+            internal::DataSource<ros::Duration>::shared_ptr d = boost::dynamic_pointer_cast< internal::DataSource<ros::Duration> >( in );
             if ( d ) {
                 double tm = d->rvalue().sec + double(d->rvalue().nsec)/1000000000.0;
                 os << tm;
