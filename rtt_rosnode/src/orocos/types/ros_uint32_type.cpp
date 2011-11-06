@@ -42,8 +42,8 @@ namespace ros_integration{
 
   void loadUInt32Types(){
 
-        RTT::types::Types()->addType( new types::StdPrimitiveTypeInfo<uint32_t>("uint32") );
-        RTT::types::Types()->addType( new types::PrimitiveSequenceTypeInfo< std::vector<uint32_t> >("uint32[]") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<uint32_t>("uint32") );
+        RTT::types::Types()->addType( new types::SequenceTypeInfo< std::vector<uint32_t> >("uint32[]") );
         RTT::types::Types()->addType( new types::CArrayTypeInfo< RTT::types::carray<uint32_t> >("cuint32[]") );
   }
 }

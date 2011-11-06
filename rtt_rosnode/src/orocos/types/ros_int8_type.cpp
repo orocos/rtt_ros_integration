@@ -42,8 +42,8 @@ namespace ros_integration{
 
   void loadInt8Types(){
 
-        RTT::types::Types()->addType( new types::StdPrimitiveTypeInfo<int8_t>("int8") );
-        RTT::types::Types()->addType( new types::PrimitiveSequenceTypeInfo< std::vector<int8_t> >("int8[]") );
+        RTT::types::Types()->addType( new types::StdTypeInfo<int8_t>("int8") );
+        RTT::types::Types()->addType( new types::SequenceTypeInfo< std::vector<int8_t> >("int8[]") );
         RTT::types::Types()->addType( new types::CArrayTypeInfo< RTT::types::carray<int8_t> >("cint8[]") );
   }
 }
