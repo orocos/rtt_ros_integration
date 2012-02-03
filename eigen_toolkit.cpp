@@ -78,6 +78,7 @@ namespace Eigen{
             // only discover the parts of this struct:
             std::vector<std::string> result;
             result.push_back("size");
+            result.push_back("capacity");
             return result;
         }
 
@@ -98,7 +99,7 @@ namespace Eigen{
             typename RTT::internal::DataSource<int>::shared_ptr id_indx = RTT::internal::DataSource<int>::narrow( RTT::internal::DataSourceTypeInfo<int>::getTypeInfo()->convert(id).get() );
             typename RTT::internal::DataSource<string>::shared_ptr id_name = RTT::internal::DataSource<string>::narrow( id.get() );
             if ( id_name ) {
-                if ( id_name->get() == "size" ) {
+                if ( id_name->get() == "size" || id_name->get() == "capacity") {
                     try {
                         return RTT::internal::newFunctorDataSource(&get_size, RTT::internal::GenerateDataSource()(item.get()) );
                     } catch(...) {}
