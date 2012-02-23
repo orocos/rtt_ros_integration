@@ -74,17 +74,6 @@ namespace Eigen{
         {
         };
 
-        bool resize(base::DataSourceBase::shared_ptr arg, int size) const
-        {
-            if (arg->isAssignable()) {
-                typename RTT::internal::AssignableDataSource<VectorXd>::shared_ptr asarg = RTT::internal::AssignableDataSource<VectorXd>::narrow( arg.get() );
-                asarg->set().resize( size );
-                asarg->updated();
-                return true;
-            }
-            return false;
-        }
-
         virtual std::vector<std::string> getMemberNames() const {
             // only discover the parts of this struct:
             std::vector<std::string> result;
