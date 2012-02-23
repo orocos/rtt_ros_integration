@@ -30,9 +30,6 @@
 #include <rtt/internal/mystd.hpp>
 #include <rtt/os/StartStopManager.hpp>
 #include <rtt/types/TypekitRepository.hpp>
-#include <rtt/internal/FusedFunctorDataSource.hpp>
-#include <rtt/internal/DataSourceGenerator.hpp>
-#include <boost/lexical_cast.hpp>
 
 
 #include <Eigen/Core>
@@ -40,7 +37,6 @@ namespace Eigen{
 
     using namespace RTT;
     using namespace RTT::detail;
-    using namespace RTT::types;
 
     std::istream& operator>>(std::istream &is,MatrixXd& v){
       return is;
@@ -49,24 +45,7 @@ namespace Eigen{
       return is;
     }
 
-    double& get_item(VectorXd& v, int index)
-    {
-        if (index >= (int) (v.size()) || index < 0)
-            return RTT::internal::NA<double&>::na();
-        return v[index];
-    }
 
-    double get_item_copy(const VectorXd& v, int index)
-    {
-        if (index >= (int) (v.size()) || index < 0)
-            return RTT::internal::NA<double>::na();
-        return v[index];
-    }
-
-    int get_size(const VectorXd& v)
-    {
-        return v.size();
-    }
 
     struct VectorTypeInfo : public types::TemplateTypeInfo<VectorXd,true>
     {
@@ -74,59 +53,7 @@ namespace Eigen{
         {
         };
 
-        virtual std::vector<std::string> getMemberNames() const {
-            // only discover the parts of this struct:
-            std::vector<std::string> result;
-            result.push_back("size");
-            result.push_back("capacity");
-            return result;
-        }
-
-        base::DataSourceBase::shared_ptr getMember(base::DataSourceBase::shared_ptr item, const std::string& name) const {
-            // the only thing we do is to check for an integer in name, otherwise, assume a part (size) is accessed:
-            try {
-                unsigned int indx = boost::lexical_cast<unsigned int>(name);
-                // @todo could also return a direct reference to item indx using another DS type that respects updated().
-                return getMember( item, new RTT::internal::ConstantDataSource<int>(indx));
-            } catch(...) {}
-
-            return getMember( item, new RTT::internal::ConstantDataSource<std::string>(name) );
-        }
-
-        base::DataSourceBase::shared_ptr getMember(base::DataSourceBase::shared_ptr item,
-                                                   base::DataSourceBase::shared_ptr id) const {
-            // discover if user gave us a part name or index:
-            typename RTT::internal::DataSource<int>::shared_ptr id_indx = RTT::internal::DataSource<int>::narrow( RTT::internal::DataSourceTypeInfo<int>::getTypeInfo()->convert(id).get() );
-            typename RTT::internal::DataSource<string>::shared_ptr id_name = RTT::internal::DataSource<string>::narrow( id.get() );
-            if ( id_name ) {
-                if ( id_name->get() == "size" || id_name->get() == "capacity") {
-                    try {
-                        return RTT::internal::newFunctorDataSource(&get_size, RTT::internal::GenerateDataSource()(item.get()) );
-                    } catch(...) {}
-                }
-            }
-
-            if ( id_indx ) {
-                try {
-                    if ( item->isAssignable() )
-                        return RTT::internal::newFunctorDataSource(&get_item, RTT::internal::GenerateDataSource()(item.get(), id_indx.get() ) );
-                    else
-                        return RTT::internal::newFunctorDataSource(&get_item_copy, RTT::internal::GenerateDataSource()(item.get(), id_indx.get() ) );
-                } catch(...) {}
-            }
-            if (id_name) {
-                log(Error) << "EigenVectorTypeInfo: No such member : " << id_name->get() << endlog();
-            }
-            if (id_indx) {
-                log(Error) << "EigenVectorTypeInfo: Invalid index : " << id_indx->get() <<":"<< id_indx->getTypeName() << endlog();
-            }
-            if ( !id_name && ! id_indx)
-                log(Error) << "EigenVectorTypeInfo: Not a member or index : " << id <<":"<< id->getTypeName() << endlog();
-            return base::DataSourceBase::shared_ptr();
-        }
-
-
-        virtual bool decomposeTypeImpl(const VectorXd& vec, PropertyBag& targetbag) const
+      virtual bool decomposeTypeImpl(const VectorXd& vec, PropertyBag& targetbag) const
         {
             targetbag.setType("eigen_vector");
             int dimension = vec.rows();
@@ -338,7 +265,7 @@ namespace Eigen{
 
     bool EigenToolkitPlugin::loadConstructors()
     {
-        RTT::types::Types()->type("eigen_vector")->addConstructor(types::newConstructor(vector_index_constructor()));
+    	RTT::types::Types()->type("eigen_vector")->addConstructor(types::newConstructor(vector_index_constructor()));
         RTT::types::Types()->type("eigen_vector")->addConstructor(types::newConstructor(vector_index_value_constructor()));
         RTT::types::Types()->type("eigen_vector")->addConstructor(types::newConstructor(vector_index_array_constructor()));
         RTT::types::Types()->type("eigen_matrix")->addConstructor(types::newConstructor(matrix_i_j_constructor()));
