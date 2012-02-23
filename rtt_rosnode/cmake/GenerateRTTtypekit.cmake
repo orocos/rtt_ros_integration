@@ -6,11 +6,7 @@ if (NOT OROCOS-RTT_FOUND)
   message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
 else()
   include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
-  add_definitions( -DRTT_COMPONENT )
 endif()
-set(ROS_BUILD_TYPE MinSizeRel)
-set(CMAKE_BUILD_TYPE MinSizeRel)
-include(AddFileDependencies)
 
 macro(rosbuild_get_msgs_external package msgs)
   rosbuild_find_ros_package(${package})
@@ -30,6 +26,10 @@ endmacro(rosbuild_get_msgs_external)
 
 
 function(ros_generate_rtt_typekit package)
+  set(ROS_BUILD_TYPE MinSizeRel)
+  set(CMAKE_BUILD_TYPE MinSizeRel)
+  include(AddFileDependencies)
+  add_definitions( -DRTT_COMPONENT )
 
   rosbuild_find_ros_package(rtt_rosnode)
 
