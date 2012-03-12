@@ -23,7 +23,7 @@ class RTT_TF: public RTT::TaskContext
             const std::string& child);
 
 public:
-    RTT_TF(string const& name);
+    RTT_TF(std::string const& name);
 
     bool configureHook();
 
