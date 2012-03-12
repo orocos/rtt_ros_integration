@@ -54,7 +54,7 @@ namespace rtt_tf
 using namespace RTT;
 using namespace tf;
 
-RTT_TF::RTT_TF(const string& name) :
+RTT_TF::RTT_TF(const std::string& name) :
     TaskContext(name, PreOperational), prop_interpolating(true),
             prop_cache_time(Transformer::DEFAULT_CACHE_TIME), prop_buffer_size(
                     DEFAULT_BUFFER_SIZE)
