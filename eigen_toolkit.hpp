@@ -38,5 +38,55 @@ public:
 	virtual bool loadOperators();
 };
 }
+#ifdef CORELIB_DATASOURCE_HPP
+    extern template class RTT::internal::DataSourceTypeInfo< Eigen::VectorXd >;
+    extern template class RTT::internal::DataSource< Eigen::VectorXd >;
+    extern template class RTT::internal::AssignableDataSource< Eigen::VectorXd >;
+    extern template class RTT::internal::AssignCommand< Eigen::VectorXd >;
+#endif
+#ifdef ORO_CORELIB_DATASOURCES_HPP
+    extern template class RTT::internal::ValueDataSource< Eigen::VectorXd >;
+    extern template class RTT::internal::ConstantDataSource< Eigen::VectorXd >;
+    extern template class RTT::internal::ReferenceDataSource< Eigen::VectorXd >;
+#endif
+#ifdef ORO_OUTPUT_PORT_HPP
+    extern template class RTT::OutputPort< Eigen::VectorXd >;
+#endif
+#ifdef ORO_INPUT_PORT_HPP
+    extern template class RTT::InputPort< Eigen::VectorXd >;
+#endif
+#ifdef ORO_PROPERTY_HPP
+    extern template class RTT::Property< Eigen::VectorXd >;
+#endif
+#ifdef ORO_CORELIB_ATTRIBUTE_HPP
+    extern template class RTT::Attribute< Eigen::VectorXd >;
+    extern template class RTT::Constant< Eigen::VectorXd >;
+#endif
+
+#ifdef CORELIB_DATASOURCE_HPP
+    extern template class RTT::internal::DataSourceTypeInfo< Eigen::MatrixXd >;
+    extern template class RTT::internal::DataSource< Eigen::MatrixXd >;
+    extern template class RTT::internal::AssignableDataSource< Eigen::MatrixXd >;
+    extern template class RTT::internal::AssignCommand< Eigen::MatrixXd >;
+#endif
+#ifdef ORO_CORELIB_DATASOURCES_HPP
+    extern template class RTT::internal::ValueDataSource< Eigen::MatrixXd >;
+    extern template class RTT::internal::ConstantDataSource< Eigen::MatrixXd >;
+    extern template class RTT::internal::ReferenceDataSource< Eigen::MatrixXd >;
+#endif
+#ifdef ORO_OUTPUT_PORT_HPP
+    extern template class RTT::OutputPort< Eigen::MatrixXd >;
+#endif
+#ifdef ORO_INPUT_PORT_HPP
+    extern template class RTT::InputPort< Eigen::MatrixXd >;
+#endif
+#ifdef ORO_PROPERTY_HPP
+    extern template class RTT::Property< Eigen::MatrixXd >;
+#endif
+#ifdef ORO_CORELIB_ATTRIBUTE_HPP
+    extern template class RTT::Attribute< Eigen::MatrixXd >;
+    extern template class RTT::Constant< Eigen::MatrixXd >;
+#endif
+
 #endif
 

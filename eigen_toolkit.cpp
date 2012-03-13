@@ -32,6 +32,33 @@
 #include <rtt/types/TypekitRepository.hpp>
 
 
+template class RTT_EXPORT RTT::internal::DataSourceTypeInfo< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::DataSource< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::AssignableDataSource< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::AssignCommand< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::ValueDataSource< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::ConstantDataSource< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::ReferenceDataSource< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::OutputPort< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::InputPort< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::Property< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::Attribute< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::Constant< Eigen::VectorXd >;
+
+template class RTT_EXPORT RTT::internal::DataSourceTypeInfo< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::DataSource< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::AssignableDataSource< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::AssignCommand< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::ValueDataSource< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::ConstantDataSource< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::ReferenceDataSource< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::OutputPort< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::InputPort< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::Property< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::Attribute< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::Constant< Eigen::MatrixXd >;
+
+
 #include <Eigen/Core>
 namespace Eigen{
 
