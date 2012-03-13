@@ -35,6 +35,33 @@
 #include <boost/lexical_cast.hpp>
 
 
+template class RTT_EXPORT RTT::internal::DataSourceTypeInfo< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::DataSource< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::AssignableDataSource< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::AssignCommand< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::ValueDataSource< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::ConstantDataSource< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::internal::ReferenceDataSource< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::OutputPort< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::InputPort< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::Property< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::Attribute< Eigen::VectorXd >;
+template class RTT_EXPORT RTT::Constant< Eigen::VectorXd >;
+
+template class RTT_EXPORT RTT::internal::DataSourceTypeInfo< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::DataSource< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::AssignableDataSource< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::AssignCommand< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::ValueDataSource< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::ConstantDataSource< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::internal::ReferenceDataSource< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::OutputPort< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::InputPort< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::Property< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::Attribute< Eigen::MatrixXd >;
+template class RTT_EXPORT RTT::Constant< Eigen::MatrixXd >;
+
+
 #include <Eigen/Core>
 namespace Eigen{
 
@@ -63,6 +90,7 @@ namespace Eigen{
         return v[index];
     }
 
+
     int get_size(const VectorXd& v)
     {
         return v.size();
@@ -73,6 +101,17 @@ namespace Eigen{
         VectorTypeInfo():TemplateTypeInfo<VectorXd, true >("eigen_vector")
         {
         };
+
+        bool resize(base::DataSourceBase::shared_ptr arg, int size) const
+        {
+            if (arg->isAssignable()) {
+                typename RTT::internal::AssignableDataSource<VectorXd>::shared_ptr asarg = RTT::internal::AssignableDataSource<VectorXd>::narrow( arg.get() );
+                asarg->set().resize( size );
+                asarg->updated();
+                return true;
+            }
+            return false;
+        }
 
         virtual std::vector<std::string> getMemberNames() const {
             // only discover the parts of this struct:
