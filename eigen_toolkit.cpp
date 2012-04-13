@@ -105,7 +105,7 @@ namespace Eigen{
         bool resize(base::DataSourceBase::shared_ptr arg, int size) const
         {
             if (arg->isAssignable()) {
-                typename RTT::internal::AssignableDataSource<VectorXd>::shared_ptr asarg = RTT::internal::AssignableDataSource<VectorXd>::narrow( arg.get() );
+	        RTT::internal::AssignableDataSource<VectorXd>::shared_ptr asarg = RTT::internal::AssignableDataSource<VectorXd>::narrow( arg.get() );
                 asarg->set().resize( size );
                 asarg->updated();
                 return true;
@@ -135,8 +135,8 @@ namespace Eigen{
         base::DataSourceBase::shared_ptr getMember(base::DataSourceBase::shared_ptr item,
                                                    base::DataSourceBase::shared_ptr id) const {
             // discover if user gave us a part name or index:
-            typename RTT::internal::DataSource<int>::shared_ptr id_indx = RTT::internal::DataSource<int>::narrow( RTT::internal::DataSourceTypeInfo<int>::getTypeInfo()->convert(id).get() );
-            typename RTT::internal::DataSource<string>::shared_ptr id_name = RTT::internal::DataSource<string>::narrow( id.get() );
+            RTT::internal::DataSource<int>::shared_ptr id_indx = RTT::internal::DataSource<int>::narrow( RTT::internal::DataSourceTypeInfo<int>::getTypeInfo()->convert(id).get() );
+            RTT::internal::DataSource<string>::shared_ptr id_name = RTT::internal::DataSource<string>::narrow( id.get() );
             if ( id_name ) {
                 if ( id_name->get() == "size" || id_name->get() == "capacity") {
                     try {
