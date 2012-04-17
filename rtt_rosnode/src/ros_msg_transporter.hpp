@@ -93,13 +93,22 @@ namespace ros_integration {
 	std::stringstream namestr;
 	gethostname(hostname, sizeof(hostname));
 	
-	namestr << hostname<<'/' << port->getInterface()->getOwner()->getName()
-		<< '/' << port->getName() << '/'<<this << '/' << getpid();
+	if (port->getInterface() && port->getInterface()->getOwner()) {
+	  namestr << hostname<<'/' << port->getInterface()->getOwner()->getName()
+		  << '/' << port->getName() << '/'<<this << '/' << getpid();
+	} else {
+	  namestr << hostname<<'/' << port->getName() << '/'<<this << '/' << getpid();
+	}
 	policy.name_id = namestr.str();
       }
       topicname=policy.name_id;
       Logger::In in(topicname);
-      log(Debug)<<"Creating ROS publisher for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+
+      if (port->getInterface() && port->getInterface()->getOwner()) {
+        log(Debug)<<"Creating ROS publisher for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+      } else {
+        log(Debug)<<"Creating ROS publisher for port "<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+      }
 
       ros_pub = ros_node.advertise<T>(policy.name_id, policy.size ? policy.size : 1, policy.init); // minimum 1
       act = RosPublishActivity::Instance();
@@ -172,7 +181,11 @@ namespace ros_integration {
      */
     RosSubChannelElement(base::PortInterface* port, const ConnPolicy& policy)
     {
-      log(Debug)<<"Creating ROS subscriber for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+      if (port->getInterface() && port->getInterface()->getOwner()) {
+        log(Debug)<<"Creating ROS subscriber for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+      } else {
+        log(Debug)<<"Creating ROS subscriber for port "<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+      }
       ros_sub=ros_node.subscribe(policy.name_id,policy.size,&RosSubChannelElement::newData,this);
       this->ref();
     }
