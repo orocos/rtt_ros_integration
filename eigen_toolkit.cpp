@@ -136,7 +136,7 @@ namespace Eigen{
                                                    base::DataSourceBase::shared_ptr id) const {
             // discover if user gave us a part name or index:
             RTT::internal::DataSource<int>::shared_ptr id_indx = RTT::internal::DataSource<int>::narrow( RTT::internal::DataSourceTypeInfo<int>::getTypeInfo()->convert(id).get() );
-            RTT::internal::DataSource<string>::shared_ptr id_name = RTT::internal::DataSource<string>::narrow( id.get() );
+            RTT::internal::DataSource<std::string>::shared_ptr id_name = RTT::internal::DataSource<std::string>::narrow( id.get() );
             if ( id_name ) {
                 if ( id_name->get() == "size" || id_name->get() == "capacity") {
                     try {
