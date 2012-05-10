@@ -5,7 +5,8 @@ import roslib
 roslib.load_manifest("rtt_rosnode");
 
 if(roslib.stacks.get_stack_version('ros')<'1.8.0'):
-    import roscpp as gencpp
+    import roscpp
+    import roscpp.msg_gen as gencpp
 else:
     import gencpp
 
