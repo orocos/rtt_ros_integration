@@ -101,7 +101,7 @@ namespace ros_integration {
       Logger::In in(topicname);
       log(Debug)<<"Creating ROS publisher for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<endlog();
 
-      ros_pub = ros_node.advertise<T>(policy.name_id, policy.size);
+      ros_pub = ros_node.advertise<T>(policy.name_id, policy.size ? policy.size : 1); // minimum 1
       act = RosPublishActivity::Instance();
       act->addPublisher( this );
     }
