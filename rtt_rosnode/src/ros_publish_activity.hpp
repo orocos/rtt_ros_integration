@@ -78,7 +78,7 @@ namespace ros_integration{
       os::Mutex map_lock;
 
     RosPublishActivity( const std::string& name)
-      : Activity(0, name)
+        : Activity(ORO_SCHED_OTHER, RTT::os::LowestPriority, 0.0, 0, name)
     {
       Logger::In in("RosPublishActivity");
       log(Debug)<<"Creating RosPublishActivity"<<endlog();
