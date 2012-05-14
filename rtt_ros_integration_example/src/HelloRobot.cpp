@@ -54,13 +54,13 @@ public:
     sinport("string_in"),soutport("string_out","Hello Robot"),
     prop_answer("Hello Robot"),prop_counter_step(0.01)
   {
-    this->addEventPort(inport);
-    this->addPort(outport);
-    this->addEventPort(sinport);
-    this->addPort(soutport);
+    this->addEventPort(inport).doc("Receiving a message here will wake up this component.");
+    this->addPort(outport).doc("Sends out 'answer'.");
+    this->addEventPort(sinport).doc("Receiving a message here will wake up this component.");
+    this->addPort(soutport).doc("Sends out a counter value based on 'counter_step'.");
     
-    this->addProperty("answer",prop_answer);
-    this->addProperty("counter_step",prop_counter_step);
+    this->addProperty("answer",prop_answer).doc("The text being sent out on 'string_out'.");
+    this->addProperty("counter_step",prop_counter_step).doc("The increment for each new sample on 'float_out'");
     
     counter=0.0;
   }
