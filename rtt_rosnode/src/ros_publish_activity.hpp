@@ -86,9 +86,11 @@ namespace ros_integration{
 
     void loop(){
         os::MutexLock lock(map_lock);
-        for(Publishers::const_iterator it = publishers.begin(); it != publishers.end(); ++it)
-            if (it->second)
+        for(Publishers::iterator it = publishers.begin(); it != publishers.end(); ++it)
+            if (it->second) {
+                it->second = false; // protected by the mutex lock !
                 it->first->publish();
+            }
     }
     
   public:

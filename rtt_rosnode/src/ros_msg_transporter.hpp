@@ -148,7 +148,7 @@ namespace ros_integration {
       typename base::ChannelElement<T>::value_t sample; // XXX: real-time !
       // this read should always succeed since signal() means 'data available in a data element'.
       typename base::ChannelElement<T>::shared_ptr input = this->getInput();
-      while( input && (input->read(sample,true) == NewData) )
+      while( input && (input->read(sample,false) == NewData) )
           ros_pub.publish(sample);
     }
     
