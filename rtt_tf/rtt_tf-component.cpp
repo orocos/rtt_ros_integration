@@ -51,91 +51,96 @@
 namespace rtt_tf
 {
 
-using namespace RTT;
-using namespace tf;
+  using namespace RTT;
+  using namespace tf;
 
-RTT_TF::RTT_TF(const std::string& name) :
+  RTT_TF::RTT_TF(const std::string& name) :
     TaskContext(name, PreOperational), prop_interpolating(true),
-            prop_cache_time(Transformer::DEFAULT_CACHE_TIME), prop_buffer_size(
-                    DEFAULT_BUFFER_SIZE)
-{
+    prop_cache_time(Transformer::DEFAULT_CACHE_TIME),
+    prop_buffer_size(DEFAULT_BUFFER_SIZE)
+  {
     this->addProperty("interpolating", prop_interpolating);
     this->addProperty("cache_time", prop_cache_time);
     this->addProperty("buffer_size", prop_buffer_size);
     this->addEventPort("tf_in", port_tf_in);
+    this->addPort("tf_out", port_tf_out);
 
-    this->addOperation("lookupTransform", &RTT_TF::lookupTransform, this).doc(
-            "lookup the most recent transform from source to target").arg(
-            "target", "target frame").arg("source", "source frame");
+    this->addOperation("lookupTransform", &RTT_TF::lookupTransform, this)
+      .doc("lookup the most recent transform from source to target")
+      .arg("target", "target frame")
+      .arg("source", "source frame");
 
-}
+    this->addOperation("broadcastTransform", &RTT_TF::broadcastTransform, this)
+      .doc("lookup the most recent transform from source to target")
+      .arg("stamped transform", "geometry_msgs::TransformStamped");
+  }
 
-bool RTT_TF::configureHook()
-{
-
+  bool RTT_TF::configureHook()
+  {
     m_transformer.reset(new Transformer(prop_interpolating, ros::Duration(
             prop_cache_time)));
 
     ConnPolicy cp = ConnPolicy::buffer(prop_buffer_size);
-    cp.transport = 3;//3=ROS
+    cp.transport = 3; //3=ROS
     cp.name_id = "/tf";
 
-    return port_tf_in.createStream(cp);
-}
+    return (port_tf_in.createStream(cp) && port_tf_out.createStream(cp));
+  }
 
-void RTT_TF::updateHook()
-{
+  void RTT_TF::updateHook()
+  {
     Logger::In(this->getName());
 #ifndef NDEBUG
     log(Debug) << "In update" << endlog();
 #endif
     try
     {
-        tf::tfMessage msg_in;
-        while (port_tf_in.read(msg_in) == NewData)
+      tf::tfMessage msg_in;
+      while (port_tf_in.read(msg_in) == NewData)
+      {
+        for (unsigned int i = 0; i < msg_in.transforms.size(); i++)
         {
-            for (unsigned int i = 0; i < msg_in.transforms.size(); i++)
+          StampedTransform trans;
+          transformStampedMsgToTF(msg_in.transforms[i], trans);
+          try
+          {
+            std::map<std::string, std::string>* msg_header_map =
+              msg_in.__connection_header.get();
+            std::string authority;
+            std::map<std::string, std::string>::iterator it =
+              msg_header_map->find("callerid");
+            if (it == msg_header_map->end())
             {
-                StampedTransform trans;
-                transformStampedMsgToTF(msg_in.transforms[i], trans);
-                try
-                {
-                    std::map<std::string, std::string>* msg_header_map =
-                            msg_in.__connection_header.get();
-                    std::string authority;
-                    std::map<std::string, std::string>::iterator it =
-                            msg_header_map->find("callerid");
-                    if (it == msg_header_map->end())
-                    {
-                        log(Warning) << "Message received without callerid"
-                                << endlog();
-                        authority = "no callerid";
-                    }
-                    else
-                    {
-                        authority = it->second;
-                    }
-                    m_transformer->setTransform(trans, authority);
-                } catch (TransformException& ex)
-                {
-
-                    log(Error) << "Failure to set received transform from "
-                            << msg_in.transforms[i].child_frame_id << " to "
-                            << msg_in.transforms[i].header.frame_id
-                            << " with error: " << ex.what() << endlog();
-                }
+              log(Warning) << "Message received without callerid"
+                << endlog();
+              authority = "no callerid";
             }
+            else
+            {
+              authority = it->second;
+            }
+            m_transformer->setTransform(trans, authority);
+          } catch (TransformException& ex)
+          {
+
+            log(Error) << "Failure to set received transform from "
+              << msg_in.transforms[i].child_frame_id << " to "
+              << msg_in.transforms[i].header.frame_id
+              << " with error: " << ex.what() << endlog();
+          }
         }
+      }
 
     } catch (std::exception& ex)
     {
-        log(Error) << ex.what() << endlog();
+      log(Error) << ex.what() << endlog();
     }
-}
+  }
 
-geometry_msgs::TransformStamped RTT_TF::lookupTransform(const std::string& target,
-        const std::string& source)
-{
+  geometry_msgs::TransformStamped RTT_TF::lookupTransform(
+      const std::string& target,
+      const std::string& source)
+  {
     tf::StampedTransform stamped_tf;
     ros::Time common_time;
     m_transformer->getLatestCommonTime(source, target, common_time,NULL);
@@ -143,7 +148,15 @@ geometry_msgs::TransformStamped RTT_TF::lookupTransform(const std::string& targe
     geometry_msgs::TransformStamped msg;
     tf::transformStampedTFToMsg(stamped_tf,msg);
     return msg;
-}
+  }
+
+  void RTT_TF::broadcastTransform(
+      const geometry_msgs::TransformStamped &tform)
+  {
+    tf::tfMessage msg_out;
+    msg_out.transforms.push_back(tform);
+    port_tf_out.write(msg_out);
+  }
 
 }//namespace
 

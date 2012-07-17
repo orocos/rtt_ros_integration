@@ -7,9 +7,8 @@
 
 namespace rtt_tf
 {
-
-class RTT_TF: public RTT::TaskContext
-{
+  class RTT_TF: public RTT::TaskContext
+  {
     static const int DEFAULT_BUFFER_SIZE = 100;
 
     boost::shared_ptr<tf::Transformer> m_transformer;
@@ -18,11 +17,16 @@ class RTT_TF: public RTT::TaskContext
     double prop_buffer_size;
 
     RTT::InputPort<tf::tfMessage> port_tf_in;
+    RTT::OutputPort<tf::tfMessage> port_tf_out;
 
-    geometry_msgs::TransformStamped lookupTransform(const std::string& parent,
-            const std::string& child);
+    geometry_msgs::TransformStamped lookupTransform(
+        const std::string& parent,
+        const std::string& child);
 
-public:
+    void broadcastTransform(
+        const geometry_msgs::TransformStamped &tform);
+
+  public:
     RTT_TF(std::string const& name);
 
     bool configureHook();
@@ -34,6 +38,6 @@ public:
     void stopHook(){};
 
     void cleanupHook(){};
-};
+  };
 }//namespace rtt_tf
 #endif
