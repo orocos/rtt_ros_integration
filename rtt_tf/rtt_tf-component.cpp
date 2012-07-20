@@ -73,6 +73,15 @@ namespace rtt_tf
     this->addOperation("broadcastTransform", &RTT_TF::broadcastTransform, this)
       .doc("lookup the most recent transform from source to target")
       .arg("stamped transform", "geometry_msgs::TransformStamped");
+
+    this->provides("tf")->addOperation("lookupTransform", &RTT_TF::lookupTransform, this)
+      .doc("lookup the most recent transform from source to target")
+      .arg("target", "target frame")
+      .arg("source", "source frame");
+
+    this->provides("tf")->addOperation("broadcastTransform", &RTT_TF::broadcastTransform, this)
+      .doc("lookup the most recent transform from source to target")
+      .arg("stamped transform", "geometry_msgs::TransformStamped");
   }
 
   bool RTT_TF::configureHook()
