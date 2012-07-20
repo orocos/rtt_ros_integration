@@ -91,3 +91,10 @@ orocos_install_headers( rtt_tf-component.hpp ) # ...you may add multiple header 
 # that it can pick up all above settings.
 #
 orocos_generate_package()
+
+# Tests  
+orocos_use_package( ocl-taskbrowser )
+orocos_use_package( ocl-deployment )
+orocos_executable(broadcaster_test tests/broadcaster_test.cpp)
+
+
