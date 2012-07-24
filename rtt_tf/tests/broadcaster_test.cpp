@@ -43,6 +43,12 @@ public:
     tform_.transform.translation.x = cos(t);
     tform_.transform.translation.y = sin(t);
     broadcaster_(tform_);
+    tform_.header.frame_id = "/world";
+    tform_.header.stamp = ros::Time(((double)RTT::os::TimeService::Instance()->getNSecs())*1E-9);
+    tform_.child_frame_id = "rel_rtt_tf_test";
+    tform_.transform.translation.x = cos(t);
+    tform_.transform.translation.y = sin(t);
+    broadcaster_(tform_);
   }
   void stopHook() { }
 };

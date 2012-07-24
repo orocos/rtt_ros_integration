@@ -12,15 +12,20 @@
 class LookupComponent : public RTT::TaskContext {
 public:
   RTT::OperationCaller
-    <geometry_msgs::TransformStamped(const std::string &, const std::string &)> lookup_;
-  geometry_msgs::TransformStamped tform_;
+    <geometry_msgs::TransformStamped(const std::string &, const std::string &, const ros::Time &)> lookup_;
+  RTT::OperationCaller
+    <geometry_msgs::TransformStamped(const std::string &, const std::string &)> lookup_now_;
+  geometry_msgs::TransformStamped tform_, tform_now_;
 
   LookupComponent(const std::string &name) :
     RTT::TaskContext(name, RTT::TaskContext::PreOperational)
-    ,lookup_("lookupTransform")
+    ,lookup_("lookupTransformAtTime")
+    ,lookup_now_("lookupTransform")
   {
     this->addProperty("tform",tform_);
+    this->addProperty("tform_now",tform_now_);
     this->requires("tf")->addOperationCaller(lookup_);
+    this->requires("tf")->addOperationCaller(lookup_now_);
   }
   virtual ~LookupComponent()  { }
   bool configureHook() { 
@@ -31,7 +36,8 @@ public:
   }
   void updateHook() {
     try{
-      tform_ = lookup_("/world","/rtt_tf_test");
+      tform_ = lookup_("/world","rtt_tf_test",ros::Time::now()-ros::Duration(0.1));
+      tform_now_ = lookup_now_("/world","rtt_tf_test");
     } catch(...) {
       
     }
