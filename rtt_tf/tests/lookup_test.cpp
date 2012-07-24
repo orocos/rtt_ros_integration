@@ -36,8 +36,8 @@ public:
   }
   void updateHook() {
     try{
-      tform_ = lookup_("/world","rtt_tf_test",ros::Time::now()-ros::Duration(0.1));
-      tform_now_ = lookup_now_("/world","rtt_tf_test");
+      tform_ = lookup_("/world","/rtt_tf_test",ros::Time::now()-ros::Duration(0.1));
+      tform_now_ = lookup_now_("/world","rel_rtt_tf_test");
     } catch(...) {
       
     }

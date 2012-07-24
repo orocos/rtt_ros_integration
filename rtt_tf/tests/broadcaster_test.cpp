@@ -85,10 +85,10 @@ int ORO_main(int argc, char** argv) {
     // Create orocos taskbrowser for easy interaction
     OCL::TaskBrowser task_browser(&deployer);
     task_browser.loop();
-
-    bcaster.stop();
   }
 
+
+  bcaster.stop();
 
   return 0;
 }
