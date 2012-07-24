@@ -70,7 +70,7 @@ namespace rtt_tf
       .arg("target", "target frame")
       .arg("source", "source frame");
 
-    this->addOperation("broadcastTransform", &RTT_TF::broadcastTransform, this)
+    this->addOperation("broadcastTransform", &RTT_TF::broadcastTransform, this, RTT::OwnThread)
       .doc("lookup the most recent transform from source to target")
       .arg("stamped transform", "geometry_msgs::TransformStamped");
 
@@ -79,7 +79,7 @@ namespace rtt_tf
       .arg("target", "target frame")
       .arg("source", "source frame");
 
-    this->provides("tf")->addOperation("broadcastTransform", &RTT_TF::broadcastTransform, this)
+    this->provides("tf")->addOperation("broadcastTransform", &RTT_TF::broadcastTransform, this, RTT::OwnThread)
       .doc("lookup the most recent transform from source to target")
       .arg("stamped transform", "geometry_msgs::TransformStamped");
   }
