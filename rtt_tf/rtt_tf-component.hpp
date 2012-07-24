@@ -15,6 +15,7 @@ namespace rtt_tf
     bool prop_interpolating;
     double prop_cache_time;
     double prop_buffer_size;
+    std::string tf_prefix;
 
     RTT::InputPort<tf::tfMessage> port_tf_in;
     RTT::OutputPort<tf::tfMessage> port_tf_out;
@@ -22,6 +23,11 @@ namespace rtt_tf
     geometry_msgs::TransformStamped lookupTransform(
         const std::string& parent,
         const std::string& child);
+
+    geometry_msgs::TransformStamped lookupTransformAtTime(
+        const std::string& parent,
+        const std::string& child,
+        const ros::Time& common_time);
 
     void broadcastTransform(
         const geometry_msgs::TransformStamped &tform);

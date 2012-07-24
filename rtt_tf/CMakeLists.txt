@@ -95,7 +95,7 @@ orocos_generate_package()
 # Tests  
 orocos_use_package( ocl-taskbrowser )
 orocos_use_package( ocl-deployment )
-orocos_executable(broadcaster_test tests/broadcaster_test.cpp)
-orocos_executable(lookup_test tests/lookup_test.cpp)
+orocos_executable(tests/broadcaster_test tests/broadcaster_test.cpp)
+orocos_executable(tests/lookup_test tests/lookup_test.cpp)
 
 

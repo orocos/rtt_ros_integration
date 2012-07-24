@@ -47,6 +47,7 @@
 
 #include "rtt_tf-component.hpp"
 #include <rtt/Component.hpp>
+#include <ros/ros.h>
 
 namespace rtt_tf
 {
@@ -62,6 +63,7 @@ namespace rtt_tf
     this->addProperty("interpolating", prop_interpolating);
     this->addProperty("cache_time", prop_cache_time);
     this->addProperty("buffer_size", prop_buffer_size);
+    this->addProperty("tf_prefix", tf_prefix);
     this->addEventPort("tf_in", port_tf_in);
     this->addPort("tf_out", port_tf_out);
 
@@ -69,6 +71,12 @@ namespace rtt_tf
       .doc("lookup the most recent transform from source to target")
       .arg("target", "target frame")
       .arg("source", "source frame");
+
+    this->addOperation("lookupTransformAtTime", &RTT_TF::lookupTransformAtTime, this)
+      .doc("lookup the most recent transform from source to target")
+      .arg("target", "target frame")
+      .arg("source", "source frame")
+      .arg("common_time", "common time at which the transform should be computed");
 
     this->addOperation("broadcastTransform", &RTT_TF::broadcastTransform, this, RTT::OwnThread)
       .doc("lookup the most recent transform from source to target")
@@ -79,6 +87,12 @@ namespace rtt_tf
       .arg("target", "target frame")
       .arg("source", "source frame");
 
+    this->provides("tf")->addOperation("lookupTransformAtTime", &RTT_TF::lookupTransformAtTime, this)
+      .doc("lookup the most recent transform from source to target")
+      .arg("target", "target frame")
+      .arg("source", "source frame")
+      .arg("common_time", "common time at which the transform should be computed");
+
     this->provides("tf")->addOperation("broadcastTransform", &RTT_TF::broadcastTransform, this, RTT::OwnThread)
       .doc("lookup the most recent transform from source to target")
       .arg("stamped transform", "geometry_msgs::TransformStamped");
@@ -86,12 +100,21 @@ namespace rtt_tf
 
   bool RTT_TF::configureHook()
   {
+    Logger::In(this->getName());
+
     m_transformer.reset(new Transformer(prop_interpolating, ros::Duration(
             prop_cache_time)));
 
     ConnPolicy cp = ConnPolicy::buffer(prop_buffer_size);
     cp.transport = 3; //3=ROS
     cp.name_id = "/tf";
+
+    // Get tf prefix rosparam
+    ros::NodeHandle nh("~");
+    std::string tf_prefix_param_key;
+    if(nh.searchParam("tf_prefix",tf_prefix_param_key)) {
+      nh.getParam(tf_prefix_param_key, tf_prefix);
+    }
 
     return (port_tf_in.createStream(cp) && port_tf_out.createStream(cp));
   }
@@ -159,11 +182,29 @@ namespace rtt_tf
     return msg;
   }
 
+  geometry_msgs::TransformStamped RTT_TF::lookupTransformAtTime(
+      const std::string& target,
+      const std::string& source,
+      const ros::Time& common_time)
+  {
+    tf::StampedTransform stamped_tf;
+    m_transformer->lookupTransform(target, source, common_time, stamped_tf);
+    geometry_msgs::TransformStamped msg;
+    tf::transformStampedTFToMsg(stamped_tf,msg);
+    return msg;
+  }
+
   void RTT_TF::broadcastTransform(
       const geometry_msgs::TransformStamped &tform)
   {
+    // Populate the TF message
     tf::tfMessage msg_out;
     msg_out.transforms.push_back(tform);
+
+    // Resolve names
+    msg_out.transforms.back().header.frame_id = tf::resolve(tf_prefix, msg_out.transforms.back().header.frame_id);
+    msg_out.transforms.back().child_frame_id = tf::resolve(tf_prefix, msg_out.transforms.back().child_frame_id);
+
     port_tf_out.write(msg_out);
   }
 
