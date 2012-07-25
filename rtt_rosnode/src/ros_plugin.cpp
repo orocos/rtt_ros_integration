@@ -34,7 +34,6 @@
 #include <ros/ros.h>
 
 void loadROSService();
-void loadROSPackService();
 
 using namespace RTT;
 extern "C" {
@@ -57,7 +56,6 @@ extern "C" {
     log(Info)<<"ROS node spinner started"<<endlog();
 
     loadROSService();
-    loadROSPackService();
     return true;
   }
   std::string getRTTPluginName (){

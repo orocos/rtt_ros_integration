@@ -26,7 +26,7 @@ include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 #common commands for building c++ executables and libraries
-orocos_plugin(${PROJECT_NAME} src/ros_plugin.cpp src/ros_publish_activity.cpp src/rtt_rospack_service.cpp src/rtt_ros_service.cpp)
+orocos_plugin(${PROJECT_NAME} src/ros_plugin.cpp src/ros_publish_activity.cpp src/rtt_ros_service.cpp)
 
 # build ROS param as a separate service
 orocos_service(rtt_rosparam_service src/rtt_rosparam_service.cpp)

@@ -11,6 +11,7 @@
   <depend package="roscpp"/>
   <depend package="roslib"/>
   <depend package="rtt"/>
+  <depend package="rtt_rospack"/>
   <depend package="ocl"/>
   <depend package="rosbuild"/>
 

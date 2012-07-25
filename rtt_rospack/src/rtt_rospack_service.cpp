@@ -28,6 +28,7 @@
 **/
 
 #include <rtt/RTT.hpp>
+#include <rtt/plugin/Plugin.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 
@@ -48,4 +49,18 @@ public:
 void loadROSPackService(){
   RTT::Service::shared_ptr rps(new ROSPackService(0));
   RTT::internal::GlobalService::Instance()->addService(rps);
+}
+
+using namespace RTT;
+extern "C" {
+  bool loadRTTPlugin(RTT::TaskContext* c){
+    loadROSPackService();
+    return true;
+  }
+  std::string getRTTPluginName (){
+    return "rospack";
+  }
+  std::string getRTTTargetName (){
+    return OROCOS_TARGET_NAME;
+  }
 }
