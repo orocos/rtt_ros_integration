@@ -46,9 +46,9 @@ extern "C" {
       if(ros::master::check())
           ros::start();
       else{
-          log(Error)<<"No ros::master available"<<endlog();
+          log(Warning)<<"No ros::master available"<<endlog();
           ros::shutdown();
-          return false;
+          return true;
       }
     }
     static ros::AsyncSpinner spinner(1); // Use 1 threads
