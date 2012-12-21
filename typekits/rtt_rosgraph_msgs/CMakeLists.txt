@@ -13,6 +13,8 @@ rosbuild_init()
 
 rosbuild_include(rtt_rosnode GenerateRTTtypekit)
 
+find_package(roscpp)
+
 ros_generate_rtt_typekit(rosgraph_msgs)
 
 
