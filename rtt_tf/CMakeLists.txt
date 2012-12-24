@@ -49,6 +49,8 @@ orocos_component(rtt_tf rtt_tf-component.cpp) # ...you may add multiple source f
 
 rosbuild_include(rtt_rosnode GenerateRTTtypekit)
 
+find_package(roscpp)
+
 ros_generate_rtt_typekit(tf)
 
 #
