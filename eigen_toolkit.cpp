@@ -97,10 +97,27 @@ namespace Eigen{
     }
 
     struct VectorTypeInfo : public types::TemplateTypeInfo<VectorXd,true>
+#if (RTT_VERSION_MAJOR*100+RTT_VERSION_MINOR) >= 206
+                          , public MemberFactory
+#endif
     {
         VectorTypeInfo():TemplateTypeInfo<VectorXd, true >("eigen_vector")
         {
         };
+        
+#if (RTT_VERSION_MAJOR*100+RTT_VERSION_MINOR) >= 206
+        bool installTypeInfoObject(TypeInfo* ti) {
+            // aquire a shared reference to the this object
+            boost::shared_ptr< VectorTypeInfo > mthis = boost::dynamic_pointer_cast<VectorTypeInfo >( this->getSharedPtr() );
+            assert(mthis);
+            // Allow base to install first
+            TemplateTypeInfo<VectorXd,true>::installTypeInfoObject(ti);
+            // Install the factories for primitive types
+            ti->setMemberFactory( mthis );
+            // Don't delete us, we're memory-managed.
+            return false;
+        }
+#endif
 
         bool resize(base::DataSourceBase::shared_ptr arg, int size) const
         {
