@@ -1,0 +1,29 @@
+<package>
+  <name>rtt_ros_integration</name>
+  <version>2.6.0</version>
+  <description>This stack contains all software necessary to build systems using both Orocos and ROS infrastructures. It depends on the</description>
+    <maintainer email="ruben.smits@mech.kuleuven.be">Ruben Smits</maintainer>
+
+  <license>GPL</license>
+  <license>BSD</license>
+  <license>LGPL</license>
+  <license>GPL + runtime exception</license>
+
+  <url type="website">http://ros.org/wiki/rtt_ros_integration</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author>Maintained by Ruben Smits - Steven Bellens</author>
+
+
+  <run_depend>rtt_rosnode</run_depend>
+  <run_depend>rtt_ros_integration_example</run_depend>
+  <run_depend>rtt_rospack</run_depend>
+
+
+
+
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
