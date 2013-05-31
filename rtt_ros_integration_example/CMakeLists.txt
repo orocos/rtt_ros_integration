@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rtt_ros_integration_example)
 # Load catkin and all dependencies required for this package
 # TODO: remove all from COMPONENTS that are not catkin packages.
-find_package(catkin REQUIRED COMPONENTS rtt rtt_rosnode std_msgs)
+find_package(catkin REQUIRED COMPONENTS rtt_rosnode std_msgs)
 
 # include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 # CATKIN_MIGRATION: removed during catkin migration
@@ -21,11 +21,7 @@ find_package(catkin REQUIRED COMPONENTS rtt rtt_rosnode std_msgs)
 set(ROS_BUILD_TYPE RelWithDebInfo)
 
 
-# CATKIN_MIGRATION: removed during catkin migration
-# rosbuild_init()
-
-rosbuild_find_ros_package(rtt )
-find_package(OROCOS-RTT HINTS ${rtt_PACKAGE_PATH}/../install )
+find_package(OROCOS-RTT REQUIRED)
 
 # Defines the orocos_* cmake macros. See that file for additional
 # documentation.
