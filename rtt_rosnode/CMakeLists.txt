@@ -27,8 +27,9 @@ find_package(OROCOS-RTT REQUIRED)
 
 ##############################################################################
 # FIXME: We need to install this RTTPlugin cmake file with ocl, previously, it
-# was just grabbed from the source in rosbuild
-list(APPEND CMAKE_MODULE_PATH ${ocl_PACKAGE_PATH}/config)
+# was just grabbed from the source in rosbuild, and now, it's copied to the
+# local directory
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(RTTPlugin REQUIRED rtt-marshalling)
 ##############################################################################
 
@@ -38,13 +39,30 @@ include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 #common commands for building c++ executables and libraries
-orocos_plugin(${PROJECT_NAME} src/ros_plugin.cpp src/ros_publish_activity.cpp src/rtt_ros_service.cpp)
+orocos_plugin(${PROJECT_NAME} 
+  src/ros_plugin.cpp 
+  src/ros_publish_activity.cpp
+  src/rtt_ros_service.cpp)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 # build ROS param as a separate service
 orocos_service(rtt_rosparam_service src/rtt_rosparam_service.cpp)
-target_link_libraries(rtt_rosparam_service ${RTT_PLUGIN_rtt-marshalling_LIBRARIES})
+target_link_libraries(rtt_rosparam_service ${RTT_PLUGIN_rtt-marshalling_LIBRARIES} ${catkin_LIBRARIES})
 
-orocos_typekit( rtt-ros-primitives-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_primitives_typekit_plugin.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_time_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint8_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int8_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint16_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int16_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint32_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int32_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint64_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int64_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float32_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float64_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_string_type.cpp )
+orocos_typekit( rtt-ros-primitives-typekit
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_primitives_typekit_plugin.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_time_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint8_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int8_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint16_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int16_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint32_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int32_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint64_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int64_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float32_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float64_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_string_type.cpp )
 
 orocos_generate_package()
 
