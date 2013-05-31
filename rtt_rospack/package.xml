@@ -1,0 +1,27 @@
+<package>
+  <name>rtt_rospack</name>
+  <version>2.6.0</version>
+  <description>rtt_rospack provides an RTT plugin to use rospack to find packages in your ROS_PACKAGE_PATH</description>
+  <maintainer email="ruben.smits@mech.kuleuven.be">Ruben Smits</maintainer>
+
+
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/rtt_rospack</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author>Ruben Smits</author>
+  <author>ruben.smits@mech.kuleuven.be</author>
+
+  <!-- <build_depend>roslib</build_depend> -->
+  <!-- <build_depend>rtt</build_depend> -->
+  <!-- <run_depend>roslib</run_depend> -->
+  <!-- <run_depend>rtt</run_depend> -->
+  <!-- <test_depend>roslib</test_depend> -->
+  <!-- <test_depend>rtt</test_depend> -->
+
+  <export>
+
+  </export>
+</package>
