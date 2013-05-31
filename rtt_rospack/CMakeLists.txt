@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rtt_rospack)
 # Load catkin and all dependencies required for this package
 # TODO: remove all from COMPONENTS that are not catkin packages.
-find_package(catkin REQUIRED COMPONENTS roslib rtt)
+find_package(catkin REQUIRED COMPONENTS roslib)
 
 # include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 # CATKIN_MIGRATION: removed during catkin migration
@@ -23,13 +23,7 @@ project(rtt_rospack)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 set(ROS_BUILD_TYPE MinSizeRel)
 
-
-# CATKIN_MIGRATION: removed during catkin migration
-# rosbuild_init()
-rosbuild_find_ros_package(rtt )
-rosbuild_find_ros_package( ocl )
-set( RTT_HINTS HINTS ${rtt_PACKAGE_PATH}/../install )
-find_package(OROCOS-RTT REQUIRED ${RTT_HINTS})
+find_package(OROCOS-RTT REQUIRED)
 find_package( roslib )
 
 # Defines the orocos_* cmake macros. See that file for additional
