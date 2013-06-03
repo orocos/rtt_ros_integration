@@ -1,0 +1,22 @@
+<package>
+  <name>rtt_rosnode</name>
+  <version>2.6.0</version>
+  <description>
+    rtt_rosnode provides an RTT plugin to add a ROS node to the RTT process, and the necessary template files and cmake macros for automatic rtt typekit and transport generation from ROS msg files
+  </description>
+  <author>Ruben Smits</author>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <license>BSD</license>
+
+  <url>http://ros.org/wiki/rtt_rosnode</url>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rtt</build_depend>
+  <build_depend>roscpp</build_depend>
+
+  <run_depend>rtt</run_depend>
+  <run_depend>roscpp</run_depend>
+  
+</package>
+
+

@@ -1,15 +1,9 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.6.4)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE MinSizeRel)
+catkin_project(@pkgname@)
+set(CMAKE_BUILD_TYPE MinSizeRel)
 
-rosbuild_init()
+find_package(rtt_rosnode)
 
 rosbuild_include(rtt_rosnode GenerateRTTtypekit)
 
