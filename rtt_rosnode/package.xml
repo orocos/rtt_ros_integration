@@ -1,34 +1,22 @@
 <package>
   <name>rtt_rosnode</name>
   <version>2.6.0</version>
-  <description>rtt_rosnode provides an RTT plugin to add a ROS node to the RTT process, and the necessary template files and cmake macros for automatic rtt typekit and transport generation from ROS msg files</description>
-  <maintainer email="ruben.smits@mech.kuleuven.be">Ruben Smits</maintainer>
 
+  <description>
+    rtt_rosnode provides an RTT plugin to add a ROS node to the RTT process, and the necessary template files and cmake macros for automatic rtt typekit and transport generation from ROS msg files
+  </description>
+  <author>Ruben Smits</author>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
   <license>BSD</license>
 
-  <url type="website">http://ros.org/wiki/rtt_rosnode</url>
-  <!-- <url type="bugtracker"></url> -->
-
-  <author email="ruben.smits@mech.kuleuven.be">Ruben Smits</author>
-
+  <url>http://ros.org/wiki/rtt_rosnode</url>
+  
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>roscpp</build_depend> 
-  <build_depend>roslib</build_depend> 
-  <build_depend>rtt</build_depend> 
-  <build_depend>rtt_rospack</build_depend> 
-  <build_depend>ocl</build_depend> 
-  <build_depend>rosbuild</build_depend> 
+  <build_depend>rtt</build_depend>
+  <build_depend>roscpp</build_depend>
 
-  <run_depend>roscpp</run_depend> 
-  <run_depend>roslib</run_depend> 
-  <run_depend>rtt</run_depend> 
-  <run_depend>rtt_rospack</run_depend> 
-  <run_depend>ocl</run_depend> 
-  <run_depend>rosbuild</run_depend> 
-
-  <export>
-    <rosbuild cmake_directory="${prefix}/cmake"/>
-    <cpp cflags="-I${prefix}/src -I${prefix}/include"/>
-  </export>
+  <run_depend>rtt</run_depend>
+  <run_depend>roscpp</run_depend>
+  
 </package>
