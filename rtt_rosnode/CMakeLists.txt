@@ -39,7 +39,12 @@ target_link_libraries(rtt_rosparam_service ${OROCOS-RTT_RTT-MARSHALLING_LIBRARY}
 orocos_typekit( rtt-ros-primitives-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_primitives_typekit_plugin.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_time_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint8_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int8_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint16_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int16_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint32_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int32_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint64_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int64_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float32_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float64_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_string_type.cpp )
 target_link_libraries(rtt-ros-primitives-typekit ${catkin_LIBRARIES})
 
-catkin_python_setup()
+install(PROGRAMS 
+  scripts/create_boost_headers.py
+  scripts/create_rtt_msgs
+  scripts/rtt-upgrade-2.5
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 
 install(DIRECTORY include/ src/
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
