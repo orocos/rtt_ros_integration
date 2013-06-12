@@ -1,7 +1,7 @@
 
 @ROSMSGBOOSTHEADERS@
-#include "ros_msg_transporter.hpp"
-#include "RosLib.hpp"
+#include <rtt_rosnode/ros_msg_transporter.hpp>
+#include <rtt_rosnode/RosLib.hpp>
 #include <rtt/types/TransportPlugin.hpp>
 #include <rtt/types/TypekitPlugin.hpp>
 

@@ -45,17 +45,15 @@ install(PROGRAMS
   scripts/rtt-upgrade-2.5
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-
 install(DIRECTORY include/ src/
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
 )
 
-install(PROGRAMS scripts/create_boost_headers.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(DIRECTORY scripts/rtt_msgs DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-install(PROGRAMS scripts/create_rtt_msgs DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 install(FILES cmake/GenerateRTTtypekit.cmake DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
+install(DIRECTORY cmake/pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
 
 orocos_generate_package()
 
@@ -67,7 +65,7 @@ orocos_generate_package()
 catkin_package(
     DEPENDS roscpp rtt rtt_rospack ocl
     CATKIN_DEPENDS # TODO
-    INCLUDE_DIRS # TODO include
+    INCLUDE_DIRS include
     LIBRARIES # TODO
     CFG_EXTRAS GenerateRTTtypekit.cmake
 )

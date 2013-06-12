@@ -1,7 +1,7 @@
 #include <rtt/RTT.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
-#include <RosLib.hpp> // todo: put RosLib.hpp in include dir of rtt_rosnode package
+#include <rtt_rosnode/RosLib.hpp> 
 
 using namespace RTT;
 using namespace std;
