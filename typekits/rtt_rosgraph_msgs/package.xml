@@ -15,20 +15,17 @@
 		typekit.</description>
   <maintainer email="ruben.smits@mech.kuleuven.be">Ruben Smits</maintainer>
 
-
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/rtt_rosnode</url>
-  <!-- <url type="bugtracker"></url> -->
 
   <author>create_rtt_msgs Generator</author>
 
-  <!-- <build_depend>rtt_rosnode</build_depend> -->
-  <!-- <build_depend>rosgraph_msgs</build_depend> -->
-  <!-- <run_depend>rtt_rosnode</run_depend> -->
-  <!-- <run_depend>rosgraph_msgs</run_depend> -->
-  <!-- <test_depend>rtt_rosnode</test_depend> -->
-  <!-- <test_depend>rosgraph_msgs</test_depend> -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rtt_rosnode</build_depend>
+  <build_depend>rosgraph_msgs</build_depend>
+  <run_depend>rtt_rosnode</run_depend>
+  <run_depend>rosgraph_msgs</run_depend>
 
   <export>
     <cpp cflags="-I${prefix}/include"/>

@@ -5,44 +5,11 @@ project(rtt_rosgraph_msgs)
 # TODO: remove all from COMPONENTS that are not catkin packages.
 find_package(catkin REQUIRED COMPONENTS rtt_rosnode rosgraph_msgs)
 
-# include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
-# CATKIN_MIGRATION: removed during catkin migration
-# cmake_minimum_required(VERSION 2.4.6)
-
-# CATKIN_MIGRATION: removed during catkin migration
-# include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
-
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE MinSizeRel)
-
-
-# CATKIN_MIGRATION: removed during catkin migration
-# rosbuild_init()
-
-
-# CATKIN_MIGRATION
-# use include(module) after finding the path
-# rosbuild_include(rtt_rosnode GenerateRTTtypekit)
-
-find_package(roscpp)
-
+include_directories(include)
 ros_generate_rtt_typekit(rosgraph_msgs)
 
-
-
-# TODO: fill in what other packages will need to use this package
-## DEPENDS: system dependencies of this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## INCLUDE_DIRS: 
-## LIBRARIES: libraries you create in this project that dependent projects also need
 catkin_package(
     DEPENDS rtt_rosnode rosgraph_msgs
-    CATKIN_DEPENDS # TODO
-    INCLUDE_DIRS # TODO include
-    LIBRARIES # TODO
+    CATKIN_DEPENDS rtt_rosnode rosgraph_msgs
+    INCLUDE_DIRS include
 )
