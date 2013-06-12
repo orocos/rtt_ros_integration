@@ -1,18 +1,24 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+# http://ros.org/doc/groovy/api/catkin/html/user_guide/supposed.html
+cmake_minimum_required(VERSION 2.8.3)
+project(rtt_std_msgs)
+# Load catkin and all dependencies required for this package
+# TODO: remove all from COMPONENTS that are not catkin packages.
+find_package(catkin REQUIRED COMPONENTS rtt_rosnode std_msgs)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE MinSizeRel)
-
-rosbuild_init()
-
-rosbuild_include(rtt_rosnode GenerateRTTtypekit)
+# CATKIN_MIGRATION
+# use include(module) after finding the path
+# rosbuild_include(rtt_rosnode GenerateRTTtypekit)
 
 ros_generate_rtt_typekit(std_msgs)
 
-
+# TODO: fill in what other packages will need to use this package
+## DEPENDS: system dependencies of this project that dependent projects also need
+## CATKIN_DEPENDS: catkin_packages dependent projects also need
+## INCLUDE_DIRS: 
+## LIBRARIES: libraries you create in this project that dependent projects also need
+catkin_package(
+    DEPENDS rtt_rosnode std_msgs
+    CATKIN_DEPENDS # TODO
+    INCLUDE_DIRS # TODO 
+    LIBRARIES # TODO
+)
