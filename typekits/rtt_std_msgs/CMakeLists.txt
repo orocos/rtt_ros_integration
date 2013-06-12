@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS rtt_rosnode std_msgs)
 # use include(module) after finding the path
 # rosbuild_include(rtt_rosnode GenerateRTTtypekit)
 
+include_directories(include)
 ros_generate_rtt_typekit(std_msgs)
 
 # TODO: fill in what other packages will need to use this package
@@ -19,6 +20,6 @@ ros_generate_rtt_typekit(std_msgs)
 catkin_package(
     DEPENDS rtt_rosnode std_msgs
     CATKIN_DEPENDS # TODO
-    INCLUDE_DIRS # TODO 
+    INCLUDE_DIRS include
     LIBRARIES # TODO
 )
