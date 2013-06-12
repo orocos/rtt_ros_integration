@@ -1,40 +1,52 @@
 
-rosbuild_find_ros_package( rtt )
-set( RTT_HINTS HINTS ${rtt_PACKAGE_PATH}/../install )
-find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling ${RTT_HINTS})
+find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling)
+
 if (NOT OROCOS-RTT_FOUND)
   message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
 else()
   include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
   add_definitions( -DRTT_COMPONENT )
 endif()
+
 set(ROS_BUILD_TYPE MinSizeRel)
 set(CMAKE_BUILD_TYPE MinSizeRel)
 include(AddFileDependencies)
 
-macro(rosbuild_get_msgs_external package msgs)
-  rosbuild_find_ros_package(${package})
-  
-  file(GLOB _msg_files RELATIVE "${${package}_PACKAGE_PATH}/msg" "${${package}_PACKAGE_PATH}/msg/*.msg")
+macro(get_ros_msgs_external package msgs)
+
+  # Find package with catkin
+  # TODO: Possibly move this find_package call up into the caller scope?
+  find_package(catkin REQUIRED COMPONENTS ${package})
+
+  # Include the cmake file with the msg file paths
+  include("${${package}_DIR}/${package}-msg-paths.cmake"})
+
+  # TODO: Set this to be empty, since _ROSBUILD_GENERATED_MSG_FILES is no longer used?
   set(${msgs} ${_ROSBUILD_GENERATED_MSG_FILES})
-  # Loop over each .msg file, establishing a rule to compile it
-  foreach(_msg ${_msg_files})
-    # Make sure we didn't get a bogus match (e.g., .#Foo.msg, which Emacs
-    # might create as a temporary file).  the file()
-    # command doesn't take a regular expression, unfortunately.
-    if(${_msg} MATCHES "^[^\\.].*\\.msg$")
-      list(APPEND ${msgs} "${${package}_PACKAGE_PATH}/msg/${_msg}")
-    endif(${_msg} MATCHES "^[^\\.].*\\.msg$")
-  endforeach(_msg)
-endmacro(rosbuild_get_msgs_external)
+
+  foreach(_msg_dir ${${package}_MSG_INCLUDE_DIR}) 
+    file(GLOB _msg_files RELATIVE "${_msg_dir}" "${_msg_dir}/*.msg")
+    # Loop over each .msg file, establishing a rule to compile it
+    foreach(_msg ${_msg_files})
+      # Make sure we didn't get a bogus match (e.g., .#Foo.msg, which Emacs
+      # might create as a temporary file).  the file()
+      # command doesn't take a regular expression, unfortunately.
+      if(${_msg} MATCHES "^[^\\.].*\\.msg$")
+        list(APPEND ${msgs} "${_msg_dir}/${_msg}")
+      endif(${_msg} MATCHES "^[^\\.].*\\.msg$")
+    endforeach(_msg)
+  endforeach(_msg_dir)
+endmacro(get_ros_msgs_external)
 
 
 function(ros_generate_rtt_typekit package)
 
-  rosbuild_find_ros_package(rtt_rosnode)
+  find_package(catkin REQUIRED COMPONENTS rtt_rosnode)
 
   #Get all .msg files
-  rosbuild_get_msgs_external(${package} MSGS )
+  # TODO: Replace this with future genmsg feature: https://github.com/ros/genmsg/issues/28
+  #       This will remove the need for globbing
+  get_ros_msgs_external(${package} MSGS )
   
   #Return if nothing to do:
   if ( "${MSGS}" STREQUAL "" )
