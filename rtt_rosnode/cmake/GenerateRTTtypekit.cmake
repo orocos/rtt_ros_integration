@@ -18,13 +18,20 @@ macro(get_ros_msgs_external package msgs)
   # TODO: Possibly move this find_package call up into the caller scope?
   find_package(catkin REQUIRED COMPONENTS ${package})
 
+  # Make sure this package has a msg-paths cmake file
+  set(_msg_paths_file "${${package}_DIR}/${package}-msg-paths.cmake")
+  if(NOT EXISTS ${_msg_paths_file})
+    message(SEND_ERROR "get_ros_msgs_external: Could not find ${package}-msg-paths.cmake file (should be at ${_msg_paths_file}).")
+    return()
+  endif()
+
   # Include the cmake file with the msg file paths
-  include("${${package}_DIR}/${package}-msg-paths.cmake"})
+  include(${_msg_paths_file})
 
   # TODO: Set this to be empty, since _ROSBUILD_GENERATED_MSG_FILES is no longer used?
   set(${msgs} ${_ROSBUILD_GENERATED_MSG_FILES})
 
-  foreach(_msg_dir ${${package}_MSG_INCLUDE_DIR}) 
+  foreach(_msg_dir ${${package}_MSG_INCLUDE_DIRS}) 
     file(GLOB _msg_files RELATIVE "${_msg_dir}" "${_msg_dir}/*.msg")
     # Loop over each .msg file, establishing a rule to compile it
     foreach(_msg ${_msg_files})
@@ -50,7 +57,7 @@ function(ros_generate_rtt_typekit package)
   
   #Return if nothing to do:
   if ( "${MSGS}" STREQUAL "" )
-    message("ros_generate_rtt_typekit: could not find any .msg files in the ${package} package.")
+    message(SEND_ERROR "ros_generate_rtt_typekit: Could not find any .msg files in the ${package} package.")
     return()
   endif()
 

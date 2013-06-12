@@ -69,4 +69,5 @@ catkin_package(
     CATKIN_DEPENDS # TODO
     INCLUDE_DIRS # TODO include
     LIBRARIES # TODO
+    CFG_EXTRAS GenerateRTTtypekit.cmake
 )
