@@ -48,12 +48,15 @@ endmacro(get_ros_msgs_external)
 
 function(ros_generate_rtt_typekit package)
 
-  find_package(catkin REQUIRED COMPONENTS rtt_rosnode ${package})
+  find_package(catkin REQUIRED COMPONENTS genmsg rtt_rosnode ${package})
 
-  #Get all .msg files
-  # TODO: Replace this with future genmsg feature: https://github.com/ros/genmsg/issues/28
-  #       This will remove the need for globbing
-  get_ros_msgs_external(${package} MSGS )
+  # Get all .msg files
+  if(genmsg_VERSION VERSION_GREATER 0.4.19)
+    set(MSGS ${${package}_MESSAGE_FILES})
+  else()
+    message("Using old get_ros_msgs_external")
+    get_ros_msgs_external(${package} MSGS )
+  endif()
   
   #Return if nothing to do:
   if ( "${MSGS}" STREQUAL "" )
