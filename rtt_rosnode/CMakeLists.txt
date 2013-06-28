@@ -17,16 +17,18 @@ find_package(catkin REQUIRED COMPONENTS roscpp)
 # Defines the orocos_* cmake macros. See that file for additional
 # documentation.
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories(${catkin_INCLUDE_DIRS})
+
+include_directories(
+  include
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
+  ${catkin_INCLUDE_DIRS})
 
 set(SKIP_PKG_CONFIG_GENERATION TRUE)
 catkin_package(
   INCLUDE_DIRS include src
-  CATKIN_DEPENDS roscpp rtt 
+  CATKIN_DEPENDS roscpp rtt rtt_rospack ocl
   CFG_EXTRAS GenerateRTTtypekit.cmake
   SKIP_PKG_CONFIG_GENERATION )
-
 
 #common commands for building c++ executables and libraries
 orocos_plugin(rtt_rosnode src/ros_plugin.cpp src/ros_publish_activity.cpp src/rtt_ros_service.cpp)
@@ -57,15 +59,3 @@ install(DIRECTORY cmake/pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINAT
 
 orocos_generate_package()
 
-# TODO: fill in what other packages will need to use this package
-## DEPENDS: system dependencies of this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## INCLUDE_DIRS: 
-## LIBRARIES: libraries you create in this project that dependent projects also need
-catkin_package(
-    DEPENDS roscpp rtt rtt_rospack ocl
-    CATKIN_DEPENDS # TODO
-    INCLUDE_DIRS include
-    LIBRARIES # TODO
-    CFG_EXTRAS GenerateRTTtypekit.cmake
-)
