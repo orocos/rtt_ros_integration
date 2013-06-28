@@ -56,7 +56,7 @@
 #include <ros/ros.h>
 
 
-#include "ros_publish_activity.hpp"
+#include <rtt_rosnode/ros_publish_activity.hpp>
 
 namespace ros_integration {
 

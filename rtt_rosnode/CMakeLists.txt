@@ -23,13 +23,13 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${catkin_INCLUDE_DIRS})
 
-set(SKIP_PKG_CONFIG_GENERATION TRUE)
+#set(SKIP_PKG_CONFIG_GENERATION TRUE)
 catkin_package(
   INCLUDE_DIRS include src
   DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp  rtt_rospack 
-  CFG_EXTRAS GenerateRTTtypekit.cmake
-  SKIP_PKG_CONFIG_GENERATION )
+  CFG_EXTRAS GenerateRTTtypekit.cmake)
+#  SKIP_PKG_CONFIG_GENERATION )
 
 #common commands for building c++ executables and libraries
 orocos_plugin(rtt_rosnode src/ros_plugin.cpp src/ros_publish_activity.cpp src/rtt_ros_service.cpp)
@@ -48,7 +48,7 @@ install(PROGRAMS
   scripts/rtt-upgrade-2.5
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-install(DIRECTORY include/ src/
+install(DIRECTORY include/${PROJECT_NAME}/
    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
 )
