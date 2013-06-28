@@ -26,7 +26,8 @@ include_directories(
 set(SKIP_PKG_CONFIG_GENERATION TRUE)
 catkin_package(
   INCLUDE_DIRS include src
-  CATKIN_DEPENDS roscpp rtt rtt_rospack ocl
+  DEPENDS rtt ocl
+  CATKIN_DEPENDS roscpp  rtt_rospack 
   CFG_EXTRAS GenerateRTTtypekit.cmake
   SKIP_PKG_CONFIG_GENERATION )
 
