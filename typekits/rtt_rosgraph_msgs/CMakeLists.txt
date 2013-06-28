@@ -5,11 +5,12 @@ project(rtt_rosgraph_msgs)
 # TODO: remove all from COMPONENTS that are not catkin packages.
 find_package(catkin REQUIRED COMPONENTS rtt_rosnode rosgraph_msgs)
 
-include_directories(include)
-ros_generate_rtt_typekit(rosgraph_msgs)
-
 catkin_package(
-    DEPENDS rtt_rosnode rosgraph_msgs
+    DEPENDS ocl rtt
     CATKIN_DEPENDS rtt_rosnode rosgraph_msgs
     INCLUDE_DIRS include
 )
+
+include_directories(include ${catkin_INCLUDE_DIRS})
+ros_generate_rtt_typekit(rosgraph_msgs)
+
