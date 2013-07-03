@@ -90,12 +90,12 @@ namespace ros_integration {
     RosPubChannelElement(base::PortInterface* port,const ConnPolicy& policy)
     {
       if ( policy.name_id.empty() ){
-	std::stringstream namestr;
-	gethostname(hostname, sizeof(hostname));
-	
-	namestr << hostname<<'/' << port->getInterface()->getOwner()->getName()
-		<< '/' << port->getName() << '/'<<this << '/' << getpid();
-	policy.name_id = namestr.str();
+        std::stringstream namestr;
+        gethostname(hostname, sizeof(hostname));
+
+        namestr << hostname<<'/' << port->getInterface()->getOwner()->getName()
+          << '/' << port->getName() << '/'<<this << '/' << getpid();
+        policy.name_id = namestr.str();
       }
       topicname=policy.name_id;
       Logger::In in(topicname);
