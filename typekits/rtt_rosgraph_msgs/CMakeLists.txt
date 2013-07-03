@@ -8,7 +8,6 @@ find_package(catkin REQUIRED COMPONENTS rtt_rosnode rosgraph_msgs)
 catkin_package(
     DEPENDS ocl rtt
     CATKIN_DEPENDS rtt_rosnode rosgraph_msgs
-    INCLUDE_DIRS include
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
