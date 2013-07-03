@@ -21,7 +21,6 @@ public:
     protocol_id(ORO_ROS_PROTOCOL_ID)
   {
     this->doc("Main RTT Service for connecting RTT ports to ROS message topics. See also the 'rosparam' service which can be added to a component and the 'rospack' global service for finding ros packages.");
-    // stream("Simulation.ctrl", ros.topic("/cmd_vel") )
     this->addOperation("topic", &ROSService::topic, this).doc(
         "Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last message is kept.").arg(
             "name", "The ros topic name");
