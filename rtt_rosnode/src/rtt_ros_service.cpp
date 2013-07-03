@@ -20,10 +20,15 @@ public:
     : Service("ros", owner),
     protocol_id(ORO_ROS_PROTOCOL_ID)
   {
-    this->doc("The main ROS helper service for RTT. See also the 'rosparam' service which can be added to a component and the 'rospack' global service for finding ros packages.");
+    this->doc("Main RTT Service for connecting RTT ports to ROS message topics. See also the 'rosparam' service which can be added to a component and the 'rospack' global service for finding ros packages.");
     // stream("Simulation.ctrl", ros.topic("/cmd_vel") )
-    this->addOperation("topic", &ROSService::topic, this).doc("Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last sample is kept.").arg("name", "The ros topic name");
-    this->addOperation("topicBuffer", &ROSService::topicBuffer, this).doc("Creates a ConnPolicy for subscribing to or publishing a topic.").arg("name", "The ros topic name").arg("size","The size of the buffer.");
+    this->addOperation("topic", &ROSService::topic, this).doc(
+        "Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last message is kept.").arg(
+            "name", "The ros topic name");
+    this->addOperation("topicBuffer", &ROSService::topicBuffer, this).doc(
+        "Creates a ConnPolicy for subscribing to or publishing a topic with a fixed-length message buffer.").arg(
+            "name", "The ros topic name").arg(
+            "size","The size of the buffer.");
     this->addConstant("protocol_id", protocol_id );
   }
 

@@ -14,23 +14,23 @@ public:
     RosParam(TaskContext* owner) :
         Service("rosparam", owner)
     {
-        addOperation("storeProperties", &RosParam::storeProperties, this) .doc(
-                "Stores all properties of this component to the ros param server");
-        addOperation("refreshProperties", &RosParam::refreshProperties, this).doc(
-                "Refreshes all properties of this component from the ros param server");
-        addOperation("storeProperty", &RosParam::storeProperty, this) .doc(
-                "Stores one property of this component to the ros param server").arg(
-                "param_name", "Name of the property.").arg("private",
-                "true if parameter should be put in private namespace").arg(
-                "relative",
-                "true if parameter should be put in the relative (component name) namespace");
-        addOperation("refreshProperty", &RosParam::refreshProperty, this) .doc(
-                "Refreshes one property of this component from the ros param server").arg(
-                "param_name", "Name of the property.").arg("private",
-                "true if parameter should be found the private namespace").arg(
-                "relative",
-                "true if parameter should be found in the relative (component name) namespace");
-        this->doc("Store component properties on the ROS parameter server or refresh them using values on the ROS parameter server");
+      this->doc("RTT Service for synchronizing ROS parameters with the properties of a corresponding RTT component");
+      this->addOperation("storeProperties", &RosParam::storeProperties, this) .doc(
+          "Stores all properties of this component to the ros param server");
+      this->addOperation("refreshProperties", &RosParam::refreshProperties, this).doc(
+          "Refreshes all properties of this component from the ros param server");
+      this->addOperation("storeProperty", &RosParam::storeProperty, this) .doc(
+          "Stores one property of this component to the ros param server").arg(
+              "param_name", "Name of the property.").arg("private",
+              "true if parameter should be put in private namespace").arg(
+              "relative",
+              "true if parameter should be put in the relative (component name) namespace");
+      this->addOperation("refreshProperty", &RosParam::refreshProperty, this) .doc(
+          "Refreshes one property of this component from the ros param server").arg(
+              "param_name", "Name of the property.").arg("private",
+              "true if parameter should be found the private namespace").arg(
+              "relative",
+              "true if parameter should be found in the relative (component name) namespace");
     }
 private:
 

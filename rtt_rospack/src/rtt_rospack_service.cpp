@@ -42,7 +42,9 @@ public:
     ROSPackService(TaskContext* owner) 
         : Service("rospack", owner) 
     {
-        this->addOperation("find", &ros::package::getPath).doc("Returns the fully-qualified path to a package, or an empty string if the package is not found");
+      this->doc("RTT Service for locating ROS resources using rospack.");
+      this->addOperation("find", &ros::package::getPath).doc(
+          "Returns the fully-qualified path to a package, or an empty string if the package is not found");
     }
 };
 

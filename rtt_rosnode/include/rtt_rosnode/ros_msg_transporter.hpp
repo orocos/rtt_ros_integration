@@ -195,21 +195,21 @@ namespace ros_integration {
     }
   };
 
-    template <class T>
-    class RosMsgTransporter : public RTT::types::TypeTransporter{
-        virtual base::ChannelElementBase::shared_ptr createStream (base::PortInterface *port, const ConnPolicy &policy, bool is_sender) const{
-            base::ChannelElementBase* buf = internal::ConnFactory::buildDataStorage<T>(policy);
-            base::ChannelElementBase::shared_ptr tmp;
-            if(is_sender){
-                tmp = base::ChannelElementBase::shared_ptr(new RosPubChannelElement<T>(port,policy));
-                buf->setOutput(tmp);
-                return buf;
-            }
-            else {
-                tmp = new RosSubChannelElement<T>(port,policy);
-                tmp->setOutput(buf);
-                return tmp;
-            }
+  template <class T>
+  class RosMsgTransporter : public RTT::types::TypeTransporter{
+    virtual base::ChannelElementBase::shared_ptr createStream (base::PortInterface *port, const ConnPolicy &policy, bool is_sender) const{
+      base::ChannelElementBase* buf = internal::ConnFactory::buildDataStorage<T>(policy);
+      base::ChannelElementBase::shared_ptr tmp;
+      if(is_sender){
+        tmp = base::ChannelElementBase::shared_ptr(new RosPubChannelElement<T>(port,policy));
+        buf->setOutput(tmp);
+        return buf;
+      }
+      else {
+        tmp = new RosSubChannelElement<T>(port,policy);
+        tmp->setOutput(buf);
+        return tmp;
+      }
     }
   };
 } 
