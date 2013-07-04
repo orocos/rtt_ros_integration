@@ -1,14 +1,13 @@
-cmake_minimum_required(VERSION 2.6.4)
+cmake_minimum_required(VERSION 2.8.3)
 
-catkin_project(@pkgname@)
-set(CMAKE_BUILD_TYPE MinSizeRel)
+project(rtt_@pkgname@)
 
-find_package(rtt_rosnode)
+find_package(catkin REQUIRED COMPONENTS rtt_rosnode @pkgname@)
 
-rosbuild_include(rtt_rosnode GenerateRTTtypekit)
+catkin_package(
+  DEPENDS ocl rtt
+  CATKIN_DEPENDS rtt_rosnode @pkgname@)
 
-find_package(roscpp)
-
+include_directories(${catkin_INCLUDE_DIRS})
 ros_generate_rtt_typekit(@pkgname@)
-
 
