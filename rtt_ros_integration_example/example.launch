@@ -1,3 +1,3 @@
 <launch>
-<node name="Example" pkg="ocl" type="deployer-gnulinux" args="-s $(find rtt_ros_integration_example)/example.ops -linfo --" output="screen"/>
+<node name="Example" pkg="rtt_rosnode" type="deployer" args="-s $(find rtt_ros_integration_example)/example.ops -linfo --" output="screen"/>
 </launch>

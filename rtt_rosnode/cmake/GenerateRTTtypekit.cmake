@@ -48,7 +48,7 @@ endmacro(get_ros_msgs_external)
 
 function(ros_generate_rtt_typekit package)
 
-  find_package(catkin REQUIRED COMPONENTS genmsg rtt_rosnode ${package})
+  find_package(catkin REQUIRED COMPONENTS genmsg rtt_rosnode rosconsole ${package})
 
   # Get all .msg files
   if(genmsg_VERSION VERSION_GREATER 0.4.19)
@@ -88,13 +88,13 @@ function(ros_generate_rtt_typekit package)
     set(ROSMSGTYPESHEADERS "${ROSMSGTYPESHEADERS}#include \"${ROSMSGNAME}.h\"\n")
 
     # Necessary for create_boost_headers.py command below
-    list(APPEND ROSMSGS_GENERATED_BOOST_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/${ROSMSGBOOSTHEADER}")
+    list(APPEND ROSMSGS_GENERATED_BOOST_HEADERS "${CATKIN_DEVEL_PREFIX}/include/${ROSMSGBOOSTHEADER}")
     
     # TypeInfo object:
     set(_template_types_src_dir "${rtt_rosnode_DIR}/pkg_template/src/orocos/types")
-    set(_template_types_dst_dir "${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types")
+    set(_template_types_dst_dir "${CATKIN_DEVEL_PREFIX}/src/orocos/types")
     set(_template_typekit_src_dir "${rtt_rosnode_DIR}/pkg_template/include/PKG_NAME/typekit")
-    set(_template_typekit_dst_dir "${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/typekit")
+    set(_template_typekit_dst_dir "${CATKIN_DEVEL_PREFIX}/include/${package}/typekit")
 
     configure_file( 
       ${_template_types_src_dir}/ros_msg_typekit_plugin.cpp.in 
@@ -144,6 +144,7 @@ function(ros_generate_rtt_typekit package)
   orocos_typekit( rtt-${package}-ros-transport ${_template_types_dst_dir}/ros_${package}_transport.cpp )
   add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
   add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
+
   if (CMAKE_COMPILER_IS_GNUCXX)
     #
     # This fails on Ubuntu Lucid with gcc Ubuntu 4.4.3-4ubuntu5 and ld/binutils 2.20.1-system.20100303 and ld/binutils-gold 2.20.1-system.20100303) 1.9
@@ -157,7 +158,7 @@ function(ros_generate_rtt_typekit package)
   endif()
 
   set_directory_properties(PROPERTIES 
-    ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${CMAKE_CURRENT_SOURCE_DIR}/include/${package}/boost")
+    ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${CATKIN_DEVEL_PREFIX}/include/${package}/boost")
 
   orocos_generate_package()
   
