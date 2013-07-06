@@ -33,8 +33,6 @@
 #include <rtt/os/startstop.h>
 #include <ros/ros.h>
 
-void loadROSService();
-
 using namespace RTT;
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
@@ -54,12 +52,10 @@ extern "C" {
     static ros::AsyncSpinner spinner(1); // Use 1 threads
     spinner.start();
     log(Info)<<"ROS node spinner started"<<endlog();
-
-    loadROSService();
     return true;
   }
   std::string getRTTPluginName (){
-    return "ros_integration";
+    return "rtt_ros";
   }
   std::string getRTTTargetName (){
     return OROCOS_TARGET_NAME;
