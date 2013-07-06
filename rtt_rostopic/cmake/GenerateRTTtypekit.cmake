@@ -93,9 +93,9 @@ function(ros_generate_rtt_typekit package)
     list(APPEND ROSMSGS_GENERATED_BOOST_HEADERS "${CATKIN_DEVEL_PREFIX}/include/${ROSMSGBOOSTHEADER}")
     
     # TypeInfo object:
-    set(_template_types_src_dir "${rtt_rosnode_DIR}/pkg_template/src/orocos/types")
+    set(_template_types_src_dir "${rtt_rosnode_DIR}/rtt_msg_pkg_template/src/orocos/types")
     set(_template_types_dst_dir "${CATKIN_DEVEL_PREFIX}/src/orocos/types")
-    set(_template_typekit_src_dir "${rtt_rosnode_DIR}/pkg_template/include/PKG_NAME/typekit")
+    set(_template_typekit_src_dir "${rtt_rosnode_DIR}/rtt_msg_pkg_template/include/PKG_NAME/typekit")
     set(_template_typekit_dst_dir "${CATKIN_DEVEL_PREFIX}/include/${package}/typekit")
 
     configure_file( 
