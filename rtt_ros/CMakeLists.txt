@@ -7,15 +7,17 @@ find_package(OROCOS-RTT REQUIRED rtt-marshalling)
 # Defines the orocos_* cmake macros. See that file for additional
 # documentation.
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
+include(cmake/rtt_ros-extras.cmake)
 
 catkin_package(
   DEPENDS rtt ocl
-  CATKIN_DEPENDS roscpp  rtt_rospack)
+  CATKIN_DEPENDS roscpp  rtt_rospack
+  CFG_EXTRAS rtt_ros-extras.cmake)
 
 include_directories(${catkin_INCLUDE_DIRS})
 
 # Create orocos rosnode plugin
-orocos_plugin(rtt_ros src/ros_plugin.cpp)
+catkin_orocos_plugin(rtt_ros src/ros_plugin.cpp)
 target_link_libraries(rtt_ros ${catkin_LIBRARIES})
 
 # Generate install targets and pkg-config files

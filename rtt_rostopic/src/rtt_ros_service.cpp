@@ -59,3 +59,17 @@ void loadROSService(){
   RTT::Service::shared_ptr rts(new ROSService(0));
   RTT::internal::GlobalService::Instance()->addService(rts);
 }
+
+using namespace RTT;
+extern "C" {
+  bool loadRTTPlugin(RTT::TaskContext* c){
+    loadROSService();
+    return true;
+  }
+  std::string getRTTPluginName (){
+    return "ros";
+  }
+  std::string getRTTTargetName (){
+    return OROCOS_TARGET_NAME;
+  }
+}

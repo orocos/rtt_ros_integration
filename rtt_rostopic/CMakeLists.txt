@@ -8,19 +8,19 @@ find_package(OROCOS-RTT REQUIRED rtt-marshalling)
 # documentation.
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
-orocos_use_package(rtt_ros)
+#orocos_use_package(rtt_ros)
 
 catkin_package(
   INCLUDE_DIRS include 
   DEPENDS rtt ocl
-  CATKIN_DEPENDS roscpp  rtt_rospack 
+  CATKIN_DEPENDS roscpp rtt_ros rtt_rospack 
   CFG_EXTRAS GenerateRTTtypekit.cmake)
 
 include_directories(
   include
   ${catkin_INCLUDE_DIRS})
 
-orocos_service(rtt_rostopic
+catkin_orocos_service(rtt_rostopic
   src/rtt_ros_service.cpp
   src/ros_publish_activity.cpp)
 target_link_libraries(rtt_rostopic ${catkin_LIBRARIES})
