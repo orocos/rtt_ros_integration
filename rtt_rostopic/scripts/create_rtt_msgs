@@ -51,7 +51,7 @@ done
 
 
 # Locate the template directory.
-templatedir="$(rospack find rtt_rosnode)/scripts/rtt_msgs"
+templatedir="$(rospack find rtt_rostopic)/scripts/rtt_msgs"
 
 # final check:
 if [ ! -d "$templatedir" ]; then

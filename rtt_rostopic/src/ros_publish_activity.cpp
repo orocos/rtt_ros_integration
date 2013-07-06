@@ -27,7 +27,7 @@
 
 
 
-#include <rtt_rosnode/ros_publish_activity.hpp>
+#include <rtt_rostopic/ros_publish_activity.hpp>
 
 namespace ros_integration {
   RosPublishActivity::weak_ptr RosPublishActivity::ros_pub_act;

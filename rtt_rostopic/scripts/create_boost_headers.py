@@ -2,7 +2,7 @@
 import sys
 
 import roslib
-roslib.load_manifest("rtt_rosnode");
+roslib.load_manifest("rtt_rostopic");
 
 try:
     if(roslib.stacks.get_stack_version('ros')<'1.8.0'):

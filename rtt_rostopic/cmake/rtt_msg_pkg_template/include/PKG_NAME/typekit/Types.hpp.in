@@ -1,4 +1,4 @@
-/* Generated from rtt_rosnode/src/Types.hpp.in */
+/* Generated from rtt_rostopic/src/Types.hpp.in */
 
 #ifndef __OROCOS_ROS_GENERATED_@ROSPACKAGE@_TYPES_HPP
 #define __OROCOS_ROS_GENERATED_@ROSPACKAGE@_TYPES_HPP

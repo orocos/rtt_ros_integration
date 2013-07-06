@@ -48,9 +48,9 @@ endmacro(get_ros_msgs_external)
 
 function(ros_generate_rtt_typekit package)
 
-  find_package(catkin REQUIRED COMPONENTS genmsg rtt_rosnode roscpp ${package})
+  find_package(catkin REQUIRED COMPONENTS genmsg rtt_rostopic roscpp ${package})
 
-  orocos_use_package(rtt_rosnode)
+  orocos_use_package(rtt_rostopic)
 
   # Get all .msg files
   if(genmsg_VERSION VERSION_GREATER 0.4.19)
@@ -93,9 +93,9 @@ function(ros_generate_rtt_typekit package)
     list(APPEND ROSMSGS_GENERATED_BOOST_HEADERS "${CATKIN_DEVEL_PREFIX}/include/${ROSMSGBOOSTHEADER}")
     
     # TypeInfo object:
-    set(_template_types_src_dir "${rtt_rosnode_DIR}/rtt_msg_pkg_template/src/orocos/types")
+    set(_template_types_src_dir "${rtt_rostopic_DIR}/rtt_msg_pkg_template/src/orocos/types")
     set(_template_types_dst_dir "${CATKIN_DEVEL_PREFIX}/src/orocos/types")
-    set(_template_typekit_src_dir "${rtt_rosnode_DIR}/rtt_msg_pkg_template/include/PKG_NAME/typekit")
+    set(_template_typekit_src_dir "${rtt_rostopic_DIR}/rtt_msg_pkg_template/include/PKG_NAME/typekit")
     set(_template_typekit_dst_dir "${CATKIN_DEVEL_PREFIX}/include/${package}/typekit")
 
     configure_file( 
@@ -120,7 +120,7 @@ function(ros_generate_rtt_typekit package)
   
   add_custom_command(
     OUTPUT ${ROSMSGS_GENERATED_BOOST_HEADERS} 
-    COMMAND rosrun rtt_rosnode create_boost_headers.py ${package}
+    COMMAND rosrun rtt_rostopic create_boost_headers.py ${package}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} 
     DEPENDS ${MSGS} 
     VERBATIM)

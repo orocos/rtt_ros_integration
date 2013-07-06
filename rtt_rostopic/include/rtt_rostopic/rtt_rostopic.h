@@ -1,7 +1,7 @@
 /***************************************************************************
-  tag: Ruben Smits  Tue Nov 16 09:18:49 CET 2010  RosLib.hpp
+  tag: Ruben Smits  Tue Nov 16 09:18:49 CET 2010  rtt_rostopic.h
 
-                        RosLib.hpp -  description
+                        rtt_rostopic.h -  description
                            -------------------
     begin                : Tue November 16 2010
     copyright            : (C) 2010 Ruben Smits

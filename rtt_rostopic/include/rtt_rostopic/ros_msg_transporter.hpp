@@ -56,7 +56,7 @@
 #include <ros/ros.h>
 
 
-#include <rtt_rosnode/ros_publish_activity.hpp>
+#include <rtt_rostopic/ros_publish_activity.hpp>
 
 namespace ros_integration {
 
@@ -196,7 +196,8 @@ namespace ros_integration {
   };
 
   template <class T>
-  class RosMsgTransporter : public RTT::types::TypeTransporter{
+  class RosMsgTransporter : public RTT::types::TypeTransporter
+  {
     virtual base::ChannelElementBase::shared_ptr createStream (base::PortInterface *port, const ConnPolicy &policy, bool is_sender) const{
       base::ChannelElementBase* buf = internal::ConnFactory::buildDataStorage<T>(policy);
       base::ChannelElementBase::shared_ptr tmp;

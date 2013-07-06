@@ -1,7 +1,7 @@
 #include <rtt/RTT.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
-#include <rtt_rosnode/RosLib.hpp> 
+#include <rtt_rostopic/rtt_rostopic.h> 
 
 using namespace RTT;
 using namespace std;
