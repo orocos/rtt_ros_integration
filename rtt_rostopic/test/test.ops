@@ -1,0 +1,5 @@
+
+# Import RTT ROS plugin
+import("rtt_rostopic")
+
+ros.topic("float_out")
