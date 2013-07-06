@@ -18,9 +18,13 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS})
 
+orocos_library(rtt_rostopic
+  src/ros_publish_activity.cpp
+  )
+target_link_libraries(rtt_rostopic ${catkin_LIBRARIES})
+
 orocos_plugin(rtt_rosnode 
   src/ros_plugin.cpp 
-  src/ros_publish_activity.cpp
   src/rtt_ros_service.cpp)
 target_link_libraries(rtt_rosnode ${catkin_LIBRARIES})
 
@@ -39,6 +43,12 @@ orocos_typekit( rtt-ros-primitives-typekit
   ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float64_type.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_string_type.cpp )
 target_link_libraries(rtt-ros-primitives-typekit ${catkin_LIBRARIES})
+
+# Generate install targets for headers
+orocos_install_headers(
+  include/rtt_rosnode/RosLib.hpp
+  include/rtt_rosnode/ros_msg_transporter.hpp
+  include/rtt_rosnode/ros_publish_activity.hpp)
 
 # Generate install targets and pkg-config files
 orocos_generate_package()

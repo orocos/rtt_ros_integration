@@ -48,7 +48,9 @@ endmacro(get_ros_msgs_external)
 
 function(ros_generate_rtt_typekit package)
 
-  find_package(catkin REQUIRED COMPONENTS genmsg rtt_rosnode rosconsole ${package})
+  find_package(catkin REQUIRED COMPONENTS genmsg rtt_rosnode roscpp ${package})
+
+  orocos_use_package(rtt_rosnode)
 
   # Get all .msg files
   if(genmsg_VERSION VERSION_GREATER 0.4.19)
@@ -144,6 +146,8 @@ function(ros_generate_rtt_typekit package)
   orocos_typekit( rtt-${package}-ros-transport ${_template_types_dst_dir}/ros_${package}_transport.cpp )
   add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
   add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
+
+  #target_link_libraries( rtt-${package}-ros-transport ${roscpp_LIBRARIES} )
 
   if (CMAKE_COMPILER_IS_GNUCXX)
     #
