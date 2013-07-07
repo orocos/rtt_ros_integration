@@ -1,0 +1,26 @@
+<package>
+  <name>rtt_rosnode</name>
+  <version>2.6.0</version>
+
+  <description>
+    This package provides an RTT plugin to add a ROS node to the RTT process.
+  </description>
+  <author>Ruben Smits</author>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <license>BSD</license>
+
+  <url>http://ros.org/wiki/rtt_ros</url>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rtt</build_depend>
+  <build_depend>ocl</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rtt_ros</build_depend>
+
+  <run_depend>rtt</run_depend>
+  <run_depend>ocl</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>rtt_ros</run_depend>
+  
+</package>
