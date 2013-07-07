@@ -1,0 +1,17 @@
+<launch>
+  <!-- Orocos log level (one of never, fatal, critical, error, warning, info, debug, realtime) -->
+  <arg name="LOG_LEVEL" default="info"/>
+  <!-- Additional Orocos deployer args -->
+  <arg name="DEPLOYER_ARGS" default=""/>
+
+  <arg name="RTT_COMPONENT_PATH" default="$(env LD_LIBRARY_PATH)"/>
+
+  <!-- Launch deployer -->
+  <node 
+    name="$(anon deployer)"
+    pkg="rtt_ros" type="deployer" 
+    args="-l $(arg LOG_LEVEL) $(arg DEPLOYER_ARGS) --"
+    output="screen">
+    <env name="RTT_COMPONENT_PATH" value="$(arg RTT_COMPONENT_PATH)"/>
+  </node>
+</launch>
