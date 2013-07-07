@@ -11,12 +11,13 @@ ROS parameter server.
 
 The packages in this repository provide:
 
+ * **rtt\_ros** CMake macros, wrapper scripts, and launchfiles for using Orocos
+   with ROS.
  * **rtt\_rostopic** ROS message typekit generation and Orocos plugin for
    publishing and subscribing to ROS topics.
- * **rtt\_ros** Plugin for ROS node instantiation inside an Orocos program, and common
-   roslaunch files.
+ * **rtt\_rosnode** Plugin for ROS node instantiation inside an Orocos program.
  * **rtt\_rosparam** Plugin for synchronizing ROS parameters with Orocos
-   component properties
+   component properties.
  * **rtt\_rospacak** Plugin for locating ROS resources.
 
 See each package's README.md file for more information.
