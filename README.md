@@ -11,7 +11,8 @@ ROS parameter server.
 
 The packages in this repository provide:
 
- * **rtt\_rostopic** ROS message typekit generation.
+ * **rtt\_rostopic** ROS message typekit generation and Orocos plugin for
+   publishing and subscribing to ROS topics.
  * **rtt\_ros** Plugin for ROS node instantiation inside an Orocos program, and common
    roslaunch files.
  * **rtt\_rosparam** Plugin for synchronizing ROS parameters with Orocos
