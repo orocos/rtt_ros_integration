@@ -1,16 +1,14 @@
-# http://ros.org/doc/groovy/api/catkin/html/user_guide/supposed.html
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_std_msgs)
-# Load catkin and all dependencies required for this package
-# TODO: remove all from COMPONENTS that are not catkin packages.
-find_package(catkin REQUIRED COMPONENTS rtt_rosnode std_msgs)
 
-include_directories(include)
-ros_generate_rtt_typekit(std_msgs)
+find_package(catkin REQUIRED COMPONENTS rtt_rostopic std_msgs)
 
 catkin_package(
-    DEPENDS rtt_rosnode std_msgs
-    CATKIN_DEPENDS rtt_rosnode std_msgs
-    INCLUDE_DIRS include
+    DEPENDS rtt_rostopic std_msgs
+    CATKIN_DEPENDS rtt_rostopic std_msgs
 )
+
+include_directories(${catkin_INCLUDE_DIRS})
+ros_generate_rtt_typekit(std_msgs)
+
 
