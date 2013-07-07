@@ -60,11 +60,15 @@ install(DIRECTORY include/${PROJECT_NAME}/
    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
 )
 
-install(DIRECTORY scripts/rtt_msgs DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+# Install cmake macros
+install(FILES cmake/GenerateRTTtypekit.cmake cmake/create_boost_header.py
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
 
-install(FILES cmake/GenerateRTTtypekit.cmake DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
-install(DIRECTORY cmake/rtt_msg_pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
+# Install template files to both install and develspace
+install(DIRECTORY rtt_msg_pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
+file(COPY rtt_msg_pkg_template DESTINATION "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake")
 
+# Install tests
 install(FILES 
   test/test.launch 
   test/test.ops 

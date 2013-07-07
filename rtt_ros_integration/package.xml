@@ -15,9 +15,11 @@
   <author>Maintained by Ruben Smits - Steven Bellens</author>
 
 
-  <run_depend>rtt_rosnode</run_depend>
   <run_depend>rtt_ros_integration_example</run_depend>
+  <run_depend>rtt_ros</run_depend>
   <run_depend>rtt_rospack</run_depend>
+  <run_depend>rtt_rosparam</run_depend>
+  <run_depend>rtt_rostopic</run_depend>
 
 
 
