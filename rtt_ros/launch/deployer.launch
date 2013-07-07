@@ -4,7 +4,7 @@
   <!-- Additional Orocos deployer args -->
   <arg name="DEPLOYER_ARGS" default=""/>
   <!-- Orocos target (gnulinux, xenomai, etc) -->
-  <arg name="OROCOS_TARGET" default="$(env OROCOS_TARGET)"/>
+  <arg name="OROCOS_TARGET" default="$(optenv OROCOS_TARGET)"/>
   <!-- Path to look for dynamically-loaded plugins and components -->
   <arg name="RTT_COMPONENT_PATH" default="$(env LD_LIBRARY_PATH)"/>
 
