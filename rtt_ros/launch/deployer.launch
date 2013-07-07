@@ -1,9 +1,11 @@
 <launch>
-  <!-- Orocos log level (one of never, fatal, critical, error, warning, info, debug, realtime) -->
+  <!-- Orocos log level (never, fatal, critical, error, warning, info, debug, realtime) -->
   <arg name="LOG_LEVEL" default="info"/>
   <!-- Additional Orocos deployer args -->
   <arg name="DEPLOYER_ARGS" default=""/>
-
+  <!-- Orocos target (gnulinux, xenomai, etc) -->
+  <arg name="OROCOS_TARGET" default="$(env OROCOS_TARGET)"/>
+  <!-- Path to look for dynamically-loaded plugins and components -->
   <arg name="RTT_COMPONENT_PATH" default="$(env LD_LIBRARY_PATH)"/>
 
   <!-- Launch deployer -->
@@ -12,6 +14,7 @@
     pkg="rtt_ros" type="deployer" 
     args="-l $(arg LOG_LEVEL) $(arg DEPLOYER_ARGS) --"
     output="screen">
+    <env name="OROCOS_TARGET" value="$(arg OROCOS_TARGET)"/>
     <env name="RTT_COMPONENT_PATH" value="$(arg RTT_COMPONENT_PATH)"/>
   </node>
 </launch>
