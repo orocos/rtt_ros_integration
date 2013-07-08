@@ -18,7 +18,7 @@ The packages in this repository provide:
  * **rtt\_rosnode** Plugin for ROS node instantiation inside an Orocos program.
  * **rtt\_rosparam** Plugin for synchronizing ROS parameters with Orocos
    component properties.
- * **rtt\_rospacak** Plugin for locating ROS resources.
+ * **rtt\_rospack** Plugin for locating ROS resources.
 
 See each package's README.md file for more information.
 
