@@ -28,14 +28,14 @@ The [Orocos Toolchain](http://www.orocos.org/orocos/toolchain) can be built from
 source in a catkin workspace using `catkin_build_isolated` since Orocos packages
 now contain `package.xml` files. 
 
-``shell
+```shell
 mkdir -p ~/ws/underlay_isolated/src/orocos
 mkdir -p ~/ws/underlay/src
 cd ~/ws/underlay_isolated/src/orocos
 git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git
 cd ~/ws/underlay_isolated
 catkin_make_isolated --install
-``
+```
 
 ## Using ROS-Based Orocos Plugins
 
@@ -50,7 +50,7 @@ Thus, when importing orocos components (programmatically, in ops, or xml
 scripts), one specifies the package name. This will load all the plugins and
 components defined in that package. 
 
-***Note***, previously, the Orocos component loader would load the plugins of
+***NOTE:*** Previously, the Orocos component loader would load the plugins of
 not only the *imported* package, but also all of its dependencies. Since we now
 use the normal plugin resolution scheme, all packages must be imported
 explicitly.
