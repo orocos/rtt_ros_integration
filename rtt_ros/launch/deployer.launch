@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <launch>
   <!-- Orocos log level (never, fatal, critical, error, warning, info, debug, realtime) -->
   <arg name="LOG_LEVEL" default="info"/>
