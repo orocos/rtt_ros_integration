@@ -55,7 +55,7 @@ extern "C" {
     return true;
   }
   std::string getRTTPluginName (){
-    return "rtt_ros";
+    return "rosnode";
   }
   std::string getRTTTargetName (){
     return OROCOS_TARGET_NAME;
