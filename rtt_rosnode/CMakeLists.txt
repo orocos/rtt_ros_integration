@@ -19,6 +19,7 @@ set( RTT_HINTS HINTS ${rtt_PACKAGE_PATH}/../install )
 find_package(OROCOS-RTT REQUIRED ${RTT_HINTS})
 list(APPEND CMAKE_MODULE_PATH ${ocl_PACKAGE_PATH}/config)
 find_package(RTTPlugin REQUIRED rtt-marshalling)
+find_package(roslib)
 
 # Defines the orocos_* cmake macros. See that file for additional
 # documentation.
@@ -31,6 +32,12 @@ orocos_plugin(${PROJECT_NAME} src/ros_plugin.cpp src/ros_publish_activity.cpp sr
 # build ROS param as a separate service
 orocos_service(rtt_rosparam_service src/rtt_rosparam_service.cpp)
 target_link_libraries(rtt_rosparam_service ${RTT_PLUGIN_rtt-marshalling_LIBRARIES})
+
+if (roslib_FOUND)
+  # Required for Groovy or later (RTT no longer links with roslib, but with rospack).
+  target_link_libraries(rtt_rosnode ${roslib_LIBRARIES})
+  target_link_libraries(rtt_rosparam_service ${roslib_LIBRARIES})
+endif()
 
 orocos_typekit( rtt-ros-primitives-typekit ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_primitives_typekit_plugin.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_time_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint8_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int8_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint16_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int16_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint32_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int32_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint64_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int64_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float32_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float64_type.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_string_type.cpp )
 
