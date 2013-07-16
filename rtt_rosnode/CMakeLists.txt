@@ -15,7 +15,7 @@ catkin_package(
 include_directories(${catkin_INCLUDE_DIRS})
 
 # Create orocos rosnode plugin
-catkin_orocos_plugin(rtt_ros src/ros_plugin.cpp)
+orocos_plugin(rtt_ros src/ros_plugin.cpp)
 target_link_libraries(rtt_ros ${catkin_LIBRARIES})
 
 # Generate install targets and pkg-config files

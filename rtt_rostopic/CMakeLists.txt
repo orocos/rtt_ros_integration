@@ -20,7 +20,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS})
 
-catkin_orocos_service(rtt_rostopic
+orocos_service(rtt_rostopic
   src/rtt_ros_service.cpp
   src/ros_publish_activity.cpp)
 target_link_libraries(rtt_rostopic ${catkin_LIBRARIES})

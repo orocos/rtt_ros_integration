@@ -10,8 +10,7 @@ include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 catkin_package(
   DEPENDS rtt ocl
-  CATKIN_DEPENDS roscpp
-  CFG_EXTRAS rtt_ros-extras.cmake)
+  CATKIN_DEPENDS roscpp)
 
 install(PROGRAMS 
   scripts/rtt-upgrade-2.5

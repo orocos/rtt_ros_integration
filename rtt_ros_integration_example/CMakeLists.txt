@@ -10,7 +10,7 @@ find_package(OROCOS-RTT REQUIRED)
 # documentation.
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
-catkin_orocos_component(${PROJECT_NAME} src/HelloRobot.cpp)
+orocos_component(${PROJECT_NAME} src/HelloRobot.cpp)
 
 catkin_package(
   DEPENDS rtt 

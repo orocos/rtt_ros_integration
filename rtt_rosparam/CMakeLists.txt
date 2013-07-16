@@ -17,7 +17,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS})
 
 # build ROS param as a separate service
-catkin_orocos_service(rtt_rosparam src/rtt_rosparam_service.cpp)
+orocos_service(rtt_rosparam src/rtt_rosparam_service.cpp)
 target_link_libraries(rtt_rosparam 
   ${OROCOS-RTT_RTT-MARSHALLING_LIBRARY} 
   ${catkin_LIBRARIES})

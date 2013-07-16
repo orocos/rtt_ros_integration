@@ -10,7 +10,7 @@ find_package(OROCOS-RTT REQUIRED)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 #build ROS pack as a separate service
-catkin_orocos_plugin(rtt_rospack src/rtt_rospack_service.cpp)
+orocos_plugin(rtt_rospack src/rtt_rospack_service.cpp)
 target_link_libraries(rtt_rospack ${roslib_LIBRARIES})
 
 orocos_generate_package()

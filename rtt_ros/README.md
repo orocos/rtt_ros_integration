@@ -10,10 +10,10 @@ The following are simple wrappers to the respective Orocos CMake macros which
 sets the proper target output directory so that it can be found in a catkin
 workspace.
 
- * `catkin_orocos_plugin( LIB_TARGET_NAME )`
- * `catkin_orocos_component( LIB_TARGET_NAME )`
- * `catkin_orocos_typekit( LIB_TARGET_NAME )`
- * `catkin_orocos_service( LIB_TARGET_NAME )`
+ * `orocos_plugin( LIB_TARGET_NAME )`
+ * `orocos_component( LIB_TARGET_NAME )`
+ * `orocos_typekit( LIB_TARGET_NAME )`
+ * `orocos_service( LIB_TARGET_NAME )`
 
 ### Launch Files
 
