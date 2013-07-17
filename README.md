@@ -33,14 +33,14 @@ The [Orocos Toolchain](http://www.orocos.org/orocos/toolchain) can be built from
 source in a catkin workspace using `catkin_build_isolated` since Orocos packages
 now contain `package.xml` files. 
 
-``shell
+```shell
 mkdir -p ~/ws/underlay_isolated/src/orocos
 mkdir -p ~/ws/underlay/src
 cd ~/ws/underlay_isolated/src/orocos
 git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git
 cd ~/ws/underlay_isolated
 catkin_make_isolated --install
-``
+```
 
 ## Using ROS-Based Orocos Plugins
 
@@ -54,15 +54,17 @@ In order to import Orocos plugins built in a ROS package, there are two
 options:
 
   1. _Import single package_:
-    ``python
+
+    ```python
     import("my_pkg_name")
-    ``
+    ```
 
   2. _Import package and it's rtt plugin dependencies_: 
-    ``python
+
+    ```python
     import("rtt_ros")
     ros.import("my_pkg_name")
-    ``
+    ```
 
 In **Option 1**, a single ROS package with orocos plugins can still be imported
 with the standard deployer `import()` function. However, Orocos RTT 2.7 no
