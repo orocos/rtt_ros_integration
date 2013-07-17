@@ -28,6 +28,6 @@
   <run_depend>std_msgs</run_depend>
 
   <export>
-    <cpp cflags="-I${prefix}/include"/>
+    <rtt_plugin_depend>rtt_rostopic</rtt_plugin_depend>
   </export>
 </package>
