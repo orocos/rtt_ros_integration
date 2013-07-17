@@ -1,5 +1,7 @@
 <package>
-  <description brief="rtt_@pkgname@">
+  <name>rtt_@pkgname@</name>
+  <version>2.6.0</version>
+  <description>
 
     Provides an rtt typekit for ROS @pkgname@ messages.
 
@@ -15,17 +17,24 @@
     typekit.
 
   </description>
-  <author>create_rtt_msgs Generator</author>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <author>create_rtt_msgs</author>
   <license>BSD</license>
-  <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/rtt_rostopic</url>
-  <depend package="rtt_rostopic"/>
-  <depend package="@pkgname@"/>
-@deplist@
-  <export>
-    <cpp cflags="-I${prefix}/include"/>
-  </export>
 
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>@pkgname@</build_depend>
+  <build_depend>rtt_rostopic</build_depend>
+
+  <run_depend>@pkgname@</run_depend>
+  <run_depend>rtt_rostopic</run_depend>
+
+@deplist@
+
+  <export>
+    <rtt_plugin_depend>rtt_rostopic</rtt_plugin_depend>
+@rtt_deplist@
+  </export>
 
 </package>
 
