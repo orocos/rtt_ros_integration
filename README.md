@@ -33,14 +33,14 @@ The [Orocos Toolchain](http://www.orocos.org/orocos/toolchain) can be built from
 source in a Catkin workspace using `catkin_build_isolated` since Orocos packages
 now contain Catkin `package.xml` files. 
 
-    ```shell
-    mkdir -p ~/ws/underlay_isolated/src/orocos
-    mkdir -p ~/ws/underlay/src
-    cd ~/ws/underlay_isolated/src/orocos
-    git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git
-    cd ~/ws/underlay_isolated
-    catkin_make_isolated --install
-    ```
+```shell
+mkdir -p ~/ws/underlay_isolated/src/orocos
+mkdir -p ~/ws/underlay/src
+cd ~/ws/underlay_isolated/src/orocos
+git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git
+cd ~/ws/underlay_isolated
+catkin_make_isolated --install
+```
 
 ## Using ROS-Based Orocos Plugins
 
@@ -86,16 +86,16 @@ For example, if loading the plugins from package `pkg_one` should necessitate
 first loading poackages from `rtt_ros` and `pkg_two`, then `pkg_one/package.xml`
 should have the following:
 
-    ```xml
-    <package>
-      <name>pkg_one</name>
-      <!-- ... -->
-      <export>
-        <rtt_plugin_depend>rtt_ros</rtt_plugin_depend>
-        <rtt_plugin_depend>pkg_two</rtt_plugin_depend>
-      </export>
-    </package>
-    ```
+```xml
+<package>
+  <name>pkg_one</name>
+  <!-- ... -->
+  <export>
+    <rtt_plugin_depend>rtt_ros</rtt_plugin_depend>
+    <rtt_plugin_depend>pkg_two</rtt_plugin_depend>
+  </export>
+</package>
+```
 
 
 ## History
