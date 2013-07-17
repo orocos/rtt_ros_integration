@@ -72,9 +72,29 @@ dependencies, so only the named package will be imported.
 
 In **Option 2**, first the `rtt_ros` package is imported using the normal
 mechanism. This then loads the `ros` service, which provides a ROS import
-function which will parse ROS package metadata and import the Orocos plugins
-from the named package _and_ all packages listed in `<rtt_plugin_depend>` tags
-in the `<export>` section of the package.xml files.
+function, `ros.import()`, which will parse ROS package metadata and import the
+Orocos plugins from the named package _and_ all packages listed in
+`<rtt_plugin_depend>` tags in the `<export>` section of the package.xml files.
+
+Catkin introduces several new dependency types for buildtime, development, and
+other purposes. In order to keep the RTT plugin depdencencies clear, and avoid
+trying to load orocos components from _every_ package dependency, we use the
+extensible ROS metadata `<export>` tag.
+
+For example, if loading the plugins from package `pkg_one` should necessitate
+first loading poackages from `rtt_ros` and `pkg_two`, then `pkg_one/package.xml`
+should have the following:
+
+    xml
+    <package>
+      <name>pkg_one</name>
+      <!-- ... -->
+      <export>
+        <rtt_plugin_depend>rtt_ros</rtt_plugin_depend>
+        <rtt_plugin_depend>pkg_two</rtt_plugin_depend>
+      </export>
+    </package>
+
 
 ## History
 
