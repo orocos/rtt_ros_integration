@@ -25,6 +25,6 @@
   <run_depend>std_msgs</run_depend> 
 
   <export>
-
+    <rtt_plugin_depend>rtt_ros</rtt_plugin_depend>
   </export>
 </package>

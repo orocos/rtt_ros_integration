@@ -9,26 +9,31 @@ using namespace std;
 /**
  * The globally loadable ROS service.
  */
-class ROSService : public RTT::Service {
+class ROSTopicService : public RTT::Service {
 public:
   int protocol_id;
   /**
    * Instantiates this service.
    * @param owner The owner or null in case of global.
    */
-  ROSService(TaskContext* owner) 
-    : Service("ros", owner),
+  ROSTopicService(TaskContext* owner) 
+    : Service("rostopic", owner),
     protocol_id(ORO_ROS_PROTOCOL_ID)
   {
     this->doc("Main RTT Service for connecting RTT ports to ROS message topics. See also the 'rosparam' service which can be added to a component and the 'rospack' global service for finding ros packages.");
-    this->addOperation("topic", &ROSService::topic, this).doc(
+
+    // ROS Package-importing
+
+    // ROS Topic-based Operations
+    this->addOperation("connect", &ROSTopicService::topic, this).doc(
         "Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last message is kept.").arg(
             "name", "The ros topic name");
-    this->addOperation("topicBuffer", &ROSService::topicBuffer, this).doc(
+    this->addOperation("connectBuffered", &ROSTopicService::topicBuffer, this).doc(
         "Creates a ConnPolicy for subscribing to or publishing a topic with a fixed-length message buffer.").arg(
             "name", "The ros topic name").arg(
             "size","The size of the buffer.");
     this->addConstant("protocol_id", protocol_id );
+
   }
 
   /**
@@ -55,19 +60,19 @@ public:
   }
 };
 
-void loadROSService(){
-  RTT::Service::shared_ptr rts(new ROSService(0));
+void loadROSTopicService(){
+  RTT::Service::shared_ptr rts(new ROSTopicService(0));
   RTT::internal::GlobalService::Instance()->addService(rts);
 }
 
 using namespace RTT;
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
-    loadROSService();
+    loadROSTopicService();
     return true;
   }
   std::string getRTTPluginName (){
-    return "ros";
+    return "rostopic";
   }
   std::string getRTTTargetName (){
     return OROCOS_TARGET_NAME;

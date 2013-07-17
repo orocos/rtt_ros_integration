@@ -1,20 +1,19 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_rostopic)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rtt_rospack rtt_ros)
+catkin_package(
+  INCLUDE_DIRS include 
+  DEPENDS rtt ocl
+  CATKIN_DEPENDS roscpp  rtt_rospack 
+  CFG_EXTRAS GenerateRTTtypekit.cmake)
+
+find_package(catkin REQUIRED COMPONENTS roscpp rtt_rospack )
 find_package(OROCOS-RTT REQUIRED rtt-marshalling)
 
 # Defines the orocos_* cmake macros. See that file for additional
 # documentation.
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
-#orocos_use_package(rtt_ros)
-
-catkin_package(
-  INCLUDE_DIRS include 
-  DEPENDS rtt ocl
-  CATKIN_DEPENDS roscpp rtt_ros rtt_rospack 
-  CFG_EXTRAS GenerateRTTtypekit.cmake)
 
 include_directories(
   include

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_rosparam)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
+find_package(catkin REQUIRED COMPONENTS roscpp )
 find_package(OROCOS-RTT REQUIRED rtt-marshalling)
 
 # Defines the orocos_* cmake macros. See that file for additional

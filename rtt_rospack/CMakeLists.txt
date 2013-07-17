@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_rospack)
 
-find_package(catkin REQUIRED COMPONENTS roslib rtt_ros)
+find_package(catkin REQUIRED COMPONENTS roslib)
 
 find_package(OROCOS-RTT REQUIRED)
 
@@ -17,5 +17,5 @@ orocos_generate_package()
 
 catkin_package(
   DEPENDS  rtt
-  CATKIN_DEPENDS roslib rtt_ros
+  CATKIN_DEPENDS roslib 
 )
