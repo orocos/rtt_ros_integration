@@ -17,11 +17,26 @@ workspace.
 
 ### Launch Files
 
- * **deployer.launch** Launch the orocos deployer
+ * **[deployer.launch](launch/deployer.launch)** Launch the orocos deployer
    * **LOG_LEVEL** (default "info") The Orocos log level
    * **DEPLOYER_ARGS** (default "") Additional arguments passed to the deployer
    * **OROCOS_TARGET** (default `$OROCOS_TARGET`)
    * **RTT_COMPONENT_PATH** (default `$LD_LIBRARY_PATH`)
+
+#### Launchfile Examples
+
+For example, the deployer can be launched by including the launchfile in
+another launchfile like the following:
+
+```xml
+<launch>
+  <include file="$(find rtt_ros)/launch/deployer.launch">
+    <arg name="DEPLOYER_ARGS" value="-s $(find rtt_ros_integration_example)/example.ops"/>
+    <arg name="LOG_LEVEL" value="debug"/>
+    <arg name="DEBUG" value="false"/>
+  </include>
+</launch>
+```
 
 ### Wrapper Scripts
 
