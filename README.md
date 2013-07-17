@@ -27,7 +27,9 @@ The packages in this repository provide:
 
 See each package's README.md file for more information.
 
-## Building Orocos From Source
+## Usage
+
+### Building Orocos From Source
 
 The [Orocos Toolchain](http://www.orocos.org/orocos/toolchain) can be built from
 source in a Catkin workspace using `catkin_build_isolated` since Orocos packages
@@ -42,7 +44,7 @@ cd ~/ws/underlay_isolated
 catkin_make_isolated --install
 ```
 
-## Using ROS-Based Orocos Plugins
+### Using ROS-Based Orocos Plugins
 
 Orocos plugins (components, typekits, plugins, etc.) are now built into the
 Catkin develspace lib directory.  Specificallly, they are built under
@@ -53,7 +55,7 @@ happens automatically when using the launchfiles in **rtt\_ros**).
 In order to import Orocos plugins built in a ROS package, there are two
 options:
 
-  1. _Import **single** package_:
+  1. _Import a **single** package_:
 
     ```python
     import("my_pkg_name")
@@ -97,23 +99,32 @@ should have the following:
 </package>
 ```
 
-## Bulding ROS-Based Orocos Plugins
+### Bulding ROS-Based Orocos Plugins
 
 Orocos plugins are built normally, with Orocos CMake macros. See
 [rtt_ros_integration_example](rtt_ros_integration_example/CMakeLists.txt) for 
 an example.
 
-## Running Orocos Programs
+### Running Orocos Programs
 
 The `rtt_ros` package provides several launchfiles and wrapper scripts for
-making it easier to Orocos programs in a ROS environment. 
-
-### Orocos Deployer
-
-Using [deployer.launch](rtt_ros/launch/deployer.launch) provides easy access 
-to changing Orocos deployer log level and other parameters. See
+making it easier to Orocos programs in a ROS environment. See
 [rtt_ros](rtt_ros/README.md) for more information.
 
+### Connecting Orocos Ports to ROS Topics
+
+The `rtt_rostopic` package provides a typekit for the the ROS Message 
+primitives, as well as a plugin which manages construction of ROS publishers
+and subscribers. See [rtt_rostopic](rtt_rostopic/README.md) for more 
+information. 
+
+### Connecting Orocos Operations to ROS Services
+
+TBD
+
+### Running an Actionlib Action Server in an Orocos Component
+
+TBD (https://github.com/konradb3/RCPRG-ros-pkg/tree/master/orocos_tools)
 
 ## History
 
@@ -128,3 +139,23 @@ With rosbuild, all orocos components were built within a given package's own
 build directory, and all generated typekit code was also placed in a given
 package's include and src directories. Now, all such files are built in the
 Catkin develspace.
+
+As of now, the new interfaces have only been developed to support catkin-based
+ROS packages, but adding backwards-compatible rosbuild support shouldn't be too hard.
+
+There are a few organizational changes that have been made in
+`rtt_ros_integration` compared to the ROS Groovy Galapagos release:
+
+ * "rtt_rosnode" has been split into three packages: 
+   1. "rtt_rosnode": Contains a plugin for creating a ROS node in an RTT program
+   2. "rtt_rostopic": Contains msg primitive typekit and the transport plugin for using ROS topics
+   3. "rtt_rosparam": Contains a plugin for synchronizing a component's properties with ROS parameters
+
+ * A new package, "rtt_ros" has been added. This package contains convenience 
+   launchfiles and wrapper scripts for running Orocos programs (typegen, 
+   deployer, etc). This package also contains a plugin for importing ROS 
+   packages and their dependencies, instead of overloading the use of the 
+   deployer's "import()" function. 
+
+There are also several API changes related to importing plugins from ROS 
+packages and creating ROS topic connections.
