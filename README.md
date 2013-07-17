@@ -33,14 +33,13 @@ The [Orocos Toolchain](http://www.orocos.org/orocos/toolchain) can be built from
 source in a catkin workspace using `catkin_build_isolated` since Orocos packages
 now contain `package.xml` files. 
 
-```shell
-mkdir -p ~/ws/underlay_isolated/src/orocos
-mkdir -p ~/ws/underlay/src
-cd ~/ws/underlay_isolated/src/orocos
-git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git
-cd ~/ws/underlay_isolated
-catkin_make_isolated --install
-```
+    shell
+    mkdir -p ~/ws/underlay_isolated/src/orocos
+    mkdir -p ~/ws/underlay/src
+    cd ~/ws/underlay_isolated/src/orocos
+    git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git
+    cd ~/ws/underlay_isolated
+    catkin_make_isolated --install
 
 ## Using ROS-Based Orocos Plugins
 
@@ -53,7 +52,7 @@ happens automatically when using the launchfiles in **rtt\_ros**).
 In order to import Orocos plugins built in a ROS package, there are two
 options:
 
-  1. _Import single package_:
+  1. _Import **single** package_:
 
     ```python
     import("my_pkg_name")
