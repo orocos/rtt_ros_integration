@@ -11,17 +11,17 @@ ROS parameter server.
 
 The packages in this repository provide:
 
- * **rtt\_ros** ROS package import plugin as well as wrapper scripts and
+ * [**rtt\_ros**](rtt_ros) ROS package import plugin as well as wrapper scripts and
    launchfiles for using Orocos with ROS.
- * **rtt\_rosnode** Plugin for ROS node instantiation inside an Orocos program.
- * **rtt\_rosparam** Plugin for synchronizing ROS parameters with Orocos
+ * [**rtt\_rosnode**](rtt_rosnode) Plugin for ROS node instantiation inside an Orocos program.
+ * [**rtt\_rosparam**](rtt_rosparam) Plugin for synchronizing ROS parameters with Orocos
    component properties.
- * **rtt\_rostopic** ROS message typekit generation and Orocos plugin for
+ * [**rtt\_rostopic**](rtt_rostopic) ROS message typekit generation and Orocos plugin for
    publishing and subscribing to ROS topics.
- * **rtt\_rospack** Plugin for locating ROS resources.
- * **rtt\_ros\_integration\_example** Example use of some of the features of
+ * [**rtt\_rospack**](rtt_rospack) Plugin for locating ROS resources.
+ * [**rtt\_ros\_integration\_example**](rtt_ros_integration_example) Example use of some of the features of
    this repository.
- * **rtt\_ros\_integration** Catkin
+ * [**rtt\_ros\_integration**](rtt_ros_integration) Catkin
    [metapackage](http://ros.org/wiki/catkin/package.xml#Metapackages) for this
    repository.
 
@@ -83,7 +83,7 @@ trying to load orocos components from _every_ package dependency, we use the
 extensible ROS metadata `<export>` tag.
 
 For example, if loading the plugins from package `pkg_one` should necessitate
-first loading poackages from `rtt_ros` and `pkg_two`, then `pkg_one/package.xml`
+first loading packages from `rtt_ros` and `pkg_two`, then `pkg_one/package.xml`
 should have the following:
 
 ```xml
@@ -96,6 +96,23 @@ should have the following:
   </export>
 </package>
 ```
+
+## Bulding ROS-Based Orocos Plugins
+
+Orocos plugins are built normally, with Orocos CMake macros. See
+[rtt_ros_integration_example](rtt_ros_integration_example/CMakeLists.txt) for 
+an example.
+
+## Running Orocos Programs
+
+The `rtt_ros` package provides several launchfiles and wrapper scripts for
+making it easier to Orocos programs in a ROS environment. 
+
+### Orocos Deployer
+
+Using [deployer.launch](rtt_ros/launch/deployer.launch) provides easy access 
+to changing Orocos deployer log level and other parameters. See
+[rtt_ros](rtt_ros/README.md) for more information.
 
 
 ## History
