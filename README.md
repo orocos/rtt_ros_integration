@@ -124,7 +124,7 @@ TBD
 
 ### Running an Actionlib Action Server in an Orocos Component
 
-TBD (https://github.com/konradb3/RCPRG-ros-pkg/tree/master/orocos_tools)
+TBD (https://github.com/RCPRG-ros-pkg/orocos_tools)
 
 ## History
 
