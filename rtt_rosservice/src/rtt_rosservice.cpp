@@ -21,6 +21,8 @@ public:
   {
     this->doc("Main RTT Service for connecting RTT operations to ROS service clients and servers.");
 
+    this->provides("client");
+    this->provides("server");
 
     // ROS Topic-based Operations
     this->addOperation("client", &ROSServiceService::client, this).doc(
@@ -34,24 +36,29 @@ public:
 
 
   //! Get an operation caller
-  // create operationcaller
-  // return string name of operationcaller
-  RTT::OperationInterfacePart* client(const std::string &name) {
-    return NULL;
+  const std::string client(const std::string &ros_service_name) {
+    // Convert 
+    // create operationcaller
+    // return string name of operationcaller
+    return "";
   }
 
   //! Get an operation 
-  // create operation
-  // return string name of  operation
+  const std::string server(const std::string &ros_service_name) {
+    // create operation
+    // return string name of  operation
 
+
+    return "";
+  }
 
 
 
 };
 
 void loadROSServiceService(){
-  RTT::Service::shared_ptr rts(new ROSServiceService(0));
-  RTT::internal::GlobalService::Instance()->addService(rts);
+  RTT::Service::shared_ptr rss(new ROSServiceService(0));
+  RTT::internal::GlobalService::Instance()->addService(rss);
 }
 
 using namespace RTT;
