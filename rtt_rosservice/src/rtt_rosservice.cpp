@@ -3,6 +3,7 @@
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 #include <rtt_rostopic/rtt_rostopic.h> 
+#include <rtt_rosservice/ros_service_proxy.h> 
 
 using namespace RTT;
 using namespace std;
@@ -22,7 +23,7 @@ public:
     this->doc("Main RTT Service for connecting RTT operations to ROS service clients and servers.");
 
     this->provides("clients");
-    this->provides("servers");
+    this->requires("servers");
 
     this->addOperation("client", &ROSServiceService::client, this).doc(
         "Creates a ROS service client and an associated Orocos operation.").arg(
@@ -35,6 +36,11 @@ public:
 
   }
 
+  /** \brief Register a ROS service proxy factory
+   *
+   * This enables the ROSServiceService to construct ROS service clients and
+   * servers from a string name.
+   */
   void registerServiceType(ROSServiceProxyFactoryBase* factory) {
     // Get the package name and service type
     std::string service_package = factory->getPackage();
@@ -66,11 +72,11 @@ public:
 
     // Have the factory create a ROS service client add the operation 
     ROSServiceClientProxyBase* client_proxy =
-      factories_[type_tokens[0]][type_tokens[1]]->create_client_proxy(this, ros_service_name);
+      factories_[type_tokens[0]][type_tokens[1]]->create_client_proxy(this->provides("clients"), ros_service_name);
     // Store the client proxy
     client_proxies_[ros_service_name] = client_proxy;
 
-    return client_proxy->getOperationName();
+    return this->getName() + ".clients." + client_proxy->getOperationName();
   }
 
   /** \brief Add an Orocos operation caller to this service which is called by
@@ -80,14 +86,30 @@ public:
    * service call is invoked.
    */
   const std::string server(const std::string &ros_service_name) {
-    // create operationcaller
+    // Check if the server proxy already exists
+    if(server_proxies_.find(ros_service_name) != server_proxies_.end()) {
+      return server_proxies_[ros_service_name]->getOperationName();
+    }
+        
+    // Split the typename
+    std::vector<std::string> type_tokens;
+    boost::split(type_tokens, ros_service_type, boost::is_any_of("/"));
+    if(type_tokens.size() != 2) { return "ERROR"; }
 
-    return "";
+    // Have the factory create a ROS service server add the operation 
+    ROSServiceServerProxyBase* server_proxy =
+      factories_[type_tokens[0]][type_tokens[1]]->create_server_proxy(this->requires("servers"), ros_service_name);
+    // Store the server proxy
+    server_proxies_[ros_service_name] = server_proxy;
+
+    return this->getName() + ".servers." + server_proxy->getOperationName();
   }
 
+  //! ROS service proxy factories
+  std::map<std::string, std::map<std::string, ROSServiceProxyFactoryBase*> > factories_;
 
-  std::vector<ros::ServiceClient> clients_;
-  std::vector<ros::ServiceServer> servers_;
+  std::map<std::string, ROSServiceServerProxyBase*> server_proxies_;
+  std::map<std::string, ROSServiceClientProxyBase*> client_proxies_;
 
 };
 
