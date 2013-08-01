@@ -10,15 +10,17 @@ functions, and data ports. As such, this package provides an "Orocos
 Service" called "RosServiceService".* 
 
 This Orocos Service Plugin provides the following operations:
-* **service client** `rosservice.client(ROS_SERVICE_NAME)`
-* **service server** `rosservice.server(ROS_SERVICE_NAME)`
+* **service client** `rosservice.client(ROS_SERVICE_NAME, ROS_SERVICE_TYPE)`
+* **service server** `rosservice.server(ROS_SERVICE_NAME, ROS_SERVICE_TYPE)`
 
 To connect an Orocos operation to a ROS service via ops script from within an
 Orocos DeploymentComponent: 
 
 ```cpp
 import("rtt_rosservice")
-connectServices("my_comp.some.rtt.service.add_two_ints",rosservice.client("/some/ros/namespace/add_two_ints"))
+import("rtt_ros")
+ros.import("rtt_std_srvs")
+connectServices("my_comp.some.rtt.service.empty",rosservice.client("/some/ros/namespace/empty","std_srvs/Empty"))
 ```
 
 
