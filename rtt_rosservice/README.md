@@ -9,7 +9,9 @@ that hapens over ROS and an "Orocos Service" is a grouping of properties,
 functions, and data ports. As such, this package provides an "Orocos
 Service" called "RosServiceService".* 
 
-This Orocos Service Plugin 
+This Orocos Service Plugin provides the following operations:
+* **rosservice.clioent(<<ROS\_TOPIC\_NAME>>**
+* **rosservice.server(<<ROS\_TOPIC\_NAME>>**
 
 To connect an Orocos operation to a ROS service via ops script from within an
 Orocos DeploymentComponent: 
