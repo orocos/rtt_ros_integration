@@ -27,10 +27,12 @@ public:
 
     this->addOperation("client", &ROSServiceService::client, this).doc(
         "Creates a ROS service client and an associated Orocos operation.").arg(
-          "name", "The ros service name.");
+          "name", "The ros service name.").arg(
+          "type", "The ros service type.");
     this->addOperation("server", &ROSServiceService::server, this).doc(
         "Creates a ROS service server and an associated Orocos operation caller").arg(
-          "name", "The ros service name.");
+          "name", "The ros service name.").arg(
+          "type", "The ros service type.");
 
     this->addOperation("registerServiceType", &ROSServiceService::registerServiceType, this);
 
