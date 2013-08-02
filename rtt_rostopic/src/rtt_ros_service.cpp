@@ -25,10 +25,10 @@ public:
     // ROS Package-importing
 
     // ROS Topic-based Operations
-    this->addOperation("connect", &ROSTopicService::topic, this).doc(
+    this->addOperation("connection", &ROSTopicService::topic, this).doc(
         "Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last message is kept.").arg(
             "name", "The ros topic name");
-    this->addOperation("connectBuffered", &ROSTopicService::topicBuffer, this).doc(
+    this->addOperation("bufferedConnection", &ROSTopicService::topicBuffer, this).doc(
         "Creates a ConnPolicy for subscribing to or publishing a topic with a fixed-length message buffer.").arg(
             "name", "The ros topic name").arg(
             "size","The size of the buffer.");
