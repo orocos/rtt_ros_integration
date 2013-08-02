@@ -16,7 +16,8 @@ void registerROSServiceProxies(){
 
   //////////////////////////////////////////////////////////////////////////////
   /** Proxy for "std_srvs/Empty" **/
-  ROSServiceProxyFactoryBase* EmptyProxy = new ROSServiceProxyFactory<std_srvs::Empty, std_srvs::Empty::Request, std_srvs::Empty::Response>("std_srvs","Empty");
+  ROSServiceProxyFactoryBase* EmptyProxy = 
+    new ROSServiceProxyFactory<std_srvs::Empty, std_srvs::Empty::Request, std_srvs::Empty::Response>("std_srvs","Empty");
   register_service(EmptyProxy);
   //////////////////////////////////////////////////////////////////////////////
 }
