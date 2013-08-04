@@ -20,7 +20,10 @@ Orocos DeploymentComponent:
 import("rtt_rosservice")
 import("rtt_ros")
 ros.import("rtt_std_srvs")
-connectServices("my_comp.some.rtt.service.empty",rosservice.client("/some/ros/namespace/empty","std_srvs/Empty"))
+connectServices(
+  "my_comp.some.rtt.service.empty",
+  rosservice.client("/some/ros/namespace/empty",
+  "std_srvs/Empty"))
 ```
 
 

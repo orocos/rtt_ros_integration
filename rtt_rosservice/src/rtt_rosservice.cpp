@@ -2,7 +2,7 @@
 #include <rtt/RTT.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
-#include <rtt_rostopic/rtt_rostopic.h> 
+
 #include <rtt_rosservice/ros_service_proxy.h> 
 
 using namespace RTT;
@@ -11,13 +11,14 @@ using namespace std;
 /**
  * The globally loadable ROS service.
  */
-class ROSServiceService : public RTT::Service {
+class ROSServiceService : public RTT::Service 
+{
 public:
   /**
    * Instantiates this service.
    * @param owner The owner or null in case of global.
    */
-  ROSTopicService(TaskContext* owner) 
+  ROSServiceService(TaskContext* owner) 
     : Service("rosservice", owner)
   {
     this->doc("Main RTT Service for connecting RTT operations to ROS service clients and servers.");
@@ -35,7 +36,6 @@ public:
           "type", "The ros service type.");
 
     this->addOperation("registerServiceType", &ROSServiceService::registerServiceType, this);
-
   }
 
   /** \brief Register a ROS service proxy factory
@@ -74,7 +74,8 @@ public:
 
     // Have the factory create a ROS service client add the operation 
     ROSServiceClientProxyBase* client_proxy =
-      factories_[type_tokens[0]][type_tokens[1]]->create_client_proxy(this->provides("clients"), ros_service_name);
+      factories_[type_tokens[0]][type_tokens[1]]->create_client_proxy(
+          this->provides("clients"), ros_service_name);
     // Store the client proxy
     client_proxies_[ros_service_name] = client_proxy;
 
@@ -87,7 +88,10 @@ public:
    * This allows another component to be called by this service when a ROS
    * service call is invoked.
    */
-  const std::string server(const std::string &ros_service_name) {
+  const std::string server(
+      const std::string &ros_service_name
+      const std::string &ros_service_type)
+  {
     // Check if the server proxy already exists
     if(server_proxies_.find(ros_service_name) != server_proxies_.end()) {
       return server_proxies_[ros_service_name]->getOperationName();
@@ -100,7 +104,8 @@ public:
 
     // Have the factory create a ROS service server add the operation 
     ROSServiceServerProxyBase* server_proxy =
-      factories_[type_tokens[0]][type_tokens[1]]->create_server_proxy(this->requires("servers"), ros_service_name);
+      factories_[type_tokens[0]][type_tokens[1]]->create_server_proxy(
+          this->requires("servers"), ros_service_name);
     // Store the server proxy
     server_proxies_[ros_service_name] = server_proxy;
 
@@ -115,7 +120,8 @@ public:
 
 };
 
-void loadROSServiceService(){
+void loadROSServiceService()
+{
   RTT::Service::shared_ptr rss(new ROSServiceService(0));
   RTT::internal::GlobalService::Instance()->addService(rss);
 }

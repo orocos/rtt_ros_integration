@@ -19,9 +19,8 @@ include_directories(
   ${catkin_INCLUDE_DIRS})
 
 orocos_service(rtt_rosservice
-  src/rtt_rosservice.cpp
-  src/ros_publish_activity.cpp)
-target_link_libraries(rtt_rostopic ${catkin_LIBRARIES})
+  src/rtt_rosservice.cpp)
+target_link_libraries(rtt_rosservice ${catkin_LIBRARIES})
 
 # Generate install targets for headers
 #orocos_install_headers(
