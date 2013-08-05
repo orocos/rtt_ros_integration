@@ -46,13 +46,7 @@ public:
     factories_[factory->getType()] = factory;
   }
 
-  /** \brief Add an Orocos operation to this service which calls a ROS service
-   * client.
-   *
-   * This allows another component to call this operation in order to invoke a
-   * ROS service call.
-   */
-
+  //! Get an RTT operation caller from a string identifier
   RTT::base::OperationCallerBaseInvoker* get_owner_operation_caller(const std::string rtt_uri)
   {
     // Split up the service uri
@@ -81,6 +75,7 @@ public:
     return required->getOperationCaller(rtt_uri_tokens.back());
   }
 
+  //! Get an RTT operation from a string identifier
   RTT::OperationInterfacePart* get_owner_operation(const std::string rtt_uri)
   {
     // Split up the service uri
@@ -109,6 +104,9 @@ public:
     return provided->getOperation(rtt_uri_tokens.back());
   }
 
+  /** \brief Connect an RTT operation or operation caller to a ROS service
+   * server or service client.
+   */
   bool connect(
     const std::string &rtt_operation_name,
     const std::string &ros_service_name,

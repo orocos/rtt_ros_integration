@@ -114,6 +114,7 @@ class ROSServiceClientProxy : public ROSServiceClientProxyBase
 {
 public:
 
+  //! The proxy RTT operation type for this ROS service
   typedef RTT::Operation<bool(typename ROS_SERVICE_T::Request&, typename ROS_SERVICE_T::Response&)> ProxyOperationType;
 
   ROSServiceClientProxy(const std::string &service_name) :
@@ -137,6 +138,7 @@ private:
   
   //! The callback for the RTT operation
   bool orocos_operation_callback(typename ROS_SERVICE_T::Request& request, typename ROS_SERVICE_T::Response& response) {
+    // Make sure the ROS service client exists and then call it (blocking)
     return client_.exists() && client_.isValid() && client_.call(request, response);
   }
 };
