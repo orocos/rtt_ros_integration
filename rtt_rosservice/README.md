@@ -1,4 +1,3 @@
-
 rtt\_rosservice
 ===============
 
@@ -21,20 +20,22 @@ It also provides a C++ API for connecting Oroocs operations to ROS services.
 To connect an Orocos operation to a ROS service via .ops script from within an
 Orocos DeploymentComponent: 
 
-    import("rtt_rosservice")
-    import("rtt_std_srvs")
+```cpp
+import("rtt_rosservice")
+import("rtt_std_srvs")
 
-    loadComponent("some_component_name","some_component_package::SomeComponent")
+loadComponent("some_component_name","some_component_package::SomeComponent")
 
-    loadService("some_component_name","rosservice")
+loadService("some_component_name","rosservice")
 
-    YourComponentName.rosservice.connect(
-      "some_provided_service.some_operation",
-      "/some/ros/namespace/empty", "std_srvs/Empty")
+YourComponentName.rosservice.connect(
+  "some_provided_service.some_operation",
+  "/some/ros/namespace/empty", "std_srvs/Empty")
 
-    YourComponentName.rosservice.connect(
-      "some_Required_service.some_operation_caller",
-      "/some/ros/namespace/empty", "std_srvs/Empty")
+YourComponentName.rosservice.connect(
+  "some_Required_service.some_operation_caller",
+  "/some/ros/namespace/empty", "std_srvs/Empty")
+```
 
 ## Design
 
