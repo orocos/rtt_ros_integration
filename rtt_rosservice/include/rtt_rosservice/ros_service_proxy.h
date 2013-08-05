@@ -14,39 +14,12 @@
 class ROSServiceProxyBase
 {
 public:
-
-  ROSServiceProxyBase(const std::string &full_service_name) 
-    : full_service_name_(full_service_name)
-  {
-    // Split the full service name into (service_ns, service_name)
-    boost::iterator_range<std::string::const_iterator> service_ns_end = boost::algorithm::find_last(full_service_name_, "/");
-    service_ns_.assign(full_service_name.begin(), service_ns_end.begin());
-    service_name_.assign(service_ns_end.begin()+1, full_service_name.end());
-
-    // Get the service namespace tokens
-    boost::split(service_ns_tokens_, service_ns_, boost::is_any_of("/"));
-    
-    // Store the operation name
-    operation_name_tokens_.assign(service_ns_tokens_.begin(), service_ns_tokens_.end());
-    operation_name_tokens_.push_back(service_name_);
-    operation_name_ = boost::algorithm::join(operation_name_tokens_, ".");
-  }
-
-  //! Get the name of the Orocos operation
-  const std::string& getOperationName() const {
-    return operation_name_;
-  }
-
+  ROSServiceProxyBase(const std::string &service_name) : service_name_(service_name) { }
+  //! Get the name of the ROS service
+  const std::string& getServiceName() const { return service_name_; }
 private:
-
   //! ROS Service name (fully qualified)
-  std::string full_service_name_;
-  std::string service_ns_;
   std::string service_name_;
-  std::vector<std::string> service_ns_tokens_;
-
-  std::string operation_name_;
-  std::vector<std::string> operation_name_tokens_;
 };
 
 
@@ -112,7 +85,7 @@ private:
 class ROSServiceClientProxyBase : public ROSServiceProxyBase
 {
 public:
-  ROSServiceClientProxyBase(const std::string &full_service_name) : ROSServiceProxyBase(full_service_name) { }
+  ROSServiceClientProxyBase(const std::string &service_name) : ROSServiceProxyBase(service_name) { }
 private:
   //! The underlying ROS service client
   ros::ServiceClient client_;
@@ -123,36 +96,38 @@ class ROSServiceClientProxy : public ROSServiceClientProxyBase
 {
 public:
 
-  ROSServiceClientProxy(RTT::Service* provider, const std::string &full_service_name) 
-    : ROSServiceClientProxyBase(full_service_name) 
+  ROSServiceClientProxy(const std::string &service_name) 
+    : ROSServiceClientProxyBase(service_name)
+      proxy_("ROS_SERVICE_CLIENT_PROXY")
   {
     // Construct the underlying service client
     ros::NodeHandle nh;
-    client_ = nh.serviceClient<ROS_SERVICE_T>(full_service_name_);
+    client_ = nh.serviceClient<ROS_SERVICE_T>(service_name);
 
-    // Add provided interfaces corresponding to the namespace tokens
-    RTT::Service *provided = provider;
-    for(std::vector<std::string>::iterator it = service_ns_tokens_.begin();
-        it != service_ns_tokens_.end();
-        ++it)
-    {
-      provided = provided->provides(*it);
-    }
-
-    // Add the Orocos Operation to the provided interface
-    provided->addOperation(service_name_,
+    // Link the operation with the service client
+    proxy_.calls(
         &ROSServiceClientProxy<ROS_SERVICE_T,ROS_SERVICE_REQ_T,ROS_SERVICE_RESP_T>::orocos_operation_callback,
         this,
         RTT::ClientThread);
   }
 
+  //! Connect an operation caller with this proxy
+  bool connect(RTT::TaskContext *owner, RTT::base::OperationCallerBaseInvoker* operation_caller) {
+    // Link the caller with the operation
+    return operaiton_caller->setImplementation(
+        proxy_.getImplementation(),
+        owner->engine())
+  }
+
 private:
 
   //! The callback called by an Orocos operation caller
-  bool orocos_operation_callback(ROS_SERVICE_REQ_T& request, ROS_SERVICE_RESP_T& response)
-  {
+  bool orocos_operation_callback(ROS_SERVICE_REQ_T& request, ROS_SERVICE_RESP_T& response) {
     return client_.exists() && client_.isValid() && client_.call(request, response);
   }
+
+  //! The RTT operation
+  RTT::Operation<bool(ROS_SERVICE_REQ_T&, ROS_SERVICE_RESP_T&)> proxy_;
 };
 
 
@@ -161,19 +136,16 @@ private:
 class ROSServiceProxyFactoryBase 
 {
 public:
-  const std::string& getPackage() { return package_name_; }
   const std::string& getType() { return service_type_; }
 
-  virtual ROSServiceClientProxyBase* create_client_proxy(RTT::TaskContext* task, const std::string &service_name) = 0;
+  virtual ROSServiceClientProxyBase* create_client_proxy(RTT::base::OperationCallerBaseInvoker* operation_caller, const std::string &service_name) = 0;
   virtual ROSServiceServerProxyBase* create_server_proxy(RTT::TaskContext* task, const std::string &service_name) = 0;
 
 private:
-  ROSServiceProxyFactoryBase(const std::string &package_name, const std::string &service_type) :
-    package_name_(package_name),
+  ROSServiceProxyFactoryBase(const std::string &service_type) :
     service_type_(service_type)
   { }
 
-  std::string package_name_;
   std::string service_type_;
 };
 
@@ -181,15 +153,17 @@ template<class ROS_SERVICE_T, class ROS_SERVICE_REQ_T, class ROS_SERVICE_RESP_T>
 class ROSServiceProxyFactory : public ROSServiceProxyFactoryBase 
 {
   public:
-    ROSServiceProxyFactory(const std::string &package_name, const std::string &service_type)
-      : ROSServiceProxyFactoryBase(package_name, service_type)
+    ROSServiceProxyFactory(const std::string &service_type)
+      : ROSServiceProxyFactoryBase(service_type)
     { }
-    virtual ROSServiceClientProxyBase* create_client_proxy(
-        RTT::TaskContext* task,
+
+  virtual ROSServiceClientProxyBase*
+    create_client_proxy(
         const std::string &service_name) 
     {
-      return new ROSServiceClientProxy<ROS_SERVICE_T, ROS_SERVICE_REQ_T, ROS_SERVICE_RESP_T>(task, service_name);
+      return new ROSServiceClientProxy<ROS_SERVICE_T, ROS_SERVICE_REQ_T, ROS_SERVICE_RESP_T>(operation_caller, service_name);
     }
+
     virtual ROSServiceServerProxyBase* create_server_proxy(
         RTT::TaskContext* task,
         const std::string &service_name) 

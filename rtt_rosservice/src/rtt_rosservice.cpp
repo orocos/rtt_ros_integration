@@ -25,9 +25,9 @@ public:
       this->doc("RTT Service for connecting the operations of "+owner->getName()+" to ROS service clients and servers.");
       this->addOperation("connect", &ROSServiceService::connect, this)
         .doc( "Connects an RTT operation or operation caller to an associated ROS service server or client.")
-        .arg( "operation_name", "The RTT operation name.")
-        .arg( "service_name", "The ROS service name.")
-        .arg( "service_type", "The ROS service type.");
+        .arg( "operation_name", "The RTT operation name (like \"some_provided_service.another.operation\").")
+        .arg( "service_name", "The ROS service name (like \"/my_robot/ns/some_service\").")
+        .arg( "service_type", "The ROS service type (like \"std_srvs/Empty\").");
     } else {
       this->doc("Global RTT Service for registering ROS service types.");
       this->addOperation("registerServiceType", &ROSServiceService::registerServiceType, this);
@@ -42,13 +42,8 @@ public:
   void registerServiceType(ROSServiceProxyFactoryBase* factory) 
   {
     os::MutexLock lock(factory_lock_);
-
-    // Get the package name and service type
-    std::string service_package = factory->getPackage();
-    std::string service_type = factory->getType();
-
     // Store the factory
-    factories_[service_package][service_type] = factory;
+    factories_[factory->getType()] = factory;
   }
 
   /** \brief Add an Orocos operation to this service which calls a ROS service
@@ -127,7 +122,7 @@ public:
       return false; 
     }
 
-    // Determine if the operation is required by the owner
+    // Check if the operation is required by the owner
     RTT::base::OperationCallerBaseInvoker* operation_caller = 
       this->get_owner_operation_caller(rtt_operation_name);
 
@@ -140,17 +135,14 @@ public:
         client_proxy = client_proxies_[ros_service_name];
       } else {
         // Create a new client proxy
-        client_proxy = factories_[ros_service_type]->create_client_proxy(
-            operation_caller, ros_service_name);
+        client_proxy = factories_[ros_service_type]->create_client_proxy(ros_service_name);
         
         // Store the client proxy
         client_proxies_[ros_service_name] = client_proxy;
       }
 
       // Associate an RTT operation caller with a ROS service client
-
-      return true;
-      
+      return client_proxy.connect(this, operation_caller);
     }
     
     // Check if the operation is provided by the owner
