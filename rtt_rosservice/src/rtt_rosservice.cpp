@@ -30,7 +30,7 @@ public:
         .arg( "service_type", "The ROS service type (like \"std_srvs/Empty\").");
     } else {
       this->doc("Global RTT Service for registering ROS service types.");
-      this->addOperation("registerServiceType", &ROSServiceService::registerServiceType, this);
+      this->addOperation("registerServiceFactory", &ROSServiceService::registerServiceFactory, this);
     }
   }
 
@@ -39,7 +39,7 @@ public:
    * This enables the ROSServiceService to construct ROS service clients and
    * servers from a string name.
    */
-  void registerServiceType(ROSServiceProxyFactoryBase* factory) 
+  void registerServiceFactory(ROSServiceProxyFactoryBase* factory) 
   {
     os::MutexLock lock(factory_lock_);
     // Store the factory
