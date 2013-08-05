@@ -150,6 +150,22 @@ public:
       this->get_owner_operation(rtt_operation_name);
     
     if(operation) {
+      ROSServiceServerProxyBase* server_proxy = NULL;
+
+      // Check if the server proxy already exists
+      if(server_proxies_.find(ros_service_name) != server_proxies_.end()) {
+        // Get the existing server proxy
+        server_proxy = server_proxies_[ros_service_name];
+      } else {
+        // Create a new server proxy
+        server_proxy = factories_[ros_service_type]->create_server_proxy(ros_service_name);
+        
+        // Store the server proxy
+        server_proxies_[ros_service_name] = server_proxy;
+      }
+
+      // Associate an RTT operation caller with a ROS service client
+      return client_proxy.connect(this, operation);
 
       return true;
     }
