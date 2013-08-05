@@ -33,8 +33,7 @@ public:
   { }
   
   //! Connect an RTT Operation to this ROS service server
-  bool connect(RTT::TaskContext *owner, RTT::OperationInterfacePart* operation) 
-  {
+  bool connect(RTT::TaskContext *owner, RTT::OperationInterfacePart* operation) {
     // Link the caller with the operation
     return proxy_operation_caller_->setImplementation(
         operation->getLocalOperation(),
@@ -94,8 +93,7 @@ public:
   { }
 
   //! Connect an operation caller with this proxy
-  bool connect(RTT::TaskContext *owner, RTT::base::OperationCallerBaseInvoker* operation_caller) 
-  {
+  bool connect(RTT::TaskContext *owner, RTT::base::OperationCallerBaseInvoker* operation_caller) {
     return proxy_operation_.get() != NULL &&
       operation_caller->setImplementation(
           proxy_operation_->getImplementation(),
@@ -150,9 +148,7 @@ class ROSServiceProxyFactoryBase
 {
 public:
 
-  ROSServiceProxyFactoryBase(const std::string &service_type) :
-    service_type_(service_type)
-  { }
+  ROSServiceProxyFactoryBase(const std::string &service_type) : service_type_(service_type) { }
 
   //! Get the ROS service type
   const std::string& getType() { return service_type_; }
@@ -171,9 +167,7 @@ class ROSServiceProxyFactory : public ROSServiceProxyFactoryBase
 {
 public:
 
-  ROSServiceProxyFactory(const std::string &service_type)
-    : ROSServiceProxyFactoryBase(service_type)
-  { }
+  ROSServiceProxyFactory(const std::string &service_type) : ROSServiceProxyFactoryBase(service_type) { }
 
   virtual ROSServiceClientProxyBase* create_client_proxy(const std::string &service_name) {
     return new ROSServiceClientProxy<ROS_SERVICE_T>(service_name);

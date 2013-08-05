@@ -156,12 +156,16 @@ public:
   }
 
   //! ROS service proxy factories
-  std::map<std::string, ROSServiceProxyFactoryBase*> factories_;
-  RTT::os::Mutex factory_lock_;
+  static std::map<std::string, ROSServiceProxyFactoryBase*> factories_;
+  static RTT::os::Mutex factory_lock_;
 
   std::map<std::string, ROSServiceServerProxyBase*> server_proxies_;
   std::map<std::string, ROSServiceClientProxyBase*> client_proxies_;
 };
+
+
+std::map<std::string, ROSServiceProxyFactoryBase*> ROSServiceService::factories_;
+RTT::os::Mutex ROSServiceService::factory_lock_;
 
 void loadROSServiceService()
 {
