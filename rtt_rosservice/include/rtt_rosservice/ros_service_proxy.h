@@ -27,10 +27,25 @@ private:
 class ROSServiceServerProxyBase : public ROSServiceProxyBase
 { 
 public:
-  ROSServiceServerProxyBase(const std::string &service_name) : ROSServiceProxyBase(service_name) { }
+  ROSServiceServerProxyBase(const std::string &service_name) :
+    ROSServiceProxyBase(service_name),
+    proxy_operation_caller_()
+  { }
+  
+  //! Connect an RTT Operation to this ROS service server
+  bool connect(RTT::TaskContext *owner, RTT::OperationInterfacePart* operation) 
+  {
+    // Link the caller with the operation
+    return proxy_operation_caller_->setImplementation(
+        operation->getLocalOperation(),
+        owner->engine());
+  }
+
 private:
   //! The underlying ROS service server
   ros::ServiceServer server_;
+  //! The underlying RTT operation caller
+  boost::shared_ptr<RTT::base::OperationCallerBaseInvoker> proxy_operation_caller_;
 };
 
 template<class ROS_SERVICE_T, class ROS_SERVICE_REQ_T, class ROS_SERVICE_RESP_T>
@@ -44,9 +59,11 @@ public:
    * task's required interface and operation caller.
    */
   ROSServiceServerProxy(const std::string &service_name) :
-    ROSServiceServerProxyBase(service_name),
-    proxy_operation_caller_("ROS_SERVICE_SERVER_PROXY")
+    ROSServiceServerProxyBase(service_name)
   {
+    // Construct operation caller
+    proxy_operation_caller_.reset(new ProxyOperationCallerType("ROS_SERVICE_SERVER_PROXY"));
+
     // Construct the ROS service server
     ros::NodeHandle nh;
     server_ = nh.advertiseService(
@@ -55,22 +72,11 @@ public:
         this);
   }
 
-  //! Connect an RTT Operation to this ROS service server
-  bool connect(RTT::TaskContext *owner, RTT::OperationInterfacePart* operation) {
-    // Link the caller with the operation
-    return proxy_operation_caller_->setImplementation(
-        operation->getLocalOperation(),
-        owner->engine());
-  }
-
 private:
-
-  //! The Orocos operation caller which gets called 
-  ProxyOperationCallerType proxy_operation_caller_;
   
   //! The callback called by the ROS service server when this service is invoked
   bool ros_service_callback(ROS_SERVICE_REQ_T& request, ROS_SERVICE_RESP_T& response) {
-    return proxy_operation_caller_.ready() && proxy_operation_caller_(request, response);
+    return proxy_operation_caller_->ready() && (*proxy_operation_caller_.get())(request, response);
   }
 };
 
@@ -79,10 +85,25 @@ private:
 class ROSServiceClientProxyBase : public ROSServiceProxyBase
 {
 public:
-  ROSServiceClientProxyBase(const std::string &service_name) : ROSServiceProxyBase(service_name) { }
+  ROSServiceClientProxyBase(const std::string &service_name) : 
+    ROSServiceProxyBase(service_name),
+    proxy_operation_()
+  { }
+
+  //! Connect an operation caller with this proxy
+  bool connect(RTT::TaskContext *owner, RTT::base::OperationCallerBaseInvoker* operation_caller) 
+  {
+    return proxy_operation_.get() != NULL &&
+      operation_caller->setImplementation(
+          proxy_operation_->getImplementation(),
+          owner->engine());
+  }
+
 private:
   //! The underlying ROS service client
   ros::ServiceClient client_;
+  //! The underlying RTT operation 
+  boost::shared_ptr<RTT::base::OperationBase> proxy_operation_;
 };
 
 template<class ROS_SERVICE_T, class ROS_SERVICE_REQ_T, class ROS_SERVICE_RESP_T>
@@ -90,34 +111,27 @@ class ROSServiceClientProxy : public ROSServiceClientProxyBase
 {
 public:
 
+  typedef RTT::Operation<bool(ROS_SERVICE_REQ_T&, ROS_SERVICE_RESP_T&)> ProxyOperationType;
+
   ROSServiceClientProxy(const std::string &service_name) :
-    ROSServiceClientProxyBase(service_name),
-    proxy_operation_("ROS_SERVICE_CLIENT_PROXY")
+    ROSServiceClientProxyBase(service_name)
   {
+    // Construct a new 
+    proxy_operation_.reset(new ProxyOperationType("ROS_SERVICE_CLIENT_PROXY"));
+
     // Construct the underlying service client
     ros::NodeHandle nh;
     client_ = nh.serviceClient<ROS_SERVICE_T>(service_name);
 
     // Link the operation with the service client
-    proxy_operation_.calls(
+    dynamic_cast<ProxyOperationType>(proxy_operation_)->calls(
         &ROSServiceClientProxy<ROS_SERVICE_T,ROS_SERVICE_REQ_T,ROS_SERVICE_RESP_T>::orocos_operation_callback,
         this,
         RTT::ClientThread);
   }
 
-  //! Connect an operation caller with this proxy
-  bool connect(RTT::TaskContext *owner, RTT::base::OperationCallerBaseInvoker* operation_caller) {
-    // Link the caller with the operation
-    return operation_caller->setImplementation(
-        proxy_operation_.getImplementation(),
-        owner->engine());
-  }
-
 private:
-
-  //! The RTT operation
-  RTT::Operation<bool(ROS_SERVICE_REQ_T&, ROS_SERVICE_RESP_T&)> proxy_operation_;
-
+  
   //! The callback for the RTT operation
   bool orocos_operation_callback(ROS_SERVICE_REQ_T& request, ROS_SERVICE_RESP_T& response) {
     return client_.exists() && client_.isValid() && client_.call(request, response);
