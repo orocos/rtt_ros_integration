@@ -8,6 +8,8 @@
 class ROSServiceRegistryService : public RTT::Service 
 {
 public:
+  typedef std::map<std::string, ROSServiceProxyFactoryBase*> FactoryMap;
+
   /**
    * Instantiates this service.
    * @param owner The owner or null in case of global.
@@ -19,6 +21,17 @@ public:
     this->addOperation("registerServiceFactory", &ROSServiceRegistryService::registerServiceFactory, this, RTT::ClientThread);
     this->addOperation("hasServiceFactory", &ROSServiceRegistryService::hasServiceFactory, this, RTT::ClientThread);
     this->addOperation("getServiceFactory", &ROSServiceRegistryService::getServiceFactory, this, RTT::ClientThread);
+  }
+
+  ~ROSServiceRegistryService()
+  {
+    // Free memory
+    for(FactoryMap::iterator it=factories_.begin(); it!=factories_.end(); ++it) {
+      if(it->second != NULL) {
+        delete it->second;
+      }
+      factories_.erase(it);
+    }
   }
 
   /** \brief Register a ROS service proxy factory

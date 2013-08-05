@@ -1,5 +1,5 @@
 <package>
-  <name>rtt_ros_integration_example</name>
+  <name>rtt_ros_plugins</name>
   <version>2.6.0</version>
   <description>
     This package is provided for convenience for depending on the "standard"
