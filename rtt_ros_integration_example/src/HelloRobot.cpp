@@ -31,6 +31,7 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/String.h>
 #include <rtt/Component.hpp>
+#include <std_srvs/Empty.h>
 
 using namespace RTT;
 
@@ -46,7 +47,7 @@ private:
   double prop_counter_step;
 
   double counter;
-  
+
 public:
   HelloRobot(const std::string& name):
     TaskContext(name),
@@ -61,6 +62,8 @@ public:
     
     this->addProperty("answer",prop_answer).doc("The text being sent out on 'string_out'.");
     this->addProperty("counter_step",prop_counter_step).doc("The increment for each new sample on 'float_out'");
+
+    this->provides()->addOperation("displayAnswer",&HelloRobot::displayAnswer,this,RTT::OwnThread);
     
     counter=0.0;
   }
@@ -80,6 +83,12 @@ private:
     outport.write(fdata);
     sdata.data=prop_answer;
     soutport.write(sdata);
+  }
+
+  bool displayAnswer(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp) {
+    log(Info)<<"Answer: "<<prop_answer;
+    prop_answer = "called";
+    return true;
   }
 };
 ORO_CREATE_COMPONENT(HelloRobot)

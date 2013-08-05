@@ -23,27 +23,18 @@ public:
   {
     if(owner) {
       this->doc("RTT Service for connecting the operations of "+owner->getName()+" to ROS service clients and servers.");
-      this->addOperation("connect", &ROSServiceService::connect, this)
-        .doc( "Connects an RTT operation or operation caller to an associated ROS service server or client.")
-        .arg( "operation_name", "The RTT operation name (like \"some_provided_service.another.operation\").")
-        .arg( "service_name", "The ROS service name (like \"/my_robot/ns/some_service\").")
-        .arg( "service_type", "The ROS service type (like \"std_srvs/Empty\").");
-    } else {
-      this->doc("Global RTT Service for registering ROS service types.");
-      this->addOperation("registerServiceFactory", &ROSServiceService::registerServiceFactory, this);
     }
-  }
 
-  /** \brief Register a ROS service proxy factory
-   *
-   * This enables the ROSServiceService to construct ROS service clients and
-   * servers from a string name.
-   */
-  void registerServiceFactory(ROSServiceProxyFactoryBase* factory) 
-  {
-    os::MutexLock lock(factory_lock_);
-    // Store the factory
-    factories_[factory->getType()] = factory;
+    this->addOperation("connect", &ROSServiceService::connect, this)
+      .doc( "Connects an RTT operation or operation caller to an associated ROS service server or client.")
+      .arg( "operation_name", "The RTT operation name (like \"some_provided_service.another.operation\").")
+      .arg( "service_name", "The ROS service name (like \"/my_robot/ns/some_service\").")
+      .arg( "service_type", "The ROS service type (like \"std_srvs/Empty\").");
+
+    // Get the global ros service registry
+    rosservice_registry_ = RTT::internal::GlobalService::Instance()->getService("rosservice_registry");
+    has_service_factory = rosservice_registry_->getOperation("hasServiceFactory");
+    get_service_factory = rosservice_registry_->getOperation("getServiceFactory");
   }
 
   //! Get an RTT operation caller from a string identifier
@@ -112,11 +103,8 @@ public:
     const std::string &ros_service_name,
     const std::string &ros_service_type)
   {
-    // Get the fectory lock
-    os::MutexLock lock(factory_lock_);
-
     // Make sure the factory for this service type exists
-    if(factories_.find(ros_service_type) == factories_.end()) {
+    if(!this->has_service_factory(ros_service_type)) {
       return false; 
     }
 
@@ -129,7 +117,7 @@ public:
       if(client_proxies_.find(ros_service_name) == client_proxies_.end()) {
         // Create a new client proxy
         client_proxies_[ros_service_name] =
-          factories_[ros_service_type]->create_client_proxy(ros_service_name);
+          get_service_factory(ros_service_type)->create_client_proxy(ros_service_name);
       }
 
       // Associate an RTT operation caller with a ROS service client
@@ -145,7 +133,7 @@ public:
       if(server_proxies_.find(ros_service_name) == server_proxies_.end()) {
         // Create a new server proxy
         server_proxies_[ros_service_name] =
-          factories_[ros_service_type]->create_server_proxy(ros_service_name);
+          get_service_factory(ros_service_type)->create_server_proxy(ros_service_name);
       }
 
       // Associate an RTT operation with a ROS service server 
@@ -155,34 +143,13 @@ public:
     return false;
   }
 
-  //! ROS service proxy factories
-  static std::map<std::string, ROSServiceProxyFactoryBase*> factories_;
-  static RTT::os::Mutex factory_lock_;
+  RTT::Service::shared_ptr rosservice_registry_;
+  RTT::OperationCaller<bool(const std::string&)> has_service_factory;
+  RTT::OperationCaller<ROSServiceProxyFactoryBase*(const std::string&)> get_service_factory;
 
   std::map<std::string, ROSServiceServerProxyBase*> server_proxies_;
   std::map<std::string, ROSServiceClientProxyBase*> client_proxies_;
 };
 
 
-std::map<std::string, ROSServiceProxyFactoryBase*> ROSServiceService::factories_;
-RTT::os::Mutex ROSServiceService::factory_lock_;
-
-void loadROSServiceService()
-{
-  RTT::Service::shared_ptr rss(new ROSServiceService(NULL));
-  RTT::internal::GlobalService::Instance()->addService(rss);
-}
-
-using namespace RTT;
-extern "C" {
-  bool loadRTTPlugin(RTT::TaskContext* c){
-    loadROSServiceService();
-    return true;
-  }
-  std::string getRTTPluginName (){
-    return "rosservice";
-  }
-  std::string getRTTTargetName (){
-    return OROCOS_TARGET_NAME;
-  }
-}
+ORO_SERVICE_NAMED_PLUGIN(ROSServiceService, "rosservice")

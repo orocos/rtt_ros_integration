@@ -18,6 +18,9 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS})
 
+orocos_service(rtt_rosservice_registry
+  src/rtt_rosservice_registry.cpp)
+
 orocos_service(rtt_rosservice
   src/rtt_rosservice.cpp)
 target_link_libraries(rtt_rosservice ${catkin_LIBRARIES})

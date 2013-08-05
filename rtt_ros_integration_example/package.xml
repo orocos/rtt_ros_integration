@@ -25,6 +25,10 @@
   <run_depend>std_msgs</run_depend> 
 
   <export>
-    <rtt_plugin_depend>rtt_ros</rtt_plugin_depend>
+    <rtt_plugin_depend>rtt_rosnode</rtt_plugin_depend>
+    <rtt_plugin_depend>rtt_rostopic</rtt_plugin_depend>
+    <rtt_plugin_depend>rtt_rosservice</rtt_plugin_depend>
+    <rtt_plugin_depend>rtt_std_msgs</rtt_plugin_depend>
+    <rtt_plugin_depend>rtt_std_srvs</rtt_plugin_depend>
   </export>
 </package>

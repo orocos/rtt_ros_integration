@@ -80,87 +80,77 @@ public:
         return false;
       }
 
-      // + add all dependencies to package names
+      // Add all rtt_plugin_depend dependencies to package names
       std::vector<std::string> deps_to_import;
       rpack.setQuiet(true);
 
-      // Try to get package deps from rospack
-      // FIXME: As of this writing, rospack does not properly handle
-      // catkin-based package dependencies. C++ catkin_pkg support has been
-      // requested, but until it's implemented, we m ust do XML parsing here
-      bool valid = rpack.deps(package, false, deps_to_import); // false: also indirect deps.
+      // Read the package.xml for this package
+      std::queue<std::string> dep_names;
+      dep_names.push(package);
+      deps_to_import.push_back(package);
 
-      if (!valid) {
-        RTT::log(RTT::Debug) << "rospack could not determine the dependencies of ROS package \""<< package << "\", falling back to ad-hoc package.xml parsing."<<RTT::endlog();
-        
-        // Read the package.xml for this package
-        std::queue<std::string> dep_names;
-        dep_names.push(package);
-        deps_to_import.push_back(package);
+      const xmlChar * rtt_plugin_depend_xpath = xmlCharStrdup("/package/export/rtt_plugin_depend/text()");
 
-        const xmlChar * rtt_plugin_depend_xpath = xmlCharStrdup("/package/export/rtt_plugin_depend/text()");
+      while(!dep_names.empty()) 
+      {
+        namespace fs = boost::filesystem;
 
-        while(!dep_names.empty()) 
-        {
-          namespace fs = boost::filesystem;
+        // Get the next dep name, store the dep path
+        std::string dep_name, dep_path;
+        dep_name = dep_names.front();
+        dep_names.pop();
 
-          // Get the next dep name, store the dep path
-          std::string dep_name, dep_path;
-          dep_name = dep_names.front();
-          dep_names.pop();
+        bool dep_found = rpack.find(dep_name,dep_path);
 
-          bool dep_found = rpack.find(dep_name,dep_path);
+        if(!dep_found) {
+          RTT::log(RTT::Error) << "Could not find ROS package \""<< dep_name << "\" in ROS_PACKAGE_PATH environment variable." <<RTT::endlog();
+          continue;
+        }
 
-          if(!dep_found) {
-            RTT::log(RTT::Error) << "Could not find ROS package \""<< dep_name << "\" in ROS_PACKAGE_PATH environment variable." <<RTT::endlog();
-            continue;
-          }
+        // Construct the package.xml path
+        fs::path package_xml_path = fs::path(dep_path) / "package.xml";
 
-          // Construct the package.xml path
-          fs::path package_xml_path = fs::path(dep_path) / "package.xml";
+        // Read in package.xml
+        if(boost::filesystem::is_regular_file( package_xml_path.string() ) ) {
+          xmlInitParser();
 
-          // Read in package.xml
-          if(boost::filesystem::is_regular_file( package_xml_path.string() ) ) {
-            xmlInitParser();
+          // libxml structures
+          xmlDocPtr package_doc;
+          xmlXPathContextPtr xpath_ctx; 
+          xmlXPathObjectPtr xpath_obj; 
 
-            // libxml structures
-            xmlDocPtr package_doc;
-            xmlXPathContextPtr xpath_ctx; 
-            xmlXPathObjectPtr xpath_obj; 
+          // Load package.xml
+          package_doc = xmlParseFile(package_xml_path.string().c_str());
+          xpath_ctx = xmlXPathNewContext(package_doc);
 
-            // Load package.xml
-            package_doc = xmlParseFile(package_xml_path.string().c_str());
-            xpath_ctx = xmlXPathNewContext(package_doc);
+          // Get the text of the rtt_plugin_depends
+          xpath_obj = xmlXPathEvalExpression(rtt_plugin_depend_xpath, xpath_ctx);
 
-            // Get the text of the rtt_plugin_depends
-            xpath_obj = xmlXPathEvalExpression(rtt_plugin_depend_xpath, xpath_ctx);
+          // Iterate through the nodes
+          if(xmlXPathNodeSetIsEmpty(xpath_obj->nodesetval)) {
+            RTT::log(RTT::Debug) << "ROS package \""<< dep_name << "\" has no RTT plugin dependencies." <<RTT::endlog();
+          } else {
+            RTT::log(RTT::Debug) << "ROS package \""<< dep_name << "\" has "<<xpath_obj->nodesetval->nodeNr<<" RTT plugin dependencies." <<RTT::endlog();
 
-            // Iterate through the nodes
-            if(xmlXPathNodeSetIsEmpty(xpath_obj->nodesetval)) {
-              RTT::log(RTT::Debug) << "ROS package \""<< dep_name << "\" has no RTT plugin dependencies." <<RTT::endlog();
-            } else {
-              RTT::log(RTT::Debug) << "ROS package \""<< dep_name << "\" has "<<xpath_obj->nodesetval->nodeNr<<" RTT plugin dependencies." <<RTT::endlog();
+            for(int i=0; i < xpath_obj->nodesetval->nodeNr; i++) {
+              if(xpath_obj->nodesetval->nodeTab[i]) {
+                std::ostringstream oss;
+                oss << xmlNodeGetContent(xpath_obj->nodesetval->nodeTab[i]);
+                RTT::log(RTT::Debug) << "Found dependency \""<< oss.str() << "\"" <<RTT::endlog();
+                dep_names.push(oss.str());
 
-              for(int i=0; i < xpath_obj->nodesetval->nodeNr; i++) {
-                if(xpath_obj->nodesetval->nodeTab[i]) {
-                  std::ostringstream oss;
-                  oss << xmlNodeGetContent(xpath_obj->nodesetval->nodeTab[i]);
-                  RTT::log(RTT::Debug) << "Found dependency \""<< oss.str() << "\"" <<RTT::endlog();
-                  dep_names.push(oss.str());
-
-                  // Add the dep to the list of deps to import
-                  deps_to_import.push_back(oss.str());
-                }
+                // Add the dep to the list of deps to import
+                deps_to_import.push_back(oss.str());
               }
             }
-
-            xmlXPathFreeObject(xpath_obj);
-            xmlXPathFreeContext(xpath_ctx); 
-            xmlFreeDoc(package_doc); 
-            xmlCleanupParser();
-          } else {
-            RTT::log(RTT::Error) << "package.xml file for ROS package \""<< dep_name << "\" not found at "<<package_xml_path <<RTT::endlog();
           }
+
+          xmlXPathFreeObject(xpath_obj);
+          xmlXPathFreeContext(xpath_ctx); 
+          xmlFreeDoc(package_doc); 
+          xmlCleanupParser();
+        } else {
+          RTT::log(RTT::Error) << "package.xml file for ROS package \""<< dep_name << "\" not found at "<<package_xml_path <<RTT::endlog();
         }
       }
 

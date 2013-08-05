@@ -1,20 +1,26 @@
 import("rtt_ros")
 ros.import("rtt_ros_integration_example")
 
-# Load a HelloRobot component
+## Load a HelloRobot component
 loadComponent("HelloRobot","HelloRobot")
 
-# Give it a periodic activity
+## Give it a periodic activity
 setActivity("HelloRobot",0.0,HighestPriority,ORO_SCHED_RT)
 
-# Create connections
-stream("HelloRobot.float_out", rostopic.connect("float_out"))
-stream("HelloRobot.float_in", rostopic.connect("float_in"))
-stream("HelloRobot.string_out", rostopic.connect("string_out"))
-stream("HelloRobot.string_in", rostopic.connect("string_in"))
+## Create connections
+stream("HelloRobot.float_out", rostopic.connection("float_out"))
+stream("HelloRobot.float_in", rostopic.connection("float_in"))
+stream("HelloRobot.string_out", rostopic.connection("string_out"))
+stream("HelloRobot.string_in", rostopic.connection("string_in"))
 
-# Configure the HelloRobot component
+## Connect the 
+loadService("HelloRobot","rosservice")
+HelloRobot.rosservice.connect( "displayAnswer", "/display_answer", "std_srvs/Empty")
+
+## Configure the HelloRobot component
 HelloRobot.configure()
 
-# Start it
+## Start it
 HelloRobot.start()
+
+
