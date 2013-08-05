@@ -1,7 +1,8 @@
 <package>
   <name>rtt_std_srvs</name>
   <version>2.6.0</version>
-  <description>Provides an rtt typekit for ROS std_msgs messages.
+  <description>
+    Provides an rtt typekit for ROS std_msgs messages.
 
     It allows you to use ROS messages transparently in
     RTT components and applications.
@@ -12,8 +13,9 @@
 
     See the http://ros.org/wiki/std_msgs documentation
     for the documentation of the ROS messages in this
-    typekit.</description>
-  <maintainer email="ruben.smits@mech.kuleuven.be">Ruben Smits</maintainer>
+    typekit.
+  </description>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
 
   <license>BSD</license>
 
@@ -22,8 +24,12 @@
   <author>create_rtt_msgs Generator</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>genmsg</build_depend>
   <build_depend>rtt_rosservice</build_depend>
   <build_depend>std_srvs</build_depend>
+
+  <run_depend>genmsg</run_depend>
   <run_depend>rtt_rosservice</run_depend>
   <run_depend>std_srvs</run_depend>
 
