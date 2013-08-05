@@ -50,7 +50,7 @@ public:
     // Construct the ROS service server
     ros::NodeHandle nh;
     server_ = nh.advertiseService(
-        full_service_name_, 
+        service_name, 
         &ROSServiceServerProxy<ROS_SERVICE_T, ROS_SERVICE_REQ_T, ROS_SERVICE_RESP_T>::ros_service_callback, 
         this);
   }
@@ -58,9 +58,9 @@ public:
   //! Connect an RTT Operation to this ROS service server
   bool connect(RTT::TaskContext *owner, RTT::OperationInterfacePart* operation) {
     // Link the caller with the operation
-    return operaiton_caller_->setImplementation(
-        operation.getImplementation(),
-        owner->engine())
+    return proxy_operation_caller_->setImplementation(
+        operation->getLocalOperation(),
+        owner->engine());
   }
 
 private:
@@ -90,9 +90,9 @@ class ROSServiceClientProxy : public ROSServiceClientProxyBase
 {
 public:
 
-  ROSServiceClientProxy(const std::string &service_name) 
-    : ROSServiceClientProxyBase(service_name)
-      proxy_operation_("ROS_SERVICE_CLIENT_PROXY")
+  ROSServiceClientProxy(const std::string &service_name) :
+    ROSServiceClientProxyBase(service_name),
+    proxy_operation_("ROS_SERVICE_CLIENT_PROXY")
   {
     // Construct the underlying service client
     ros::NodeHandle nh;
@@ -108,9 +108,9 @@ public:
   //! Connect an operation caller with this proxy
   bool connect(RTT::TaskContext *owner, RTT::base::OperationCallerBaseInvoker* operation_caller) {
     // Link the caller with the operation
-    return operaiton_caller->setImplementation(
+    return operation_caller->setImplementation(
         proxy_operation_.getImplementation(),
-        owner->engine())
+        owner->engine());
   }
 
 private:

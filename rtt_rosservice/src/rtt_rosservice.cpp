@@ -93,7 +93,7 @@ public:
     }
 
     // Iterate through the tokens except for the last one (the operation name)
-    RTT::Service::shared_ptr *provided = this->getOwner()->provides();
+    RTT::Service::shared_ptr provided = this->getOwner()->provides();
     for(std::vector<std::string>::iterator it = rtt_uri_tokens.begin();
         it+1 != rtt_uri_tokens.end();
         ++it)
@@ -109,7 +109,7 @@ public:
     return provided->getOperation(rtt_uri_tokens.back());
   }
 
-  bool connectOperation(
+  bool connect(
     const std::string &rtt_operation_name,
     const std::string &ros_service_name,
     const std::string &ros_service_type)
@@ -130,11 +130,12 @@ public:
       // Check if the client proxy already exists
       if(client_proxies_.find(ros_service_name) == client_proxies_.end()) {
         // Create a new client proxy
-        client_proxies_[ros_service_name] = factories_[ros_service_type]->create_client_proxy(ros_service_name);
+        client_proxies_[ros_service_name] =
+          factories_[ros_service_type]->create_client_proxy(ros_service_name);
       }
 
       // Associate an RTT operation caller with a ROS service client
-      return client_proxies_[ros_service_name].connect(this, operation_caller);
+      return client_proxies_[ros_service_name]->connect(this->getOwner(), operation_caller);
     }
     
     // Check if the operation is provided by the owner
@@ -145,54 +146,23 @@ public:
       // Check if the server proxy already exists
       if(server_proxies_.find(ros_service_name) == server_proxies_.end()) {
         // Create a new server proxy
-        server_proxies_[ros_service_name] = factories_[ros_service_type]->create_server_proxy(ros_service_name);
+        server_proxies_[ros_service_name] =
+          factories_[ros_service_type]->create_server_proxy(ros_service_name);
       }
 
-      // Associate an RTT operation caller with a ROS service client
-      return server_proxies_[ros_service_name].connect(this, operation);
+      // Associate an RTT operation with a ROS service server 
+      return server_proxies_[ros_service_name]->connect(this->getOwner(), operation);
     }
 
     return false;
   }
 
-  /** \brief Add an Orocos operation caller to this service which is called by
-   * a ROS service server.
-   *
-   * This allows another component to be called by this service when a ROS
-   * service call is invoked.
-   */
-  const std::string server(
-      const std::string &ros_service_name
-      const std::string &ros_service_type)
-  {
-    // Check if the server proxy already exists
-    if(server_proxies_.find(ros_service_name) != server_proxies_.end()) {
-      return server_proxies_[ros_service_name]->getOperationName();
-    }
-        
-    // Split the typename
-    std::vector<std::string> type_tokens;
-    boost::split(type_tokens, ros_service_type, boost::is_any_of("/"));
-    if(type_tokens.size() != 2) { return "ERROR"; }
-
-    // Have the factory create a ROS service server add the operation 
-    ROSServiceServerProxyBase* server_proxy =
-      factories_[type_tokens[0]][type_tokens[1]]->create_server_proxy(
-          this->requires("servers"), ros_service_name);
-    // Store the server proxy
-    server_proxies_[ros_service_name] = server_proxy;
-
-    return this->getName() + ".servers." + server_proxy->getOperationName();
-  }
-
   //! ROS service proxy factories
-  std::map<std::string, std::map<std::string, ROSServiceProxyFactoryBase*> > factories_;
+  std::map<std::string, ROSServiceProxyFactoryBase*> factories_;
   RTT::os::Mutex factory_lock_;
 
   std::map<std::string, ROSServiceServerProxyBase*> server_proxies_;
   std::map<std::string, ROSServiceClientProxyBase*> client_proxies_;
-
-
 };
 
 void loadROSServiceService()
