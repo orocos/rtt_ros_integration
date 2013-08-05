@@ -6,7 +6,7 @@ that hapens over the ROS communication protocols and an "Orocos/RTT Service" is
 a grouping of properties, functions, and data ports. "ROS Services" satisfy a
 similar role to "Orocos/RTT Operations".* 
 
-## Introduction
+## Contents 
 
 This package provides an Orocos Plugin which supports connecting "ROS Services"
 to "Orocos Operations" by providing typekit generation and a few "Orocos
@@ -22,16 +22,16 @@ users will only use the task-scoped RTT service, similarly to how the
 `rtt_rosparam` service is used.
 
 The task-scoped RTT service `rosservice` provides the following operations:
-* **rosservice.connect(RTT_OPERATION_NAME, ROS_SERVICE_NAME, ROS_SERVICE_TYPE)**
+* `rosservice.connect(RTT_OPERATION_NAME, ROS_SERVICE_NAME, ROS_SERVICE_TYPE)`
   * Connect an RTT operation to ROS service.
-  * **RTT_OPERATION_NAME** The task-scoped operation/operation caller name, with provided/required services separated by dots (like `foo.bar.baz.op`)
-  * **ROS_SERVICE_NAME** The name of the service client/server in the ROS graph (like `/some/ros/ns/my_service`)
-  * **ROS_SERVICE_TYPE** The full typename of the service (like `std_srvs/Empty`)
+  * `RTT_OPERATION_NAME`: The task-scoped operation/operation caller name, with provided/required services separated by dots (like `foo.bar.baz.op`)
+  * `ROS_SERVICE_NAME`: The name of the service client/server in the ROS graph (like `/some/ros/ns/my_service`)
+  * `ROS_SERVICE_TYPE`: The full typename of the service (like `std_srvs/Empty`)
 
 The global RTT service `rosservice_registry` provides the following operations:
-* **rosservice_registry.registerServiceFactory(FACTORY)** register a ROS service factory
-* **rosservice_registry.hasServiceFactory** check if ROS service type has been registered
-* **rosservice_registry.geServiceFactory** get a ROS service client/server factory
+* `rosservice_registry.registerServiceFactory(FACTORY)`: Register a ROS service factory
+* `rosservice_registry.hasServiceFactory(TYPENAME)`: Check if ROS service type has been registered
+* `rosservice_registry.geServiceFactory(TYPENAME)`: Get a ROS service client/server factory
 
 ### Code Generation
 
