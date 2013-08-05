@@ -165,9 +165,7 @@ public:
       }
 
       // Associate an RTT operation caller with a ROS service client
-      return client_proxy.connect(this, operation);
-
-      return true;
+      return server_proxy.connect(this, operation);
     }
 
     return false;
