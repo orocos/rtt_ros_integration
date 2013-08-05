@@ -76,7 +76,10 @@ private:
   
   //! The callback called by the ROS service server when this service is invoked
   bool ros_service_callback(typename ROS_SERVICE_T::Request& request, typename ROS_SERVICE_T::Response& response) {
-    return proxy_operation_caller_->ready() && (*dynamic_cast<ProxyOperationCallerType*>(proxy_operation_caller_.get()))(request, response);
+    // Downcast the proxy operation caller
+    ProxyOperationCallerType &proxy_operation_caller = *dynamic_cast<ProxyOperationCallerType*>(proxy_operation_caller_.get());
+    // Check if the operation caller is ready, and then call it
+    return proxy_operation_caller_->ready() && proxy_operation_caller(request, response);
   }
 };
 
