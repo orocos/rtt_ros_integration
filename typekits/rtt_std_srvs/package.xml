@@ -22,9 +22,9 @@
   <author>create_rtt_msgs Generator</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rtt_rostopic</build_depend>
+  <build_depend>rtt_rosservice</build_depend>
   <build_depend>std_srvs</build_depend>
-  <run_depend>rtt_rostopic</run_depend>
+  <run_depend>rtt_rosservice</run_depend>
   <run_depend>std_srvs</run_depend>
 
   <export>

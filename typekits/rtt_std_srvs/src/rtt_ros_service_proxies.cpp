@@ -11,14 +11,14 @@
 
 void registerROSServiceProxies(){
   // Get the ros service service
-  RRTT::Service::shared_ptr rss(RTT::internal::GlobalService::Instance()->getService("rosservice"));
-  RTT::OperationCaller<void(ROSServiceProxyBase*)> register_service = rss->getOperation("registerServiceType");
+  RTT::Service::shared_ptr rss(RTT::internal::GlobalService::Instance()->getService("rosservice"));
+  RTT::OperationCaller<void(ROSServiceProxyFactoryBase*)> register_service_factory = rss->getOperation("registerServiceFactory");
 
   //////////////////////////////////////////////////////////////////////////////
   /** Proxy for "std_srvs/Empty" **/
-  ROSServiceProxyFactoryBase* EmptyProxy = 
-    new ROSServiceProxyFactory<std_srvs::Empty, std_srvs::Empty::Request, std_srvs::Empty::Response>("std_srvs","Empty");
-  register_service(EmptyProxy);
+  ROSServiceProxyFactoryBase* EmptyProxyFactory = 
+    new ROSServiceProxyFactory<std_srvs::Empty>("std_srvs/Empty");
+  register_service_factory(EmptyProxyFactory);
   //////////////////////////////////////////////////////////////////////////////
 }
 

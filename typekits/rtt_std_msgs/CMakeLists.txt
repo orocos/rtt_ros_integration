@@ -4,8 +4,7 @@ project(rtt_std_msgs)
 find_package(catkin REQUIRED COMPONENTS rtt_rostopic std_msgs)
 
 catkin_package(
-    DEPENDS rtt_rostopic std_msgs
-    CATKIN_DEPENDS rtt_rostopic std_msgs
+  CATKIN_DEPENDS rtt_rostopic std_msgs
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
