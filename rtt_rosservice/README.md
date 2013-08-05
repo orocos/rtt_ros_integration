@@ -21,26 +21,27 @@ To connect an Orocos operation to a ROS service via .ops script from within an
 Orocos DeploymentComponent: 
 
 ```cpp
+// Imports
 import("rtt_rosservice")
 import("rtt_std_srvs")
 
+// Load some application-specific component
 loadComponent("some_component_name","some_component_package::SomeComponent")
-
+// Load the rosservice RTT service for this components
 loadService("some_component_name","rosservice")
 
-YourComponentName.rosservice.connect(
+// Expose a provided operation of this component as a ROS service
+some_component_name.rosservice.connect(
   "some_provided_service.some_operation",
   "/some/ros/namespace/empty", "std_srvs/Empty")
 
-YourComponentName.rosservice.connect(
+// Expose a ROS service to this component
+some_component_name.rosservice.connect(
   "some_Required_service.some_operation_caller",
   "/some/ros/namespace/empty", "std_srvs/Empty")
 ```
 
 ## Design
-
-**NOTE** global services can't _require_ services / operations
-**NOTE** you can't resolve an RTT uri unless the component is a peer of roservice
 
 The `rosservice` RTT service contains a list of ROS service clients and servers
 which are associated with RTT operations and operationcallers, respectively.
@@ -53,3 +54,8 @@ caller.
 
 The provided and required services on which the wrapper operations and
 operationCallers are created are private to the ROS service service. 
+
+**NOTE** global services can't _require_ services / operations
+
+**NOTE** you can't resolve an RTT uri unless the component is a peer of roservice
+
