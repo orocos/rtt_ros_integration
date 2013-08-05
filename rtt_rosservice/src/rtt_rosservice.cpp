@@ -169,7 +169,7 @@ RTT::os::Mutex ROSServiceService::factory_lock_;
 
 void loadROSServiceService()
 {
-  RTT::Service::shared_ptr rss(new ROSServiceService(0));
+  RTT::Service::shared_ptr rss(new ROSServiceService(NULL));
   RTT::internal::GlobalService::Instance()->addService(rss);
 }
 

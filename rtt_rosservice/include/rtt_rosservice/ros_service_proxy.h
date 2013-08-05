@@ -23,7 +23,7 @@ private:
 };
 
 
-//! Abstract ROS Service Proxy Server
+//! Abstract ROS Service Server Proxy
 class ROSServiceServerProxyBase : public ROSServiceProxyBase
 { 
 public:
@@ -83,7 +83,7 @@ private:
 };
 
 
-//! Abstract ROS Service Proxy Client
+//! Abstract ROS Service Client Proxy
 class ROSServiceClientProxyBase : public ROSServiceProxyBase
 {
 public:
@@ -140,7 +140,6 @@ private:
     return client_.exists() && client_.isValid() && client_.call(request, response);
   }
 };
-
 
 
 //! Abstract factory for ROS Service Proxy Factories
