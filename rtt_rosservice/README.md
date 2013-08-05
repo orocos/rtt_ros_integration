@@ -22,15 +22,16 @@ users will only use the task-scoped RTT service, similarly to how the
 `rtt_rosparam` service is used.
 
 The task-scoped RTT service `rosservice` provides the following operations:
-* **connect RTT operation to ROS service** `some_component.rosservice.connect(RTT_OPERATION_NAME, ROS_SERVICE_NAME, ROS_SERVICE_TYPE)`
-  * *RTT_OPERATION_NAME* The task-scoped operation/operation caller name, with provided/required services separated by dots (like `foo.bar.baz.op`)
-  * *ROS_SERVICE_NAME* The name of the service client/server in the ROS graph (like `/some/ros/ns/my_service`)
-  * *ROS_SERVICE_TYPE* The full typename of the service (like `std_srvs/Empty`)
+* **rosservice.connect(RTT_OPERATION_NAME, ROS_SERVICE_NAME, ROS_SERVICE_TYPE)**
+  * Connect an RTT operation to ROS service.
+  * **RTT_OPERATION_NAME** The task-scoped operation/operation caller name, with provided/required services separated by dots (like `foo.bar.baz.op`)
+  * **ROS_SERVICE_NAME** The name of the service client/server in the ROS graph (like `/some/ros/ns/my_service`)
+  * **ROS_SERVICE_TYPE** The full typename of the service (like `std_srvs/Empty`)
 
 The global RTT service `rosservice_registry` provides the following operations:
-* **register a ROS service type** `rosservice_registry.registerServiceFactory`
-* **check if ROS service type has been registered** `rosservice_registry.hasServiceFactory`
-* **get a ROS service client/server factory** `rosservice_registry.geServiceFactory`
+* **rosservice_registry.registerServiceFactory(FACTORY)** register a ROS service factory
+* **rosservice_registry.hasServiceFactory** check if ROS service type has been registered
+* **rosservice_registry.geServiceFactory** get a ROS service client/server factory
 
 ### Code Generation
 
