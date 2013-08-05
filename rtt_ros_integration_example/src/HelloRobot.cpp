@@ -32,6 +32,7 @@
 #include <std_msgs/String.h>
 #include <rtt/Component.hpp>
 #include <std_srvs/Empty.h>
+#include <ros/ros.h>
 
 using namespace RTT;
 
@@ -86,8 +87,7 @@ private:
   }
 
   bool displayAnswer(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp) {
-    log(Info)<<"Answer: "<<prop_answer;
-    prop_answer = "called";
+    ROS_INFO_STREAM("Operation called!");
     return true;
   }
 };

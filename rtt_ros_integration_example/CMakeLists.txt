@@ -16,6 +16,7 @@ find_package(OROCOS-RTT REQUIRED)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 add_definitions(-DRTT_COMPONENT)
 orocos_component(${PROJECT_NAME} src/HelloRobot.cpp)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 orocos_generate_package()
 
