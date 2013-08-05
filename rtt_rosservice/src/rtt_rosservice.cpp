@@ -123,49 +123,33 @@ public:
     }
 
     // Check if the operation is required by the owner
-    RTT::base::OperationCallerBaseInvoker* operation_caller = 
-      this->get_owner_operation_caller(rtt_operation_name);
+    RTT::base::OperationCallerBaseInvoker* 
+      operation_caller = this->get_owner_operation_caller(rtt_operation_name);
 
     if(operation_caller) {
-      ROSServiceClientProxyBase* client_proxy = NULL;
-
       // Check if the client proxy already exists
-      if(client_proxies_.find(ros_service_name) != client_proxies_.end()) {
-        // Get the existing client proxy
-        client_proxy = client_proxies_[ros_service_name];
-      } else {
+      if(client_proxies_.find(ros_service_name) == client_proxies_.end()) {
         // Create a new client proxy
-        client_proxy = factories_[ros_service_type]->create_client_proxy(ros_service_name);
-        
-        // Store the client proxy
-        client_proxies_[ros_service_name] = client_proxy;
+        client_proxies_[ros_service_name] = factories_[ros_service_type]->create_client_proxy(ros_service_name);
       }
 
       // Associate an RTT operation caller with a ROS service client
-      return client_proxy.connect(this, operation_caller);
+      return client_proxies_[ros_service_name].connect(this, operation_caller);
     }
     
     // Check if the operation is provided by the owner
-    RTT::OperationInterfacePart* operation = 
-      this->get_owner_operation(rtt_operation_name);
+    RTT::OperationInterfacePart*
+      operation = this->get_owner_operation(rtt_operation_name);
     
     if(operation) {
-      ROSServiceServerProxyBase* server_proxy = NULL;
-
       // Check if the server proxy already exists
-      if(server_proxies_.find(ros_service_name) != server_proxies_.end()) {
-        // Get the existing server proxy
-        server_proxy = server_proxies_[ros_service_name];
-      } else {
+      if(server_proxies_.find(ros_service_name) == server_proxies_.end()) {
         // Create a new server proxy
-        server_proxy = factories_[ros_service_type]->create_server_proxy(ros_service_name);
-        
-        // Store the server proxy
-        server_proxies_[ros_service_name] = server_proxy;
+        server_proxies_[ros_service_name] = factories_[ros_service_type]->create_server_proxy(ros_service_name);
       }
 
       // Associate an RTT operation caller with a ROS service client
-      return server_proxy.connect(this, operation);
+      return server_proxies_[ros_service_name].connect(this, operation);
     }
 
     return false;
