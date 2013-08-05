@@ -8,8 +8,6 @@
 class ROSServiceRegistryService : public RTT::Service 
 {
 public:
-  typedef std::map<std::string, ROSServiceProxyFactoryBase*> FactoryMap;
-
   /**
    * Instantiates this service.
    * @param owner The owner or null in case of global.
@@ -23,27 +21,30 @@ public:
     this->addOperation("getServiceFactory", &ROSServiceRegistryService::getServiceFactory, this, RTT::ClientThread);
   }
 
-  ~ROSServiceRegistryService()
-  {
-    // Free memory
-    for(FactoryMap::iterator it=factories_.begin(); it!=factories_.end(); ++it) {
-      if(it->second != NULL) {
-        delete it->second;
-      }
-      factories_.erase(it);
-    }
-  }
-
   /** \brief Register a ROS service proxy factory
    *
    * This enables the ROSServiceRegistryService to construct ROS service clients and
    * servers from a string name.
    */
-  void registerServiceFactory(ROSServiceProxyFactoryBase* factory) 
+  bool registerServiceFactory(ROSServiceProxyFactoryBase* factory) 
   {
     RTT::os::MutexLock lock(factory_lock_);
-    // Store the factory
-    factories_[factory->getType()] = factory;
+    if(factory == NULL) {
+      return false;
+    }
+
+    const std::string &ros_service_type = factory->getType();
+
+    // Check if the factory type has yet to be registered
+    if(factories_.find(ros_service_type) == factories_.end()) {
+      // Store a new factory
+      factories_[ros_service_type] = boost::shared_ptr<ROSServiceProxyFactoryBase>(factory);
+    } else {
+      // Reset the existing factory
+      factories_[ros_service_type].reset(factory);
+    }
+
+    return true;
   }
 
   bool hasServiceFactory(const std::string &service_type)
@@ -56,7 +57,7 @@ public:
   {
     RTT::os::MutexLock lock(factory_lock_);
     if(factories_.find(service_type) != factories_.end()) {
-      return factories_[service_type];
+      return factories_[service_type].get();
     }
 
     RTT::log(RTT::Error)<<"Service type \""<<service_type<<"\" has not been registerd with the rosserivce_registry service."<<RTT::endlog();
@@ -65,12 +66,12 @@ public:
   }
 
   //! ROS service proxy factories
-  static std::map<std::string, ROSServiceProxyFactoryBase*> factories_;
-  static RTT::os::Mutex factory_lock_;
+  static std::map<std::string, boost::shared_ptr<ROSServiceProxyFactoryBase> > factories_;
+  static RTT::os::MutexRecursive factory_lock_;
 };
 
-std::map<std::string, ROSServiceProxyFactoryBase*> ROSServiceRegistryService::factories_;
-RTT::os::Mutex ROSServiceRegistryService::factory_lock_;
+std::map<std::string, boost::shared_ptr<ROSServiceProxyFactoryBase> > ROSServiceRegistryService::factories_;
+RTT::os::MutexRecursive ROSServiceRegistryService::factory_lock_;
 
 void loadROSServiceRegistryService()
 {
