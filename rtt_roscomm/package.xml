@@ -1,9 +1,9 @@
 <package>
-  <name>rtt_rostopic</name>
+  <name>rtt_roscomm</name>
   <version>2.6.0</version>
 
   <description>
-    rtt_rostopic provides the necessary template files and cmake macros for
+    rtt_roscomm provides the necessary template files and cmake macros for
     automatic rtt typekit and transport generation from ROS msg files
   </description>
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
