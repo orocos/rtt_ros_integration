@@ -74,6 +74,8 @@ Usage
 ### Connecting an Orocos Port to a ROS Topic
 
 ```python
+## Imports
+import("rtt_roscomm")
 # Publish
 stream("my_component.my_output", rostopic.connect("my_ros_output"))
 # Subscribe
@@ -87,7 +89,7 @@ Orocos DeploymentComponent:
 
 ```python
 ## Imports
-import("rtt_rosservice")
+import("rtt_roscomm")
 import("rtt_std_srvs")
 
 ## Load some application-specific component
@@ -107,13 +109,13 @@ some_component_name.rosservice.connect(
 ```
 
 
-### Making a ROS Service Type Available
+### Making a Package's ROS .msg and .srv Types Available
 
 Generally, you can crete a catkin package simply with the `create_rtt_srvs`
 script by running:
 
 ```shell
-rosrun rtt_rosservice create_rtt_srvs my_srvs
+rosrun rtt_roscomm create_rtt_msgs my_srvs
 ```
 
 All this does is create a package with the following CMakeLists.txt and
@@ -121,9 +123,11 @@ corresponding package.xml:
 
 ```cmake
 project(rtt_std_srvs)
-find_package(catkin REQUIRED COMPONENTS genmsg rtt_rosservice std_srvs)
-catkin_package(CATKIN_DEPENDS genmsg rtt_rosservice std_srvs)
+find_package(catkin REQUIRED COMPONENTS genmsg rtt_roscomm std_srvs)
+catkin_package(CATKIN_DEPENDS genmsg rtt_roscomm std_srvs)
 
+# Generate typekits for ros .msg files
+ros_generate_rtt_typekit(@pkgname@)
 # Generate the plugin which makes the services in std_srvs available
 ros_generate_rtt_service_proxies(std_srvs)
 ```
@@ -156,3 +160,5 @@ Todo
 
 * Implement typekit generation (similar to rtt\_rostopic) so that services can
   be called from the taskbrowser.
+* Automatically detect the type of ROS service from the service name or the
+  operation signature.
