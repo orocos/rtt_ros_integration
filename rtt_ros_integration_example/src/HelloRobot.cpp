@@ -46,15 +46,19 @@ private:
   
   std::string prop_answer;
   double prop_counter_step;
+  double prop_service_call_counter;
 
   double counter;
+
+  OperationCaller<bool(std_srvs::Empty::Request&, std_srvs::Empty::Response&)> updated;
 
 public:
   HelloRobot(const std::string& name):
     TaskContext(name),
     inport("float_in"),outport("float_out"),
     sinport("string_in"),soutport("string_out","Hello Robot"),
-    prop_answer("Hello Robot"),prop_counter_step(0.01)
+    prop_answer("Hello Robot"),prop_counter_step(0.01),prop_service_call_counter(0.0),
+    updated("updated")
   {
     this->addEventPort(inport).doc("Receiving a message here will wake up this component.");
     this->addPort(outport).doc("Sends out 'answer'.");
@@ -63,8 +67,10 @@ public:
     
     this->addProperty("answer",prop_answer).doc("The text being sent out on 'string_out'.");
     this->addProperty("counter_step",prop_counter_step).doc("The increment for each new sample on 'float_out'");
+    this->addProperty("service_call_counter",prop_service_call_counter).doc("The number of times the incrememt operation has been called.");
 
-    this->provides()->addOperation("displayAnswer",&HelloRobot::displayAnswer,this,RTT::OwnThread);
+    this->provides()->addOperation("increment",&HelloRobot::increment,this,RTT::OwnThread);
+    this->requires()->addOperationCaller(updated);
     
     counter=0.0;
   }
@@ -84,10 +90,16 @@ private:
     outport.write(fdata);
     sdata.data=prop_answer;
     soutport.write(sdata);
+
+    if(updated.ready()) {
+      std_srvs::Empty::Request req;
+      std_srvs::Empty::Response res;
+      updated(req,res);
+    }
   }
 
-  bool displayAnswer(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp) {
-    ROS_INFO_STREAM("Operation called!");
+  bool increment(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp) {
+    prop_service_call_counter++;
     return true;
   }
 };

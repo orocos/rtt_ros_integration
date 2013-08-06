@@ -4,5 +4,7 @@
     <arg name="LOG_LEVEL" value="debug"/>
     <arg name="DEBUG" value="false"/>
   </include>
+
+  <node name="update_monitor" pkg="rtt_ros_integration_example" type="update_monitor.py" output="screen"/>
 </launch>
 

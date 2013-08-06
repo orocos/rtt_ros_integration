@@ -15,7 +15,8 @@ stream("HelloRobot.string_in", rostopic.connection("string_in"))
 
 ## Connect the 
 loadService("HelloRobot","rosservice")
-HelloRobot.rosservice.connect( "displayAnswer", "/display_answer", "std_srvs/Empty")
+HelloRobot.rosservice.connect( "increment", "/increment", "std_srvs/Empty")
+HelloRobot.rosservice.connect( "updated", "/updated", "std_srvs/Empty")
 
 ## Configure the HelloRobot component
 HelloRobot.configure()
