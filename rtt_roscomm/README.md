@@ -11,21 +11,36 @@ Contents
 
 This package serves three purposes. It provides:
  * An Orocos typekit for ROS message primitive types
- * A template for generating ROS message typekit packages
  * An Orocos RTT Service for publishing and subscribing to ROS topics
-
-This package provides an Orocos Plugin which supports connecting "ROS Services"
-to "Orocos Operations" by providing typekit generation and a few "Orocos
-Service Plugins".
+ * Orocos RTT Services for calling and serving ROS services
+ * A template for generating wrapper packages for ROS .msg and .srv files
 
 ### Plugins
 
-This package provides both a global RTT service and a task-scoped service. The
-global service, `rosservice_registry` is used to register factories for
-creating proxies to ROS service clients and servers. The task-scoped service is
-ued to bind RTT operations and operation callers to ROS services. In general,
-users will only use the task-scoped RTT service, similarly to how the
-`rtt_rosparam` service is used.
+#### ROS Topics
+
+This package provides a global RTT service for creating real-time-safe
+connections between ROS topics and Orocos RTT data ports.
+
+This package provides two Orocos connection policies: buffered and 
+unbufferd connections to ROS topics. Publishing and subscribing are done
+with the same command, and the topic type is inferred from the Orocos port
+type. Connection policies are created with these operations:
+
+ * `rostopic.connection(TOPIC_NAME)`: Creates a connection with a buffer length
+   of 1.
+ * `rostopic.connectionBuffered(TOPIC_NAME, BUFFER_LENGTH)`: Creates a
+   connection with a user-supplied buffer length.
+
+#### ROS Services
+
+This package provides both a global RTT service and a task-scoped service for
+facilitating communication with ROS services. The global service,
+`rosservice_registry` is used to register factories for creating proxies to ROS
+service clients and servers. The task-scoped service is ued to bind RTT
+operations and operation callers to ROS services. In general, users will only
+use the task-scoped RTT service, similarly to how the `rtt_rosparam` service is
+used.
 
 The task-scoped RTT service `rosservice` provides the following operations:
 * `rosservice.connect(RTT_OPERATION_NAME, ROS_SERVICE_NAME, ROS_SERVICE_TYPE)`
@@ -57,14 +72,6 @@ Usage
 -----
 
 ### Connecting an Orocos Port to a ROS Topic
-
-This package provides two Orocos connection policies: buffered and 
-unbufferd connections to ROS topics. Publishing and subscribing are done
-with the same command, and the topic type is inferred from the Orocos port
-type. Connection policies are created with these operations:
-
- * **unbuffered** `rostopic.connection(TOPIC_NAME)`
- * **buffered** `rostopic.connectionBuffered(TOPIC_NAME, BUFFER_LENGTH)`
 
 ```python
 # Publish
