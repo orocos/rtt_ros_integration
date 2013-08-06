@@ -9,10 +9,10 @@ similar role to "Orocos/RTT Operations".*
 Contents 
 --------
 
-This package serves three purposes. It provides:
- * An Orocos typekit for ROS message primitive types
+This package serves several purposes. It provides:
  * An Orocos RTT Service for publishing and subscribing to ROS topics
  * Orocos RTT Services for calling and serving ROS services
+ * Orocos typekits for ROS message primitive types
  * A template for generating wrapper packages for ROS .msg and .srv files
 
 ### Plugins
