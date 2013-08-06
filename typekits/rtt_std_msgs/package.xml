@@ -17,17 +17,17 @@
 
   <license>BSD</license>
 
-  <url type="website">http://ros.org/wiki/rtt_rostopic</url>
+  <url type="website">http://ros.org/wiki/rtt_roscomm</url>
 
   <author>create_rtt_msgs Generator</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rtt_rostopic</build_depend>
+  <build_depend>rtt_roscomm</build_depend>
   <build_depend>std_msgs</build_depend>
-  <run_depend>rtt_rostopic</run_depend>
+  <run_depend>rtt_roscomm</run_depend>
   <run_depend>std_msgs</run_depend>
 
   <export>
-    <rtt_plugin_depend>rtt_rostopic</rtt_plugin_depend>
+    <rtt_plugin_depend>rtt_roscomm</rtt_plugin_depend>
   </export>
 </package>
