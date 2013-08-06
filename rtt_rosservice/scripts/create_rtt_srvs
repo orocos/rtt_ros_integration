@@ -1,0 +1,85 @@
+#!/bin/bash
+
+function help
+{
+  echo
+  echo "Creates an Orocos plugins package from a ROS srvs package."
+  echo " Usage: $(basename $0) [-f] ros_srvs_package_name "
+  echo
+  echo "Example:"
+  echo " $(basename $0) std_srvs "
+  echo "   Creates the rtt_std_srvs package derived from the ROS std_srvs package."
+  echo
+}
+
+if [ x$1 = x ]; then
+  help
+  exit 1
+fi
+
+cwd="$(pwd)"
+abspath=$(dirname "$(cd "${0%/*}" 2>/dev/null; echo "$PWD"/"${0##*/}")")
+
+# Parse arguments
+force=
+for arg in $*; do
+  case "$arg" in
+    -f)
+      force=-p
+      ;;
+    -h|--help)
+      help
+      exit 1
+      ;;
+    *)
+      if [ -n "$pkgname" ]; then
+        echo "ERROR: '$arg': please provide only one ros package name."
+        exit 1;
+      fi
+      if [ -z "$(rospack find $arg)" ]; then
+        echo "ERROR: could not find ros package '$arg'"
+        exit 1;
+      fi
+      if [[ $arg =~ rtt_.* ]]; then
+        echo "ERROR: You're giving a package name that starts with 'rtt_'. Use the ROS/non-RTT package name instead."
+        exit 1;
+      fi
+      pkgname="$arg"
+      ;;
+  esac
+done
+
+
+# Locate the template directory.
+templatedir="$(rospack find rtt_rosservice)/rtt_srv_pkg_template"
+
+# final check:
+if [ ! -d "$templatedir" ]; then
+  echo "Could not find templates at $templatedir !"
+  exit 1
+else
+  echo "Using templates at $templatedir..."
+fi
+
+for dep in $(rospack depends $pkgname | grep "_msgs$"); do
+  if [ -z "$(rospack find -q rtt_$dep)" ]; then
+    echo "WARNING: The package 'rtt_$dep' does not exist yet, however, 'rtt_$pkgname' will depend on it !"
+    echo "         Use '$(basename $0) $dep' to create this missing package..."
+  fi
+  deplist="$deplist  <build_depend>rtt_$dep</build_depend>\n  <run_depend>rtt_$dep</run_depend>"
+  rtt_deplist="$rtt_deplist    <rtt_plugin_depend>rtt_$dep</rtt_plugin_depend>"
+  catkin_deplist="$catkin_deplist  rtt_$dep"
+done
+
+mkdir $force rtt_$pkgname || { echo "Package already exists, use -f to force creation." ; exit 1; }
+
+# process template files:
+files="$(find $templatedir -maxdepth 1 -type f)"
+allcappkgname=$(echo $pkgname | tr [:lower:] [:upper:])
+cappkgname=$(echo $allcappkgname | cut -c1)$(echo $pkgname | cut -c2-)
+for i in $files; do
+  tgtname=$(echo $(basename "$i") | sed -e "s/pkgname/$pkgname/g;s/Pkgname/$cappkgname/g;")
+  cat "$i" | sed -e "s/@PKGNAME@/$allcappkgname/g;s/@pkgname@/$pkgname/g;s/@Pkgname@/$cappkgname/g;s|@deplist@|$deplist|g;s|@rtt_deplist@|$rtt_deplist|g;s|@catkin_deplist@|$catkin_deplist|g" > rtt_$pkgname/$tgtname
+done
+
+echo "Successfully created rtt_$pkgname."

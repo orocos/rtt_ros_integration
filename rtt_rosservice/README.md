@@ -60,7 +60,7 @@ import("rtt_std_srvs")
 
 ## Load some application-specific component
 loadComponent("some_component_name","some_component_package::SomeComponent")
-// Load the rosservice RTT service for this components
+## Load the rosservice RTT service for this components
 loadService("some_component_name","rosservice")
 
 ## Expose a provided operation of this component as a ROS service
@@ -76,7 +76,28 @@ some_component_name.rosservice.connect(
 
 ### Making a ROS Service Type Available
 
+Generally, you can crete a catkin package simply with the `create_rtt_srvs`
+script by running:
 
+```shell
+rosrun rtt_rosservice create_rtt_srvs my_srvs
+```
+
+All this does is create a package with the following CMakeLists.txt and
+corresponding package.xml:
+
+```cmake
+project(rtt_std_srvs)
+find_package(catkin REQUIRED COMPONENTS genmsg rtt_rosservice std_srvs)
+catkin_package(CATKIN_DEPENDS genmsg rtt_rosservice std_srvs)
+
+# Generate the plugin which makes the services in std_srvs available
+ros_generate_rtt_service_proxies(std_srvs)
+```
+
+The `ros_generate_rtt_service_proxies()` cmake function will generate an RTT
+plugin which registers factories for all of the services in the named package
+when the plugin is loaded.
 
 ## Design
 
