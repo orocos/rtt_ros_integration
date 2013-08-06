@@ -113,3 +113,7 @@ be called by the operation caller.
 The provided and required services on which the wrapper operations and
 operationCallers are created are private to the ROS service service. 
 
+## Todo
+
+* Implement typekit generation (similar to rtt\_rostopic) so that services can
+  be called from the taskbrowser.
