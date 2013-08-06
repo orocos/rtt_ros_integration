@@ -16,8 +16,8 @@ The packages in this repository provide:
  * [**rtt\_rosnode**](rtt_rosnode) Plugin for ROS node instantiation inside an Orocos program.
  * [**rtt\_rosparam**](rtt_rosparam) Plugin for synchronizing ROS parameters with Orocos
    component properties.
- * [**rtt\_rostopic**](rtt_rostopic) ROS message typekit generation and Orocos plugin for
-   publishing and subscribing to ROS topics.
+ * [**rtt\_roscomm**](rtt_roscomm) ROS message typekit generation and Orocos plugin for
+   publishing and subscribing to ROS topics as well as calling and responding to ROS services.
  * [**rtt\_rospack**](rtt_rospack) Plugin for locating ROS resources.
  * [**rtt\_ros\_integration\_example**](rtt_ros_integration_example) Example use of some of the features of
    this repository.
@@ -113,9 +113,9 @@ making it easier to Orocos programs in a ROS environment. See
 
 ### Connecting Orocos Ports to ROS Topics
 
-The `rtt_rostopic` package provides a typekit for the the ROS Message 
+The `rtt_roscomm` package provides a typekit for the the ROS Message 
 primitives, as well as a plugin which manages construction of ROS publishers
-and subscribers. See [rtt_rostopic](rtt_rostopic/README.md) for more 
+and subscribers. See [rtt_roscomm](rtt_roscomm/README.md) for more 
 information. 
 
 ### Connecting Orocos Operations to ROS Services
@@ -148,7 +148,7 @@ There are a few organizational changes that have been made in
 
  * "rtt_rosnode" has been split into three packages: 
    1. "rtt_rosnode": Contains a plugin for creating a ROS node in an RTT program
-   2. "rtt_rostopic": Contains msg primitive typekit and the transport plugin for using ROS topics
+   2. "rtt_roscomm": Contains msg primitive typekit and the transport plugin for using ROS topics
    3. "rtt_rosparam": Contains a plugin for synchronizing a component's properties with ROS parameters
 
  * A new package, "rtt_ros" has been added. This package contains convenience 
