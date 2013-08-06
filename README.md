@@ -120,11 +120,13 @@ information.
 
 ### Connecting Orocos Operations to ROS Services
 
-TBD
+The `rtt_rsocomm` package provides RTT services for binding an Orocos RTT
+operation or operation caller to the ROS service server or client,
+respectively. See [rtt_roscomm](rtt_roscomm/README.md) for more information.
 
 ### Running an Actionlib Action Server in an Orocos Component
 
-TBD (https://github.com/RCPRG-ros-pkg/orocos_tools)
+TBD (See current implementation [here](https://github.com/RCPRG-ros-pkg/orocos_tools))
 
 ## History
 
