@@ -13,9 +13,9 @@ set(CMAKE_BUILD_TYPE MinSizeRel)
 
 function(ros_generate_rtt_service_proxies package)
 
-  find_package(catkin REQUIRED COMPONENTS genmsg rtt_rosservice roscpp ${package})
+  find_package(catkin REQUIRED COMPONENTS genmsg rtt_roscomm roscpp ${package})
 
-  orocos_use_package(rtt_rosservice)
+  orocos_use_package(rtt_roscomm)
 
   # Get all .msg files
   if(genmsg_VERSION VERSION_GREATER 0.4.19)
@@ -42,7 +42,7 @@ function(ros_generate_rtt_service_proxies package)
   endforeach()
   
   # TypeInfo object:
-  set(_template_proxies_src_dir "${rtt_rosservice_DIR}/rtt_srv_pkg_template/src")
+  set(_template_proxies_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/src")
   set(_template_proxies_dst_dir "${CATKIN_DEVEL_PREFIX}/src")
 
   configure_file( 

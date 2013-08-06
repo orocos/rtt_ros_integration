@@ -48,9 +48,9 @@ endmacro(get_ros_msgs_external)
 
 function(ros_generate_rtt_typekit package)
 
-  find_package(catkin REQUIRED COMPONENTS genmsg rtt_rostopic roscpp ${package})
+  find_package(catkin REQUIRED COMPONENTS genmsg rtt_roscomm roscpp ${package})
 
-  orocos_use_package(rtt_rostopic)
+  orocos_use_package(rtt_roscomm)
 
   # Get all .msg files
   if(genmsg_VERSION VERSION_GREATER 0.4.19)
@@ -112,8 +112,8 @@ function(ros_generate_rtt_typekit package)
     #set_source_files_properties(${ROSMSGS_GENERATED_BOOST_HEADERS} PROPERTIES GENERATED TRUE)
     
     # TypeInfo object:
-    set(_template_types_src_dir "${rtt_rostopic_DIR}/rtt_msg_pkg_template/src/orocos/types")
-    set(_template_typekit_src_dir "${rtt_rostopic_DIR}/rtt_msg_pkg_template/include/PKG_NAME/typekit")
+    set(_template_types_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/src/orocos/types")
+    set(_template_typekit_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/include/PKG_NAME/typekit")
 
     set(_template_types_dst_dir "${CATKIN_DEVEL_PREFIX}/src/orocos/types")
     set(_template_typekit_dst_dir "${CATKIN_DEVEL_PREFIX}/include/${package}/typekit")

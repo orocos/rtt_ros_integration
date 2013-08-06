@@ -45,7 +45,7 @@ target_link_libraries(rtt-ros-primitives-typekit ${catkin_LIBRARIES})
 orocos_service(rtt_rosservice_registry
   src/rtt_rosservice_registry_service.cpp)
 
-orocos_service(rtt_rosservice_service
+orocos_service(rtt_rosservice
   src/rtt_rosservice_service.cpp)
 target_link_libraries(rtt_rosservice ${catkin_LIBRARIES})
 
@@ -76,8 +76,8 @@ install(FILES cmake/GenerateRTTtypekit.cmake cmake/create_boost_header.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
 
 # Install template files to both install and develspace
-install(DIRECTORY rtt_msg_pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
-file(COPY rtt_msg_pkg_template DESTINATION "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake")
+install(DIRECTORY rtt_roscomm_pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
+file(COPY rtt_roscomm_pkg_template DESTINATION "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake")
 
 # Install tests
 install(FILES 

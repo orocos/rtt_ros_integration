@@ -1,53 +1,28 @@
-<?xml version="1.0"?>
 <package>
-  <name>rtt_genmsg</name>
-  <version>0.0.0</version>
-  <description>The rtt_genmsg package</description>
+  <name>rtt_roscomm</name>
+  <version>2.6.0</version>
 
-  <!-- One maintainer tag required, multiple allowed, one person per tag --> 
-  <!-- Example:  -->
-  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="jbohren@todo.todo">jbohren</maintainer>
+  <description>
+    rtt_roscomm provides the necessary template files and cmake macros for
+    automatic rtt typekit and transport generation from ROS msg files
+  </description>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <license>BSD</license>
 
+  <author>Ruben Smits</author>
 
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
-
-
-  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
-  <!-- Optional attribute type can be: website, bugtracker, or repository -->
-  <!-- Example: -->
-  <!-- <url type="website">http://ros.org/wiki/rtt_genmsg</url> -->
-
-
-  <!-- Author tags are optional, mutiple are allowed, one per tag -->
-  <!-- Authors do not have to be maintianers, but could be -->
-  <!-- Example: -->
-  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
-
-
-  <!-- The *_depend tags are used to specify dependencies -->
-  <!-- Dependencies can be catkin packages or system dependencies -->
-  <!-- Examples: -->
-  <!-- Use build_depend for packages you need at compile time: -->
-  <!--   <build_depend>message_generation</build_depend> -->
-  <!-- Use buildtool_depend for build tool packages: -->
-  <!--   <buildtool_depend>catkin</buildtool_depend> -->
-  <!-- Use run_depend for packages you need at runtime: -->
-  <!--   <run_depend>message_runtime</run_depend> -->
-  <!-- Use test_depend for packages you need only for testing: -->
-  <!--   <test_depend>gtest</test_depend> -->
+  <url>http://ros.org/wiki/rtt_rostopic</url>
+  
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>ocl</build_depend>
+  <build_depend>rtt</build_depend>
+  <build_depend>rtt_rospack</build_depend>
+  <build_depend>roscpp</build_depend>
 
-  <!-- The export tag contains other, unspecified, tags -->
-  <export>
-    <!-- You can specify that this package is a metapackage here: -->
-    <!-- <metapackage/> -->
-
-    <!-- Other tools can request additional information be placed here -->
-
-  </export>
+  <run_depend>ocl</run_depend>
+  <run_depend>rtt</run_depend>
+  <run_depend>rtt_rospack</run_depend>
+  <run_depend>roscpp</run_depend>
+  
 </package>
