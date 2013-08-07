@@ -77,9 +77,9 @@ Usage
 ## Imports
 import("rtt_roscomm")
 # Publish
-stream("my_component.my_output", rostopic.connect("my_ros_output"))
+stream("my_component.my_output", rostopic.connection("my_ros_output"))
 # Subscribe
-stream("my_component.my_input", rostopic.connect("my_ros_input"))
+stream("my_component.my_input", rostopic.connection("my_ros_input"))
 ```
 
 ### Connecting RTT Operations to ROS Services
