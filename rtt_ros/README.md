@@ -48,3 +48,10 @@ another launchfile like the following:
  * rttlua-tlsf
  * rttscript
  * typegen
+
+### Environment Hooks
+
+This package also provides catkin env-hooks which will get executed when a user
+sources the catkin-generated setup.sh scripts. These hooks declare Orocos
+environment variables needed for setting the system configuration and finding
+Orocos resources.
