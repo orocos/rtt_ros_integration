@@ -5,7 +5,7 @@ catkin_package(
   INCLUDE_DIRS include 
   DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp  rtt_rospack 
-  CFG_EXTRAS GenerateRTTtypekit.cmake GenerateServiceProxies.cmake)
+  CFG_EXTRAS GenerateRTTROSCommPackage.cmake)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rtt_rospack )
 find_package(OROCOS-RTT REQUIRED rtt-marshalling)
@@ -72,7 +72,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 # Install cmake macros
-install(FILES cmake/GenerateRTTtypekit.cmake cmake/create_boost_header.py
+install(FILES cmake/GenerateRTTROSCommPackage.cmake cmake/create_boost_header.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
 
 # Install template files to both install and develspace

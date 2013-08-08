@@ -1,4 +1,7 @@
 
+set(ROS_BUILD_TYPE MinSizeRel)
+set(CMAKE_BUILD_TYPE MinSizeRel)
+
 find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling)
 
 if (NOT OROCOS-RTT_FOUND)
@@ -8,47 +11,13 @@ else()
   add_definitions( -DRTT_COMPONENT )
 endif()
 
-set(ROS_BUILD_TYPE MinSizeRel)
-set(CMAKE_BUILD_TYPE MinSizeRel)
 include(AddFileDependencies)
-
-macro(get_ros_msgs_external package msgs)
-
-  # Find package with catkin
-  # TODO: Possibly move this find_package call up into the caller scope?
-  #find_package(catkin REQUIRED COMPONENTS ${package})
-
-  # Make sure this package has a msg-paths cmake file
-  set(_msg_paths_file "${${package}_DIR}/${package}-msg-paths.cmake")
-  if(NOT EXISTS ${_msg_paths_file})
-    message(SEND_ERROR "get_ros_msgs_external: Could not find ${package}-msg-paths.cmake file (should be at ${_msg_paths_file}).")
-    return()
-  endif()
-
-  # Include the cmake file with the msg file paths
-  include(${_msg_paths_file})
-
-  # TODO: Set this to be empty, since _ROSBUILD_GENERATED_MSG_FILES is no longer used?
-  set(${msgs} ${_ROSBUILD_GENERATED_MSG_FILES})
-
-  foreach(_msg_dir ${${package}_MSG_INCLUDE_DIRS}) 
-    file(GLOB _msg_files RELATIVE "${_msg_dir}" "${_msg_dir}/*.msg")
-    # Loop over each .msg file, establishing a rule to compile it
-    foreach(_msg ${_msg_files})
-      # Make sure we didn't get a bogus match (e.g., .#Foo.msg, which Emacs
-      # might create as a temporary file).  the file()
-      # command doesn't take a regular expression, unfortunately.
-      if(${_msg} MATCHES "^[^\\.].*\\.msg$")
-        list(APPEND ${msgs} "${_msg_dir}/${_msg}")
-      endif(${_msg} MATCHES "^[^\\.].*\\.msg$")
-    endforeach(_msg)
-  endforeach(_msg_dir)
-endmacro(get_ros_msgs_external)
-
 
 function(ros_generate_rtt_typekit package)
 
   find_package(catkin REQUIRED COMPONENTS genmsg rtt_roscomm roscpp ${package})
+
+  include_directories(${catkin_INCLUDE_DIRS})
 
   orocos_use_package(rtt_roscomm)
 
@@ -56,13 +25,12 @@ function(ros_generate_rtt_typekit package)
   if(genmsg_VERSION VERSION_GREATER 0.4.19)
     set(MSGS ${${package}_MESSAGE_FILES})
   else()
-    message("Using old get_ros_msgs_external")
-    get_ros_msgs_external(${package} MSGS )
+    message(SEND_ERROR "genmsg version must be 0.4.19 or greater")
   endif()
   
   #Return if nothing to do:
   if ( "${MSGS}" STREQUAL "" )
-    message(SEND_ERROR "ros_generate_rtt_typekit: Could not find any .msg files in the ${package} package.")
+    message(SEND_WARNING "ros_generate_rtt_typekit: Could not find any .msg files in the ${package} package.")
     return()
   endif()
 
@@ -161,22 +129,70 @@ function(ros_generate_rtt_typekit package)
   add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
   add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
 
-  if (CMAKE_COMPILER_IS_GNUCXX)
-    #
-    # This fails on Ubuntu Lucid with gcc Ubuntu 4.4.3-4ubuntu5 and ld/binutils 2.20.1-system.20100303 and ld/binutils-gold 2.20.1-system.20100303) 1.9
-    # This works on Ubuntu Maverick with gcc Ubuntu/Linaro 4.4.4-14ubuntu5 and ld/binutils 2.20.51-system.20100908
-    # Main suspect is the compiler, but this has not been proven. We could enable this flag from gcc 4.5 on to be on the safe side.
-    #
-    # The failure is that a DataSource<T> of one .so can not be dynamic_cast'ed to a DataSource<T> of another .so
-    #
-    #set_target_properties( rtt-${package}-typekit PROPERTIES COMPILE_FLAGS "-fvisibility=hidden" )
-    #set_target_properties( rtt-${package}-ros-transport PROPERTIES COMPILE_FLAGS "-fvisibility=hidden" )
-  endif()
-
   set_directory_properties(PROPERTIES 
     ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${CATKIN_DEVEL_PREFIX}/include/${package}/boost")
 
-  orocos_generate_package()
+  #orocos_generate_package()
   
 endfunction(ros_generate_rtt_typekit)
 
+
+function(ros_generate_rtt_service_proxies package)
+
+  find_package(catkin REQUIRED COMPONENTS genmsg rtt_roscomm roscpp ${package})
+
+  include_directories(${catkin_INCLUDE_DIRS})
+  orocos_use_package(rtt_roscomm)
+
+  # Get all .msg files
+  if(genmsg_VERSION VERSION_GREATER 0.4.19)
+    set(SRVS ${${package}_SERVICE_FILES})
+  else()
+    message(SEND_ERROR "genmsg version must be 0.4.19 or greater")
+  endif()
+  
+  #Return if nothing to do:
+  if ( "${SRVS}" STREQUAL "" )
+    message(SEND_WARNING "ros_generate_rtt_service_proxies: Could not find any .srv files in the ${package} package.")
+    return()
+  endif()
+
+  set(ROS_SRV_HEADERS "")
+  set(ROS_SRV_FACTORIES "")
+  set(ROSPACKAGE ${package})
+  foreach( FILE ${SRVS} )
+    string(REGEX REPLACE ".+/\(.+\).srv" "\\1" ROS_SRV_NAME ${FILE})
+    
+    set(ROS_SRV_TYPE "${ROSPACKAGE}::${ROS_SRV_NAME}")
+    set(ROS_SRV_TYPENAME "${ROSPACKAGE}/${ROS_SRV_NAME}")
+
+    set(ROS_SRV_HEADERS "${ROS_SRV_HEADERS}#include <${ROS_SRV_TYPENAME}.h>\n")
+    set(ROS_SRV_FACTORIES "${ROS_SRV_PROXY_FACTORIES}  success = success && register_service_factory(new ROSServiceProxyFactory<${ROS_SRV_TYPE}>(\"${ROS_SRV_TYPENAME}\"));\n")
+  endforeach()
+  
+  # TypeInfo object:
+  set(_template_proxies_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/src")
+  set(_template_proxies_dst_dir "${CATKIN_DEVEL_PREFIX}/src")
+
+  configure_file( 
+    ${_template_proxies_src_dir}/rtt_ros_service_proxies.cpp.in 
+    ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp @@ONLY )
+  
+  include_directories(${catkin_INCLUDE_DIRS})
+  orocos_service(rtt_${ROSPACKAGE}_ros_service_proxies ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp)
+  target_link_libraries(rtt_${ROSPACKAGE}_ros_service_proxies ${catkin_LIBRARIES})
+
+  set_directory_properties(PROPERTIES 
+    ADDITIONAL_MAKE_CLEAN_FILES "${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp")
+
+  #orocos_generate_package()
+  
+endfunction(ros_generate_rtt_service_proxies)
+
+
+
+function(rtt_roscomm_generate_package package)
+  ros_generate_rtt_typekit(${package})
+  ros_generate_rtt_service_proxies(${package})
+  orocos_generate_package()
+endfunction(rtt_roscomm_generate_package)

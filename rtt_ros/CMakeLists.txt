@@ -7,6 +7,8 @@ catkin_package(
   DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp)
 
+catkin_add_env_hooks(10.orocos SHELLS bash DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks)
+
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 find_package(OROCOS-RTT REQUIRED rtt-marshalling)
