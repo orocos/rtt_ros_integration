@@ -12,6 +12,8 @@
 
   <author>ruben smits</author>
 
+  <buildtool_depend>catkin</buildtool_depend>
+
   <build_depend>rtt</build_depend>
   <build_depend>tf_conversions</build_depend>
 
