@@ -1,0 +1,21 @@
+<package>
+  <name>rtt_kdl_conversions</name>
+  <version>0.4.0</version>
+  <description>
+    This package contains the components of the kdl_conversions package
+  </description>
+  <license>GPL</license>
+ 
+  <maintainer email="ruben.smits@mech.kuleuven.be">ruben smits</maintainer>
+
+  <license>gpl</license>
+
+  <author>ruben smits</author>
+
+  <build_depend>rtt</build_depend>
+  <build_depend>tf_conversions</build_depend>
+
+  <run_depend>rtt</run_depend>
+  <run_depend>tf_conversions</run_depend>
+</package>
+
