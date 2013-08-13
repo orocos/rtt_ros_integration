@@ -1,18 +1,20 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(rtt_stereo_msgs)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE MinSizeRel)
+find_package(catkin REQUIRED COMPONENTS 
+  rtt_roscomm 
+  stereo_msgs
+  rtt_std_msgs  rtt_geometry_msgs  rtt_sensor_msgs)
 
-rosbuild_init()
+catkin_package(
+  DEPENDS ocl rtt
+  CATKIN_DEPENDS 
+  rtt_roscomm 
+  stereo_msgs
+  rtt_std_msgs  rtt_geometry_msgs  rtt_sensor_msgs)
 
-rosbuild_include(rtt_rosnode GenerateRTTtypekit)
-
+include_directories(${catkin_INCLUDE_DIRS})
 ros_generate_rtt_typekit(stereo_msgs)
+ros_generate_rtt_service_proxies(stereo_msgs)
 
-
+orocos_generate_package()
