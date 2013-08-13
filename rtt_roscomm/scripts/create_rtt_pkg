@@ -4,7 +4,7 @@ function help
 {
   echo
   echo "Creates an Orocos typekit package from a ROS msgs package."
-  echo " Usage: $(basename $0) [-f] ros_msgs_package_name "
+  echo " Usage: $(basename $0) [-f] ros_package_name "
   echo
   echo "Example:"
   echo " $(basename $0) std_msgs "
@@ -51,7 +51,7 @@ done
 
 
 # Locate the template directory.
-templatedir="$(rospack find rtt_rostopic)/rtt_msg_pkg_template"
+templatedir="$(rospack find rtt_roscomm)/rtt_roscomm_pkg_template"
 
 # final check:
 if [ ! -d "$templatedir" ]; then
@@ -67,7 +67,7 @@ for dep in $(rospack depends $pkgname | grep "_msgs$"); do
     echo "         Use '$(basename $0) $dep' to create this missing package..."
   fi
   deplist="$deplist  <build_depend>rtt_$dep</build_depend>\n  <run_depend>rtt_$dep</run_depend>"
-  rtt_deplist="$rtt_deplist    <rtt_plugin_depend>rtt_$dep</rtt_plugin_depend>"
+  rtt_deplist="$rtt_deplist      <plugin_depend>rtt_$dep</plugin_depend>"
   catkin_deplist="$catkin_deplist  rtt_$dep"
 done
 

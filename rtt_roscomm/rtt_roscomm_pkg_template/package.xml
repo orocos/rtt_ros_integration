@@ -24,16 +24,18 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>@pkgname@</build_depend>
-  <build_depend>rtt_rostopic</build_depend>
+  <build_depend>rtt_roscomm</build_depend>
 
   <run_depend>@pkgname@</run_depend>
-  <run_depend>rtt_rostopic</run_depend>
+  <run_depend>rtt_roscomm</run_depend>
 
 @deplist@
 
   <export>
-    <rtt_plugin_depend>rtt_rostopic</rtt_plugin_depend>
+    <rtt_ros>
+      <plugin_depend>rtt_roscomm</plugin_depend>
 @rtt_deplist@
+    </rtt_ros>
   </export>
 
 </package>

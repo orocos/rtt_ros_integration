@@ -80,7 +80,7 @@ public:
         return false;
       }
 
-      // Add all rtt_plugin_depend dependencies to package names
+      // Add all rtt_ros/plugin_depend dependencies to package names
       std::vector<std::string> deps_to_import;
       rpack.setQuiet(true);
 
@@ -89,7 +89,7 @@ public:
       dep_names.push(package);
       deps_to_import.push_back(package);
 
-      const xmlChar * rtt_plugin_depend_xpath = xmlCharStrdup("/package/export/rtt_plugin_depend/text()");
+      const xmlChar * rtt_plugin_depend_xpath = xmlCharStrdup("/package/export/rtt_ros/plugin_depend/text()");
 
       while(!dep_names.empty()) 
       {
@@ -123,7 +123,7 @@ public:
           package_doc = xmlParseFile(package_xml_path.string().c_str());
           xpath_ctx = xmlXPathNewContext(package_doc);
 
-          // Get the text of the rtt_plugin_depends
+          // Get the text of the rtt_ros <plugin_depend>s
           xpath_obj = xmlXPathEvalExpression(rtt_plugin_depend_xpath, xpath_ctx);
 
           // Iterate through the nodes

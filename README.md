@@ -77,7 +77,8 @@ In **Option 2**, first the `rtt_ros` package is imported using the normal
 mechanism. This then loads the `ros` service, which provides a ROS import
 function, `ros.import()`, which will parse ROS package metadata and import the
 Orocos plugins from the named package _and_ all packages listed in
-`<rtt_plugin_depend>` tags in the `<export>` section of the package.xml files.
+`<rtt_ros><plugin_depend>PKG_NAME</plugin_depend></rtt_ros>` tags in the
+`<export>` section of the package.xml files.
 
 Catkin introduces several new dependency types for buildtime, development, and
 other purposes. In order to keep the RTT plugin depdencencies clear, and avoid
@@ -93,8 +94,10 @@ should have the following:
   <name>pkg_one</name>
   <!-- ... -->
   <export>
-    <rtt_plugin_depend>rtt_ros</rtt_plugin_depend>
-    <rtt_plugin_depend>pkg_two</rtt_plugin_depend>
+    <rtt_ros>
+      <plugin_depend>rtt_roscomm</plugin_depend>
+      <plugin_depend>pkg_two</plugin_depend>
+    </rtt_ros>
   </export>
 </package>
 ```
