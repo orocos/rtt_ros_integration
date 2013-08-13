@@ -14,6 +14,7 @@ include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 orocos_component(rtt_tf rtt_tf-component.cpp)
+target_link_libraries(rtt_tf ${catkin_LIBRARIES})
 orocos_install_headers( rtt_tf-component.hpp )
 
 ros_generate_rtt_typekit(tf)
@@ -23,5 +24,7 @@ orocos_generate_package()
 # Tests  
 orocos_use_package(ocl-taskbrowser)
 orocos_use_package(ocl-deployment)
-orocos_executable(tests/broadcaster_test tests/broadcaster_test.cpp)
-orocos_executable(tests/lookup_test tests/lookup_test.cpp)
+orocos_executable(broadcaster_test tests/broadcaster_test.cpp)
+target_link_libraries(broadcaster_test ${catkin_LIBRARIES})
+orocos_executable(lookup_test tests/lookup_test.cpp)
+target_link_libraries(lookup_test ${catkin_LIBRARIES})
