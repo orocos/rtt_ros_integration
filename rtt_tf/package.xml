@@ -14,13 +14,13 @@
   <!-- Dependencies needed to compile this package. -->
   <build_depend>rtt</build_depend>
   <build_depend>tf</build_depend>
-  <build_depend>rtt_rosnode</build_depend>
+  <build_depend>rtt_roscomm</build_depend>
   <build_depend>rtt_geometry_msgs</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>rtt</run_depend>
   <run_depend>tf</run_depend>
-  <run_depend>rtt_rosnode</run_depend>
+  <run_depend>rtt_roscomm</run_depend>
   <run_depend>rtt_geometry_msgs</run_depend>
 
   <!-- Dependencies needed only for running tests. -->

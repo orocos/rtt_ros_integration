@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_kdl_conversions)
 
-find_package(catkin REQUIRED COMPONENTS rtt tf_conversions)
+find_package(catkin REQUIRED COMPONENTS tf_conversions)
 
 catkin_package(
     DEPENDS rtt 

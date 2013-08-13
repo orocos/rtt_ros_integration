@@ -58,11 +58,9 @@ namespace rtt_tf
   RTT_TF::RTT_TF(const std::string& name) :
     TaskContext(name, PreOperational), 
     tf::Transformer(true, ros::Duration(Transformer::DEFAULT_CACHE_TIME)),
-    prop_interpolating(true),
     prop_cache_time(Transformer::DEFAULT_CACHE_TIME),
     prop_buffer_size(DEFAULT_BUFFER_SIZE)
   {
-    this->addProperty("interpolating", prop_interpolating);
     this->addProperty("cache_time", prop_cache_time);
     this->addProperty("buffer_size", prop_buffer_size);
     this->addProperty("tf_prefix", prop_tf_prefix);
@@ -111,10 +109,6 @@ namespace rtt_tf
       nh.getParam(tf_prefix_param_key, prop_tf_prefix);
     }
     
-    // Update tf::Transformer configuration
-    interpolating = prop_interpolating;
-    cache_time = ros::Duration(prop_cache_time);
-
     // Update the tf::Transformer prefix
     tf_prefix_ = prop_tf_prefix;
     

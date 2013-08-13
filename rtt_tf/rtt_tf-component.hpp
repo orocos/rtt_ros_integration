@@ -8,12 +8,11 @@
 namespace rtt_tf
 {
   // Inherit from TaskContext and Transformer, the second is required in order to use tf_prefix
-  class RTT_TF: public RTT::TaskContext, public tf::Transformer
+  class RTT_TF: public RTT::TaskContext, protected tf::Transformer
   {
     static const int DEFAULT_BUFFER_SIZE = 100;
 
     boost::shared_ptr<tf::Transformer> m_transformer;
-    bool prop_interpolating;
     double prop_cache_time;
     double prop_buffer_size;
     std::string prop_tf_prefix;
