@@ -83,7 +83,7 @@ function(ros_generate_rtt_typekit package)
     set(_template_types_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/src/orocos/types")
     set(_template_typekit_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/include/PKG_NAME/typekit")
 
-    set(_template_types_dst_dir "${CATKIN_DEVEL_PREFIX}/src/orocos/types")
+    set(_template_types_dst_dir "${CMAKE_CURRENT_BINARY_DIR}/src/orocos/types")
     set(_template_typekit_dst_dir "${CATKIN_DEVEL_PREFIX}/include/${package}/typekit")
 
     include_directories("${CATKIN_DEVEL_PREFIX}/include")
@@ -126,14 +126,14 @@ function(ros_generate_rtt_typekit package)
   
   orocos_typekit( rtt-${package}-typekit ${_template_types_dst_dir}/ros_${package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
   orocos_typekit( rtt-${package}-ros-transport ${_template_types_dst_dir}/ros_${package}_transport.cpp )
+  target_link_libraries(rtt-${package}-typekit ${catkin_LIBRARIES})
+  target_link_libraries(rtt-${package}-ros-transport ${catkin_LIBRARIES})
   add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
   add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
 
   set_directory_properties(PROPERTIES 
     ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${CATKIN_DEVEL_PREFIX}/include/${package}/boost")
 
-  #orocos_generate_package()
-  
 endfunction(ros_generate_rtt_typekit)
 
 
@@ -184,8 +184,6 @@ function(ros_generate_rtt_service_proxies package)
 
   set_directory_properties(PROPERTIES 
     ADDITIONAL_MAKE_CLEAN_FILES "${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp")
-
-  #orocos_generate_package()
   
 endfunction(ros_generate_rtt_service_proxies)
 
