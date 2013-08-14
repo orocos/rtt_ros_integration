@@ -24,8 +24,8 @@ and an RTT service for connecting those ports to ROS topics if necessary.
 Contents
 --------
 
-This package provides an RTT service which constructs and connects several RTT
-ports to a ROS actionlib action namespace.
+This package provides a C++ API and RTT service for constructing and connecting
+several RTT ports to a ROS actionlib action namespace.
 
 ### Providng Actions from Orocos
 
