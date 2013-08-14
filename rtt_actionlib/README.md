@@ -59,6 +59,80 @@ subservice) of a TaskContext. These are creted by delegating to an
 RTTActionServer. The RTTActionServer will create the necessary RTT ports and
 bind them to the user-supplied callbacks.
 
+```cpp
+class SomeComponent : public RTT::TaskContext {
+private:
+  
+  // Convenience typedefs
+  typedef rtt_actionlib::RTTActionServer<some_msgs::SomeAction> RTTActionServerType;
+  typedef actionlib::ServerGoalHandle<some_msgs::SomeAction> GoalHandle;
+
+  // RTT action server
+  boost::shared_ptr<RTTActionServerType> rtt_action_server_;
+
+public:
+
+  // Component constructor
+  SomeComponent(std::string name) : TaskContext(name, RTT::PreOperational)
+  { 
+    // Initialize RTT action server (creates data ports)
+    rtt_action_server_.reset(new RTTActionServerType(this->provides(), RTT::OwnThread);
+    
+    // Bind action server goal and cancel callbacks
+    rtt_action_server_->registerGoalCallback(boost::bind(&SomeComponent::goalCallback, this, _1));
+    rtt_action_server_->registerCancelCallback(boost::bind(&SomeComponent::cancelCAllback, this, _1));
+  }
+
+  // RTT configure hook
+  bool configureHook() {
+    return true;
+  }
+
+  // RTT start hook
+  bool startHook() {
+    // Start action server
+    rtt_action_server_.start();
+    return true;
+  }
+
+  // RTT update hook
+  void updateHook() {
+    // Pursue goal...
+
+    // EXAMPLE //
+    if(current_gh_.getGoalStatus().status == actionlib_msgs::GoalStatus::ACTIVE) {
+      current_gh_.setSucceeded();
+    }
+    // EXAMPLE //
+  }
+  
+  // Accept/reject goal requests here
+  // NOTE: Since we created the RTT action server with `RTT::OwnThread`, calls to
+  //       this member function will be serialized with updateHook()
+  void goalCallback(GoalHandle gh) {
+    // EXAMPLE //
+    // Always preempt the current goal and accept the new one
+    if(current_gh_.getGoalStatus().status == actionlib_msgs::GoalStatus::ACTIVE) {
+      current_gh_.setCanceled();
+    }
+    gh.setAccepted();
+    current_gh_ = gh;
+    // EXAMPLE //
+  }
+
+  // Handle preemption here
+  // NOTE: Since we created the RTT action server with `RTT::OwnThread`, calls to
+  //       this member function will be serialized with updateHook()
+  void cancelCallback(GoalHandle gh) {
+    // EXAMPLE //
+    if(current_gh_ == gh && current_gh_.getGoalStatus().status == actionlib_msgs::GoalStatus::ACTIVE) {
+      current_gh_.setCanceled();
+    }
+    // EXAMPLE //
+  }
+};
+```
+
 Second, the ports need to be connected to ROS topics. This can be done easily
 with the "actionlib" service as shown below in Orocos .ops script:
 
