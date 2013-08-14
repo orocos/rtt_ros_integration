@@ -147,7 +147,7 @@ loadComponent("some_component_name","some_component_package::SomeComponent")
 ## Load the actionlib service
 loadService("some_component_name","actionlib")
 
-## Connect an actionlib omterface to the task's root service
+## Connect an actionlib interface to the task's root service
 ## This requires that the following ports exist with directions (server/client):
 ##  some_component_name.goal (in/out)
 ##  some_component_name.cancel (in/out)
@@ -158,7 +158,7 @@ loadService("some_component_name","actionlib")
 
 some_component_name.actionlib.connect("/some/ros/namespace/my_action")
 
-## Alternatively, connect an actionlib omterface to a provided sub-service:
+## Alternatively, connect an actionlib interface to a provided sub-service:
 
 some_component_name.actionlib.connect(
   "some_prov.ided_service",
