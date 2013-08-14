@@ -86,8 +86,8 @@ trying to load orocos components from _every_ package dependency, we use the
 extensible ROS metadata `<export>` tag.
 
 For example, if loading the plugins from package `pkg_one` should necessitate
-first loading packages from `rtt_ros` and `pkg_two`, then `pkg_one/package.xml`
-should have the following:
+first loading plugins from packages `rtt_roscomm` and `pkg_two`, then
+`pkg_one/package.xml` should have the following:
 
 ```xml
 <package>
