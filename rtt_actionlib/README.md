@@ -17,7 +17,9 @@ clients reciprocate:
 For an Orocos RTT component to provide an actionlib interface, it needs to
 provide the topics described above. In order to expose actionlib interfaces
 to components running in real-time threads, we should use the rtt data ports
-to connect to these topics.
+to connect to these topics. In order to make it easy to connect these ports,
+this package provides a C++ API for constructing the appropriate RTT data ports
+and an RTT service for connecting those ports to ROS topics if necessary.
 
 Contents
 --------
@@ -72,11 +74,20 @@ loadComponent("some_component_name","some_component_package::SomeComponent")
 loadService("some_component_name","actionlib")
 
 ## Connect an actionlib server with goal/cancel/etc ports on the given service
+## This requires that the following ports exist with directions (server/client):
+##  some_prov.ided_service.goal (in/out)
+##  some_prov.ided_service.cancel (in/out)
+##  some_prov.ided_service.status (out/in)
+##  some_prov.ided_service.result (out/in)
+##  some_prov.ided_service.feedback (out/in)
+
 some_component_name.actionlib.connect(
-  "some_provided_service.sub_service",
+  "some_prov.ided_service",
   "/some/ros/namespace/my_action1")
 
 ## Connect an actionlib server with goal/cancel/etc ports on the task's root service
+## In this case, the input/output ports are defined on the TaskContext and not a
+## sub-service
 some_component_name.actionlib.connect("/some/ros/namespace/my_action2")
 ```
 
