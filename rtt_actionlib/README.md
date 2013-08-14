@@ -75,6 +75,9 @@ loadService("some_component_name","actionlib")
 some_component_name.actionlib.connect(
   "some_provided_service.sub_service",
   "/some/ros/namespace/my_action1")
+
+## Connect an actionlib server with goal/cancel/etc ports on the task's root service
+some_component_name.actionlib.connect("/some/ros/namespace/my_action2")
 ```
 
 Alternatively, each data port could be streamed to the appropriate action
