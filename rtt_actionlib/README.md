@@ -147,22 +147,30 @@ loadComponent("some_component_name","some_component_package::SomeComponent")
 ## Load the actionlib service
 loadService("some_component_name","actionlib")
 
-## Connect an actionlib server with goal/cancel/etc ports on the given service
+## Connect an actionlib server with goal/cancel/etc ports on the task's root service
+## This requires that the following ports exist with directions (server/client):
+##  some_component_name.goal (in/out)
+##  some_component_name.cancel (in/out)
+##  some_component_name.status (out/in)
+##  some_component_name.result (out/in)
+##  some_component_name.feedback (out/in)
+## These ports can be created by the RTTActionServer or RTTActionClient.
+
+some_component_name.actionlib.connect("/some/ros/namespace/my_action")
+
+## Connect an actionlib server with goal/cancel/etc ports on a given sub-service
 ## This requires that the following ports exist with directions (server/client):
 ##  some_prov.ided_service.goal (in/out)
 ##  some_prov.ided_service.cancel (in/out)
 ##  some_prov.ided_service.status (out/in)
 ##  some_prov.ided_service.result (out/in)
 ##  some_prov.ided_service.feedback (out/in)
+## These ports can be created by the RTTActionServer or RTTActionClient.
 
 some_component_name.actionlib.connect(
   "some_prov.ided_service",
-  "/some/ros/namespace/my_action1")
+  "/some/ros/namespace/my_other_action")
 
-## Connect an actionlib server with goal/cancel/etc ports on the task's root service
-## In this case, the input/output ports are defined on the TaskContext and not a
-## sub-service
-some_component_name.actionlib.connect("/some/ros/namespace/my_action2")
 ```
 
 Alternatively, each data port could be streamed to the appropriate action
