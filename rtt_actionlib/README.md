@@ -147,7 +147,7 @@ loadComponent("some_component_name","some_component_package::SomeComponent")
 ## Load the actionlib service
 loadService("some_component_name","actionlib")
 
-## Connect an actionlib server with goal/cancel/etc ports on the task's root service
+## Connect an actionlib omterface to the task's root service
 ## This requires that the following ports exist with directions (server/client):
 ##  some_component_name.goal (in/out)
 ##  some_component_name.cancel (in/out)
@@ -158,14 +158,7 @@ loadService("some_component_name","actionlib")
 
 some_component_name.actionlib.connect("/some/ros/namespace/my_action")
 
-## Connect an actionlib server with goal/cancel/etc ports on a given sub-service
-## This requires that the following ports exist with directions (server/client):
-##  some_prov.ided_service.goal (in/out)
-##  some_prov.ided_service.cancel (in/out)
-##  some_prov.ided_service.status (out/in)
-##  some_prov.ided_service.result (out/in)
-##  some_prov.ided_service.feedback (out/in)
-## These ports can be created by the RTTActionServer or RTTActionClient.
+## Alternatively, connect an actionlib omterface to a provided sub-service:
 
 some_component_name.actionlib.connect(
   "some_prov.ided_service",
