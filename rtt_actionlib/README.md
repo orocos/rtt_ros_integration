@@ -25,7 +25,7 @@ Contents
 This package provides an RTT service which constructs and connects several RTT
 ports to a ROS actionlib action namespace.
 
-### Providng Action Server from Orocos
+### Providng Actions from Orocos
 
 In the standard ROS actionlib server, subscribing and publishing ROS messages on
 the actionlib topics are handled automatiaclly by the ActionServer class, and
@@ -44,7 +44,7 @@ To this end, we implement an RTTActionServer C++ class which inherits from
 ActionServerBase and implements the "publish" functions with RTT data ports and
 binds the goal and cancel callbacks to RTT event ports.
 
-### Caling Action Servers outside of Orocos
+### Calling Actions from Orocos
 
 TBD
 
