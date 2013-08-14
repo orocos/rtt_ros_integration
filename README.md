@@ -112,24 +112,26 @@ an example.
 
 The `rtt_ros` package provides several launchfiles and wrapper scripts for
 making it easier to Orocos programs in a ROS environment. See
-[rtt_ros](rtt_ros/README.md) for more information.
+[rtt_ros](rtt_ros) for more information.
 
 ### Connecting Orocos Ports to ROS Topics
 
 The `rtt_roscomm` package provides a typekit for the the ROS Message 
 primitives, as well as a plugin which manages construction of ROS publishers
-and subscribers. See [rtt_roscomm](rtt_roscomm/README.md) for more 
+and subscribers. See [rtt_roscomm](rtt_roscomm) for more 
 information. 
 
 ### Connecting Orocos Operations to ROS Services
 
 The `rtt_rsocomm` package provides RTT services for binding an Orocos RTT
 operation or operation caller to the ROS service server or client,
-respectively. See [rtt_roscomm](rtt_roscomm/README.md) for more information.
+respectively. See [rtt_roscomm](rtt_roscomm) for more information.
 
 ### Running an Actionlib Action Server in an Orocos Component
 
-TBD (See current implementation [here](https://github.com/RCPRG-ros-pkg/orocos_tools))
+In progress...
+(See current development in [rtt_actionlib](rtt_actionlib))
+(See current implementation [here](https://github.com/RCPRG-ros-pkg/orocos_tools))
 
 ## History
 
