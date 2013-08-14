@@ -76,7 +76,7 @@ public:
   SomeComponent(std::string name) : TaskContext(name, RTT::PreOperational)
   { 
     // Initialize RTT action server (creates data ports)
-    rtt_action_server_.reset(new RTTActionServerType(this->provides(), RTT::OwnThread);
+    rtt_action_server_.reset(new RTTActionServerType(this->provides(), RTT::OwnThread));
     
     // Bind action server goal and cancel callbacks
     rtt_action_server_->registerGoalCallback(boost::bind(&SomeComponent::goalCallback, this, _1));
