@@ -73,13 +73,12 @@ public:
 
   // Component constructor
   SomeComponent(std::string name) :
-    TaskContext(name, RTT::PreOperational),
-    rtt_action_server_()
+    TaskContext(name, RTT::PreOperational)
   { 
     // Add action server ports to this task's root service
-    rtt_action_server_.addPorts(this->provides();
+    rtt_action_server_.addPorts(this->provides());
     
-    // Bind action server goal and cancel callbacks
+    // Bind action server goal and cancel callbacks (see below)
     rtt_action_server_.registerGoalCallback(boost::bind(&SomeComponent::goalCallback, this, _1));
     rtt_action_server_.registerCancelCallback(boost::bind(&SomeComponent::cancelCallback, this, _1));
   }
@@ -108,8 +107,6 @@ public:
   }
   
   // Accept/reject goal requests here
-  // NOTE: Since we created the RTT action server with `RTT::OwnThread`, calls to
-  //       this member function will be serialized with updateHook()
   void goalCallback(GoalHandle gh) {
     // EXAMPLE //
     // Always preempt the current goal and accept the new one
@@ -122,8 +119,6 @@ public:
   }
 
   // Handle preemption here
-  // NOTE: Since we created the RTT action server with `RTT::OwnThread`, calls to
-  //       this member function will be serialized with updateHook()
   void cancelCallback(GoalHandle gh) {
     // EXAMPLE //
     if(current_gh_ == gh && current_gh_.getGoalStatus().status == actionlib_msgs::GoalStatus::ACTIVE) {
