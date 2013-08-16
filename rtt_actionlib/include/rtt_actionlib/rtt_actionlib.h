@@ -14,64 +14,76 @@ namespace rtt_actionlib {
 
     //! Constructor
     ActionBridge() : 
-      goal_(NULL), cancel_(NULL), status_(NULL), result_(NULL), feedback_(NULL)
+      owns_port_pointers_(false), goal_(NULL), cancel_(NULL), status_(NULL), result_(NULL), feedback_(NULL)
+    { }
+
+    ~ActionBridge()
     {
+      if(owns_port_pointers_) {
+        if(goal_) delete goal_;
+        if(cancel_) delete cancel_;
+        if(status_) delete status_;
+        if(result_) delete result_;
+        if(feedback_) delete feedback_;
+      }
     }
 
     //! Add actionlib ports to a given rtt service
     template<class ActionSpec>
-    bool createServerPorts(bool provide_cancel, bool provide_feedback)
+    bool createServerPorts()
     {
       // Generates typedefs that make our lives easier
       ACTION_DEFINITION(ActionSpec);
 
       // Make sure it isn't valid or connected
-      if(this->isValid() || this->isConnected()) {
+      if(this->isValid() || this->anyConnected()) {
         return false;
       }
 
       // Construct server ports
-      goal_ = new RTT::InputPort<ActionGoal>("goal", exec_thread_type);
-      cancel = provide_cancel ? new RTT::InputPort<actionlib_msgs::GoalID>("cancel", exec_thread_type) : NULL;
-      result = new RTT::OutputPort<ActionResult>("result");
-      status = new RTT::OutputPort<actionlib_msgs::GoalStatusArray>("status");
-      feedback = provide_feedback ? new RTT::OutputPort<ActionFeedback>("feedback") : NULL;
+      goal_     = new RTT::InputPort<ActionGoal>("goal");
+      cancel_   = new RTT::InputPort<actionlib_msgs::GoalID>("cancel");
+      result_   = new RTT::OutputPort<ActionResult>("result");
+      status_   = new RTT::OutputPort<actionlib_msgs::GoalStatusArray>("status");
+      feedback_ = new RTT::OutputPort<ActionFeedback>("feedback");
 
-      return true;
+      // Set the ownership flag
+      owns_port_pointers_ = true;
+
+      return this->isValid();
     }
 
+#if 0
     template<class ActionSpec>
-    bool createClientPorts(
-        RTT::Service::shared_ptr service,
-        const RTT::ExecutionThread exec_thread_type,
-        bool require_cencel, bool require_feedback)
+    bool createClientPorts()
     {
       // Generates typedefs that make our lives easier
       ACTION_DEFINITION(ActionSpec);
 
       // Make sure it isn't valid or connected
-      if(this->isValid() || this->isConnected()) {
+      if(this->isValid() || this->anyConnected()) {
         return false;
       }
 
       // Construct server ports
-      goal_ = new RTT::OutputPort<ActionGoal>("goal");
-      cancel = require_cancel ? new RTT::OutputPort<actionlib_msgs::GoalID>("cancel") : NULL;
-      result = new RTT::InputPort<ActionResult>("result");
-      status = new RTT::InputPort<actionlib_msgs::GoalStatusArray>("status");
-      feedback = require_feedback ? new RTT::InputPort<ActionFeedback>("feedback") : NULL;
+      goal_     = new RTT::OutputPort<ActionGoal>("goal");
+      cancel_   = new RTT::OutputPort<actionlib_msgs::GoalID>("cancel");
+      result_   = new RTT::InputPort<ActionResult>("result");
+      status_   = new RTT::InputPort<actionlib_msgs::GoalStatusArray>("status");
+      feedback_ = new RTT::InputPort<ActionFeedback>("feedback");
+
+      return this->isValid();
 
       // Add all the ports to this service
       bool success = true;
-
       success &= service->addPort(goal_);
-      success &= require_cancel ? service->addPort(cancel) : true;
+      success &= service->addPort(cancel);
       success &= service->addPort(result);
       success &= service->addPort(status);
-      success &= require_feedback ? service->addPort(feedback) : true;
-
+      success &= service->addPort(feedback);
       return success;
     }
+#endif
 
     //! Get the goal port
     RTT::base::PortInteface* goal() { return goal_; }
@@ -85,7 +97,7 @@ namespace rtt_actionlib {
     RTT::base::PortInteface* feedback() { return feedback_; }
 
     //! Store the RTT ports manually
-    bool seetPorts(
+    bool setPorts(
         RTT::base::PortInteface* goal,
         RTT::base::PortInteface* cancel,
         RTT::base::PortInteface* status,
@@ -97,7 +109,10 @@ namespace rtt_actionlib {
       cancel_ = cancel;
       status_ = status;
       result_ = result;
-      feedbacl_ = feedbacl;
+      feedbacl_ = feedback;
+
+      // Set the ownership flag
+      owns_port_pointers_ = false;
 
       return this->isValid();
     }
@@ -122,14 +137,14 @@ namespace rtt_actionlib {
     //! True if all required ports are not null
     bool isValid() const 
     {
-      return goal_ && status_ && result_;
+      return goal_ && cancel_ && status_ && result_ && feedback_;
     }
 
     //! True if valid, goal/cancel are inputs, and result/status/feedback are outputs
-    bool is_server() const
+    bool isServer() const
     {
       // Make sure the bridge is valid
-      if(!this->is_valid()) { return false; }
+      if(!this->isValid()) { return false; }
 
       RTT::base::InputPortInterface goal_in, cancel_in;
       RTT::base::OutputPortInterface status_out, result_out, feedback_out;
@@ -142,21 +157,14 @@ namespace rtt_actionlib {
       result_out = dynamic_cast<RTT::base::OutputPortInterface*>(result_);
       feedback_out = dynamic_cast<RTT::base::OutputPortInterface*>(feedback_);
 
-      // Check port existence / directions
-      bool valid = true;
-
-      // Make sure optional ports are either the right direction or non-existent
-      valid &= cancel_in != NULL || cancel_ == NULL;
-      valid &= feedback_out != NULL || feedback_ == NULL;
-
-      return valid;
+      return goal_in && cancel_in && status_out && result_out && feedback_out;
     }
 
     //! True if valid, goal/cancel are outputs, and result/status/feedback are inputs 
-    bool is_client() const
+    bool isClient() const
     {
       // Make sure the bridge is valid
-      if(!this->is_valid()) { return false; }
+      if(!this->isValid()) { return false; }
 
       // Declare actual port directions
       RTT::base::InputPortInterface status_in, result_in, feedback_in;
@@ -170,21 +178,14 @@ namespace rtt_actionlib {
       result_in = dynamic_cast<RTT::base::InputPortInterface*>(result_);
       feedback_in = dynamic_cast<RTT::base::InputPortInterface*>(feedback_);
 
-      // Check port existence / directions
-      bool valid = true;
-
-      // Make sure optional ports are either the right direction or non-existent
-      valid &= cancel_out != NULL || cancel_ == NULL;
-      valid &= feedback_in != NULL || feedback_ == NULL;
-
-      return valid;
+      return goal_out && cancel_out && status_in && result_in && feedback_in;
     }
 
     //! Create a stream from this RTT actionlib port interface to the appropriate ROS topic interface
     bool createStream(const std::string action_ns, RTT::ConnPolicy cp_template = RTT::ConnPolicy::data()) 
     {
       // Make sure the bridge is valid
-      if(!this->is_valid()) { return false; }
+      if(!this->isValid()) { return false; }
 
       // Construct connection policies for each port
       RTT::ConnPolicy 
@@ -212,30 +213,51 @@ namespace rtt_actionlib {
       bool valid = true;
 
       valid &= goal_->createStream(cp_goal);
-      valid &= cancel_ ? cancel_->createStream(cp_cancel):true;
+      valid &= cancel_->createStream(cp_cancel);
       valid &= status_->createStream(cp_status);
       valid &= result_->createStream(cp_result);
-      valid &= feedback_ ? feedback_->createStream(cp_goal):true;
+      valid &= feedback_->createStream(cp_feedback);
 
       return valid;
     }
 
     //! True if all existing ports are connected
-    bool isConnected() const 
+    bool allConnected() const 
     {
       // Make sure the bridge is valid
-      if(!this->is_valid()) { return false; }
+      if(!this->isValid()) { return false; }
 
       bool valid = true;
 
       valid &= goal_->isConnected();
-      valid &= cancel_ ? cancel_->createStream():true;
+      valid &= cancel_->isConnected();
       valid &= status_->isConnected();
       valid &= result_->isConnected();
-      valid &= feedback_ ? feedback_->isConnected():true;
+      valid &= feedback_->isConnected();
 
       return valid;
     }
+
+    bool anyConnected() const 
+    {
+      // Make sure the bridge is valid
+      if(!this->isValid()) { return false; }
+
+      bool valid = false;
+
+      valid |= goal_->isConnected();
+      valid |= cancel_->isConnected();
+      valid |= status_->isConnected();
+      valid |= result_->isConnected();
+      valid |= feedback_->isConnected();
+
+      return valid;
+    }
+
+  private:
+
+    // Ownership of pointers
+    bool owns_port_pointers_;
 
     // RTT Ports
     RTT::base::PortInteface* goal_;
@@ -243,6 +265,7 @@ namespace rtt_actionlib {
     RTT::base::PortInteface* status_;
     RTT::base::PortInteface* result_;
     RTT::base::PortInteface* feedback_;
+
   };
 
 }

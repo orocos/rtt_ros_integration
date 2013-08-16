@@ -77,11 +77,7 @@ public:
     rtt_action_server_()
   { 
     // Add action server ports to this task's root service
-    rtt_action_server_.addPorts(
-      this->provides(), // Use the root service
-      RTT::OwnThread,   // Handle events
-      true,             // Create a "cancel" port to use the cancel callback
-      ture);            // Create a "feedback" port
+    rtt_action_server_.addPorts(this->provides();
     
     // Bind action server goal and cancel callbacks
     rtt_action_server_.registerGoalCallback(boost::bind(&SomeComponent::goalCallback, this, _1));
