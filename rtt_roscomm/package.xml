@@ -26,6 +26,8 @@
   <run_depend>roscpp</run_depend>
   
   <export>
-    <rtt_ros plugin_depend="rtt_rosnode"/>
+    <rtt_ros>
+      <plugin_depend>rtt_rosnode</plugin_depend>
+    </rtt_ros>
   </export>
 </package>
