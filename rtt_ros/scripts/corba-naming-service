@@ -2,4 +2,13 @@
 
 # Wrapper script 
 
-tao_cosnaming "$@"
+ps cax | grep omniNames > /dev/null
+if [ $? -eq 0 ]; then
+  echo "Process is running."
+  tao_cosnaming "$@"
+else
+  echo "Process is not running."
+  tao_cosnaming "$@"
+fi
+
+

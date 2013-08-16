@@ -64,23 +64,28 @@ class SomeComponent : public RTT::TaskContext {
 private:
   
   // Convenience typedefs
-  typedef rtt_actionlib::RTTActionServer<some_msgs::SomeAction> RTTActionServerType;
   typedef actionlib::ServerGoalHandle<some_msgs::SomeAction> GoalHandle;
 
   // RTT action server
-  boost::shared_ptr<RTTActionServerType> rtt_action_server_;
+  rtt_actionlib::RTTActionServer<some_msgs::SomeAction> rtt_action_server_;
 
 public:
 
   // Component constructor
-  SomeComponent(std::string name) : TaskContext(name, RTT::PreOperational)
+  SomeComponent(std::string name) :
+    TaskContext(name, RTT::PreOperational),
+    rtt_action_server_()
   { 
-    // Initialize RTT action server (creates data ports)
-    rtt_action_server_.reset(new RTTActionServerType(this->provides(), RTT::OwnThread));
+    // Add action server ports to this task's root service
+    rtt_action_server_.addPorts(
+      this->provides(), // Use the root service
+      RTT::OwnThread,   // Handle events
+      true,             // Create a "cancel" port to use the cancel callback
+      ture);            // Create a "feedback" port
     
     // Bind action server goal and cancel callbacks
-    rtt_action_server_->registerGoalCallback(boost::bind(&SomeComponent::goalCallback, this, _1));
-    rtt_action_server_->registerCancelCallback(boost::bind(&SomeComponent::cancelCAllback, this, _1));
+    rtt_action_server_.registerGoalCallback(boost::bind(&SomeComponent::goalCallback, this, _1));
+    rtt_action_server_.registerCancelCallback(boost::bind(&SomeComponent::cancelCallback, this, _1));
   }
 
   // RTT configure hook
