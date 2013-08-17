@@ -57,7 +57,6 @@ namespace rtt_actionlib {
       return this->isValid();
     }
 
-#if 0
     template<class ActionSpec>
     bool createClientPorts()
     {
@@ -76,18 +75,11 @@ namespace rtt_actionlib {
       status_   = new RTT::InputPort<actionlib_msgs::GoalStatusArray>("status");
       feedback_ = new RTT::InputPort<ActionFeedback>("feedback");
 
-      return this->isValid();
+      // Set the ownership flag
+      owns_port_pointers_ = true;
 
-      // Add all the ports to this service
-      bool success = true;
-      success &= service->addPort(goal_);
-      success &= service->addPort(cancel);
-      success &= service->addPort(result);
-      success &= service->addPort(status);
-      success &= service->addPort(feedback);
-      return success;
+      return this->isValid();
     }
-#endif
 
     //! Get the goal input port
     template<class ActionSpec>
