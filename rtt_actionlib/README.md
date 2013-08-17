@@ -53,11 +53,11 @@ TBD
 Usage
 -----
 
-
 First the appropriate RTT ports need to be created in a given service (or
-subservice) of a TaskContext. These are creted by delegating to an
+subservice) of a TaskContext. These can be easily creted by delegating to an
 RTTActionServer. The RTTActionServer will create the necessary RTT ports and
-bind them to the user-supplied callbacks.
+bind them to the user-supplied callbacks. For example, to add an actionlib
+interface to a given compnent, you could do something similar to the following:
 
 ```cpp
 class SomeComponent : public RTT::TaskContext {
@@ -116,7 +116,6 @@ public:
     gh.setAccepted();
     current_gh_ = gh;
     // EXAMPLE //
-  }
 
   // Handle preemption here
   void cancelCallback(GoalHandle gh) {
@@ -129,8 +128,9 @@ public:
 };
 ```
 
-Second, the ports need to be connected to ROS topics. This can be done easily
-with the "actionlib" service as shown below in Orocos .ops script:
+Second, the ports need to be connected to ROS topics. This can either be done
+in C++ with hard-coded action topic names, or with the "actionlib" RTT service
+similarly to the following:
 
 ```python
 ## Imports
@@ -162,14 +162,13 @@ some_component_name.actionlib.connect(
 
 ```
 
-Alternatively, each data port could be streamed to the appropriate action
-namespace manually.
+Future Work
+-----------
 
-Use Cases
----------
-
-### Sending a Reference Trajectory to a Controller 
-
+* Add operation to actionlib service which connects goal/cancel callbacks to
+  given RTT operations so that any RTT component with operations with the right
+  types can be bound to an actionlib service
+* Add action client support.
 
 
 
