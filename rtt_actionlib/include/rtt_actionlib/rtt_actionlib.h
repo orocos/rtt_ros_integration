@@ -1,7 +1,11 @@
 #ifndef __RTT_ACTIONLIB_H
 #define __RTT_ACTIONLIB_H
 
+#include <rtt/RTT.hpp>
+/*#include <rtt/base/PortInterface.hpp>*/
 #include <actionlib/action_definition.h>
+#include <actionlib_msgs/GoalID.h>
+#include <actionlib_msgs/GoalStatusArray.h>
 
 #include <rtt_rostopic/rtt_rostopic.h>
 
@@ -85,31 +89,48 @@ namespace rtt_actionlib {
     }
 #endif
 
-    //! Get the goal port
-    RTT::base::PortInteface* goal() { return goal_; }
-    //! Get the cancel port
-    RTT::base::PortInteface* cancel() { return cancel_; }
-    //! Get the status port
-    RTT::base::PortInteface* status() { return status_; }
-    //! Get the result port
-    RTT::base::PortInteface* result() { return result_; }
-    //! Get the feedback port
-    RTT::base::PortInteface* feedback() { return feedback_; }
+    //! Get the goal input port
+    template<class ActionSpec>
+    RTT::InputPort<typename ActionSpec::_action_goal_type>& goalInput() { return *dynamic_cast<RTT::InputPort<typename ActionSpec::_action_goal_type>*>(goal_); }
+    //! Get the cancel input port
+    RTT::InputPort<actionlib_msgs::GoalID>& cancelInput() { return *dynamic_cast<RTT::InputPort<actionlib_msgs::GoalID>*>(cancel_); }
+    //! Get the status input port
+    RTT::InputPort<actionlib_msgs::GoalStatusArray>& statusInput() { return *dynamic_cast<RTT::InputPort<actionlib_msgs::GoalStatusArray>*>(status_); }
+    //! Get the result input port
+    template<class ActionSpec>
+    RTT::InputPort<typename ActionSpec::_action_feedback_type>& resultInput() { return *dynamic_cast<RTT::InputPort<typename ActionSpec::_action_feedback_type>*>(result_); }
+    //! Get the feedback input port
+    template<class ActionSpec>
+    RTT::InputPort<typename ActionSpec::_action_feedback_type>& feedbackInput() { return *dynamic_cast<RTT::InputPort<typename ActionSpec::_action_feedback_type>*>(feedback_); }
+    
+    //! Get the goal output port
+    template<class ActionSpec>
+    RTT::OutputPort<typename ActionSpec::_action_goal_type>& goalOutput() { return *dynamic_cast<RTT::OutputPort<typename ActionSpec::_action_goal_type>*>(goal_); }
+    //! Get the cancel output port
+    RTT::OutputPort<actionlib_msgs::GoalID>& cancelOutput() { return *dynamic_cast<RTT::OutputPort<actionlib_msgs::GoalID>*>(cancel_); }
+    //! Get the status output port
+    RTT::OutputPort<actionlib_msgs::GoalStatusArray>& statusOutput() { return *dynamic_cast<RTT::OutputPort<actionlib_msgs::GoalStatusArray>*>(status_); }
+    //! Get the result output port
+    template<class ActionSpec>
+    RTT::OutputPort<typename ActionSpec::_action_feedback_type>& resultOutput() { return *dynamic_cast<RTT::OutputPort<typename ActionSpec::_action_feedback_type>*>(result_); }
+    //! Get the feedback output port
+    template<class ActionSpec>
+    RTT::OutputPort<typename ActionSpec::_action_feedback_type>& feedbackOutput() { return *dynamic_cast<RTT::OutputPort<typename ActionSpec::_action_feedback_type>*>(feedback_); }
 
     //! Store the RTT ports manually
     bool setPorts(
-        RTT::base::PortInteface* goal,
-        RTT::base::PortInteface* cancel,
-        RTT::base::PortInteface* status,
-        RTT::base::PortInteface* result,
-        RTT::base::PortInteface* feedback) 
+        RTT::base::PortInterface* goal,
+        RTT::base::PortInterface* cancel,
+        RTT::base::PortInterface* status,
+        RTT::base::PortInterface* result,
+        RTT::base::PortInterface* feedback) 
     {
       // Store the ports
       goal_ = goal;
       cancel_ = cancel;
       status_ = status;
       result_ = result;
-      feedbacl_ = feedback;
+      feedback_ = feedback;
 
       // Set the ownership flag
       owns_port_pointers_ = false;
@@ -146,8 +167,8 @@ namespace rtt_actionlib {
       // Make sure the bridge is valid
       if(!this->isValid()) { return false; }
 
-      RTT::base::InputPortInterface goal_in, cancel_in;
-      RTT::base::OutputPortInterface status_out, result_out, feedback_out;
+      RTT::base::InputPortInterface *goal_in, *cancel_in;
+      RTT::base::OutputPortInterface *status_out, *result_out, *feedback_out;
 
       // Get port directions
       goal_in = dynamic_cast<RTT::base::InputPortInterface*>(goal_);
@@ -167,12 +188,12 @@ namespace rtt_actionlib {
       if(!this->isValid()) { return false; }
 
       // Declare actual port directions
-      RTT::base::InputPortInterface status_in, result_in, feedback_in;
-      RTT::base::OutputPortInterface goal_out, cancel_out;
+      RTT::base::InputPortInterface *status_in, *result_in, *feedback_in;
+      RTT::base::OutputPortInterface *goal_out, *cancel_out;
 
       // Get port directions
-      goal_out = dynamic_cast<RTT::base::OuptutPortInterface*>(goal_);
-      cancel_out = dynamic_cast<RTT::base::OuptutPortInterface*>(cancel_);
+      goal_out = dynamic_cast<RTT::base::OutputPortInterface*>(goal_);
+      cancel_out = dynamic_cast<RTT::base::OutputPortInterface*>(cancel_);
 
       status_in = dynamic_cast<RTT::base::InputPortInterface*>(status_);
       result_in = dynamic_cast<RTT::base::InputPortInterface*>(result_);
@@ -229,11 +250,11 @@ namespace rtt_actionlib {
 
       bool valid = true;
 
-      valid &= goal_->isConnected();
-      valid &= cancel_->isConnected();
-      valid &= status_->isConnected();
-      valid &= result_->isConnected();
-      valid &= feedback_->isConnected();
+      valid &= goal_->connected();
+      valid &= cancel_->connected();
+      valid &= status_->connected();
+      valid &= result_->connected();
+      valid &= feedback_->connected();
 
       return valid;
     }
@@ -245,11 +266,11 @@ namespace rtt_actionlib {
 
       bool valid = false;
 
-      valid |= goal_->isConnected();
-      valid |= cancel_->isConnected();
-      valid |= status_->isConnected();
-      valid |= result_->isConnected();
-      valid |= feedback_->isConnected();
+      valid |= goal_->connected();
+      valid |= cancel_->connected();
+      valid |= status_->connected();
+      valid |= result_->connected();
+      valid |= feedback_->connected();
 
       return valid;
     }
@@ -260,11 +281,11 @@ namespace rtt_actionlib {
     bool owns_port_pointers_;
 
     // RTT Ports
-    RTT::base::PortInteface* goal_;
-    RTT::base::PortInteface* cancel_;
-    RTT::base::PortInteface* status_;
-    RTT::base::PortInteface* result_;
-    RTT::base::PortInteface* feedback_;
+    RTT::base::PortInterface* goal_;
+    RTT::base::PortInterface* cancel_;
+    RTT::base::PortInterface* status_;
+    RTT::base::PortInterface* result_;
+    RTT::base::PortInterface* feedback_;
 
   };
 

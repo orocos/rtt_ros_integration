@@ -1,11 +1,13 @@
 
+#include <boost/algorithm/string.hpp>
+
 #include <rtt/RTT.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 
-#include <rtt_rosservice/ros_service_proxy.h> 
-
 #include <rtt_rostopic/rtt_rostopic.h>
+
+#include <rtt_actionlib/rtt_actionlib.h>
 
 using namespace RTT;
 using namespace std;
@@ -41,7 +43,7 @@ public:
 
     // Make sure the uri has at least one token
     if(rtt_uri_tokens.size() < 1) {
-      return NULL;
+      return RTT::Service::shared_ptr();
     }
 
     // Iterate through the tokens except for the last one (the operation name)
@@ -53,7 +55,7 @@ public:
       if(provided->hasService(*it)) {
         provided = provided->provides(*it);
       } else {
-        return NULL;
+        return RTT::Service::shared_ptr();
       }
     }
 
@@ -68,8 +70,13 @@ public:
     const std::string &rtt_service_name,
     const std::string &ros_action_ns)
   {
-    // Check if the operation is required by the owner
+    // Check if the operation is provided by the owner
     RTT::Service::shared_ptr rtt_action_service = this->get_owner_service(rtt_service_name);
+
+    // Return false if the operation isn't provided
+    if(rtt_action_service.get() == NULL) {
+      return false;
+    }
     
     return this->connect(rtt_action_service, ros_action_ns);
   }

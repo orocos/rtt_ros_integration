@@ -1,8 +1,14 @@
 #ifndef __RTT_ACTION_SERVER_H
 #define __RTT_ACTION_SERVER_H
 
+#include <rtt/RTT.hpp>
+#include <rtt/plugin/ServicePlugin.hpp>
+#include <rtt/internal/GlobalService.hpp>
+
 #include <actionlib/action_definition.h>
 #include <actionlib/server/action_server_base.h>
+
+#include <rtt_actionlib/rtt_actionlib.h>
 
 namespace rtt_actionlib {
 
@@ -27,6 +33,7 @@ namespace rtt_actionlib {
 
     //! Constructor
     RTTActionServer(const double status_period = 0.200);
+    virtual ~RTTActionServer();
 
     //! Add actionlib ports to a given rtt service
     bool addPorts(RTT::Service::shared_ptr service);
@@ -36,7 +43,7 @@ namespace rtt_actionlib {
 
   private:
 
-    //! \brief  Initialize all RTT/ROS connections and setup timers
+    //! \brief Set up status publishing timers
     virtual void initialize();
 
     //! Publishes a result for a given goal
@@ -64,7 +71,10 @@ namespace rtt_actionlib {
      */
     void cancelCallback();
 
+    //! Period (Hz) at which the status should be published
     double status_period_;
+
+    //! Action bridge container for RTT ports corresponding to the action interface
     rtt_actionlib::ActionBridge action_bridge_;
   };
 
