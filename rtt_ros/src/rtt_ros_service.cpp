@@ -25,6 +25,8 @@
 #include <ros/ros.h>
 #include <rospack/rospack.h>
 
+#include <rtt_ros/time.h>
+
 using namespace RTT;
 using namespace std;
 
@@ -47,6 +49,9 @@ public:
     this->addOperation("import", &ROSService::import, this).doc(
         "Imports the Orocos plugins from a given ROS package (if found) along with the plugins of all of the package's run or exec dependencies as listed in the package.xml.").arg(
             "package", "The ROS package name.");
+
+    this->provides("time")->addOperation("now", &rtt_ros::time::now).doc(
+        "Get a ros::Time structure based on the RTT time source.");
   }
 
   /**

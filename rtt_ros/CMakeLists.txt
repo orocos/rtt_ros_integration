@@ -4,6 +4,7 @@ project(rtt_ros)
 find_package(catkin REQUIRED COMPONENTS roscpp rospack)
 
 catkin_package(
+  INCLUDE_DIRS include
   DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp)
 
@@ -19,7 +20,7 @@ find_package(LibXml2 REQUIRED)
 # documentation.
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
-include_directories(${catkin_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR})
+include_directories(include ${catkin_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR})
 
 add_definitions(-DRTT_COMPONENT)
 orocos_service(rtt_ros src/rtt_ros_service.cpp)
