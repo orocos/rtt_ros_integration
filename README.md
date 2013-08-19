@@ -21,8 +21,6 @@ The packages in this repository provide:
    plugin for publishing and subscribing to ROS topics as well as calling and
    responding to ROS services.
  * [**rtt\_rospack**](rtt_rospack) Plugin for locating ROS resources.
- * [**rtt\_ros\_integration\_example**](rtt_ros_integration_example) Example
-   use of some of the features of this repository.
  * [**rtt\_actionlib**](rtt_actionlib) RTT-Enabled
    [actionlib](http://ros.org/wiki/actionlib) action server and client for
    providing actions from ROS-integrated RTT components.
@@ -33,6 +31,10 @@ The packages in this repository provide:
 See each package's README.md file for more information.
 
 ## Usage
+
+For numerous examples of usage, see the
+[**rtt\_ros\_integration\_examples**](jhu-lcsr-forks/rtt_ros_integration_examples)
+stack.
 
 ### Building Orocos From Source
 
