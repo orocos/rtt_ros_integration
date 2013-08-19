@@ -172,7 +172,7 @@ public:
           continue;
         }
 
-        // Import the package
+        // Import the dependency
         if(loader->import(*it,"")) {
           found_packages = true;
         } else {

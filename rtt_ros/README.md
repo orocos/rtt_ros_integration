@@ -4,16 +4,62 @@ RTT ROS
 This package contains tools for building and running Orocos components
 integrated into a ROS architecture.
 
-### CMake Macros
+### RTT Services
 
-The following are simple wrappers to the respective Orocos CMake macros which
-sets the proper target output directory so that it can be found in a catkin
-workspace.
+#### ROS Package Import Chaining Service
 
- * `orocos_plugin( LIB_TARGET_NAME )`
- * `orocos_component( LIB_TARGET_NAME )`
- * `orocos_typekit( LIB_TARGET_NAME )`
- * `orocos_service( LIB_TARGET_NAME )`
+The "ros" RTT service can be used to import all of the RTT plugins built in a
+given ROS package along with plugins on which they depend. These dependencies
+are specified in package.xml files in the `<export>` section.
+
+For example, all RTT plugins in the ROS package "my\_package\_name" along with
+its dependencies can be imported by running the following Orocos .ops script:
+
+```python
+import("rtt_ros")
+ros.import("my_pkg_name")
+```
+
+When doing the above, first the `rtt_ros` package is imported using the normal
+mechanism. This then loads the `ros` service, which provides a ROS import
+function, `ros.import()`, which will parse ROS package metadata and import the
+Orocos plugins from the named package _and_ all packages listed in
+`<rtt_ros><plugin_depend>PKG_NAME</plugin_depend></rtt_ros>` tags in the
+`<export>` section of the package.xml files.
+
+Catkin introduces several new dependency types for buildtime, development, and
+other purposes. In order to keep the RTT plugin depdencencies clear, and avoid
+trying to load orocos components from _every_ package dependency, we use the
+extensible ROS metadata `<export>` tag.
+
+For example, if loading the plugins from package `pkg_one` should necessitate
+first loading plugins from packages `rtt_roscomm` and `pkg_two`, then
+`pkg_one/package.xml` should have the following:
+
+```xml
+<package>
+  <name>pkg_one</name>
+  <!-- ... -->
+  <export>
+    <rtt_ros>
+      <plugin_depend>rtt_roscomm</plugin_depend>
+      <plugin_depend>pkg_two</plugin_depend>
+    </rtt_ros>
+  </export>
+</package>
+```
+
+#### Time Service
+
+The "ros" RTT service also provides a service "time" which provides the
+following operations:
+
+ * `ros::Time ros.time.now(void)` Get a ROS time structure from the RTT clock.
+
+### C++ API
+
+ * `ros::Time rtt_ros::time::now(void)` Get a ROS time structure from the RTT
+   clock.
 
 ### Launch Files
 
