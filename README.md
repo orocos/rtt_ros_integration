@@ -87,27 +87,8 @@ Orocos plugins from the named package _and_ all packages listed in
 `<rtt_ros><plugin_depend>PKG_NAME</plugin_depend></rtt_ros>` tags in the
 `<export>` section of the package.xml files.
 
-Catkin introduces several new dependency types for buildtime, development, and
-other purposes. In order to keep the RTT plugin depdencencies clear, and avoid
-trying to load orocos components from _every_ package dependency, we use the
-extensible ROS metadata `<export>` tag.
-
-For example, if loading the plugins from package `pkg_one` should necessitate
-first loading plugins from packages `rtt_roscomm` and `pkg_two`, then
-`pkg_one/package.xml` should have the following:
-
-```xml
-<package>
-  <name>pkg_one</name>
-  <!-- ... -->
-  <export>
-    <rtt_ros>
-      <plugin_depend>rtt_roscomm</plugin_depend>
-      <plugin_depend>pkg_two</plugin_depend>
-    </rtt_ros>
-  </export>
-</package>
-```
+For more information on specifying RTT plugin dependencies in ROS packages, see
+the README in the [rtt_ros](rtt_ros) package.
 
 ### Bulding ROS-Based Orocos Plugins
 

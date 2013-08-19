@@ -13,7 +13,8 @@ given ROS package along with plugins on which they depend. These dependencies
 are specified in package.xml files in the `<export>` section.
 
 For example, all RTT plugins in the ROS package "my\_package\_name" along with
-its dependencies can be imported by running the following Orocos .ops script:
+its dependencies can be imported by running the following Orocos .ops script
+(or calling the appropriate operation on the "ros" global service):
 
 ```python
 import("rtt_ros")
