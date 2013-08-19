@@ -13,7 +13,7 @@ from cStringIO import StringIO
 
 import argparse
 
-NAME='create_boost_headers'
+NAME='create_boost_header'
 
 def write_boost_includes(s, spec):
     """
@@ -80,14 +80,13 @@ def write_boost_serialization(s, spec, cpp_name_prefix, file):
     
 
 
-def generate_boost_serialization(msg_path, msg_type, boost_header_path):
+def generate_boost_serialization(package, msg_path, msg_type, boost_header_path):
     """
     Generate a boost::serialization header
     
     @param msg_path: The path to the .msg file
     @type msg_path: str
     """
-    (package_dir, package) = roslib.packages.get_dir_pkg(msg_path)
     mc = genmsg.msg_loader.MsgContext()
 
     spec = genmsg.msg_loader.load_msg_from_file(mc, msg_path, msg_type)
@@ -117,7 +116,7 @@ def create_boost_headers(argv, stdout, stderr):
 
     args = parser.parse_args()
 
-    generate_boost_serialization(args.msg_file_path[0], args.msg_type[0], args.boost_file_path[0])
+    generate_boost_serialization(args.pkg[0], args.msg_file_path[0], args.msg_type[0], args.boost_file_path[0])
 
 if __name__ == "__main__":
     try:

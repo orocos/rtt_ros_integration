@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.8.3)
 
 set(ROS_BUILD_TYPE MinSizeRel)
 set(CMAKE_BUILD_TYPE MinSizeRel)
@@ -15,9 +16,12 @@ include(AddFileDependencies)
 
 function(ros_generate_rtt_typekit package)
 
-  find_package(catkin REQUIRED COMPONENTS genmsg rtt_roscomm roscpp ${package})
+  # Check if we're generating code for services in this package
+  if(NOT package STREQUAL PROJECT_NAME)
+    find_package(${package})
+  endif()
 
-  include_directories(${catkin_INCLUDE_DIRS})
+  find_package(genmsg)
 
   orocos_use_package(rtt_roscomm)
 
@@ -72,7 +76,7 @@ function(ros_generate_rtt_typekit package)
       OUTPUT ${_ROSMSG_GENERATED_BOOST_HEADER} 
       COMMAND ${CREATE_BOOST_HEADER_EXE_PATH}/create_boost_header.py ${package} "${package}/${ROSMSGNAME}" ${FILE} ${_ROSMSG_GENERATED_BOOST_HEADER} 
       WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} 
-      DEPENDS ${FILE} 
+      DEPENDS ${FILE} ${${package}_EXPORTED_TARGETS}
       VERBATIM)
     # TODO: add custom target
     # add_dependencies(${_ROSMSG_GENERATED_BOOST_HEADER} @(CMAKE_CURRENT_SOURCE_DIR)/cmake/create_boost_header.py)
@@ -85,8 +89,6 @@ function(ros_generate_rtt_typekit package)
 
     set(_template_types_dst_dir "${CMAKE_CURRENT_BINARY_DIR}/src/orocos/types")
     set(_template_typekit_dst_dir "${CATKIN_DEVEL_PREFIX}/include/${package}/typekit")
-
-    include_directories("${CATKIN_DEVEL_PREFIX}/include")
 
     configure_file( 
       ${_template_types_src_dir}/ros_msg_typekit_plugin.cpp.in 
@@ -124,12 +126,17 @@ function(ros_generate_rtt_typekit package)
     ${_template_typekit_src_dir}/Types.h.in 
     ${_template_typekit_dst_dir}/Types.h @@ONLY )
   
+  include_directories(${CATKIN_DEVEL_PREFIX}/include ${catkin_INCLUDE_DIRS})
   orocos_typekit( rtt-${package}-typekit ${_template_types_dst_dir}/ros_${package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
   orocos_typekit( rtt-${package}-ros-transport ${_template_types_dst_dir}/ros_${package}_transport.cpp )
   target_link_libraries(rtt-${package}-typekit ${catkin_LIBRARIES})
   target_link_libraries(rtt-${package}-ros-transport ${catkin_LIBRARIES})
-  add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
-  add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
+  add_dependencies( rtt-${package}-typekit ${${package}_EXPORTED_TARGETS})
+  add_dependencies( rtt-${package}-ros-transport ${${package}_EXPORTED_TARGETS})
+  add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_typekit.cpp 
+    "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
+  add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_transport.cpp
+    "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
 
   set_directory_properties(PROPERTIES 
     ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${CATKIN_DEVEL_PREFIX}/include/${package}/boost")
@@ -138,10 +145,13 @@ endfunction(ros_generate_rtt_typekit)
 
 
 function(ros_generate_rtt_service_proxies package)
+  # Check if we're generating code for services in this package
+  if(NOT package STREQUAL PROJECT_NAME)
+    find_package(${package})
+  endif()
 
-  find_package(catkin REQUIRED COMPONENTS genmsg rtt_roscomm roscpp ${package})
+  find_package(genmsg)
 
-  include_directories(${catkin_INCLUDE_DIRS})
   orocos_use_package(rtt_roscomm)
 
   # Get all .msg files
@@ -178,7 +188,7 @@ function(ros_generate_rtt_service_proxies package)
     ${_template_proxies_src_dir}/rtt_ros_service_proxies.cpp.in 
     ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp @@ONLY )
   
-  include_directories(${catkin_INCLUDE_DIRS})
+  include_directories(${CATKIN_DEVEL_PREFIX}/include ${catkin_INCLUDE_DIRS})
   orocos_service(rtt_${ROSPACKAGE}_ros_service_proxies ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp)
   target_link_libraries(rtt_${ROSPACKAGE}_ros_service_proxies ${catkin_LIBRARIES})
 

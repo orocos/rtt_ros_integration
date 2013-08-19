@@ -41,8 +41,7 @@ for arg in $*; do
         exit 1;
       fi
       if [[ $arg =~ rtt_.* ]]; then
-        echo "ERROR: You're giving a package name that starts with 'rtt_'. Use the ROS/non-RTT package name instead."
-        exit 1;
+        echo "WARNING: You're giving a package name that starts with 'rtt_'. You may want to use the ROS/non-RTT package name instead."
       fi
       pkgname="$arg"
       ;;
