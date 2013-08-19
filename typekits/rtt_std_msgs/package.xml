@@ -28,6 +28,8 @@
   <run_depend>std_msgs</run_depend>
 
   <export>
-    <rtt_plugin_depend>rtt_roscomm</rtt_plugin_depend>
+    <rtt_ros>
+      <plugin_depend>rtt_roscomm</plugin_depend>
+    </rtt_ros>
   </export>
 </package>
