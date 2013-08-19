@@ -28,10 +28,16 @@ public:
     this->doc("RTT Service for connecting RTT ports to ROS actionlib actions.");
 
     this->addOperation( "connect", 
-        (bool (ActionlibService::*)(const std::string&, const std::string&))&ActionlibService::connect, this)
+        (bool (ActionlibService::*)(const std::string&))&ActionlibService::connect, this)
       .doc( "Connects a set of RTT data ports (goal,cancel,status,result,feedback) to a ROS actionlib action server or client.")
+      .arg( "action_ns", "The ROS action namespace (like \"/some/action\").");
+
+    this->addOperation( "connectSub", 
+        (bool (ActionlibService::*)(const std::string&, const std::string&))&ActionlibService::connect, this)
+      .doc( "Connects a set of RTT data ports (goal,cancel,status,result,feedback) defined on a sub-service to a ROS actionlib action server or client.")
       .arg( "service_name", "The RTT service name (like \"some_provided_service.another\") under which the ports are defined.")
       .arg( "action_ns", "The ROS action namespace (like \"/some/action\").");
+
   }
 
   //! Get an RTT service from a string identifier
@@ -63,8 +69,15 @@ public:
     return provided;
   }
 
-  /** \brief Connect an RTT operation or operation caller to a ROS service
-   * server or service client.
+  /** \brief 
+   */
+  bool connect(
+    const std::string &ros_action_ns)
+  {
+    return this->connect(this->getOwner()->provides(), ros_action_ns);
+  }
+
+  /** \brief Connect 
    */
   bool connect(
     const std::string &rtt_service_name,

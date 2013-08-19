@@ -2,7 +2,7 @@
 #define __RTT_ACTIONLIB_H
 
 #include <rtt/RTT.hpp>
-/*#include <rtt/base/PortInterface.hpp>*/
+
 #include <actionlib/action_definition.h>
 #include <actionlib_msgs/GoalID.h>
 #include <actionlib_msgs/GoalStatusArray.h>
@@ -90,7 +90,7 @@ namespace rtt_actionlib {
     RTT::InputPort<actionlib_msgs::GoalStatusArray>& statusInput() { return *dynamic_cast<RTT::InputPort<actionlib_msgs::GoalStatusArray>*>(status_); }
     //! Get the result input port
     template<class ActionSpec>
-    RTT::InputPort<typename ActionSpec::_action_feedback_type>& resultInput() { return *dynamic_cast<RTT::InputPort<typename ActionSpec::_action_feedback_type>*>(result_); }
+    RTT::InputPort<typename ActionSpec::_action_result_type>& resultInput() { return *dynamic_cast<RTT::InputPort<typename ActionSpec::_action_result_type>*>(result_); }
     //! Get the feedback input port
     template<class ActionSpec>
     RTT::InputPort<typename ActionSpec::_action_feedback_type>& feedbackInput() { return *dynamic_cast<RTT::InputPort<typename ActionSpec::_action_feedback_type>*>(feedback_); }
@@ -104,7 +104,7 @@ namespace rtt_actionlib {
     RTT::OutputPort<actionlib_msgs::GoalStatusArray>& statusOutput() { return *dynamic_cast<RTT::OutputPort<actionlib_msgs::GoalStatusArray>*>(status_); }
     //! Get the result output port
     template<class ActionSpec>
-    RTT::OutputPort<typename ActionSpec::_action_feedback_type>& resultOutput() { return *dynamic_cast<RTT::OutputPort<typename ActionSpec::_action_feedback_type>*>(result_); }
+    RTT::OutputPort<typename ActionSpec::_action_result_type>& resultOutput() { return *dynamic_cast<RTT::OutputPort<typename ActionSpec::_action_result_type>*>(result_); }
     //! Get the feedback output port
     template<class ActionSpec>
     RTT::OutputPort<typename ActionSpec::_action_feedback_type>& feedbackOutput() { return *dynamic_cast<RTT::OutputPort<typename ActionSpec::_action_feedback_type>*>(feedback_); }

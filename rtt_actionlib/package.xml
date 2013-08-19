@@ -7,7 +7,7 @@
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
   <license>BSD</license>
 
-  <author>Ruben Smits</author>
+  <author>Jonathan Bohren</author>
 
   <url>http://ros.org/wiki/rtt_rostopic</url>
   
@@ -15,22 +15,27 @@
 
   <build_depend>ocl</build_depend>
   <build_depend>rtt</build_depend>
+  <build_depend>rtt_ros</build_depend>
   <build_depend>rtt_roscomm</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>actionlib</build_depend>
   <build_depend>actionlib_msgs</build_depend>
+  <build_depend>rtt_actionlib_msgs</build_depend>
 
   <run_depend>ocl</run_depend>
   <run_depend>rtt</run_depend>
+  <run_depend>rtt_ros</run_depend>
   <run_depend>rtt_roscomm</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>actionlib</run_depend>
   <run_depend>actionlib_msgs</run_depend>
+  <run_depend>rtt_actionlib_msgs</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <rtt_ros>
       <plugin_depend>rtt_roscomm</plugin_depend>
+      <plugin_depend>rtt_actionlib_msgs</plugin_depend>
     </rtt_ros>
   </export>
 </package>
