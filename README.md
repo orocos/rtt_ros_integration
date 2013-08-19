@@ -33,7 +33,7 @@ See each package's README.md file for more information.
 ## Usage
 
 For numerous examples of usage, see the
-[**rtt\_ros\_integration\_examples**](http://github.com/jhu-lcsr/rtt_ros_integration_examples)
+[**rtt\_ros\_examples**](http://github.com/jhu-lcsr/rtt_ros_examples)
 stack.
 
 ### Building Orocos From Source
