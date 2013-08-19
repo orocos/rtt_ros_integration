@@ -11,16 +11,21 @@ ROS parameter server.
 
 The packages in this repository provide:
 
- * [**rtt\_ros**](rtt_ros) ROS package import plugin as well as wrapper scripts and
-   launchfiles for using Orocos with ROS.
- * [**rtt\_rosnode**](rtt_rosnode) Plugin for ROS node instantiation inside an Orocos program.
- * [**rtt\_rosparam**](rtt_rosparam) Plugin for synchronizing ROS parameters with Orocos
-   component properties.
- * [**rtt\_roscomm**](rtt_roscomm) ROS message typekit generation and Orocos plugin for
-   publishing and subscribing to ROS topics as well as calling and responding to ROS services.
+ * [**rtt\_ros**](rtt_ros) ROS package import plugin as well as wrapper scripts
+   and launchfiles for using Orocos with ROS.
+ * [**rtt\_rosnode**](rtt_rosnode) Plugin for ROS node instantiation inside an
+   Orocos program.
+ * [**rtt\_rosparam**](rtt_rosparam) Plugin for synchronizing ROS parameters
+   with Orocos component properties.
+ * [**rtt\_roscomm**](rtt_roscomm) ROS message typekit generation and Orocos
+   plugin for publishing and subscribing to ROS topics as well as calling and
+   responding to ROS services.
  * [**rtt\_rospack**](rtt_rospack) Plugin for locating ROS resources.
- * [**rtt\_ros\_integration\_example**](rtt_ros_integration_example) Example use of some of the features of
-   this repository.
+ * [**rtt\_ros\_integration\_example**](rtt_ros_integration_example) Example
+   use of some of the features of this repository.
+ * [**rtt\_actionlib**](rtt_actionlib) RTT-Enabled
+   [actionlib](http://ros.org/wiki/actionlib) action server and client for
+   providing actions from ROS-integrated RTT components.
  * [**rtt\_ros\_integration**](rtt_ros_integration) Catkin
    [metapackage](http://ros.org/wiki/catkin/package.xml#Metapackages) for this
    repository.
