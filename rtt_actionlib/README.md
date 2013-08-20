@@ -121,11 +121,11 @@ loadService("some_component_name","actionlib")
 
 ## Connect an actionlib interface to the task's root service
 ## This requires that the following ports exist with directions (server/client):
-##  some_component_name.goal (in/out)
-##  some_component_name.cancel (in/out)
-##  some_component_name.status (out/in)
-##  some_component_name.result (out/in)
-##  some_component_name.feedback (out/in)
+##  some_component_name._action_goal (in/out)
+##  some_component_name._action_cancel (in/out)
+##  some_component_name._action_status (out/in)
+##  some_component_name._action_result (out/in)
+##  some_component_name._action_feedback (out/in)
 ## These ports can be created by the RTTActionServer or RTTActionClient.
 
 some_component_name.actionlib.connect("/some/ros/namespace/my_action")
@@ -145,6 +145,9 @@ Future Work
   given RTT operations so that any RTT component with operations with the right
   types can be bound to an actionlib service
 * Add action client support.
+* Add a "simple" mode which implememnts a policy like SimpleActionServer
+
+
 
 
 

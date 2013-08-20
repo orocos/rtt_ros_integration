@@ -11,7 +11,8 @@
 
 namespace rtt_actionlib {
 
-  //! Reqiured and optional ports for a valid Actionlib interface
+  /* \brief Actionlib RTT bridge used to create and access actionlib RTT data ports
+   */
   class ActionBridge
   {
   public:
@@ -45,11 +46,11 @@ namespace rtt_actionlib {
       }
 
       // Construct server ports
-      goal_     = new RTT::InputPort<ActionGoal>("goal");
-      cancel_   = new RTT::InputPort<actionlib_msgs::GoalID>("cancel");
-      result_   = new RTT::OutputPort<ActionResult>("result");
-      status_   = new RTT::OutputPort<actionlib_msgs::GoalStatusArray>("status");
-      feedback_ = new RTT::OutputPort<ActionFeedback>("feedback");
+      goal_     = new RTT::InputPort<ActionGoal>("_action_goal");
+      cancel_   = new RTT::InputPort<actionlib_msgs::GoalID>("_action_cancel");
+      result_   = new RTT::OutputPort<ActionResult>("_action_result");
+      status_   = new RTT::OutputPort<actionlib_msgs::GoalStatusArray>("_action_status");
+      feedback_ = new RTT::OutputPort<ActionFeedback>("_action_feedback");
 
       // Set the ownership flag
       owns_port_pointers_ = true;
@@ -69,11 +70,11 @@ namespace rtt_actionlib {
       }
 
       // Construct server ports
-      goal_     = new RTT::OutputPort<ActionGoal>("goal");
-      cancel_   = new RTT::OutputPort<actionlib_msgs::GoalID>("cancel");
-      result_   = new RTT::InputPort<ActionResult>("result");
-      status_   = new RTT::InputPort<actionlib_msgs::GoalStatusArray>("status");
-      feedback_ = new RTT::InputPort<ActionFeedback>("feedback");
+      goal_     = new RTT::OutputPort<ActionGoal>("_action_goal");
+      cancel_   = new RTT::OutputPort<actionlib_msgs::GoalID>("_action_cancel");
+      result_   = new RTT::InputPort<ActionResult>("_action_result");
+      status_   = new RTT::InputPort<actionlib_msgs::GoalStatusArray>("_action_status");
+      feedback_ = new RTT::InputPort<ActionFeedback>("_action_feedback");
 
       // Set the ownership flag
       owns_port_pointers_ = true;
@@ -137,11 +138,14 @@ namespace rtt_actionlib {
       if(service.get() == NULL) { return false; }
 
       // Get ports
-      goal_ = service->getPort("goal");
-      cancel_ = service->getPort("cancel");
-      status_ = service->getPort("status");
-      result_ = service->getPort("result");
-      feedback_ = service->getPort("feedback");
+      goal_ = service->getPort("_action_goal");
+      cancel_ = service->getPort("_action_cancel");
+      status_ = service->getPort("_action_status");
+      result_ = service->getPort("_action_result");
+      feedback_ = service->getPort("_action_feedback");
+
+      // Set the ownership flag
+      owns_port_pointers_ = false;
 
       // Return true if required ports are non-null
       return this->isValid();

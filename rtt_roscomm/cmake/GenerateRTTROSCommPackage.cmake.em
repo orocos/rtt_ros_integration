@@ -176,9 +176,6 @@ function(ros_generate_rtt_service_proxies package)
     return()
   endif()
 
-  #set(ROS_SRV_HEADERS "")
-  #set(ROS_SRV_FACTORIES "")
-
   # Get the ros package name
   set(ROSPACKAGE ${package})
 

@@ -19,6 +19,7 @@ namespace rtt_actionlib {
   template<class ActionSpec>
   class RTTActionServer;
 
+  //! Timer to trigger status publications
   template<class ActionSpec>
   class RTTActionServerStatusTimer : public RTT::os::Timer 
   {
@@ -37,6 +38,7 @@ namespace rtt_actionlib {
     RTTActionServer<ActionSpec> &server_;
   };
 
+  //! Orocos RTT-Based Action Server
   template<class ActionSpec>
   class RTTActionServer : public actionlib::ActionServerBase<ActionSpec>
   {
@@ -143,13 +145,22 @@ namespace rtt_actionlib {
       // Add the ports to the service
       service->addEventPort(
           action_bridge_.goalInput<ActionSpec>(), 
-          boost::bind(&RTTActionServer<ActionSpec>::goalCallback, this, _1));
+          boost::bind(&RTTActionServer<ActionSpec>::goalCallback, this, _1))
+        .doc("Actionlib goal port. Do not read from this port directly.");
+
       service->addEventPort(
           action_bridge_.cancelInput(), 
-          boost::bind(&RTTActionServer<ActionSpec>::cancelCallback, this, _1));
-      service->addPort(action_bridge_.resultOutput<ActionSpec>());
-      service->addPort(action_bridge_.statusOutput());
-      service->addPort(action_bridge_.feedbackOutput<ActionSpec>());
+          boost::bind(&RTTActionServer<ActionSpec>::cancelCallback, this, _1))
+        .doc("Actionlib cancel port. Do not read from this port directly.");
+
+      service->addPort(action_bridge_.resultOutput<ActionSpec>())
+        .doc("Actionlib result port. Do not write to this port directly.");
+
+      service->addPort(action_bridge_.statusOutput())
+        .doc("Actionlib result port. Do not write to this port directly.");
+
+      service->addPort(action_bridge_.feedbackOutput<ActionSpec>())
+        .doc("Actionlib result port. Do not write to this port directly.");
 
       return true;
     }
