@@ -137,13 +137,12 @@ function(ros_generate_rtt_typekit package)
   include_directories(${CATKIN_DEVEL_PREFIX}/include ${catkin_INCLUDE_DIRS})
 
   orocos_typekit(         rtt-${package}-typekit ${_template_types_dst_dir}/ros_${package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
-  target_link_libraries(  rtt-${package}-typekit ${catkin_LIBRARIES})
-  add_dependencies(       rtt-${package}-typekit ${${package}_EXPORTED_TARGETS})
-  add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
-
   orocos_typekit(         rtt-${package}-ros-transport ${_template_types_dst_dir}/ros_${package}_transport.cpp )
+  target_link_libraries(  rtt-${package}-typekit ${catkin_LIBRARIES})
   target_link_libraries(  rtt-${package}-ros-transport ${catkin_LIBRARIES})
+  add_dependencies(       rtt-${package}-typekit ${${package}_EXPORTED_TARGETS})
   add_dependencies(       rtt-${package}-ros-transport ${${package}_EXPORTED_TARGETS})
+  add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
   add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
 
   set_directory_properties(PROPERTIES 
