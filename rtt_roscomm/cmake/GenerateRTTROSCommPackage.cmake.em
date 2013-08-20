@@ -149,9 +149,7 @@ function(ros_generate_rtt_typekit package)
     ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${CATKIN_DEVEL_PREFIX}/include/${package}/boost")
 
   # Install generated header files (dependent packages might need them)
-  foreach (HEADER ${ROSMSGS_GENERATED_BOOST_HEADERS})
-    install(FILES ${HEADER} DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${package}/boost/)
-  endforeach()
+  install(FILES ${ROSMSGS_GENERATED_BOOST_HEADERS} DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${package}/boost/)
 
 endfunction(ros_generate_rtt_typekit)
 
