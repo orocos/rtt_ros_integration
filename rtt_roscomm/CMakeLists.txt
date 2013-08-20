@@ -48,30 +48,20 @@ orocos_service(rtt_rosservice
   src/rtt_rosservice_service.cpp)
 target_link_libraries(rtt_rosservice ${catkin_LIBRARIES})
 
-
-# Generate install targets for headers
-orocos_install_headers(
-  include/rtt_rostopic/rtt_rostopic.h
-  include/rtt_rostopic/ros_msg_transporter.hpp
-  include/rtt_rostopic/ros_publish_activity.hpp
-  include/rtt_rosservice/ros_service_proxy.h
-  )
-
 # Generate install targets and pkg-config files
 orocos_generate_package()
 
 install(PROGRAMS 
-  scripts/create_boost_headers.py
-  scripts/create_rtt_msgs
+  scripts/create_rtt_pkg
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-install(DIRECTORY include/${PROJECT_NAME}/
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+install(DIRECTORY include/
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
 )
 
 # Install cmake macros
-install(FILES cmake/GenerateRTTROSCommPackage.cmake cmake/create_boost_header.py
+install(PROGRAMS cmake/create_boost_header.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
 
 # Install template files to both install and develspace

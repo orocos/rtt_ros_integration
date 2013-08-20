@@ -40,7 +40,7 @@ function(ros_generate_rtt_typekit package)
   @[if DEVELSPACE]@
     set(CREATE_BOOST_HEADER_EXE_PATH @(CMAKE_CURRENT_SOURCE_DIR)/cmake/create_boost_header.py)
   @[else]@
-    set(CREATE_BOOST_HEADER_EXE_PATH "create_boost_header.py")
+    set(CREATE_BOOST_HEADER_EXE_PATH @(CMAKE_INSTALL_PREFIX)/@(CATKIN_PACKAGE_SHARE_DESTINATION)/cmake/create_boost_header.py)
   @[end if]@
 
   # Store the ros package name
@@ -147,6 +147,9 @@ function(ros_generate_rtt_typekit package)
 
   set_directory_properties(PROPERTIES 
     ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${CATKIN_DEVEL_PREFIX}/include/${package}/boost")
+
+  # Install generated header files (dependent packages might need them)
+  install(FILES ${ROSMSGS_GENERATED_BOOST_HEADERS} DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${package}/boost/)
 
 endfunction(ros_generate_rtt_typekit)
 
