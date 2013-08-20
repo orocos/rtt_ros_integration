@@ -22,7 +22,7 @@ The packages in this repository provide:
    responding to ROS services.
  * [**rtt\_rospack**](rtt_rospack) Plugin for locating ROS resources.
  * [**rtt\_actionlib**](rtt_actionlib) RTT-Enabled
-   [actionlib](http://ros.org/wiki/actionlib) action server and client for
+   [actionlib](http://ros.org/wiki/actionlib) action server for
    providing actions from ROS-integrated RTT components.
  * [**rtt\_ros\_integration**](rtt_ros_integration) Catkin
    [metapackage](http://ros.org/wiki/catkin/package.xml#Metapackages) for this
@@ -111,15 +111,16 @@ information.
 
 ### Connecting Orocos Operations to ROS Services
 
-The `rtt_rsocomm` package provides RTT services for binding an Orocos RTT
+The `rtt_roscomm` package provides RTT services for binding an Orocos RTT
 operation or operation caller to the ROS service server or client,
 respectively. See [rtt_roscomm](rtt_roscomm) for more information.
 
 ### Running an Actionlib Action Server in an Orocos Component
 
-In progress...
-(See current development in [rtt_actionlib](rtt_actionlib))
-(See current implementation [here](https://github.com/RCPRG-ros-pkg/orocos_tools))
+The `rtt_actionlib` package provides a C++ API and an RTT service for
+implementing [actionlib](http://www.ros.org/wiki/actionlib) actions with Orocos
+RTT components.  See current [rtt_actionlib](rtt_actionlib) for more
+information.
 
 ## History
 
