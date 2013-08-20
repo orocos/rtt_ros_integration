@@ -12,7 +12,7 @@ namespace ros_integration {
     {
       bool registerTransport(std::string name, types::TypeInfo* ti)
       {
-          @ROSMSGTRANSPORTS@
+          @ROSMSGTRANSPORTS@ { }
           return false;
       }
       

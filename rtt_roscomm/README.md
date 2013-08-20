@@ -10,10 +10,13 @@ Contents
 --------
 
 This package serves several purposes. It provides:
- * An Orocos RTT Service for publishing and subscribing to ROS topics
- * Orocos RTT Services for calling and serving ROS services
- * Orocos typekits for ROS message primitive types
- * A template for generating wrapper packages for ROS .msg and .srv files
+* An Orocos RTT Service for publishing and subscribing to ROS topics
+* Orocos RTT Services for calling and serving ROS services
+* Orocos typekits for ROS message primitive types
+* A template for generating wrapper packages for ROS .msg and .srv files
+  * typekits for .msg files
+  * transport plugin for .msg files
+  * ros service proxy factories for .srv files
 
 ### Plugins
 
@@ -27,10 +30,10 @@ unbufferd connections to ROS topics. Publishing and subscribing are done
 with the same command, and the topic type is inferred from the Orocos port
 type. Connection policies are created with these operations:
 
- * `rostopic.connection(TOPIC_NAME)`: Creates a connection with a buffer length
-   of 1.
- * `rostopic.connectionBuffered(TOPIC_NAME, BUFFER_LENGTH)`: Creates a
-   connection with a user-supplied buffer length.
+* `rostopic.connection(TOPIC_NAME)`: Creates a connection with a buffer length
+  of 1.
+* `rostopic.connectionBuffered(TOPIC_NAME, BUFFER_LENGTH)`: Creates a
+  connection with a user-supplied buffer length.
 
 #### ROS Services
 
