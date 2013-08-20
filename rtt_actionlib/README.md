@@ -1,9 +1,6 @@
 RTT Actionlib
 =============
 
-***NOTE: This is a preliminary design document and rtt\_actionlib is currently
-unimplemented.***
-
 Actionlib action servers provide the following interfaces, and actionlib action
 clients reciprocate:
 * Inputs:
