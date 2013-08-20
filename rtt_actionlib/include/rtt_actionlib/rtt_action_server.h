@@ -2,6 +2,7 @@
 #define __RTT_ACTION_SERVER_H
 
 #include <rtt/RTT.hpp>
+#include <rtt/os/Timer.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 
@@ -14,17 +15,27 @@
 
 namespace rtt_actionlib {
 
-#if 0
+  // Forward declaration
+  template<class ActionSpec>
+  class RTTActionServer;
+
   template<class ActionSpec>
   class RTTActionServerStatusTimer : public RTT::os::Timer 
   {
-    public:
-      void setServer() {}
-      virtual void timeout(RTT::os::Timer::TimerID timer_id) {
-        
-      }
+  public:
+    RTTActionServerStatusTimer(RTTActionServer<ActionSpec> &server) :
+      RTT::os::Timer(1,ORO_SCHED_OTHER),
+      server_(server) 
+    { }
+
+    //! Publish the action server status
+    virtual void timeout(RTT::os::Timer::TimerId timer_id) {
+      server_.publishStatus();
+    }
+  private:
+    //! A reference to the owning action server
+    RTTActionServer<ActionSpec> &server_;
   };
-#endif
 
   template<class ActionSpec>
   class RTTActionServer : public actionlib::ActionServerBase<ActionSpec>
@@ -44,8 +55,6 @@ namespace rtt_actionlib {
 
     //! Check if the server is ready to be started
     bool ready();
-
-  private:
 
     //! \brief Set up status publishing timers
     virtual void initialize();
@@ -80,12 +89,16 @@ namespace rtt_actionlib {
 
     //! Action bridge container for RTT ports corresponding to the action interface
     rtt_actionlib::ActionBridge action_bridge_;
+
+    //! RTT Timer for periodic status updates
+    RTTActionServerStatusTimer<ActionSpec> status_timer_;
   };
 
   template <class ActionSpec>
     RTTActionServer<ActionSpec>::RTTActionServer(const double status_period) :
       actionlib::ActionServerBase<ActionSpec>(boost::function<void (GoalHandle)>(), boost::function<void (GoalHandle)>(), false),
-      status_period_(status_period)
+      status_period_(status_period),
+      status_timer_(*this)
   {
 
   }
@@ -101,7 +114,11 @@ namespace rtt_actionlib {
     {
       if(this->ready()) {
         // Start status publish timer 
-        //TODO: create timer
+        if(!status_timer_.startTimer(0,status_period_)) {
+          RTT::log(RTT::Error) << "Failed to initialize RTT Action Server: could not start status publisher timer." << RTT::endlog();
+        }
+      } else {
+        RTT::log(RTT::Error) << "Failed to initialize RTT Action Server: ports not ready." << RTT::endlog();
       }
     }
 
