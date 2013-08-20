@@ -40,7 +40,7 @@ function(ros_generate_rtt_typekit package)
   @[if DEVELSPACE]@
     set(CREATE_BOOST_HEADER_EXE_PATH @(CMAKE_CURRENT_SOURCE_DIR)/cmake/create_boost_header.py)
   @[else]@
-    set(CREATE_BOOST_HEADER_EXE_PATH "create_boost_header.py")
+    set(CREATE_BOOST_HEADER_EXE_PATH @(CMAKE_INSTALL_PREFIX)/@(CATKIN_PACKAGE_SHARE_DESTINATION)/cmake/create_boost_header.py)
   @[end if]@
 
   # Store the ros package name
