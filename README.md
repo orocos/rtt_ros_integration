@@ -119,8 +119,7 @@ respectively. See [rtt_roscomm](rtt_roscomm) for more information.
 
 The `rtt_actionlib` package provides a C++ API and an RTT service for
 implementing [actionlib](http://www.ros.org/wiki/actionlib) actions with Orocos
-RTT components.  See current [rtt_actionlib](rtt_actionlib) for more
-information.
+RTT components. See [rtt_actionlib](rtt_actionlib) for more information.
 
 ## History
 
