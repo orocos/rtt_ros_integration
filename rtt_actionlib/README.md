@@ -80,11 +80,6 @@ public:
     rtt_action_server_.registerCancelCallback(boost::bind(&SomeComponent::cancelCallback, this, _1));
   }
 
-  // RTT configure hook
-  bool configureHook() {
-    return true;
-  }
-
   // RTT start hook
   bool startHook() {
     // Start action server
@@ -94,33 +89,17 @@ public:
 
   // RTT update hook
   void updateHook() {
-    // Pursue goal...
-
-    // EXAMPLE //
-    if(current_gh_.getGoalStatus().status == actionlib_msgs::GoalStatus::ACTIVE) {
-      current_gh_.setSucceeded();
-    }
-    // EXAMPLE //
+    // Pursue goal here
   }
   
-  // Accept/reject goal requests here
+  // Called by rtt_action_server_ when a new goal is received
   void goalCallback(GoalHandle gh) {
-    // EXAMPLE //
-    // Always preempt the current goal and accept the new one
-    if(current_gh_.getGoalStatus().status == actionlib_msgs::GoalStatus::ACTIVE) {
-      current_gh_.setCanceled();
-    }
-    gh.setAccepted();
-    current_gh_ = gh;
-    // EXAMPLE //
+    // Accept/reject goal requests here
+  }
 
-  // Handle preemption here
+  // Called by rtt_action_server_ when a goal is cancelled / preempted
   void cancelCallback(GoalHandle gh) {
-    // EXAMPLE //
-    if(current_gh_ == gh && current_gh_.getGoalStatus().status == actionlib_msgs::GoalStatus::ACTIVE) {
-      current_gh_.setCanceled();
-    }
-    // EXAMPLE //
+    // Handle preemption here
   }
 };
 ```
@@ -153,7 +132,7 @@ some_component_name.actionlib.connect("/some/ros/namespace/my_action")
 
 ## Alternatively, connect an actionlib interface to a provided sub-service:
 
-some_component_name.actionlib.connect(
+some_component_name.actionlib.connectSub(
   "some_prov.ided_service",
   "/some/ros/namespace/my_other_action")
 
