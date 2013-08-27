@@ -11,24 +11,31 @@ ROS parameter server.
 
 The packages in this repository provide:
 
- * [**rtt\_ros**](rtt_ros) ROS package import plugin as well as wrapper scripts
-   and launchfiles for using Orocos with ROS.
- * [**rtt\_rosnode**](rtt_rosnode) Plugin for ROS node instantiation inside an
-   Orocos program.
- * [**rtt\_rosparam**](rtt_rosparam) Plugin for synchronizing ROS parameters
-   with Orocos component properties.
- * [**rtt\_roscomm**](rtt_roscomm) ROS message typekit generation and Orocos
-   plugin for publishing and subscribing to ROS topics as well as calling and
-   responding to ROS services.
- * [**rtt\_rospack**](rtt_rospack) Plugin for locating ROS resources.
- * [**rtt\_actionlib**](rtt_actionlib) RTT-Enabled
-   [actionlib](http://ros.org/wiki/actionlib) action server for
-   providing actions from ROS-integrated RTT components.
- * [**rtt\_ros\_integration**](rtt_ros_integration) Catkin
-   [metapackage](http://ros.org/wiki/catkin/package.xml#Metapackages) for this
-   repository.
+* [**rtt\_ros**](rtt_ros) ROS package import plugin as well as wrapper scripts
+  and launchfiles for using Orocos with ROS.
+* [**rtt\_rosnode**](rtt_rosnode) Plugin for ROS node instantiation inside an
+  Orocos program.
+* [**rtt\_rosparam**](rtt_rosparam) Plugin for synchronizing ROS parameters
+  with Orocos component properties.
+* [**rtt\_roscomm**](rtt_roscomm) ROS message typekit generation and Orocos
+  plugin for publishing and subscribing to ROS topics as well as calling and
+  responding to ROS services.
+* [**rtt\_rospack**](rtt_rospack) Plugin for locating ROS resources.
+* [**rtt\_actionlib**](rtt_actionlib) RTT-Enabled
+  [actionlib](http://ros.org/wiki/actionlib) action server for providing
+  actions from ROS-integrated RTT components.
+* [**rtt\_ros\_integration**](rtt_ros_integration) Catkin
+  [metapackage](http://ros.org/wiki/catkin/package.xml#Metapackages) for this
+  repository.
 
 See each package's README.md file for more information.
+
+The following packages are in the planning stages:
+
+* [**rtt\_rostime**](rtt_rostime) Plugin for basing RTT time off of ROS sim
+  time.
+* [**rtt\_rosops**](rtt_rosops) Plugin for executing Orocos Ops script via ROS
+  service call.
 
 ## Usage
 
