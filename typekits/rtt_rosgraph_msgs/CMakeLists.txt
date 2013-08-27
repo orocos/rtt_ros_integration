@@ -11,3 +11,4 @@ catkin_package(
 include_directories(${catkin_INCLUDE_DIRS})
 ros_generate_rtt_typekit(rosgraph_msgs)
 
+orocos_generate_package()
