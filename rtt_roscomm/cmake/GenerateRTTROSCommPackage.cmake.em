@@ -150,6 +150,7 @@ function(ros_generate_rtt_typekit package)
 
   # Install generated header files (dependent packages might need them)
   install(FILES ${ROSMSGS_GENERATED_BOOST_HEADERS} DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${package}/boost/)
+  install(DIRECTORY "${CATKIN_DEVEL_PREFIX}/include/${package}/typekit/" DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${package}/typekit)
 
 endfunction(ros_generate_rtt_typekit)
 
