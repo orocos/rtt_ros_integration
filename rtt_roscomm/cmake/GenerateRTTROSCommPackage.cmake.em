@@ -150,7 +150,7 @@ macro(ros_generate_rtt_typekit package)
 
   else()
     # Return if nothing to do
-    message(SEND_WARNING "ros_generate_rtt_typekit: Could not find any .msg files in the ${package} package.")
+    message(WARNING "ros_generate_rtt_typekit: Could not find any .msg files in the ${package} package.")
   endif()
 
 endmacro(ros_generate_rtt_typekit)
@@ -214,7 +214,7 @@ macro(ros_generate_rtt_service_proxies package)
 
   else()
     #Return if nothing to do:
-    message(SEND_WARNING "ros_generate_rtt_service_proxies: Could not find any .srv files in the ${package} package.")
+    message(WARNING "ros_generate_rtt_service_proxies: Could not find any .srv files in the ${package} package.")
   endif()
   
 endmacro(ros_generate_rtt_service_proxies)
