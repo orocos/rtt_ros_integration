@@ -14,7 +14,7 @@ endif()
 
 include(AddFileDependencies)
 
-function(ros_generate_rtt_typekit package)
+macro(ros_generate_rtt_typekit package)
   # Check if we're generating code for messages in this package
   if(NOT package STREQUAL PROJECT_NAME)
     find_package(${package})
@@ -152,10 +152,10 @@ function(ros_generate_rtt_typekit package)
   install(FILES ${ROSMSGS_GENERATED_BOOST_HEADERS} DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${package}/boost/)
   install(DIRECTORY "${CATKIN_DEVEL_PREFIX}/include/${package}/typekit/" DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${package}/typekit)
 
-endfunction(ros_generate_rtt_typekit)
+endmacro(ros_generate_rtt_typekit)
 
 
-function(ros_generate_rtt_service_proxies package)
+macro(ros_generate_rtt_service_proxies package)
   # Check if we're generating code for services in this package
   if(NOT package STREQUAL PROJECT_NAME)
     find_package(${package})
@@ -215,7 +215,7 @@ function(ros_generate_rtt_service_proxies package)
   set_directory_properties(PROPERTIES 
     ADDITIONAL_MAKE_CLEAN_FILES "${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp")
   
-endfunction(ros_generate_rtt_service_proxies)
+endmacro(ros_generate_rtt_service_proxies)
 
 
 
