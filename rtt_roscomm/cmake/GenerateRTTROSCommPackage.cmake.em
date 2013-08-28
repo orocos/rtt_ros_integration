@@ -1,6 +1,10 @@
+# 
+# Generate RTT typekits and plugins for using ROS .msg messages and .srv
+# services
+#
+
 cmake_minimum_required(VERSION 2.8.3)
 
-set(ROS_BUILD_TYPE MinSizeRel)
 set(CMAKE_BUILD_TYPE MinSizeRel)
 
 find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling)
