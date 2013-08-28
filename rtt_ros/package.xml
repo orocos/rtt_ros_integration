@@ -28,14 +28,12 @@
   <run_depend>rtt_rosnode</run_depend>
   <run_depend>rtt_rospack</run_depend>
   <run_depend>rtt_rosparam</run_depend>
-  <run_depend>rtt_rostopic</run_depend>
 
   <export>
     <rtt_ros>
       <!--<plugin_depend>rtt_rosnode</plugin_depend>-->
       <!--<plugin_depend>rtt_rospack</plugin_depend>-->
       <!--<plugin_depend>rtt_rosparam</plugin_depend>-->
-      <!--<plugin_depend>rtt_rostopic</plugin_depend>-->
       <!--<plugin_depend>rtt_std_msgs</plugin_depend>-->
       <!--<plugin_depend>rtt_rosgraph_msgs</plugin_depend>-->
     </rtt_ros>
