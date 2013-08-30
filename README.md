@@ -104,7 +104,11 @@ Orocos target- and package-definition macros like `orocos_executable()`,
 Also, while the `orocos_find_package()` macro can be used to find both
 Orocos-based packages and normal pkg-config-based packages, you should only use
 it for Orocos-based packages. You should use the normal CMake and Catkin
-mechanisms for all non-Orocos dependencies.
+mechanisms for all non-Orocos dependencies. As long as the names of orocos
+packages are listed as `<build_depend>` dependencies in your package.xml files,
+their build flags will automatically be made available when buildinf your
+package. Listing them in the package.xml file will also enforce proper build
+ordering.
 
 To build components, libraries, typekits, and other Orocos plugins, use the
 standard `orocos_*()` CMake macros. Then to make these available to other
@@ -119,9 +123,7 @@ See the Orocos RTT documentation for more info on these macros.
 
 **NOTE:** You still need to call `find_package(catkin ...)` and
 `catkin_package(...)` for non-orocos dependencies and targets, but you shuold
-use the `orocos_*()` CMake macros for orocos code. Also, you still need to list
-the names of orocos packages as `<build_depend>` dependencies in your
-package.xml files to enforce peoper build ordering.
+use the `orocos_*()` CMake macros for Orocos-based code.
 
 ### Dynamically Loading ROS-Based Orocos Plugins
 
