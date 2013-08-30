@@ -81,7 +81,7 @@ CMake/PkgConfig-based package description system meta-buildsystem which uses
 files similar to rosbuild manifest.xml files. 
 
 This is primarily because Orocos builds its libraries with respect to a given
-`OROCOS_TARGET` (gnulinux/xenomai/macosx/etc) so that you can build multiple
+`$OROCOS_TARGET` (gnulinux/xenomai/macosx/etc) so that you can build multiple
 versions of the same library in place without having to rebuild everything
 whenever you change targets.
 
