@@ -89,6 +89,7 @@ So in order to build Orocos components in a rosbuild or Catkin package, you need
 to first include the RTT use-file:
 
 ```cmake
+find_package(OROCOS-RTT REQUIRED ...)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 ```
 
