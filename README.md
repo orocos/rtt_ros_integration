@@ -76,7 +76,7 @@ rtt\_ros\_integration tools.
 
 While the ROS community has standardized on the rosbuild (ROS Hydro and earlier)
 and Catkin (ROS Groovy and later) buildsystems, Orocos has its own
-CMake/PkgConfig-based package description system meta-buildsystem which uses
+CMake/PkgConfig-based package description system which uses
 [Autoproj](http://rock-robotics.org/stable/documentation/autoproj/) manifest.xml
 files similar to rosbuild manifest.xml files. 
 
