@@ -119,7 +119,9 @@ package at the end of your CMakeLists.txt file:
 orocos_generate_package(DEPENDS some-other-oro-pkg)
 ```
 
-See the Orocos RTT documentation for more info on these macros.
+See the Orocos RTT documentation (or [cheat
+sheet](http://www.orocos.org/stable/documentation/rtt/v2.x/doc-xml/rtt_cheat_sheet.pdf))
+for more info on these macros.
 
 **NOTE:** You still need to call `find_package(catkin ...)` and
 `catkin_package(...)` for non-orocos dependencies and targets, but you shuold
