@@ -102,3 +102,7 @@ This package also provides catkin env-hooks which will get executed when a user
 sources the catkin-generated setup.sh scripts. These hooks declare Orocos
 environment variables needed for setting the system configuration and finding
 Orocos resources.
+
+* `RTT_COMPONENT_PATH`: Set to equal `LD_LIBRARY_PATH`
+* `OROCOS_TARGET`: Set to what `OROCOS_TARGET` was set to when building this
+  package.

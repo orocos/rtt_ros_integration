@@ -49,16 +49,76 @@ The [Orocos Toolchain](http://www.orocos.org/orocos/toolchain) can be built from
 source in a Catkin workspace using `catkin_build_isolated` since Orocos packages
 now contain Catkin `package.xml` files. 
 
+First, create an isolated underlay for building plain CMake-based packages like
+Orocos:
 ```shell
+export OROCOS_TARGET=gnulinux
 mkdir -p ~/ws/underlay_isolated/src/orocos
-mkdir -p ~/ws/underlay/src
-cd ~/ws/underlay_isolated/src/orocos
-git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git
 cd ~/ws/underlay_isolated
+git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git src/orocos/orocos_toolchain
 catkin_make_isolated --install
+source install/setup.sh
 ```
 
-### Using ROS-Based Orocos Plugins
+Then, in the same shell, create an underlay for building Catkin-based packages:
+```shell
+mkdir -p ~/ws/underlay/src
+cd ~/ws/underlay
+git clone git@github.com:jhu_lcsr_forks/rtt_ros_integration.git src/rtt_ros_integration
+catkin_make
+source devel/setup.sh
+```
+
+At this point you can create Catkin or rosbuild packages which use the
+rtt\_ros\_integration tools.
+
+### Building ROS-Base Orocos Components
+
+While the ROS community has standardized on the rosbuild (ROS Hydro and earlier)
+and Catkin (ROS Groovy and later) buildsystems, Orocos has its own
+CMake/PkgConfig-based package description system meta-buildsystem which uses
+[Autoproj](http://rock-robotics.org/stable/documentation/autoproj/) manifest.xml
+files similar to rosbuild manifest.xml files. 
+
+This is primarily because Orocos builds its libraries with respect to a given
+`OROCOS_TARGET` (gnulinux/xenomai/macosx/etc) so that you can build multiple
+versions of the same library in place without having to rebuild everything
+whenever you change targets.
+
+So in order to build Orocos components in a rosbuild or Catkin package, you need
+to first include the RTT use-file:
+
+```cmake
+include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
+```
+
+When this file is included, it both defines and executes several macros.
+Specifically, it parses the package.xml or manifest.xml of the including
+package, and executes `orocos_find_package(pkg-name)` on all build dependencies.
+This populates several variables includeing, but not limited to
+`${OROCOS_USE_INCLUDE_DIRS}` and  `${OROCOS_USE_LIBRARIES}` which are used by
+Orocos target- and package-definition macros like `orocos_executable()`,
+`orocos_library()` and `orocos_generate_package()`.
+
+The Orocos package-locating macro `orocos_find_package(pkg-name)` will find both
+Orocos-based packages and normal pkg-config-based packages. See the Orocos RTT
+documentation for more info.
+
+To build components, libraries, typekits, and other Orocos plugins, use the
+standard `orocos_*()` CMake macros. Then to make these available to other
+packages at build-time, declare an Orocos package at the end of your
+CMakeLists.txt file:
+
+```cmake
+orocos_generate_package(DEPENDS some-other-oro-pkg)
+```
+
+**NOTE:** You still need to call `find_package(catkin ...)` and `catkin_package(...)` for
+non-orocos dependencies and targets, but you shuold use the `orocos_*()` CMake
+macros for orocos code. Also, you still need to put the names of orocos packages
+in your package.xml files to enforce peoper build ordering.
+
+### Dynamically Loading ROS-Based Orocos Plugins
 
 Orocos plugins (components, typekits, plugins, etc.) are now built into the
 Catkin develspace lib directory.  Specificallly, they are built under
