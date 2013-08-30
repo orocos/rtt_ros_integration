@@ -72,7 +72,7 @@ source devel/setup.sh
 At this point you can create Catkin or rosbuild packages which use the
 rtt\_ros\_integration tools.
 
-### Building ROS-Base Orocos Components
+### Building ROS-Based Orocos Components
 
 While the ROS community has standardized on the rosbuild (ROS Hydro and earlier)
 and Catkin (ROS Groovy and later) buildsystems, Orocos has its own
