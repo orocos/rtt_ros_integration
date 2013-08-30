@@ -18,22 +18,53 @@ endif()
 
 include(AddFileDependencies)
 
+if(ORO_USE_ROSBUILD)
+  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${PROJECT_SOURCE_DIR}/include/orocos")
+  set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/src")
+  set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION)
+elseif(ORO_USE_CATKIN)
+  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${CATKIN_DEVEL_PREFIX}/include/orocos")
+  set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/src")
+  set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION "${CATKIN_GLOBAL_INCLUDE_DESTINATION}/orocos")
+else()
+  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/include/orocos")
+  set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/src")
+  set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION "include/orocos")
+endif()
+
 macro(ros_generate_rtt_typekit package)
   # Check if we're generating code for messages in this package
   if(NOT package STREQUAL PROJECT_NAME)
-    find_package(${package})
+    find_package(${package} QUIET)
   endif()
 
   find_package(genmsg)
   find_package(rtt_roscomm)
 
-  # Get all .msg files
-  if(genmsg_VERSION VERSION_GREATER 0.4.19)
-    set(MSGS ${${package}_MESSAGE_FILES})
-  else()
-    message(SEND_ERROR "genmsg version must be 0.4.19 or greater to generate RTT typekits for ROS messages")
+  if(${package}_FOUND)
+    # Get all .msg files
+    if(genmsg_VERSION VERSION_GREATER 0.4.19)
+      set(MSGS ${${package}_MESSAGE_FILES})
+    else()
+      message(SEND_ERROR "genmsg version must be 0.4.19 or greater to generate RTT typekits for ROS messages")
+    endif()
+
+  # try to find rosbuild-style message package
+  elseif(ROSBUILD_init_called)
+    rosbuild_find_ros_package(${package})
+    if(DEFINED ${package}_PACKAGE_PATH)
+      set(${package}_FOUND TRUE)
+      file(GLOB MSGS "${${package}_PACKAGE_PATH}/msg/*.msg")
+      set(${package}_EXPORTED_TARGETS)
+    endif()
   endif()
-  
+
+  # message package not found
+  if(NOT ${package}_FOUND)
+    message(SEND_ERROR "Package ${package} not found. Will not generate RTT typekit.")
+    set(MSGS)
+  endif()
+
   if( NOT "${MSGS}" STREQUAL "" )
 
     # Set the boost header generation script path
@@ -78,7 +109,7 @@ macro(ros_generate_rtt_typekit package)
       set(ROSMSGTYPESHEADERS "${ROSMSGTYPESHEADERS}#include \"${ROSMSGNAME}.h\"\n")
 
       # Necessary for create_boost_header.py command below
-      set(_ROSMSG_GENERATED_BOOST_HEADER  "${CATKIN_DEVEL_PREFIX}/include/${ROSMSGBOOSTHEADER}")
+      set(_ROSMSG_GENERATED_BOOST_HEADER  "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${ROSMSGBOOSTHEADER}")
       list(APPEND ROSMSGS_GENERATED_BOOST_HEADERS ${_ROSMSG_GENERATED_BOOST_HEADER})
 
       add_custom_command(
@@ -92,10 +123,10 @@ macro(ros_generate_rtt_typekit package)
       
       # TypeInfo object
       set(_template_types_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/src/orocos/types")
-      set(_template_types_dst_dir                 "${CMAKE_CURRENT_BINARY_DIR}/src/orocos/types")
+      set(_template_types_dst_dir "${rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY}/orocos/types")
 
       set(_template_typekit_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/include/PKG_NAME/typekit")
-      set(_template_typekit_dst_dir                    "${CATKIN_DEVEL_PREFIX}/include/${package}/typekit")
+      set(_template_typekit_dst_dir "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}/typekit")
 
       configure_file( 
         ${_template_types_src_dir}/ros_msg_typekit_plugin.cpp.in 
@@ -134,14 +165,16 @@ macro(ros_generate_rtt_typekit package)
       ${_template_typekit_dst_dir}/Types.h @@ONLY )
     
     # Targets
-    include_directories(${CATKIN_DEVEL_PREFIX}/include ${catkin_INCLUDE_DIRS})
+    include_directories(${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY} ${catkin_INCLUDE_DIRS})
 
     orocos_typekit(         rtt-${package}-typekit ${_template_types_dst_dir}/ros_${package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
     orocos_typekit(         rtt-${package}-ros-transport ${_template_types_dst_dir}/ros_${package}_transport.cpp )
     target_link_libraries(  rtt-${package}-typekit ${catkin_LIBRARIES})
     target_link_libraries(  rtt-${package}-ros-transport ${catkin_LIBRARIES})
-    add_dependencies(       rtt-${package}-typekit ${${package}_EXPORTED_TARGETS})
-    add_dependencies(       rtt-${package}-ros-transport ${${package}_EXPORTED_TARGETS})
+    if(DEFINED ${package}_EXPORTED_TARGETS)
+      add_dependencies(       rtt-${package}-typekit ${${package}_EXPORTED_TARGETS})
+      add_dependencies(       rtt-${package}-ros-transport ${${package}_EXPORTED_TARGETS})
+    endif()
     add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
     add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
 
@@ -149,8 +182,11 @@ macro(ros_generate_rtt_typekit package)
       ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${CATKIN_DEVEL_PREFIX}/include/${package}/boost")
 
     # Install generated header files (dependent packages might need them)
-    install(FILES ${ROSMSGS_GENERATED_BOOST_HEADERS} DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${package}/boost/)
-    install(DIRECTORY "${CATKIN_DEVEL_PREFIX}/include/${package}/typekit/" DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/${package}/typekit)
+    if(DEFINED rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION)
+      # install(FILES ${ROSMSGS_GENERATED_BOOST_HEADERS} DESTINATION ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}/${package}/boost/)
+      # install(DIRECTORY "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}/typekit" DESTINATION ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}/${package})
+      install(DIRECTORY "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}" DESTINATION "${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}")
+    endif()
 
   else()
     # Return if nothing to do
