@@ -87,6 +87,7 @@ public:
 
       // Add all rtt_ros/plugin_depend dependencies to package names
       std::vector<std::string> deps_to_import;
+      std::vector<std::string> search_paths;
       rpack.setQuiet(true);
 
       // Read the package.xml for this package
@@ -114,57 +115,84 @@ public:
 
         // Construct the package.xml path
         fs::path package_xml_path = fs::path(dep_path) / "package.xml";
+        bool is_rosbuild_package = false;
 
-        // Read in package.xml
-        if(boost::filesystem::is_regular_file( package_xml_path.string() ) ) {
-          xmlInitParser();
+        // Check if package.xml file exists
+        if(!boost::filesystem::is_regular_file( package_xml_path.string() ) ) {
 
-          // libxml structures
-          xmlDocPtr package_doc;
-          xmlXPathContextPtr xpath_ctx; 
-          xmlXPathObjectPtr xpath_obj; 
+          // Fall back to manifest.xml for rosbuild packages
+          package_xml_path = fs::path(dep_path) / "manifest.xml";
+          is_rosbuild_package = true;
 
-          // Load package.xml
-          package_doc = xmlParseFile(package_xml_path.string().c_str());
-          xpath_ctx = xmlXPathNewContext(package_doc);
+          if(!boost::filesystem::is_regular_file( package_xml_path.string() ) ) {
+            RTT::log(RTT::Error) << "No package.xml or manifest.xml file for ROS package \""<< dep_name << "\" found at "<<package_xml_path.branch_path() <<RTT::endlog();
+            continue;
+          }
+        }
 
-          // Get the text of the rtt_ros <plugin_depend>s
-          xpath_obj = xmlXPathEvalExpression(rtt_plugin_depend_xpath, xpath_ctx);
+        // Add package path to the list of search paths
+        if (is_rosbuild_package) {
+          search_paths.push_back((fs::path(dep_path) / "lib" / "orocos").string());
+        }
 
-          // Iterate through the nodes
-          if(xmlXPathNodeSetIsEmpty(xpath_obj->nodesetval)) {
-            RTT::log(RTT::Debug) << "ROS package \""<< dep_name << "\" has no RTT plugin dependencies." <<RTT::endlog();
-          } else {
-            RTT::log(RTT::Debug) << "ROS package \""<< dep_name << "\" has "<<xpath_obj->nodesetval->nodeNr<<" RTT plugin dependencies." <<RTT::endlog();
+        // Read in package.xml/manifest.xml
+        xmlInitParser();
 
-            for(int i=0; i < xpath_obj->nodesetval->nodeNr; i++) {
-              if(xpath_obj->nodesetval->nodeTab[i]) {
-                std::ostringstream oss;
-                oss << xmlNodeGetContent(xpath_obj->nodesetval->nodeTab[i]);
-                RTT::log(RTT::Debug) << "Found dependency \""<< oss.str() << "\"" <<RTT::endlog();
-                dep_names.push(oss.str());
+        // libxml structures
+        xmlDocPtr package_doc;
+        xmlXPathContextPtr xpath_ctx;
+        xmlXPathObjectPtr xpath_obj;
 
-                // Add the dep to the list of deps to import
-                deps_to_import.push_back(oss.str());
-              }
+        // Load package.xml
+        package_doc = xmlParseFile(package_xml_path.string().c_str());
+        xpath_ctx = xmlXPathNewContext(package_doc);
+
+        // Get the text of the rtt_ros <plugin_depend>s
+        xpath_obj = xmlXPathEvalExpression(rtt_plugin_depend_xpath, xpath_ctx);
+
+        // Iterate through the nodes
+        if(xmlXPathNodeSetIsEmpty(xpath_obj->nodesetval)) {
+          RTT::log(RTT::Debug) << "ROS package \""<< dep_name << "\" has no RTT plugin dependencies." <<RTT::endlog();
+        } else {
+          RTT::log(RTT::Debug) << "ROS package \""<< dep_name << "\" has "<<xpath_obj->nodesetval->nodeNr<<" RTT plugin dependencies." <<RTT::endlog();
+
+          for(int i=0; i < xpath_obj->nodesetval->nodeNr; i++) {
+            if(xpath_obj->nodesetval->nodeTab[i]) {
+              std::ostringstream oss;
+              oss << xmlNodeGetContent(xpath_obj->nodesetval->nodeTab[i]);
+              RTT::log(RTT::Debug) << "Found dependency \""<< oss.str() << "\"" <<RTT::endlog();
+              dep_names.push(oss.str());
+
+              // Add the dep to the list of deps to import
+              deps_to_import.push_back(oss.str());
             }
           }
-
-          xmlXPathFreeObject(xpath_obj);
-          xmlXPathFreeContext(xpath_ctx); 
-          xmlFreeDoc(package_doc); 
-          xmlCleanupParser();
-        } else {
-          RTT::log(RTT::Error) << "package.xml file for ROS package \""<< dep_name << "\" not found at "<<package_xml_path <<RTT::endlog();
         }
+
+        xmlXPathFreeObject(xpath_obj);
+        xmlXPathFreeContext(xpath_ctx);
+        xmlFreeDoc(package_doc);
+        xmlCleanupParser();
+      }
+
+      // Build path list by prepending paths from search_paths list to the RTT component path in reverse order without duplicates
+      std::set<std::string> search_paths_seen;
+      std::string path_list = loader->getComponentPath();
+      for(std::vector<std::string>::reverse_iterator it = search_paths.rbegin();
+          it != search_paths.rend();
+          ++it)
+      {
+        if (search_paths_seen.count(*it)) continue;
+        path_list = *it + ":" + path_list;
+        search_paths_seen.insert(*it);
       }
 
       RTT::log(RTT::Debug) << "Attempting to load RTT plugins from "<<deps_to_import.size()<<" packages..." << RTT::endlog();
 
-      // Import each package dependency
-      for(std::vector<std::string>::reverse_iterator it = deps_to_import.rbegin(); 
-          it != deps_to_import.rend(); 
-          ++it) 
+      // Import each package dependency and the package itself (in deps_to_import[0])
+      for(std::vector<std::string>::reverse_iterator it = deps_to_import.rbegin();
+          it != deps_to_import.rend();
+          ++it)
       {
         // Check if it's already been imported
         if(*it == "rtt_ros" || loader->isImported(*it)) {
@@ -173,24 +201,18 @@ public:
         }
 
         // Import the dependency
-        if(loader->import(*it,"")) {
+        RTT::log(RTT::Debug) << "Importing Orocos components from ROS package '"<<*it<<"'" << RTT::endlog();
+        if(loader->import(*it, path_list)) {
           found_packages = true;
         } else {
-          RTT::log(RTT::Debug) << "Could not load ROS package dependency \"" << *it << "\" of ROS package \"" << package << "\"" << RTT::endlog();
+          if (*it != package) {
+            RTT::log(RTT::Debug) << "Could not load ROS package dependency \"" << *it << "\" of ROS package \"" << package << "\"" << RTT::endlog();
+          } else {
+            RTT::log(RTT::Debug) << "Could not import any plugins from ROS package \"" << package << "\"" << RTT::endlog();
+          }
         }
       }
 
-      // Now that all deps are done, import the package itself:
-      if(package == "rtt_ros" || loader->isImported(package)) {
-          RTT::log(RTT::Debug) << "Package '"<< package <<"' already imported." << RTT::endlog();
-      } else {
-        RTT::log(RTT::Debug) << "Importing Orocos components from ROS package '"<<package<<"'" << RTT::endlog();
-        if(loader->import(package,"")) {
-          found_packages = true;
-        } else {
-          RTT::log(RTT::Debug) << "Could not import any plugins from ROS package \"" << package << "\"" << RTT::endlog();
-        }
-      }
     } catch(std::string arg) {
       RTT::log(RTT::Debug) << "While processing the dependencies of " << package << ": not a ros package: " << arg << RTT::endlog();
     }
