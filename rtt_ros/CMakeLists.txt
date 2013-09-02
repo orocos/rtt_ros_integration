@@ -8,13 +8,13 @@ catkin_package(
   DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp)
 
-# This adds orocos environment variables to the catkin setup.sh
-catkin_add_env_hooks(10.orocos SHELLS bash DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks)
-
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 find_package(OROCOS-RTT REQUIRED rtt-marshalling)
 find_package(LibXml2 REQUIRED)
+
+# This adds orocos environment variables to the catkin setup.sh
+catkin_add_env_hooks(10.orocos SHELLS sh DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks)
 
 # Defines the orocos_* cmake macros. See that file for additional
 # documentation.
