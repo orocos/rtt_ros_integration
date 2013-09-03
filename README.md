@@ -36,6 +36,9 @@ The following packages are in the planning stages:
   time.
 * [**rtt\_rosops**](rtt_rosops) Plugin for executing Orocos Ops script via ROS
   service call.
+* [**rtt\_dynamic_reconfigure**](rtt_dynamic_reconfigure) Plugin for running
+  a [dynamic\_reconfigure](http://ros.org/wiki/dynamic_reconfigure) server from
+  an RTT component.
 
 ## Usage
 
