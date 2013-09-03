@@ -131,37 +131,31 @@ use the `orocos_*()` CMake macros for Orocos-based code.
 
 Orocos plugins (components, typekits, plugins, etc.) are now built into the
 Catkin develspace lib directory.  Specificallly, they are built under
-`devel/lib/$OROCOS_TARGET/PKG_NAME/`. These directories should be on the default
-Oroco search path as long as `devel/lib` is in the `$RTT_COMPONENT_PATH` (which
-happens automatically when using the launchfiles in **rtt\_ros**).
+`devel/lib/orocos/$OROCOS_TARGET/PKG_NAME/`. These directories should be on the 
+default Orocos search path as long as `devel/lib/orocos` is in the `$RTT_COMPONENT_PATH`
+(which happens automatically through the env-hooks supplied by **rtt\_ros**).
 
-In order to import Orocos plugins built in a ROS package, there are two
-options:
+In order to import Orocos plugins built in a ROS package and all of that plugin's
+dependencies, no matter where it is, you can use the `ros.import()` service:
 
-  1. _Import a **single** package_:
+```python
+import("rtt_ros")
+ros.import("my_pkg_name")
+```
 
-    ```python
-    import("my_pkg_name")
-    ```
-
-  2. _Import package **and** it's rtt plugin dependencies_: 
-
-    ```python
-    import("rtt_ros")
-    ros.import("my_pkg_name")
-    ```
-
-In **Option 1**, a single ROS package with orocos plugins can still be imported
-with the standard deployer `import()` function. However, Orocos RTT 2.7 no
-longer parses ROS package metadata in order to import all of a plugin's
-dependencies, so only the named package will be imported.
-
-In **Option 2**, first the `rtt_ros` package is imported using the normal
-mechanism. This then loads the `ros` service, which provides a ROS import
+In this example, first the `rtt_ros` package is imported using the normal
+mechanism. This loads the `ros` service, which provides a ROS import
 function, `ros.import()`, which will parse ROS package metadata and import the
 Orocos plugins from the named package _and_ all packages listed in
 `<rtt_ros><plugin_depend>PKG_NAME</plugin_depend></rtt_ros>` tags in the
 `<export>` section of the package.xml files.
+
+A single ROS package with orocos plugins can still be imported
+with the standard deployer `import()` function. However, this will only work
+if the named package is built in the same workspace as `rtt_ros` or a 
+workspace which `rtt_ros` extends. Additionally, Orocos RTT 2.7 no
+longer parses ROS package metadata in order to import all of a plugin's
+dependencies, so only the named package will be imported.
 
 For more information on specifying RTT plugin dependencies in ROS packages, see
 the README in the [rtt_ros](rtt_ros) package.
