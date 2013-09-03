@@ -5,8 +5,8 @@
   <arg name="DEPLOYER_ARGS" default=""/>
   <!-- Orocos target (gnulinux, xenomai, etc) -->
   <arg name="OROCOS_TARGET" default="$(optenv OROCOS_TARGET)"/>
-  <!-- Path to look for dynamically-loaded plugins and components -->
-  <arg name="RTT_COMPONENT_PATH" default="$(env LD_LIBRARY_PATH)"/>
+  <!-- Path to look for dynamically-loaded plugins and components (something like /lib/orocos) -->
+  <arg name="RTT_COMPONENT_PATH" default="$(env RTT_COMPONENT_PATH)"/>
 
   <!-- Set DEBUG to true to run in GDB (don't forget to build in Debug mode) -->
   <arg name="DEBUG" default="false"/>
