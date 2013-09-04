@@ -1,3 +1,2 @@
 export OROCOS_TARGET=@OROCOS_TARGET@
-export RTT_COMPONENT_PATH=`echo $LD_LIBRARY_PATH | sed 's/\/lib[:$]/\/lib\/orocos:/g'`
-
+export RTT_COMPONENT_PATH=`echo $LD_LIBRARY_PATH | sed 's/\/lib:/\/lib\/orocos:/g' | sed 's/\/lib$/\/lib\/orocos/'`
