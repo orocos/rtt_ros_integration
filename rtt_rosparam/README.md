@@ -12,6 +12,10 @@ all properties of a component simultaneously. The operations map directly onto
 operations in the roscpp library, except they only store the retrieved values in
 RTT properties of the given component.
 
+Using this service requires that the RTT properties of a given component match
+the names of their associated ROS parameters, modulo the namespace resolution
+policy (see below).
+
 ## Usage
 
 ### Service Interface
@@ -49,6 +53,25 @@ RTT properties of the given component.
 * **setPrivate(name)**
 * **setComponentPrivate(name)**
 
+### Scripting Interface
+
+```cpp
+// Import packages
+import("rtt_ros");
+ros.import("rtt_rosparam");
+
+// Create your components ...
+laodService("my_component","rosparam");
+
+// Try to get all parameters from the component namespace "~my_component/..."
+my_component.rosparam.getAll();
+
+// Try to get "robot_description" from the absolute namespace "/robot_description"
+my_component.rosparam.getAbsolute("robot_description");
+// Alternatively:
+my_component.rosparam.get("robot_description",my_component.rosparam.ABSOLUTE);
+```
+
 ### C++ Interface
 
 If your component is designed to be used with ROS parameters, you can also
@@ -66,6 +89,7 @@ like the following:
 
 class MyComponent : public RTT::TaskContext {
   private:
+    // Storage for RTT properties
     std::string robot_description_;
     double publish_period_;
 
