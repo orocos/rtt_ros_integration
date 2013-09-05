@@ -79,7 +79,20 @@ private:
 };
 
 template<class T>
-bool castable(const RTT::base::PropertyBase *prop) {
+bool castable(const RTT::base::PropertyBase *prop);
+template<class T>
+XmlRpc::XmlRpcValue rttPropertyToXmlParam(const T &prop);
+template<>
+XmlRpc::XmlRpcValue rttPropertyToXmlParam<float>(const float &prop);
+template<>
+XmlRpc::XmlRpcValue rttPropertyToXmlParam<RTT::PropertyBag>(const RTT::PropertyBag &bag);
+template<class T>
+XmlRpc::XmlRpcValue rttPropertyToXmlParam(const std::vector<T> &vec);
+XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(const RTT::base::PropertyBase *prop);
+
+template<class T>
+bool castable(const RTT::base::PropertyBase *prop) 
+{
   return dynamic_cast<const Property<T>*>(prop);
 }
 
@@ -93,6 +106,26 @@ template<>
 XmlRpc::XmlRpcValue rttPropertyToXmlParam<float>(const float &prop)
 {
   return XmlRpc::XmlRpcValue(static_cast<const double &>(prop));
+}
+
+template<>
+XmlRpc::XmlRpcValue rttPropertyToXmlParam<RTT::PropertyBag>(const RTT::PropertyBag &bag)
+{
+  // Make the xml value a struct
+  XmlRpc::XmlRpcValue xml_struct;
+  const XmlRpc::XmlRpcValue::ValueStruct &xml_map = (const XmlRpc::XmlRpcValue::ValueStruct &)(xml_struct);
+
+  // Get the properties
+  const RTT::PropertyBag::Properties &properties = bag.getProperties();
+
+  for(RTT::PropertyBag::Properties::const_iterator it = properties.begin();
+      it != properties.end();
+      ++it)
+  {
+    xml_struct[(*it)->getName()] = rttPropertyBaseToXmlParam(*it);
+  }
+
+  return xml_struct;
 }
 
 template<class T>
@@ -130,6 +163,8 @@ XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(const RTT::base::PropertyBase *pro
   RETURN_RTT_PROPERTY_CONTAINER_TO_XML_PARAM(std::vector<int>, int, prop);
   RETURN_RTT_PROPERTY_CONTAINER_TO_XML_PARAM(std::vector<bool>, bool, prop);
 
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(RTT::PropertyBag,prop);
+
   // Add more types here //
 
   return XmlRpc::XmlRpcValue();
@@ -144,19 +179,27 @@ bool ROSParamService::setParam(const std::string &name)
   return true;
 }
 
+// Declarations
+template <class T>
+bool xmlParamToProp(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<T>* prop);
+template <class T>
+bool xmlParamToProp(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<std::vector<T> >* prop);
+template <> 
+bool xmlParamToProp<RTT::PropertyBag>(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<RTT::PropertyBag>* prop);
+bool xmlParamToProp( const XmlRpc::XmlRpcValue &xml_value, RTT::base::PropertyBase* prop_base);
 
 template <class T>
 bool xmlParamToProp(
     const XmlRpc::XmlRpcValue &xml_value,
-    RTT::Property<T>* prop_base)
+    RTT::Property<T>* prop)
 {
   // Check if the property value is the requested type T
-  if(!prop_base) {
+  if(!prop) {
     return false;
   }
 
   // Set the value
-  prop_base->set((const T&)xml_value);
+  prop->set((const T&)xml_value);
 
   return true;
 }
@@ -164,10 +207,10 @@ bool xmlParamToProp(
 template <class T>
 bool xmlParamToProp(
     const XmlRpc::XmlRpcValue &xml_value,
-    RTT::Property<std::vector<T> >* prop_base)
+    RTT::Property<std::vector<T> >* prop)
 {
   // Check if the property value is the requested type T
-  if(!prop_base) {
+  if(!prop) {
     return false;
   }
 
@@ -176,8 +219,8 @@ bool xmlParamToProp(
     return false;
   }
 
-  // Copy the data in
-  std::vector<T> &vec = prop_base->value();
+  // Copy the data into the vector property
+  std::vector<T> &vec = prop->value();
   vec.resize(xml_value.size());
   for(size_t i=0; i<vec.size(); i++) {
     vec[i] = (const T&)xml_value[i];
@@ -186,24 +229,38 @@ bool xmlParamToProp(
   return true;
 }
 
-
-bool ROSParamService::getParam(const std::string &name)
+template <>
+bool xmlParamToProp<RTT::PropertyBag>(
+    const XmlRpc::XmlRpcValue &xml_value,
+    RTT::Property<RTT::PropertyBag>* prop)
 {
-  // Get the parameter
-  XmlRpc::XmlRpcValue xml_value;
-  if(!ros::param::get(name, xml_value)) {
-    RTT::log(RTT::Debug) << "ROS Parameter \"" << name << "\" not found on the parameter server!" << RTT::endlog();
+  // Check if the property value is the requested type T
+  if(!prop) {
     return false;
   }
 
-  // Try to get the property if it exists
-  RTT::base::PropertyBase *prop_base = this->getOwner()->getProperty(name);
-
-  if(!prop_base) {
-    RTT::log(RTT::Debug) << "RTT component does not have a property named \"" << name << "\"" << RTT::endlog();
+  // Make sure it's an array 
+  if(xml_value.getType() != XmlRpc::XmlRpcValue::TypeStruct) {
     return false;
   }
 
+  bool success = true;
+  typedef const XmlRpc::XmlRpcValue::ValueStruct & ConstStruct;
+  for(XmlRpc::XmlRpcValue::ValueStruct::const_iterator it = ((ConstStruct)xml_value).begin();
+      it != ((ConstStruct)xml_value).end();
+      ++it)
+  {
+    RTT::base::PropertyBase *sub_prop_base = prop->value().getProperty(it->first);
+    success &= xmlParamToProp(it->second, sub_prop_base);
+  }
+
+  return success;
+}
+
+bool xmlParamToProp(
+    const XmlRpc::XmlRpcValue &xml_value,
+    RTT::base::PropertyBase* prop_base)
+{
   // Switch based on the type of XmlRpcValue 
   switch(xml_value.getType()) {
     case XmlRpc::XmlRpcValue::TypeString:
@@ -226,14 +283,35 @@ bool ROSParamService::getParam(const std::string &name)
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<float> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<int> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<bool> >*>(prop_base));
-    default:
-      RTT::log(RTT::Debug) << "Property \"" << name << "\" not found on the parameter server!" << RTT::endlog();
-      return false;
+    case XmlRpc::XmlRpcValue::TypeStruct:
+      return
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<RTT::PropertyBag>*>(prop_base));
   };
 
-  RTT::log(RTT::Debug) << "No appropriate conversion for property \"" << name << "\"" << RTT::endlog();
+  RTT::log(RTT::Debug) << "No appropriate conversion for property \"" << prop_base->getName() << "\"" << RTT::endlog();
 
   return false;
+}
+
+bool ROSParamService::getParam(const std::string &name)
+{
+  // Get the parameter
+  XmlRpc::XmlRpcValue xml_value;
+  if(!ros::param::get(name, xml_value)) {
+    RTT::log(RTT::Debug) << "ROS Parameter \"" << name << "\" not found on the parameter server!" << RTT::endlog();
+    return false;
+  }
+
+  // Try to get the property if it exists
+  RTT::base::PropertyBase *prop_base = this->getOwner()->getProperty(name);
+
+  if(!prop_base) {
+    RTT::log(RTT::Debug) << "RTT component does not have a property named \"" << name << "\"" << RTT::endlog();
+    return false;
+  }
+
+  // Deal with the xml value
+  return xmlParamToProp(xml_value, prop_base);
 }
 void ROSParamService::setNamespace(const std::string &ns)
 {
