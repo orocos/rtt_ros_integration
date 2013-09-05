@@ -25,6 +25,11 @@ public:
   {
     this->doc("RTT Service for synchronizing ROS parameters with the properties of a corresponding RTT component");
 
+    this->addConstant("RELATIVE",RELATIVE);
+    this->addConstant("ABSOLUTE",ABSOLUTE);
+    this->addConstant("PRIVATE",PRIVATE);
+    this->addConstant("COMPONENT",COMPONENT);
+
     this->addOperation("getAll", &ROSParamService::getParams, this) 
       .doc("Gets all properties of this component from the ROS param server relative to the component namespace.");
 
