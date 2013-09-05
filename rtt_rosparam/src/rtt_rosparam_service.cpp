@@ -1,10 +1,8 @@
 #include <rtt/RTT.hpp>
 #include <rtt/Property.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
-#include <rtt/marsh/PropertyBagIntrospector.hpp>
 
 #include <ros/ros.h>
-#include <stack>
 
 using namespace RTT;
 using namespace std;
@@ -75,6 +73,7 @@ public:
   }
 private:
 
+  //! Resolve a parameter name based on the given \ref ResolutionPolicy
   const std::string resolvedName(
     const std::string &param_name, 
     const ROSParamService::ResolutionPolicy policy);
@@ -120,16 +119,22 @@ const std::string ROSParamService::resolvedName(
 
 
 
+//! Determine if the RTT property can be casted into an RTT::Property<T>
 template<class T>
 bool castable(const RTT::base::PropertyBase *prop);
+//! Convert a value to an XmlRpc value
 template<class T>
 XmlRpc::XmlRpcValue rttPropertyToXmlParam(const T &prop);
+//! Convert a float value to an XmlRpc double value
 template<>
 XmlRpc::XmlRpcValue rttPropertyToXmlParam<float>(const float &prop);
+//! Convert a PropertyBag to an XmlRpc struct value
 template<>
 XmlRpc::XmlRpcValue rttPropertyToXmlParam<RTT::PropertyBag>(const RTT::PropertyBag &bag);
+//! Convert a std::vector<T> to an XmlRpc array value
 template<class T>
 XmlRpc::XmlRpcValue rttPropertyToXmlParam(const std::vector<T> &vec);
+//! Convert an abstract RTT PropertyBase to an XmlRpc value
 XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(const RTT::base::PropertyBase *prop);
 
 template<class T>
@@ -234,12 +239,16 @@ bool ROSParamService::setParams()
 }
 
 // Declarations
+//! Convert an XmlRpc value into an RTT property
 template <class T>
 bool xmlParamToProp(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<T>* prop);
+//! Convert an XmlRpc array value into an RTT std::vector property
 template <class T>
 bool xmlParamToProp(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<std::vector<T> >* prop);
+//! Convert an XmlRpc structure value into an RTT PropertyBag property
 template <> 
 bool xmlParamToProp<RTT::PropertyBag>(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<RTT::PropertyBag>* prop);
+//! Convert an XmlRpc structure value into an abstract RTT PropertyBase
 bool xmlParamToProp( const XmlRpc::XmlRpcValue &xml_value, RTT::base::PropertyBase* prop_base);
 
 template <class T>
