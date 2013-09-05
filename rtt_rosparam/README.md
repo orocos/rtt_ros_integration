@@ -25,24 +25,29 @@ RTT properties of the given component.
 
 #### Operations (getting/setting params)
 
-* ***getAll()*** Attempt to get all properties from ros parameters in the
+##### Operations on all properties
+* **getAll()** Attempt to get all properties from ros parameters in the
   **COMPONENT** namespace.
-* ***setAll()*** Set ROS parameters in the **COMPONENT** namespace from all
+* **setAll()** Set ROS parameters in the **COMPONENT** namespace from all
   properties of this component.
 
-* ***get(name,policy)*** Attempt to get the property named **name** from the
-  namespace specified by **policy**.
-* ***getRelative(name)***
-* ***getAbsolute(name)***
-* ***getPrivate(name)***
-* ***getComponentPrivate(name)***
+##### Operations for getting single properties
 
-* ***set(name,policy)*** Attempt to set the property named **name** from the
+* **get(name,policy)** Attempt to get the property named **name** from the
   namespace specified by **policy**.
-* ***setRelative(name)***
-* ***setAbsolute(name)***
-* ***setPrivate(name)***
-* ***setComponentPrivate(name)***
+* **getRelative(name)**
+* **getAbsolute(name)**
+* **getPrivate(name)**
+* **getComponentPrivate(name)**
+
+##### Operations for setting single properties
+
+* **set(name,policy)** Attempt to set the property named **name** from the
+  namespace specified by **policy**.
+* **setRelative(name)**
+* **setAbsolute(name)**
+* **setPrivate(name)**
+* **setComponentPrivate(name)**
 
 ### C++ Interface
 
