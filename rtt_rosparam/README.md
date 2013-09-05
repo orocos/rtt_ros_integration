@@ -109,15 +109,16 @@ class MyComponent : public RTT::TaskContext {
       bool all_params_found = true;
 
       // Get the rosparam service requester
-      boost::shared_ptr<rtt_rosparam::ROSParam> rosparam = this->getProvider<rtt_rosparam::ROSParam>("rosparam");
+      boost::shared_ptr<rtt_rosparam::ROSParam> rosparam =
+          this->getProvider<rtt_rosparam::ROSParam>("rosparam");
 
       // Get the parameters
       if(rosparam) {
         // Get the ROS parameter "/robot_description"
-        bool result = rosparam->getAbsolute("robot_description"); // 2.
+        bool result = rosparam->getAbsolute("robot_description");
 
         // Get the ROS parameter "~publish_period"
-        bool result = rosparam->getPrivate("publish_priod"); // 2.
+        bool result = rosparam->getPrivate("publish_priod");
       }
     }
 
