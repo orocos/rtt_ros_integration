@@ -55,6 +55,9 @@ policy (see below).
 
 ### Scripting Interface
 
+Components which were never meant to be used with ROS parameters can have their
+properties set from the ROS parameter server through the scripting interface:
+
 ```cpp
 // Import packages
 import("rtt_ros");
@@ -66,7 +69,7 @@ laodService("my_component","rosparam");
 // Try to get all parameters from the component namespace "~my_component/..."
 my_component.rosparam.getAll();
 
-// Try to get "robot_description" from the absolute namespace "/robot_description"
+// Try to get the "robot_description" property from the absolute namespace "/robot_description"
 my_component.rosparam.getAbsolute("robot_description");
 // Alternatively:
 my_component.rosparam.get("robot_description",my_component.rosparam.ABSOLUTE);
