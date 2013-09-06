@@ -199,18 +199,36 @@ endmacro(ros_generate_rtt_typekit)
 macro(ros_generate_rtt_service_proxies package)
   # Check if we're generating code for services in this package
   if(NOT package STREQUAL PROJECT_NAME)
-    find_package(${package})
+    find_package(${package} QUIET)
   endif()
 
   find_package(genmsg)
   find_package(rtt_roscomm)
 
-  # Get all .msg files
-  if(genmsg_VERSION VERSION_GREATER 0.4.19)
-    set(SRVS ${${package}_SERVICE_FILES})
-  else()
-    message(SEND_ERROR "genmsg version must be 0.4.19 or greater")
+  if(${package}_FOUND)
+    # Get all .srv files
+    if(genmsg_VERSION VERSION_GREATER 0.4.19)
+      set(SRVS ${${package}_SERVICE_FILES})
+    else()
+      message(SEND_ERROR "genmsg version must be 0.4.19 or greater")
+    endif()
+
+  # try to find rosbuild-style message package
+  elseif(ROSBUILD_init_called)
+    rosbuild_find_ros_package(${package})
+    if(DEFINED ${package}_PACKAGE_PATH)
+      set(${package}_FOUND TRUE)
+      file(GLOB SRVS "${${package}_PACKAGE_PATH}/srv/*.srv")
+      set(${package}_EXPORTED_TARGETS)
+    endif()
   endif()
+
+  # message package not found
+  if(NOT ${package}_FOUND)
+    message(SEND_ERROR "Package ${package} not found. Will not generate RTT service proxy.")
+    set(SRVS)
+  endif()
+
   
   if ( NOT "${SRVS}" STREQUAL "" )
 
@@ -246,7 +264,9 @@ macro(ros_generate_rtt_service_proxies package)
 
     orocos_service(         rtt_${ROSPACKAGE}_ros_service_proxies ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp)
     target_link_libraries(  rtt_${ROSPACKAGE}_ros_service_proxies ${catkin_LIBRARIES})
-    add_dependencies(       rtt_${ROSPACKAGE}_ros_service_proxies ${${package}_EXPORTED_TARGETS})
+    if(DEFINED ${package}_EXPORTED_TARGETS)
+      add_dependencies(       rtt_${ROSPACKAGE}_ros_service_proxies ${${package}_EXPORTED_TARGETS})
+    endif()
     add_file_dependencies(  ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp "${CMAKE_CURRENT_LIST_FILE}")
 
     set_directory_properties(PROPERTIES 
