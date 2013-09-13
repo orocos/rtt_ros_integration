@@ -41,20 +41,28 @@ macro(ros_generate_rtt_typekit package)
   find_package(genmsg)
   find_package(rtt_roscomm)
 
+  # Get all .msg files
   if(${package}_FOUND)
-    # Get all .msg files
+    # Use catkin-based genmsg to find msg files
     if(genmsg_VERSION VERSION_GREATER 0.4.19)
-      set(MSGS ${${package}_MESSAGE_FILES})
+      set(MSG_FILES)
+      # TODO: genmsg API is unstable at this level
+      foreach(FILE ${${package}_MESSAGE_FILES})
+        if(IS_ABSOLUTE "${FILE}")
+          list(APPEND MSG_FILES ${FILE})
+        else()
+          list(APPEND MSG_FILES ${${package}_DIR}/../${FILE})
+        endif()
+      endforeach()
     else()
       message(SEND_ERROR "genmsg version must be 0.4.19 or greater to generate RTT typekits for ROS messages")
     endif()
-
-  # try to find rosbuild-style message package
   elseif(ROSBUILD_init_called)
+    # try to find rosbuild-style message package
     rosbuild_find_ros_package(${package})
     if(DEFINED ${package}_PACKAGE_PATH)
       set(${package}_FOUND TRUE)
-      file(GLOB MSGS "${${package}_PACKAGE_PATH}/msg/*.msg")
+      file(GLOB MSG_FILES "${${package}_PACKAGE_PATH}/msg/*.msg")
       set(${package}_EXPORTED_TARGETS)
     endif()
   endif()
@@ -62,10 +70,10 @@ macro(ros_generate_rtt_typekit package)
   # message package not found
   if(NOT ${package}_FOUND)
     message(SEND_ERROR "Package ${package} not found. Will not generate RTT typekit.")
-    set(MSGS)
+    set(MSG_FILES)
   endif()
 
-  if( NOT "${MSGS}" STREQUAL "" )
+  if( NOT "${MSG_FILES}" STREQUAL "" )
 
     # Set the boost header generation script path
     @[if DEVELSPACE]@
@@ -78,7 +86,8 @@ macro(ros_generate_rtt_typekit package)
     set(ROSPACKAGE ${package})
 
     # Generate code for each message type
-    foreach( FILE ${MSGS} )
+    foreach( FILE ${MSG_FILES} )
+
       # Get just the message name
       string(REGEX REPLACE ".+/\(.+\).msg" "\\1" ROSMSGNAME ${FILE})
       
@@ -146,7 +155,7 @@ macro(ros_generate_rtt_typekit package)
       list(APPEND ROSMSG_TRANSPORT_PLUGIN ${_template_types_dst_dir}/ros_${ROSMSGNAME}_transport_plugin.cpp )
       
       add_file_dependencies( ${_template_types_dst_dir}/ros_${package}_typekit.cpp ${FILE})
-    endforeach( FILE ${MSGS} )
+    endforeach( FILE ${MSG_FILES} )
     
     configure_file( 
       ${_template_types_src_dir}/ros_msg_typekit_package.cpp.in 
@@ -205,19 +214,38 @@ macro(ros_generate_rtt_service_proxies package)
   find_package(genmsg)
   find_package(rtt_roscomm)
 
-  # Get all .msg files
-  if(genmsg_VERSION VERSION_GREATER 0.4.19)
-    set(SRVS ${${package}_SERVICE_FILES})
-  else()
-    message(SEND_ERROR "genmsg version must be 0.4.19 or greater")
+  # Get all .srv files
+  if(${package}_FOUND)
+    # Use catkin-based genmsg to find srv files
+    if(genmsg_VERSION VERSION_GREATER 0.4.19)
+      set(SRV_FILES)
+      # TODO: genmsg API is unstable at this level
+      foreach(FILE ${${package}_SERVICE_FILES})
+        if(IS_ABSOLUTE "${FILE}")
+          list(APPEND SRV_FILES ${FILE})
+        else()
+          list(APPEND SRV_FILES ${${package}_DIR}/../${FILE})
+        endif()
+      endforeach()
+    else()
+      message(SEND_ERROR "genmsg version must be 0.4.19 or greater")
+    endif()
+  elseif(ROSBUILD_init_called)
+    # try to find rosbuild-style message package
+    rosbuild_find_ros_package(${package})
+    if(DEFINED ${package}_PACKAGE_PATH)
+      set(${package}_FOUND TRUE)
+      file(GLOB SRV_FILES "${${package}_PACKAGE_PATH}/srv/*.srv")
+      set(${package}_EXPORTED_TARGETS)
+    endif()
   endif()
   
-  if ( NOT "${SRVS}" STREQUAL "" )
+  if ( NOT "${SRV_FILES}" STREQUAL "" )
 
     # Get the ros package name
     set(ROSPACKAGE ${package})
 
-    foreach( FILE ${SRVS} )
+    foreach( FILE ${SRV_FILES} )
       # Extract the service name
       string(REGEX REPLACE ".+/\(.+\).srv" "\\1" ROS_SRV_NAME ${FILE})
       
@@ -239,7 +267,7 @@ macro(ros_generate_rtt_service_proxies package)
       ${_template_proxies_src_dir}/rtt_ros_service_proxies.cpp.in 
       ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp @@ONLY )
 
-    add_file_dependencies( ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp ${SRVS})
+    add_file_dependencies( ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp ${SRV_FILES})
     
     # Targets
     include_directories(${CATKIN_DEVEL_PREFIX}/include ${catkin_INCLUDE_DIRS})
