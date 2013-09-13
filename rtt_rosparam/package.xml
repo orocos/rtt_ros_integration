@@ -25,5 +25,8 @@
   <run_depend>ocl</run_depend>
 
   <export>
+    <rtt_ros>
+      <plugin_depend>rtt_rosnode</plugin_depend>
+    </rtt_ros>
   </export>
 </package>

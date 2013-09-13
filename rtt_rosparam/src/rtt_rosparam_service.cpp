@@ -261,8 +261,30 @@ bool xmlParamToProp(
     return false;
   }
 
+  // We need to copy the value because XmlRpcValue doesn't have const accessors
+  XmlRpc::XmlRpcValue xml_value_tmp = xml_value;
+
   // Set the value
-  prop->set((const T&)xml_value);
+  prop->set(static_cast<T>(xml_value_tmp));
+
+  return true;
+}
+
+template <>
+bool xmlParamToProp<float>(
+    const XmlRpc::XmlRpcValue &xml_value,
+    RTT::Property<float>* prop)
+{
+  // Check if the property value is the requested type T
+  if(!prop) {
+    return false;
+  }
+
+  // We need to copy the value because XmlRpcValue doesn't have const accessors
+  XmlRpc::XmlRpcValue xml_value_tmp = xml_value;
+
+  // Set the value
+  prop->set(static_cast<double>(xml_value_tmp));
 
   return true;
 }
@@ -362,6 +384,8 @@ bool ROSParamService::getParam(
     const std::string &param_name, 
     const ROSParamService::ResolutionPolicy policy)
 {
+  RTT::Logger::In in("ROSParamService::getParam");
+
   // Get the parameter
   XmlRpc::XmlRpcValue xml_value;
 
@@ -385,6 +409,8 @@ bool ROSParamService::getParam(
 
 bool ROSParamService::getParams()
 {
+  RTT::Logger::In in("ROSParamService::getParams");
+
   // Get the parameter
   XmlRpc::XmlRpcValue xml_value;
 
