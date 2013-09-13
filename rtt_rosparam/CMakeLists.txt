@@ -9,6 +9,7 @@ find_package(OROCOS-RTT REQUIRED rtt-marshalling)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 catkin_package(
+  INCLUDE_DIRS include
   DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp)
 
@@ -23,5 +24,7 @@ target_link_libraries(rtt_rosparam
   ${catkin_LIBRARIES})
 
 # Generate install targets and pkg-config files
+orocos_install_headers(include/rtt_rosparam/rosparam.h)
 orocos_generate_package()
+
 
