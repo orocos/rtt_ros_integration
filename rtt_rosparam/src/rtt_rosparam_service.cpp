@@ -331,13 +331,16 @@ bool xmlParamToProp<RTT::PropertyBag>(
 
   // Copy the properties
   bool success = true;
-  typedef const XmlRpc::XmlRpcValue::ValueStruct & ConstStruct;
-  for(XmlRpc::XmlRpcValue::ValueStruct::const_iterator it = ((ConstStruct)xml_value).begin();
-      it != ((ConstStruct)xml_value).end();
+  // We need to copy the struct because XmlRpc++ doesn't have const operations for this
+  XmlRpc::XmlRpcValue xml_value_struct(xml_value);
+  for(XmlRpc::XmlRpcValue::ValueStruct::iterator it = xml_value_struct.begin();
+      it != xml_value_struct.end();
       ++it)
   {
     RTT::base::PropertyBase *sub_prop_base = prop->value().getProperty(it->first);
-    success &= xmlParamToProp(it->second, sub_prop_base);
+    if(sub_prop_base) {
+      success &= xmlParamToProp(it->second, sub_prop_base);
+    }
   }
 
   return success;
