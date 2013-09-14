@@ -45,7 +45,7 @@ connectServices("my_component","tf");
 
 ### C++ API
 
-The [rtt\_tf/tf.h](include/rtt_tf/tf.h) header includes the
+The [rtt\_tf/tf\_interface.h](include/rtt_tf/tf_interface.h) header includes the
 `rtt_tf::TFInterface` class which adds a required service to a given RTT
 component. This can be used for more easily connecting with the TF component.
 
