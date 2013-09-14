@@ -20,17 +20,22 @@ namespace rtt_tf
     RTT::InputPort<tf::tfMessage> port_tf_in;
     RTT::OutputPort<tf::tfMessage> port_tf_out;
 
-    geometry_msgs::TransformStamped lookupTransformService(
+    geometry_msgs::TransformStamped lookupTransform(
         const std::string& parent,
         const std::string& child);
 
-    geometry_msgs::TransformStamped lookupTransformAtTimeService(
+    geometry_msgs::TransformStamped lookupTransformAtTime(
         const std::string& parent,
         const std::string& child,
         const ros::Time& common_time);
 
-    void broadcastTransformService(
+    void broadcastTransform(
         const geometry_msgs::TransformStamped &tform);
+
+    void broadcastTransforms(
+        const std::vector<geometry_msgs::TransformStamped> &tforms);
+
+    void addTFOperations(RTT::Service::shared_ptr service);
 
   public:
     RTT_TF(std::string const& name);

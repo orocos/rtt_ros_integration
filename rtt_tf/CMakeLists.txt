@@ -4,6 +4,7 @@ project(rtt_tf)
 find_package(catkin REQUIRED COMPONENTS tf rtt_roscomm rtt_geometry_msgs)
 
 catkin_package(
+  INCLUDE include
   DEPENDS rtt 
   CATKIN_DEPENDS tf rtt_roscomm rtt_geometry_msgs
 )
