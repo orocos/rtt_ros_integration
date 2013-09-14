@@ -1,4 +1,6 @@
 <launch>
+  <!-- The node name for the deployer -->
+  <arg name="NAME" default="$(anon deployer)"/>
   <!-- Orocos log level (never, fatal, critical, error, warning, info, debug, realtime) -->
   <arg name="LOG_LEVEL" default="info"/>
   <!-- Additional Orocos deployer args -->
@@ -15,7 +17,7 @@
 
   <!-- Launch deployer -->
   <node 
-    name="$(anon deployer)"
+    name="$(arg NAME)"
     pkg="rtt_ros" type="deployer$(arg SUFFIX)" 
     args="-l $(arg LOG_LEVEL) $(arg DEPLOYER_ARGS) --"
     output="screen">
