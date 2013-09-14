@@ -1,12 +1,16 @@
-#ifndef __RTT_TF_TF_H
-#define __RTT_TF_TF_H
+#ifndef __RTT_TF_TF_INTERFACE_H
+#define __RTT_TF_TF_INTERFACE_H
 
 namespace rtt_tf {
 
   //! Class for using the TF component from C++
   class TFInterface {
   public:
+    //! Add interfaces to a given taskcontext
     TFInterface(RTT::TaskContext *owner);
+
+    //! Check if the operations are ready
+    bool ready();
     
     RTT::OperationCaller<geometry_msgs::TransformStamped(const std::string&, const std::string&)> lookupTransform;
     RTT::OperationCaller<geometry_msgs::TransformStamped(const std::string&, const std::string&, const ros::Time&)> lookupTransformAtTime;
@@ -25,6 +29,14 @@ namespace rtt_tf {
     owner->requires("tf")->addOperationCaller(broadcastTransform);
     owner->requires("tf")->addOperationCaller(broadcastTransforms);
   }
+
+  TFInterface::ready() {
+    return 
+      lookupTransform->ready() &&
+      lookupTransformAtTime->ready() &&
+      broadcastTransform->ready() &&
+      broadcastTransforms->ready();
+  }
 }
 
-#endif // ifndef __RTT_TF_TF_H
+#endif // ifndef __RTT_TF_TF_INTERFACE_H
