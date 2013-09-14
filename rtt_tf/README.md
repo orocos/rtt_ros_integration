@@ -41,6 +41,7 @@ loadComponent("tf","rtt_tf::RTT_TF");
 // next section)
 loadComponent("my_component","MyComponent");
 connectServices("my_component","tf");
+```
 
 ### C++ API
 
