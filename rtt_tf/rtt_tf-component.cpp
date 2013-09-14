@@ -67,35 +67,30 @@ namespace rtt_tf
     this->addEventPort("tf_in", port_tf_in);
     this->addPort("tf_out", port_tf_out);
 
-    this->addOperation("lookupTransform", &RTT_TF::lookupTransformService, this)
-      .doc("lookup the most recent transform from source to target")
+    this->addTFOperations(this->provides());
+    this->addTFOperations(this->provides("tf"));
+  }
+
+  void RTT_TF::addTFOperations(RTT::Service::shared_ptr service)
+  {
+    service->addOperation("lookupTransform", &RTT_TF::lookupTransform, this)
+      .doc("Lookup the most recent transform from source to target.")
       .arg("target", "target frame")
       .arg("source", "source frame");
 
-    this->addOperation("lookupTransformAtTime", &RTT_TF::lookupTransformAtTimeService, this)
-      .doc("lookup the most recent transform from source to target")
-      .arg("target", "target frame")
-      .arg("source", "source frame")
-      .arg("common_time", "common time at which the transform should be computed");
+    service->addOperation("lookupTransformAtTime", &RTT_TF::lookupTransformAtTime, this)
+      .doc("Lookup the most recent transform from source to target at a specific time.")
+      .arg("target", "Target frame")
+      .arg("source", "Source frame")
+      .arg("common_time", "[ros::Time] The common time at which the transform should be computed");
 
-    this->addOperation("broadcastTransform", &RTT_TF::broadcastTransformService, this, RTT::OwnThread)
-      .doc("lookup the most recent transform from source to target")
-      .arg("stamped transform", "geometry_msgs::TransformStamped");
+    service->addOperation("broadcastTransform", &RTT_TF::broadcastTransform, this, RTT::OwnThread)
+      .doc("Broadcast a stamped transform immediately.")
+      .arg("transform", "[geometry_msgs::TransformStamped]");
 
-    this->provides("tf")->addOperation("lookupTransform", &RTT_TF::lookupTransformService, this)
-      .doc("lookup the most recent transform from source to target")
-      .arg("target", "target frame")
-      .arg("source", "source frame");
-
-    this->provides("tf")->addOperation("lookupTransformAtTime", &RTT_TF::lookupTransformAtTimeService, this)
-      .doc("lookup the most recent transform from source to target")
-      .arg("target", "target frame")
-      .arg("source", "source frame")
-      .arg("common_time", "common time at which the transform should be computed");
-
-    this->provides("tf")->addOperation("broadcastTransform", &RTT_TF::broadcastTransformService, this, RTT::OwnThread)
-      .doc("lookup the most recent transform from source to target")
-      .arg("stamped transform", "geometry_msgs::TransformStamped");
+    service->addOperation("broadcastTransforms", &RTT_TF::broadcastTransforms, this, RTT::OwnThread)
+      .doc("Broadcast a stamped transform immediately.")
+      .arg("transforms", "[std::vector<geometry_msgs::TransformStamped>]");
   }
 
   bool RTT_TF::configureHook()
@@ -126,36 +121,28 @@ namespace rtt_tf
 #ifndef NDEBUG
     log(Debug) << "In update" << endlog();
 #endif
-    try
-    {
+    try {
       tf::tfMessage msg_in;
-      while (port_tf_in.read(msg_in) == NewData)
-      {
-        for (unsigned int i = 0; i < msg_in.transforms.size(); i++)
-        {
+
+      while (port_tf_in.read(msg_in) == NewData) {
+        for (unsigned int i = 0; i < msg_in.transforms.size(); i++) {
           StampedTransform trans;
           transformStampedMsgToTF(msg_in.transforms[i], trans);
-          try
-          {
+          try {
             std::map<std::string, std::string>* msg_header_map =
               msg_in.__connection_header.get();
             std::string authority;
             std::map<std::string, std::string>::iterator it =
               msg_header_map->find("callerid");
-            if (it == msg_header_map->end())
-            {
-              log(Warning) << "Message received without callerid"
-                << endlog();
+
+            if (it == msg_header_map->end()) {
+              log(Warning) << "Message received without callerid" << endlog();
               authority = "no callerid";
-            }
-            else
-            {
+            } else {
               authority = it->second;
             }
             this->setTransform(trans, authority);
-          } catch (TransformException& ex)
-          {
-
+          } catch (TransformException& ex) {
             log(Error) << "Failure to set received transform from "
               << msg_in.transforms[i].child_frame_id << " to "
               << msg_in.transforms[i].header.frame_id
@@ -163,39 +150,37 @@ namespace rtt_tf
           }
         }
       }
-
-    } catch (std::exception& ex)
-    {
+    } catch (std::exception& ex) {
       log(Error) << ex.what() << endlog();
     }
   }
 
-  geometry_msgs::TransformStamped RTT_TF::lookupTransformService(
+  geometry_msgs::TransformStamped RTT_TF::lookupTransform(
       const std::string& target,
       const std::string& source)
   {
     tf::StampedTransform stamped_tf;
     ros::Time common_time;
     this->getLatestCommonTime(source, target, common_time,NULL);
-    this->lookupTransform(target, source, common_time, stamped_tf);
+    static_cast<tf::Transformer*>(this)->lookupTransform(target, source, common_time, stamped_tf);
     geometry_msgs::TransformStamped msg;
     tf::transformStampedTFToMsg(stamped_tf,msg);
     return msg;
   }
 
-  geometry_msgs::TransformStamped RTT_TF::lookupTransformAtTimeService(
+  geometry_msgs::TransformStamped RTT_TF::lookupTransformAtTime(
       const std::string& target,
       const std::string& source,
       const ros::Time& common_time)
   {
     tf::StampedTransform stamped_tf;
-    this->lookupTransform(target, source, common_time, stamped_tf);
+    static_cast<tf::Transformer*>(this)->lookupTransform(target, source, common_time, stamped_tf);
     geometry_msgs::TransformStamped msg;
     tf::transformStampedTFToMsg(stamped_tf,msg);
     return msg;
   }
 
-  void RTT_TF::broadcastTransformService(
+  void RTT_TF::broadcastTransform(
       const geometry_msgs::TransformStamped &tform)
   {
     // Populate the TF message
@@ -205,6 +190,25 @@ namespace rtt_tf
     // Resolve names
     msg_out.transforms.back().header.frame_id = tf::resolve(prop_tf_prefix, msg_out.transforms.back().header.frame_id);
     msg_out.transforms.back().child_frame_id = tf::resolve(prop_tf_prefix, msg_out.transforms.back().child_frame_id);
+
+    port_tf_out.write(msg_out);
+  }
+
+  void RTT_TF::broadcastTransforms(
+      const std::vector<geometry_msgs::TransformStamped> &tform)
+  {
+    // Populate the TF message
+    tf::tfMessage msg_out;
+
+    // Resolve names
+    for(std::vector<geometry_msgs::TransformStamped>::const_iterator it = tform.begin();
+        it != tform.end();
+        ++it)
+    {
+      msg_out.transforms.push_back(*it);
+      msg_out.transforms.back().header.frame_id = tf::resolve(prop_tf_prefix, msg_out.transforms.back().header.frame_id);
+      msg_out.transforms.back().child_frame_id = tf::resolve(prop_tf_prefix, msg_out.transforms.back().child_frame_id);
+    }
 
     port_tf_out.write(msg_out);
   }
