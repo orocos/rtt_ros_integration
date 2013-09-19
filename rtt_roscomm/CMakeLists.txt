@@ -51,6 +51,8 @@ target_link_libraries(rtt_rosservice ${catkin_LIBRARIES})
 # Generate install targets and pkg-config files
 orocos_generate_package()
 
+
+
 install(PROGRAMS 
   scripts/create_rtt_pkg
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
@@ -66,8 +68,7 @@ install(PROGRAMS cmake/create_boost_header.py
 
 # Install template files to both install and develspace
 install(DIRECTORY rtt_roscomm_pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-# Why develspace? rospack finds the package in its source dir in devel-spaces.
-#file(COPY rtt_roscomm_pkg_template DESTINATION "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake")
+file(COPY rtt_roscomm_pkg_template DESTINATION "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake")
 
 # Install tests
 install(FILES 
