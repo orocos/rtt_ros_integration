@@ -99,7 +99,7 @@ macro(ros_generate_rtt_typekit package)
       # msg_Types.hpp.in, ros_msg_typekit_plugin.cpp.in, ros_msg_typekit_package.cpp.in
       set(ROSMSGBOOSTHEADER  "${package}/boost/${ROSMSGNAME}.h")
       # ros_msg_typekit_plugin.cpp.in, ros_msg_typekit_package.cpp.in
-      set(ROSMSGBOOSTHEADERS "${ROSMSGBOOSTHEADERS}#include <${package}/${ROSMSGNAME}.h>\n")
+      set(ROSMSGBOOSTHEADERS "${ROSMSGBOOSTHEADERS}#include <orocos/${ROSMSGBOOSTHEADER}>\n")
       # Types.hpp.in, ros_msg_typekit_package.cpp.in
       set(ROSMSGTYPES        "${ROSMSGTYPES}        rtt_ros_addType_${package}_${ROSMSGNAME}(); // factory function for adding TypeInfo.\n")
       # ros_msg_typekit_package.cpp.in
@@ -195,6 +195,13 @@ macro(ros_generate_rtt_typekit package)
       # install(FILES ${ROSMSGS_GENERATED_BOOST_HEADERS} DESTINATION ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}/${package}/boost/)
       # install(DIRECTORY "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}/typekit" DESTINATION ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}/${package})
       install(DIRECTORY "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}" DESTINATION "${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}")
+    endif()
+
+    # Add catkin exported targets 
+    if(DEFINED ${package}_EXPORTED_TARGETS)
+      list(APPEND ${package}_EXPORTED_TARGETS rtt-${package}-typekit)
+      list(APPEND ${package}_EXPORTED_TARGETS rtt-${package}-ros-transport)
+      list(APPEND ${package}_EXPORTED_TARGETS ${ROSMSGS_GENERATED_BOOST_HEADERS})
     endif()
 
   else()

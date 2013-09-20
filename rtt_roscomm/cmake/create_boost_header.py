@@ -38,7 +38,7 @@ def write_boost_includes(s, spec):
             else:
                 (pkg, name) = genmsg.names.package_resource_name(field.base_type)
                 pkg = (pkg or spec.package) # convert '' to this package
-                s.write('#include <%s/boost/%s.h>\n'%(pkg,  name))
+                s.write('#include <orocos/%s/boost/%s.h>\n'%(pkg,  name))
                 
     s.write('\n') 
 
