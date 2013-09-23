@@ -14,22 +14,24 @@ if (NOT OROCOS-RTT_FOUND)
 else()
   include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
   add_definitions( -DRTT_COMPONENT )
+  include_directories(${USE_OROCOS_INCLUDE_DIRS})
 endif()
 
 include(AddFileDependencies)
 
 if(ORO_USE_ROSBUILD)
-  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${PROJECT_SOURCE_DIR}/include/orocos")
+  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${PROJECT_SOURCE_DIR}/include")
   set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/src")
   set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION)
 elseif(ORO_USE_CATKIN)
-  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${CATKIN_DEVEL_PREFIX}/include/orocos")
+  catkin_destinations()
+  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${CATKIN_DEVEL_PREFIX}/include")
   set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/src")
   set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION "${CATKIN_GLOBAL_INCLUDE_DESTINATION}/orocos")
 else()
-  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/include/orocos")
+  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/include")
   set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/src")
-  set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION "include/orocos")
+  set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
 endif()
 
 macro(ros_generate_rtt_typekit package)
@@ -118,7 +120,7 @@ macro(ros_generate_rtt_typekit package)
       set(ROSMSGTYPESHEADERS "${ROSMSGTYPESHEADERS}#include \"${ROSMSGNAME}.h\"\n")
 
       # Necessary for create_boost_header.py command below
-      set(_ROSMSG_GENERATED_BOOST_HEADER  "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${ROSMSGBOOSTHEADER}")
+      set(_ROSMSG_GENERATED_BOOST_HEADER  "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${ROSMSGBOOSTHEADER}")
       list(APPEND ROSMSGS_GENERATED_BOOST_HEADERS ${_ROSMSG_GENERATED_BOOST_HEADER})
 
       add_custom_command(
@@ -135,7 +137,7 @@ macro(ros_generate_rtt_typekit package)
       set(_template_types_dst_dir "${rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY}/orocos/types")
 
       set(_template_typekit_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/include/PKG_NAME/typekit")
-      set(_template_typekit_dst_dir "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}/typekit")
+      set(_template_typekit_dst_dir "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${package}/typekit")
 
       configure_file( 
         ${_template_types_src_dir}/ros_msg_typekit_plugin.cpp.in 
@@ -173,9 +175,12 @@ macro(ros_generate_rtt_typekit package)
       ${_template_typekit_src_dir}/Types.h.in 
       ${_template_typekit_dst_dir}/Types.h @@ONLY )
     
-    # Targets
-    include_directories(${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY} ${catkin_INCLUDE_DIRS})
+    include_directories(
+      ${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY} 
+      ${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos
+      ${catkin_INCLUDE_DIRS})
 
+    # Targets
     orocos_typekit(         rtt-${package}-typekit ${_template_types_dst_dir}/ros_${package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
     orocos_typekit(         rtt-${package}-ros-transport ${_template_types_dst_dir}/ros_${package}_transport.cpp )
     target_link_libraries(  rtt-${package}-typekit ${catkin_LIBRARIES})
@@ -193,8 +198,10 @@ macro(ros_generate_rtt_typekit package)
     # Install generated header files (dependent packages might need them)
     if(DEFINED rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION)
       # install(FILES ${ROSMSGS_GENERATED_BOOST_HEADERS} DESTINATION ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}/${package}/boost/)
-      # install(DIRECTORY "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}/typekit" DESTINATION ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}/${package})
-      install(DIRECTORY "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}" DESTINATION "${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}")
+      # install(DIRECTORY "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${package}/typekit" DESTINATION ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}/${package})
+      install(
+        DIRECTORY "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${package}" 
+        DESTINATION "${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}")
     endif()
 
   else()
@@ -273,9 +280,9 @@ macro(ros_generate_rtt_service_proxies package)
 
     add_file_dependencies( ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp ${SRV_FILES})
     
-    # Targets
     include_directories(${CATKIN_DEVEL_PREFIX}/include ${catkin_INCLUDE_DIRS})
 
+    # Targets
     orocos_service(         rtt_${ROSPACKAGE}_ros_service_proxies ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp)
     target_link_libraries(  rtt_${ROSPACKAGE}_ros_service_proxies ${catkin_LIBRARIES})
     if(DEFINED ${package}_EXPORTED_TARGETS)
