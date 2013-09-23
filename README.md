@@ -99,7 +99,7 @@ include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 When this file is included, it both defines and executes several macros.
 Specifically, it parses the package.xml or manifest.xml of the including
 package, and executes `orocos_find_package(pkg-name)` on all build dependencies.
-This populates several variables includeing, but not limited to
+This populates several variables including, but not limited to
 `${OROCOS_USE_INCLUDE_DIRS}` and  `${OROCOS_USE_LIBRARIES}` which are used by
 Orocos target- and package-definition macros like `orocos_executable()`,
 `orocos_library()` and `orocos_generate_package()`.
