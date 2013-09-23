@@ -16,6 +16,8 @@
   <build_depend>tf</build_depend>
   <build_depend>rtt_roscomm</build_depend>
   <build_depend>rtt_geometry_msgs</build_depend>
+  <!--<build_depend>ocl-deployment</build_depend>-->
+  <!--<build_depend>ocl-taskbrowser</build_depend>-->
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>rtt</run_depend>
