@@ -197,16 +197,9 @@ macro(ros_generate_rtt_typekit package)
       install(DIRECTORY "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}" DESTINATION "${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}")
     endif()
 
-    # Add catkin exported targets 
-    if(DEFINED ${package}_EXPORTED_TARGETS)
-      list(APPEND ${package}_EXPORTED_TARGETS rtt-${package}-typekit)
-      list(APPEND ${package}_EXPORTED_TARGETS rtt-${package}-ros-transport)
-      list(APPEND ${package}_EXPORTED_TARGETS ${ROSMSGS_GENERATED_BOOST_HEADERS})
-    endif()
-
   else()
     # Return if nothing to do
-    message(WARNING "ros_generate_rtt_typekit: Could not find any .msg files in the ${package} package.")
+    message(STATUS "ros_generate_rtt_typekit: Could not find any .msg files in the ${package} package.")
   endif()
 
 endmacro(ros_generate_rtt_typekit)
@@ -295,7 +288,7 @@ macro(ros_generate_rtt_service_proxies package)
 
   else()
     #Return if nothing to do:
-    message(WARNING "ros_generate_rtt_service_proxies: Could not find any .srv files in the ${package} package.")
+    message(STATUS "ros_generate_rtt_service_proxies: Could not find any .srv files in the ${package} package.")
   endif()
   
 endmacro(ros_generate_rtt_service_proxies)
