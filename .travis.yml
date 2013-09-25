@@ -18,8 +18,9 @@ before_install:
   - source /opt/ros/$ROS_DISTRO/setup.bash
   # Create isolated workspace based on the ros distro
   - mkdir -p ~/ws_isolated/src
-  - pushd ~/ws_isolated
-  - git clone --recursive https://github.com/jhu-lcsr-forks/orocos_toolchain.git src/orocos_toolchain
+  - pushd ~/ws_isolated/src
+  - git clone --recursive https://github.com/jhu-lcsr-forks/orocos_toolchain.git
+  - git clone --recursive https://github.com/jhu-lcsr-forks/orocos_kinematics_dynamics.git
   - popd
   # Create non-isolated workspace
   - mkdir -p ~/ws/src
