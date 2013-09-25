@@ -1,0 +1,40 @@
+language:
+  - cpp
+  - python
+  - ruby
+  - lua
+python:
+  - "2.7"
+compiler:
+  - gcc
+before_install:
+  # Define some config vars
+  - export ROS_DISTRO=hydro
+  - export CI_SOURCE_PATH=$(pwd)
+  - export EXTRA_CMAKE_ARGS="-DENABLE_CORBA=ON -DCORBA_IMPLEMENTATION=OMNIORB"
+  # Bootstrap a minimal ROS installation
+  - git clone https://raw.github.com/jhu-lcsr/ros_ci_tools /tmp/ros_ci_tools && export PATH=/tmp/ros_ci_tools:$PATH
+  - ros_ci_bootstrap
+  - source /opt/ros/$ROS_DISTRO/setup.bash
+  # Create isolated workspace based on the ros distro
+  - mkdir -p ~/ws_isolated/src
+  - pushd ~/ws_isolated
+  - git clone --recursive https://www.github.com/jhu-lcsr-forks/orocos_toolchain.git src/orocos_toolchain
+  - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y > /dev/null
+  - catkin_make_isolated --install -j1 --cmake-args $EXTRA_CMAKE_ARGS
+  - source install_isolated/setup.bash
+  # Create non-isolated workspace
+  - mkdir -p ~/ws/src
+  - pushd ~/ws
+  - ln -s $CI_SOURCE_PATH src/
+  - git clone --recursive https://www.github.com/jhu-lcsr-forks/rtt_ros_comm.git src/
+  - git clone --recursive https://www.github.com/jhu-lcsr-forks/rtt_common_msgs.git src/
+  - git clone --recursive https://www.github.com/jhu-lcsr-forks/rtt_ros_examples.git src/
+  - git clone --recursive https://www.github.com/jhu-lcsr-forks/rtt_geometry.git src/
+  - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y > /dev/null
+install:
+  # Build in an isolated catkin workspace
+  - catkin_make
+script:
+  # Run tests
+  - ""
