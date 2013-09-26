@@ -41,7 +41,7 @@ install:
   - popd
   # build the normal catkin workspace
   - pushd ~/ws
-  - catkin_make_isolated --install
+  - catkin_make -j1
 
 script:
   # Run tests
