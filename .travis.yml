@@ -20,16 +20,16 @@ before_install:
   - mkdir -p ~/ws_isolated/src
   - pushd ~/ws_isolated/src
   - git clone --recursive https://github.com/jhu-lcsr-forks/orocos_toolchain.git
-  - git clone --recursive https://github.com/jhu-lcsr-forks/orocos_kinematics_dynamics.git
+  #- git clone --recursive https://github.com/jhu-lcsr-forks/orocos_kinematics_dynamics.git
   - popd
   # Create non-isolated workspace
   - mkdir -p ~/ws/src
   - pushd ~/ws/src
   - ln -s $CI_SOURCE_PATH
-  - git clone https://github.com/jhu-lcsr-forks/rtt_ros_comm.git
-  - git clone https://github.com/jhu-lcsr-forks/rtt_common_msgs.git
-  - git clone https://github.com/jhu-lcsr-forks/rtt_geometry.git
-  - git clone https://github.com/jhu-lcsr/rtt_ros_examples.git
+  #- git clone https://github.com/jhu-lcsr-forks/rtt_ros_comm.git
+  #- git clone https://github.com/jhu-lcsr-forks/rtt_common_msgs.git
+  #- git clone https://github.com/jhu-lcsr-forks/rtt_geometry.git
+  #- git clone https://github.com/jhu-lcsr/rtt_ros_examples.git
   - popd
   - rosdep install -r --from-paths ~/ws/src ~/ws_isolated/src --ignore-src --rosdistro $ROS_DISTRO -y > /dev/null
   
