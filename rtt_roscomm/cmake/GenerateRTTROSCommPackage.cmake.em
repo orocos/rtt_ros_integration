@@ -131,10 +131,10 @@ macro(ros_generate_rtt_typekit package)
       #set_source_files_properties(${ROSMSGS_GENERATED_BOOST_HEADERS} PROPERTIES GENERATED TRUE)
       
       # TypeInfo object
-      set(_template_types_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/src/orocos/types")
+      set(_template_types_src_dir "${rtt_roscomm_DIR}/../rtt_roscomm_pkg_template/src/orocos/types")
       set(_template_types_dst_dir "${rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY}/orocos/types")
 
-      set(_template_typekit_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/include/PKG_NAME/typekit")
+      set(_template_typekit_src_dir "${rtt_roscomm_DIR}/../rtt_roscomm_pkg_template/include/PKG_NAME/typekit")
       set(_template_typekit_dst_dir "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}/typekit")
 
       configure_file( 
@@ -264,7 +264,7 @@ macro(ros_generate_rtt_service_proxies package)
     endforeach()
     
     # Service proxy factories
-    set(_template_proxies_src_dir "${rtt_roscomm_DIR}/rtt_roscomm_pkg_template/src")
+    set(_template_proxies_src_dir "${rtt_roscomm_DIR}/../rtt_roscomm_pkg_template/src")
     set(_template_proxies_dst_dir "${CMAKE_CURRENT_BINARY_DIR}/src")
 
     configure_file( 
