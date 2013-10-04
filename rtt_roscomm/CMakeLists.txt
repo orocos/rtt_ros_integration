@@ -67,8 +67,8 @@ install(PROGRAMS cmake/create_boost_header.py
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
 
 # Install template files to both install and develspace
-install(DIRECTORY rtt_roscomm_pkg_template DESTINATION "${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake")
-file(COPY rtt_roscomm_pkg_template DESTINATION "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake")
+install(DIRECTORY rtt_roscomm_pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+file(COPY rtt_roscomm_pkg_template DESTINATION "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}")
 
 # Install tests
 install(FILES 

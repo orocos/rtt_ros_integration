@@ -18,25 +18,31 @@ before_install:
   - source /opt/ros/$ROS_DISTRO/setup.bash
   # Create isolated workspace based on the ros distro
   - mkdir -p ~/ws_isolated/src
-  - pushd ~/ws_isolated
-  - git clone --recursive https://www.github.com/jhu-lcsr-forks/orocos_toolchain.git src/orocos_toolchain
-  - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y > /dev/null
-  - catkin_make_isolated --install -j1 --cmake-args $EXTRA_CMAKE_ARGS
-  - source install_isolated/setup.bash
+  - pushd ~/ws_isolated/src
+  - git clone --recursive https://github.com/jhu-lcsr-forks/orocos_toolchain.git
+  #- git clone --recursive https://github.com/jhu-lcsr-forks/orocos_kinematics_dynamics.git
+  - popd
   # Create non-isolated workspace
   - mkdir -p ~/ws/src
-  - pushd ~/ws
-  - ln -s $CI_SOURCE_PATH src/
-  - pushd src
-  - git clone --recursive https://www.github.com/jhu-lcsr-forks/rtt_ros_comm.git
-  - git clone --recursive https://www.github.com/jhu-lcsr-forks/rtt_common_msgs.git
-  - git clone --recursive https://www.github.com/jhu-lcsr-forks/rtt_ros_examples.git
-  - git clone --recursive https://www.github.com/jhu-lcsr-forks/rtt_geometry.git
+  - pushd ~/ws/src
+  - ln -s $CI_SOURCE_PATH
+  #- git clone https://github.com/jhu-lcsr-forks/rtt_ros_comm.git
+  #- git clone https://github.com/jhu-lcsr-forks/rtt_common_msgs.git
+  #- git clone https://github.com/jhu-lcsr-forks/rtt_geometry.git
+  #- git clone https://github.com/jhu-lcsr/rtt_ros_examples.git
   - popd
-  - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y > /dev/null
+  - rosdep install -r --from-paths ~/ws/src ~/ws_isolated/src --ignore-src --rosdistro $ROS_DISTRO -y > /dev/null
+  
 install:
   # Build in an isolated catkin workspace
-  - catkin_make
+  - pushd ~/ws_isolated
+  - catkin_make_isolated --install -j1 --cmake-args $EXTRA_CMAKE_ARGS
+  - source install_isolated/setup.bash
+  - popd
+  # build the normal catkin workspace
+  - pushd ~/ws
+  - catkin_make -j1
+
 script:
   # Run tests
   - ""
