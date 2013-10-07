@@ -23,22 +23,22 @@ using namespace boost::assign;
 #include <gmock/gmock.h>
 using ::testing::ElementsAre;
 
-OCL::DeploymentComponent *deployer;
+boost::shared_ptr<OCL::DeploymentComponent> deployer;
 boost::shared_ptr<RTT::Scripting> scripting_service;
 
 TEST(BasicTest, Import) 
 {
   // Import rtt_ros plugin
-  EXPECT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_ros", "" ));
-  EXPECT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_roscomm", "" ));
+  RTT::ComponentLoader::Instance()->import("rtt_ros", "" );
 }
 
-TEST(BasicTest, ImportTypekit) 
+TEST(BasicTest, ImportChaining) 
 {
   // Import rtt_ros plugin
-  EXPECT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_std_msgs", "" ));
-  EXPECT_TRUE(scripting_service->eval("var ConnPolicy float_out = rostopic.connection(\"float_out\")"));
+  EXPECT_TRUE(scripting_service->eval("ros.import(\"rtt_rospack\")"));
+  EXPECT_TRUE(scripting_service->eval("rospack.find(\"rtt_ros\")"));
 }
+
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
@@ -46,17 +46,12 @@ int main(int argc, char** argv) {
   // Initialize Orocos
   __os_init(argc, argv);
 
-  deployer = new OCL::DeploymentComponent();
+  deployer = boost::make_shared<OCL::DeploymentComponent>();
   scripting_service = deployer->getProvider<RTT::Scripting>("scripting");
 
   RTT::Logger::log().setStdStream(std::cerr);
   RTT::Logger::log().mayLogStdOut(true);
-  //RTT::Logger::log().setLogLevel(RTT::Logger::Info);
+  RTT::Logger::log().setLogLevel(RTT::Logger::Info);
   
-  int test_ret = RUN_ALL_TESTS();
-
-  delete deployer;
-
-  return test_ret;
+  return RUN_ALL_TESTS();
 }
-
