@@ -208,7 +208,7 @@ public:
           if (*it != package) {
             RTT::log(RTT::Debug) << "Could not load ROS package dependency \"" << *it << "\" of ROS package \"" << package << "\"" << RTT::endlog();
           } else {
-            RTT::log(RTT::Debug) << "Could not import any plugins from ROS package \"" << package << "\"" << RTT::endlog();
+            RTT::log(RTT::Warning) << "Could not import any plugins from ROS package \"" << package << "\"" << RTT::endlog();
           }
         }
       }
@@ -218,7 +218,9 @@ public:
     }
 
     if(!found_packages) { 
-      RTT::log(RTT::Error) << "Could not load and plugins from ROS package \"" << package << "\" or it's dependencies." << RTT::endlog();
+      RTT::log(RTT::Warning) << "Could not load any plugins from ROS package \"" << package << "\" or it's dependencies." << RTT::endlog();
+    } else {
+      RTT::log(RTT::Info) << "Loaded plugins from ROS package \"" << package << "\" or it's dependencies." << RTT::endlog();
     }
 
     return found_packages;

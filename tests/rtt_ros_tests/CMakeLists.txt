@@ -18,5 +18,4 @@ if(CATKIN_ENABLE_TESTING)
 
 endif()
 
-
-
+orocos_generate_package()

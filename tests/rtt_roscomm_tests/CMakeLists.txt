@@ -19,5 +19,4 @@ if(CATKIN_ENABLE_TESTING)
   #add_rostest(test/connpolicy/connpolicy.test)
 endif()
 
-
-
+orocos_generate_package()
