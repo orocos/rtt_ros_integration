@@ -3,6 +3,8 @@ project(rtt_tf)
 
 find_package(catkin REQUIRED COMPONENTS tf rtt_roscomm rtt_geometry_msgs)
 
+ros_generate_rtt_typekit(tf)
+
 catkin_package(
   INCLUDE_DIRS include
   DEPENDS rtt 
@@ -17,8 +19,6 @@ include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 orocos_component(rtt_tf rtt_tf-component.cpp)
 target_link_libraries(rtt_tf ${catkin_LIBRARIES})
 orocos_install_headers( rtt_tf-component.hpp )
-
-ros_generate_rtt_typekit(tf)
 
 # Tests  
 orocos_use_package(ocl-taskbrowser REQUIRED)
