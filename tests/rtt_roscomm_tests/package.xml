@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>rtt_ros_tests</name>
+  <name>rtt_roscomm_tests</name>
   <version>0.0.0</version>
-  <description>The rtt_ros_tests package</description>
+  <description>The rtt_roscomm_tests package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
@@ -41,7 +41,7 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>rtt_ros</build_depend>
+  <build_depend>rtt_roscomm</build_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
