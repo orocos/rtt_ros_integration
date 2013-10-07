@@ -1,5 +1,0 @@
-
-# Import RTT ROS plugin
-import("rtt_rostopic")
-
-var ConnPolicy float_out = ros.topic("float_out")

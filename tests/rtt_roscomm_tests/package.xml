@@ -42,6 +42,10 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>rtt_roscomm</build_depend>
+  <build_depend>rtt_std_msgs</build_depend>
+  <build_depend>rostest</build_depend>
+  <build_depend>ocl-logging</build_depend>
+  <build_depend>ocl-deployment</build_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

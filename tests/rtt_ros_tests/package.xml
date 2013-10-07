@@ -42,6 +42,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>rtt_ros</build_depend>
+  <build_depend>ocl-logging</build_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

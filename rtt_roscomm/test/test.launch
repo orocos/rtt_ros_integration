@@ -1,5 +1,0 @@
-<launch>
-  <node name="test" pkg="rtt_ros" type="deployer" 
-    args="-s $(find rtt_rostopic)/test/test.ops -linfo --"
-    output="screen"/>
-</launch>
