@@ -6,15 +6,14 @@ find_package(catkin REQUIRED COMPONENTS
   diagnostic_msgs
   rtt_std_msgs)
 
+ros_generate_rtt_typekit(diagnostic_msgs)
+ros_generate_rtt_service_proxies(diagnostic_msgs)
+
 catkin_package(
   DEPENDS ocl rtt
   CATKIN_DEPENDS 
   rtt_roscomm 
   diagnostic_msgs
   rtt_std_msgs)
-
-include_directories(${catkin_INCLUDE_DIRS})
-ros_generate_rtt_typekit(diagnostic_msgs)
-ros_generate_rtt_service_proxies(diagnostic_msgs)
 
 orocos_generate_package()
