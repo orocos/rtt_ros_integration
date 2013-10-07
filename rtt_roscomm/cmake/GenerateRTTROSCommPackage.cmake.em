@@ -186,6 +186,7 @@ macro(ros_generate_rtt_typekit package)
       ${_template_typekit_dst_dir}/Types.h @@ONLY )
     
     include_directories(
+      ${rtt_roscomm_INCLUDE_DIRS}
       ${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY} 
       ${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos
       ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}/orocos
@@ -296,7 +297,10 @@ macro(ros_generate_rtt_service_proxies package)
 
     add_file_dependencies( ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp ${SRV_FILES})
     
-    include_directories(${CATKIN_DEVEL_PREFIX}/include ${catkin_INCLUDE_DIRS})
+    include_directories(
+      ${rtt_roscomm_INCLUDE_DIRS}
+      ${CATKIN_DEVEL_PREFIX}/include 
+      ${catkin_INCLUDE_DIRS})
 
     # Targets
     orocos_service(         rtt_${ROSPACKAGE}_ros_service_proxies ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp)
