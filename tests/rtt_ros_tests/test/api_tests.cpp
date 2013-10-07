@@ -20,8 +20,6 @@
 using namespace boost::assign;
 
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
-using ::testing::ElementsAre;
 
 boost::shared_ptr<OCL::DeploymentComponent> deployer;
 boost::shared_ptr<RTT::Scripting> scripting_service;
