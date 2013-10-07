@@ -127,12 +127,15 @@ corresponding package.xml:
 ```cmake
 project(rtt_std_srvs)
 find_package(catkin REQUIRED COMPONENTS genmsg rtt_roscomm @pkgname@)
-catkin_package(CATKIN_DEPENDS genmsg rtt_roscomm @pkgname@)
 
 # Generate typekits for ros .msg files
 ros_generate_rtt_typekit(@pkgname@)
 # Generate the plugin which makes the services in std_srvs available
 ros_generate_rtt_service_proxies(@pkgname@)
+
+# Call catkin_package after the above to export the proper targets
+catkin_package(CATKIN_DEPENDS genmsg rtt_roscomm @pkgname@)
+
 ```
 
 The `ros_generate_rtt_service_proxies()` cmake function will generate an RTT

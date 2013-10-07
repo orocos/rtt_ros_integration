@@ -7,51 +7,59 @@ cmake_minimum_required(VERSION 2.8.3)
 
 set(CMAKE_BUILD_TYPE MinSizeRel)
 
-find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling)
-
-if (NOT OROCOS-RTT_FOUND)
-  message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
-else()
-  include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
-  add_definitions( -DRTT_COMPONENT )
-  include_directories(${USE_OROCOS_INCLUDE_DIRS})
-endif()
-
 include(AddFileDependencies)
 
-if(ORO_USE_ROSBUILD)
-  message(STATUS "[ros_generate_rtt_typekit] Generating ROS typekit for ${PROJECT_NAME} with ROSBuild destinations.")
-  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${PROJECT_SOURCE_DIR}/include")
-  set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/src")
-  set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION)
-elseif(ORO_USE_CATKIN)
-  message(STATUS "[ros_generate_rtt_typekit] Generating ROS typekit for ${PROJECT_NAME} with Catkin destinations.")
-  catkin_destinations()
-  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${CATKIN_DEVEL_PREFIX}/include")
-  set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/src")
-  set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION "${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
-else()
-  message(STATUS "[ros_generate_rtt_typekit] Generating ROS typekit for ${PROJECT_NAME} with normal CMake destinations.")
-  set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${PROJECT_BINARY_DIR}/include")
-  set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${PROJECT_BINARY_DIR}/src")
-  set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
-endif()
+macro(rtt_roscomm_destinations)
+  if(ORO_USE_ROSBUILD)
+    message(STATUS "[ros_generate_rtt_typekit] Generating ROS typekit for ${PROJECT_NAME} with ROSBuild destinations.")
+    set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${PROJECT_SOURCE_DIR}/include")
+    set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/src")
+    set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION)
+  elseif(ORO_USE_CATKIN)
+    message(STATUS "[ros_generate_rtt_typekit] Generating ROS typekit for ${PROJECT_NAME} with Catkin destinations.")
+    catkin_destinations()
+    set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${CATKIN_DEVEL_PREFIX}/include")
+    set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${CMAKE_CURRENT_BINARY_DIR}/src")
+    set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION "${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
+  else()
+    message(STATUS "[ros_generate_rtt_typekit] Generating ROS typekit for ${PROJECT_NAME} with normal CMake destinations.")
+    set(rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY    "${PROJECT_BINARY_DIR}/include")
+    set(rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY    "${PROJECT_BINARY_DIR}/src")
+    set(rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
+  endif()
 
-if(DEFINED ENV{VERBOSE_CONFIG})
-  message(STATUS "[ros_generate_rtt_typekit]   Generating headers in: ${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}")
-  message(STATUS "[ros_generate_rtt_typekit]   Generating sources in: ${rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY}")
-  message(STATUS "[ros_generate_rtt_typekit]   Installing headers to: ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}")
-  message(STATUS "[catkin_INCLUDE_DIRS] ${catkin_INCLUDE_DIRS}")
-endif()
+  if(DEFINED ENV{VERBOSE_CONFIG})
+    message(STATUS "[ros_generate_rtt_typekit]   Generating headers in: ${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}")
+    message(STATUS "[ros_generate_rtt_typekit]   Generating sources in: ${rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY}")
+    message(STATUS "[ros_generate_rtt_typekit]   Installing headers to: ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}")
+  endif()
+endmacro()
+
+macro(rtt_roscomm_debug)
+  if(DEFINED ENV{VERBOSE_CONFIG})
+    message(STATUS "[ros_generate_rtt_typekit]     catkin_INCLUDE_DIRS: ${catkin_INCLUDE_DIRS}")
+  endif()
+endmacro()
 
 macro(ros_generate_rtt_typekit package)
+  rtt_roscomm_destinations()
+
+  find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling)
+  if (NOT OROCOS-RTT_FOUND)
+    message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
+  else()
+    include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
+    add_definitions( -DRTT_COMPONENT )
+  endif()
+
   # Check if we're generating code for messages in this package
-  if(NOT package STREQUAL PROJECT_NAME)
+  if("${package}" STREQUAL "${PROJECT_NAME}")
+    set(${package}_FOUND True)
+  else()
     find_package(${package} QUIET)
   endif()
 
-  find_package(genmsg)
-  find_package(rtt_roscomm)
+  find_package(genmsg REQUIRED)
 
   # Get all .msg files
   if(${package}_FOUND)
@@ -186,10 +194,10 @@ macro(ros_generate_rtt_typekit package)
       ${_template_typekit_dst_dir}/Types.h @@ONLY )
     
     include_directories(
-      ${rtt_roscomm_INCLUDE_DIRS}
       ${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY} 
       ${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos
       ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}/orocos
+      ${USE_OROCOS_INCLUDE_DIRS}
       ${catkin_INCLUDE_DIRS})
 
     # Targets
@@ -197,10 +205,17 @@ macro(ros_generate_rtt_typekit package)
     orocos_typekit(         rtt-${package}-ros-transport ${_template_types_dst_dir}/ros_${package}_transport.cpp )
     target_link_libraries(  rtt-${package}-typekit ${catkin_LIBRARIES})
     target_link_libraries(  rtt-${package}-ros-transport ${catkin_LIBRARIES})
+
+    # Add an explicit dependency between the typekits and message files
     if(DEFINED ${package}_EXPORTED_TARGETS)
       add_dependencies(       rtt-${package}-typekit ${${package}_EXPORTED_TARGETS})
       add_dependencies(       rtt-${package}-ros-transport ${${package}_EXPORTED_TARGETS})
     endif()
+
+    # Add the typekit libraries to the dependecies exported by this project
+    LIST(APPEND ${${PROJECT_NAME}_EXPORTED_TARGETS} "rtt-${package}-typekit")
+    LIST(APPEND ${${PROJECT_NAME}_EXPORTED_TARGETS} "rtt-${package}-ros-transport")
+
     add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
     add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
 
@@ -230,13 +245,22 @@ endmacro(ros_generate_rtt_typekit)
 
 
 macro(ros_generate_rtt_service_proxies package)
+  rtt_roscomm_destinations()
+
+  find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling)
+  if (NOT OROCOS-RTT_FOUND)
+    message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
+  else()
+    include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
+    add_definitions( -DRTT_COMPONENT )
+  endif()
+
   # Check if we're generating code for services in this package
   if(NOT package STREQUAL PROJECT_NAME)
     find_package(${package} QUIET)
   endif()
 
-  find_package(genmsg)
-  find_package(rtt_roscomm)
+  find_package(genmsg REQUIRED)
 
   # Get all .srv files
   if(${package}_FOUND)
@@ -298,8 +322,8 @@ macro(ros_generate_rtt_service_proxies package)
     add_file_dependencies( ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp ${SRV_FILES})
     
     include_directories(
-      ${rtt_roscomm_INCLUDE_DIRS}
       ${CATKIN_DEVEL_PREFIX}/include 
+      ${USE_OROCOS_INCLUDE_DIRS}
       ${catkin_INCLUDE_DIRS})
 
     # Targets
@@ -319,11 +343,3 @@ macro(ros_generate_rtt_service_proxies package)
   endif()
   
 endmacro(ros_generate_rtt_service_proxies)
-
-
-
-function(rtt_roscomm_generate_package package)
-  ros_generate_rtt_typekit(${package})
-  ros_generate_rtt_service_proxies(${package})
-  orocos_generate_package()
-endfunction(rtt_roscomm_generate_package)
