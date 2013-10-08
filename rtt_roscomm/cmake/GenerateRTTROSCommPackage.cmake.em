@@ -155,7 +155,7 @@ macro(ros_generate_rtt_typekit package)
       set(_template_types_dst_dir "${rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY}/orocos/types")
 
       set(_template_typekit_src_dir "${rtt_roscomm_DIR}/../rtt_roscomm_pkg_template/include/PKG_NAME/typekit")
-      set(_template_typekit_dst_dir "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/${package}/typekit")
+      set(_template_typekit_dst_dir "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${package}/typekit")
 
       configure_file( 
         ${_template_types_src_dir}/ros_msg_typekit_plugin.cpp.in 
