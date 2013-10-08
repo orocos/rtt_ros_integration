@@ -31,6 +31,7 @@ before_install:
   #- git clone https://github.com/jhu-lcsr-forks/rtt_geometry.git
   #- git clone https://github.com/jhu-lcsr/rtt_ros_examples.git
   - popd
+  - rosdep keys -r --from-paths ~/ws/src ~/ws_isolated/src --ignore-src --rosdistro $ROS_DISTRO -y
   - rosdep install -r --from-paths ~/ws/src ~/ws_isolated/src --ignore-src --rosdistro $ROS_DISTRO -y > /dev/null
   
 install:
