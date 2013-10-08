@@ -20,6 +20,7 @@ before_install:
   - mkdir -p ~/ws_isolated/src
   - pushd ~/ws_isolated/src
   - git clone --recursive https://github.com/jhu-lcsr-forks/orocos_toolchain.git
+  - git clone https://github.com/jhu-lcsr-forks/orocos_kinematics_dynamics.git
   #- git clone --recursive https://github.com/jhu-lcsr-forks/orocos_kinematics_dynamics.git
   - popd
   # Create non-isolated workspace
