@@ -70,8 +70,3 @@ install(PROGRAMS cmake/create_boost_header.py
 install(DIRECTORY rtt_roscomm_pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 file(COPY rtt_roscomm_pkg_template DESTINATION "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}")
 
-# Install tests
-install(FILES 
-  test/test.launch 
-  test/test.ops 
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/test)
