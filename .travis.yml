@@ -1,0 +1,49 @@
+language:
+  - cpp
+  - python
+  - ruby
+  - lua
+python:
+  - "2.7"
+compiler:
+  - gcc
+before_install:
+  # Define some config vars
+  - export ROS_DISTRO=hydro
+  - export CI_SOURCE_PATH=$(pwd)
+  - export EXTRA_CMAKE_ARGS="-DENABLE_CORBA=ON -DCORBA_IMPLEMENTATION=OMNIORB"
+  # Bootstrap a minimal ROS installation
+  - git clone https://raw.github.com/jhu-lcsr/ros_ci_tools /tmp/ros_ci_tools && export PATH=/tmp/ros_ci_tools:$PATH
+  - ros_ci_bootstrap
+  - source /opt/ros/$ROS_DISTRO/setup.bash
+  # Create isolated workspace based on the ros distro
+  - mkdir -p ~/ws_isolated/src
+  - pushd ~/ws_isolated/src
+  - git clone --recursive https://github.com/jhu-lcsr-forks/orocos_toolchain.git
+  #- git clone --recursive https://github.com/jhu-lcsr-forks/orocos_kinematics_dynamics.git
+  - popd
+  # Create non-isolated workspace
+  - mkdir -p ~/ws/src
+  - pushd ~/ws/src
+  - ln -s $CI_SOURCE_PATH
+  - git clone https://github.com/jhu-lcsr-forks/rtt_ros_integration.git
+  - git clone https://github.com/jhu-lcsr-forks/rtt_ros_comm.git
+  - git clone https://github.com/jhu-lcsr-forks/rtt_common_msgs.git
+  - popd
+  - rosdep install -r --from-paths ~/ws/src ~/ws_isolated/src --ignore-src --rosdistro $ROS_DISTRO -y > /dev/null
+  
+install:
+  # Build in an isolated catkin workspace
+  - pushd ~/ws_isolated
+  - catkin_make_isolated --install -j2 --cmake-args $EXTRA_CMAKE_ARGS
+  - source install_isolated/setup.bash
+  - popd
+  # build the normal catkin workspace
+  - pushd ~/ws
+  - catkin_make -j2
+
+script:
+  # Run tests
+  - source devel/setup.bash
+  - catkin_make run_tests
+  - catkin_make install
