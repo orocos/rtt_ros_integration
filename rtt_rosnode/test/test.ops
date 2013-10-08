@@ -1,4 +1,0 @@
-
-# Import RTT ROS plugin
-import("rtt_ros")
-

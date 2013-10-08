@@ -26,8 +26,8 @@ before_install:
   - mkdir -p ~/ws/src
   - pushd ~/ws/src
   - ln -s $CI_SOURCE_PATH
-  #- git clone https://github.com/jhu-lcsr-forks/rtt_ros_comm.git
-  #- git clone https://github.com/jhu-lcsr-forks/rtt_common_msgs.git
+  - git clone https://github.com/jhu-lcsr-forks/rtt_ros_comm.git
+  - git clone https://github.com/jhu-lcsr-forks/rtt_common_msgs.git
   #- git clone https://github.com/jhu-lcsr-forks/rtt_geometry.git
   #- git clone https://github.com/jhu-lcsr/rtt_ros_examples.git
   - popd
@@ -36,13 +36,15 @@ before_install:
 install:
   # Build in an isolated catkin workspace
   - pushd ~/ws_isolated
-  - catkin_make_isolated --install -j1 --cmake-args $EXTRA_CMAKE_ARGS
+  - catkin_make_isolated --install -j2 --cmake-args $EXTRA_CMAKE_ARGS
   - source install_isolated/setup.bash
   - popd
   # build the normal catkin workspace
   - pushd ~/ws
-  - catkin_make -j1
+  - catkin_make -j2
 
 script:
   # Run tests
-  - ""
+  - source devel/setup.bash
+  - rosrun rtt_roscomm_tests test_message_package.bash
+  - catkin_make run_tests

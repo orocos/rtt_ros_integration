@@ -1,5 +1,0 @@
-<launch>
-  <include file="$(find rtt_ros)/launch/deployer.launch">
-    <arg name="DEPLOYER_ARGS" value="-s $(find rtt_rosnode)/test/test.ops"/>
-  </include>
-</launch>
