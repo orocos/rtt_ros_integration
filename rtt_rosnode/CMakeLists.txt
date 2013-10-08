@@ -21,7 +21,3 @@ target_link_libraries(rtt_rosnode ${catkin_LIBRARIES})
 # Generate install targets and pkg-config files
 orocos_generate_package()
 
-install(FILES 
-  test/test.launch 
-  test/test.ops 
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/test)
