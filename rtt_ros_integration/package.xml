@@ -2,7 +2,7 @@
   <name>rtt_ros_integration</name>
   <version>2.6.0</version>
   <description>This stack contains all software necessary to build systems using both Orocos and ROS infrastructures. It depends on the</description>
-    <maintainer email="ruben.smits@mech.kuleuven.be">Ruben Smits</maintainer>
+  <maintainer email="ruben.smits@mech.kuleuven.be">Ruben Smits</maintainer>
 
   <license>GPL</license>
   <license>BSD</license>
@@ -16,15 +16,16 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>rtt_ros_integration_example</run_depend>
+  <run_depend>rtt_actionlib</run_depend>
+  <run_depend>rtt_dynamic_reconfigure</run_depend>
   <run_depend>rtt_ros</run_depend>
+  <run_depend>rtt_roscomm</run_depend>
+  <run_depend>rtt_ros_integration</run_depend>
+  <run_depend>rtt_rosnode</run_depend>
+  <run_depend>rtt_rosops</run_depend>
   <run_depend>rtt_rospack</run_depend>
   <run_depend>rtt_rosparam</run_depend>
-  <run_depend>rtt_rostopic</run_depend>
-
-
-
-
+  <run_depend>rtt_rostime</run_depend>
 
   <export>
     <metapackage/>
