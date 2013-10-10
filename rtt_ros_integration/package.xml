@@ -20,7 +20,6 @@
   <run_depend>rtt_dynamic_reconfigure</run_depend>
   <run_depend>rtt_ros</run_depend>
   <run_depend>rtt_roscomm</run_depend>
-  <run_depend>rtt_ros_integration</run_depend>
   <run_depend>rtt_rosnode</run_depend>
   <run_depend>rtt_rosops</run_depend>
   <run_depend>rtt_rospack</run_depend>
