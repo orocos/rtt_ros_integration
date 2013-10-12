@@ -218,8 +218,10 @@ macro(ros_generate_rtt_typekit package)
     add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
     add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
 
+    get_directory_property(_additional_make_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
+    list(APPEND _additional_make_clean_files "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${package}")
     set_directory_properties(PROPERTIES 
-      ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${CATKIN_DEVEL_PREFIX}/include/${package}/boost")
+      ADDITIONAL_MAKE_CLEAN_FILES "${_additional_make_clean_files}")
 
     # Install generated header files (dependent packages might need them)
     if(DEFINED rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION)
@@ -333,8 +335,10 @@ macro(ros_generate_rtt_service_proxies package)
     endif()
     add_file_dependencies(  ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp "${CMAKE_CURRENT_LIST_FILE}")
 
+    get_directory_property(_additional_make_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
+    list(APPEND _additional_make_clean_files "${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp")
     set_directory_properties(PROPERTIES 
-      ADDITIONAL_MAKE_CLEAN_FILES "${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp")
+      ADDITIONAL_MAKE_CLEAN_FILES "${_additional_make_clean_files}")
 
   else()
     #Return if nothing to do:
