@@ -206,9 +206,12 @@ macro(ros_generate_rtt_typekit package)
     target_link_libraries(  rtt-${package}-ros-transport ${catkin_LIBRARIES})
 
     # Add an explicit dependency between the typekits and message files
+    # TODO: Add deps for all msg dependencies
     if(DEFINED ${package}_EXPORTED_TARGETS)
-      add_dependencies(       rtt-${package}-typekit ${${package}_EXPORTED_TARGETS})
-      add_dependencies(       rtt-${package}-ros-transport ${${package}_EXPORTED_TARGETS})
+      if(NOT ${package} STREQUAL ${PROJECT_NAME})
+        add_dependencies(       rtt-${package}-typekit ${${package}_EXPORTED_TARGETS})
+        add_dependencies(       rtt-${package}-ros-transport ${${package}_EXPORTED_TARGETS})
+      endif()
     endif()
 
     # Add the typekit libraries to the dependecies exported by this project
