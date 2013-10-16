@@ -65,9 +65,9 @@ for dep in $(rospack depends $pkgname | grep "_msgs$"); do
     echo "WARNING: The package 'rtt_$dep' does not exist yet, however, 'rtt_$pkgname' will depend on it !"
     echo "         Use '$(basename $0) $dep' to create this missing package..."
   fi
-  deplist="$deplist  <build_depend>rtt_$dep</build_depend>\n  <run_depend>rtt_$dep</run_depend>"
-  rtt_deplist="$rtt_deplist      <plugin_depend>rtt_$dep</plugin_depend>"
-  catkin_deplist="$catkin_deplist  rtt_$dep"
+  deplist="$deplist  <build_depend>rtt_$dep</build_depend>\n  <run_depend>rtt_$dep</run_depend>\n"
+  rtt_deplist="$rtt_deplist      <plugin_depend>rtt_$dep</plugin_depend>\n"
+  catkin_deplist="$catkin_deplist  rtt_$dep\n"
 done
 
 mkdir $force rtt_$pkgname || { echo "Package already exists, use -f to force creation." ; exit 1; }
