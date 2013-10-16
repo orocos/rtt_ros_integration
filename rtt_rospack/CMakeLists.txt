@@ -16,6 +16,6 @@ target_link_libraries(rtt_rospack ${roslib_LIBRARIES})
 orocos_generate_package()
 
 catkin_package(
-  DEPENDS  rtt
+#  DEPENDS  rtt
   CATKIN_DEPENDS roslib 
 )

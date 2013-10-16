@@ -9,7 +9,7 @@ find_package(OROCOS-RTT REQUIRED rtt-marshalling)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 catkin_package(
-  DEPENDS rtt ocl
+#  DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp )
 
 include_directories(${catkin_INCLUDE_DIRS})

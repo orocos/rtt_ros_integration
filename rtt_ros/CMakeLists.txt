@@ -5,7 +5,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospack)
 
 catkin_package(
   INCLUDE_DIRS include
-  DEPENDS rtt ocl
+#  DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
