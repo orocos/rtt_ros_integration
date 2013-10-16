@@ -1,11 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_roscomm_tests)
 
-find_package(OROCOS-RTT REQUIRED COMPONENTS rtt-scripting)
-include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
-
 find_package(catkin REQUIRED
-  COMPONENTS rtt_roscomm rtt_std_msgs rostest)
+  COMPONENTS rtt_ros rtt_roscomm rtt_std_msgs rostest)
 
 catkin_package()
 
