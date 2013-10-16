@@ -1,0 +1,4 @@
+set(ORO_USE_CATKIN True)
+find_package(OROCOS-RTT REQUIRED 
+  COMPONENTS rtt-marshalling rtt-scripting rtt-transport-corba)
+include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
