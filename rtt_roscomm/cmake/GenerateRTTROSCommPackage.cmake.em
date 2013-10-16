@@ -42,8 +42,6 @@ macro(rtt_roscomm_debug)
 endmacro()
 
 macro(ros_generate_rtt_typekit package)
-  rtt_roscomm_destinations()
-
   find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling)
   if (NOT OROCOS-RTT_FOUND)
     message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
@@ -51,6 +49,14 @@ macro(ros_generate_rtt_typekit package)
     include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
     add_definitions( -DRTT_COMPONENT )
   endif()
+
+  # Configure source and destination paths of generated files
+  rtt_roscomm_destinations()
+  set(_template_types_src_dir "${rtt_roscomm_DIR}/../rtt_roscomm_pkg_template/src/orocos/types")
+  set(_template_types_dst_dir "${rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY}/orocos/types")
+
+  set(_template_typekit_src_dir "${rtt_roscomm_DIR}/../rtt_roscomm_pkg_template/include/PKG_NAME/typekit")
+  set(_template_typekit_dst_dir "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${package}/typekit")
 
   # Check if we're generating code for messages in this package
   if("${package}" STREQUAL "${PROJECT_NAME}")
@@ -150,13 +156,6 @@ macro(ros_generate_rtt_typekit package)
 
       #set_source_files_properties(${ROSMSGS_GENERATED_BOOST_HEADERS} PROPERTIES GENERATED TRUE)
       
-      # TypeInfo object
-      set(_template_types_src_dir "${rtt_roscomm_DIR}/../rtt_roscomm_pkg_template/src/orocos/types")
-      set(_template_types_dst_dir "${rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY}/orocos/types")
-
-      set(_template_typekit_src_dir "${rtt_roscomm_DIR}/../rtt_roscomm_pkg_template/include/PKG_NAME/typekit")
-      set(_template_typekit_dst_dir "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${package}/typekit")
-
       configure_file( 
         ${_template_types_src_dir}/ros_msg_typekit_plugin.cpp.in 
         ${_template_types_dst_dir}/ros_${ROSMSGNAME}_typekit_plugin.cpp @@ONLY )
@@ -219,8 +218,10 @@ macro(ros_generate_rtt_typekit package)
     add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
     add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
 
+    get_directory_property(_additional_make_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
+    list(APPEND _additional_make_clean_files "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${package}")
     set_directory_properties(PROPERTIES 
-      ADDITIONAL_MAKE_CLEAN_FILES "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${_template_types_dst_dir}/ros_${package}_typekit.cpp;${_template_types_dst_dir}/ros_${package}_transport.cpp;${CATKIN_DEVEL_PREFIX}/include/${package}/boost")
+      ADDITIONAL_MAKE_CLEAN_FILES "${_additional_make_clean_files}")
 
     # Install generated header files (dependent packages might need them)
     if(DEFINED rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION)
@@ -245,8 +246,6 @@ endmacro(ros_generate_rtt_typekit)
 
 
 macro(ros_generate_rtt_service_proxies package)
-  rtt_roscomm_destinations()
-
   find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling)
   if (NOT OROCOS-RTT_FOUND)
     message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
@@ -254,6 +253,11 @@ macro(ros_generate_rtt_service_proxies package)
     include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
     add_definitions( -DRTT_COMPONENT )
   endif()
+
+  # Configure source and destination paths of generated files
+  rtt_roscomm_destinations()
+  set(_template_proxies_src_dir "${rtt_roscomm_DIR}/../rtt_roscomm_pkg_template/src")
+  set(_template_proxies_dst_dir "${rtt_roscomm_GENERATED_SOURCES_OUTPUT_DIRECTORY}/orocos")
 
   # Check if we're generating code for services in this package
   if(NOT package STREQUAL PROJECT_NAME)
@@ -312,9 +316,6 @@ macro(ros_generate_rtt_service_proxies package)
     endforeach()
     
     # Service proxy factories
-    set(_template_proxies_src_dir "${rtt_roscomm_DIR}/../rtt_roscomm_pkg_template/src")
-    set(_template_proxies_dst_dir "${CMAKE_CURRENT_BINARY_DIR}/src")
-
     configure_file( 
       ${_template_proxies_src_dir}/rtt_ros_service_proxies.cpp.in 
       ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp @@ONLY )
@@ -334,8 +335,10 @@ macro(ros_generate_rtt_service_proxies package)
     endif()
     add_file_dependencies(  ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp "${CMAKE_CURRENT_LIST_FILE}")
 
+    get_directory_property(_additional_make_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
+    list(APPEND _additional_make_clean_files "${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp")
     set_directory_properties(PROPERTIES 
-      ADDITIONAL_MAKE_CLEAN_FILES "${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp")
+      ADDITIONAL_MAKE_CLEAN_FILES "${_additional_make_clean_files}")
 
   else()
     #Return if nothing to do:
