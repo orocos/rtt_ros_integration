@@ -4,7 +4,7 @@ project(rtt_ros)
 find_package(catkin REQUIRED COMPONENTS roscpp rospack)
 
 find_package(OROCOS-RTT REQUIRED 
-  COMPONENTS rtt-marshalling rtt-scripting rtt-transport-corba)
+  COMPONENTS rtt-marshalling rtt-scripting)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 catkin_package(
