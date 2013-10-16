@@ -4,7 +4,7 @@ project(rtt_rosnode)
 find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
 
 catkin_package(
-  DEPENDS rtt ocl
+#  DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp )
 
 include_directories(${catkin_INCLUDE_DIRS})

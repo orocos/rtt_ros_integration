@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
 
 catkin_package(
   INCLUDE_DIRS include
-  DEPENDS rtt ocl
+#  DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp)
 
 include_directories(

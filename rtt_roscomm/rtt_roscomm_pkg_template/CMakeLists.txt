@@ -10,7 +10,7 @@ ros_generate_rtt_typekit(@pkgname@)
 ros_generate_rtt_service_proxies(@pkgname@)
 
 catkin_package(
-  DEPENDS ocl rtt
+#  DEPENDS ocl rtt
   CATKIN_DEPENDS 
   rtt_roscomm 
   @pkgname@
