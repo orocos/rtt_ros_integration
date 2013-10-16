@@ -10,7 +10,7 @@ include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 catkin_package(
   INCLUDE_DIRS include 
-  DEPENDS rtt ocl
+#  DEPENDS rtt ocl
   CATKIN_DEPENDS roscpp  rtt_rospack 
   CFG_EXTRAS GenerateRTTROSCommPackage.cmake)
 
