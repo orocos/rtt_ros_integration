@@ -3,12 +3,7 @@ project(rtt_rosparam)
 
 set(CMAKE_BUILD_TYPE Debug)
 
-find_package(catkin REQUIRED COMPONENTS roscpp )
-find_package(OROCOS-RTT REQUIRED rtt-marshalling)
-
-# Defines the orocos_* cmake macros. See that file for additional
-# documentation.
-include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
+find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
 
 catkin_package(
   INCLUDE_DIRS include

@@ -3,22 +3,21 @@ project(rtt_ros)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rospack)
 
+find_package(OROCOS-RTT REQUIRED 
+  COMPONENTS rtt-marshalling rtt-scripting)
+include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
+
 catkin_package(
   INCLUDE_DIRS include
-#  DEPENDS rtt ocl
-  CATKIN_DEPENDS roscpp)
+  CATKIN_DEPENDS roscpp
+  CFG_EXTRAS rtt_ros-extras.cmake)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-find_package(OROCOS-RTT REQUIRED rtt-marshalling)
 find_package(LibXml2 REQUIRED)
 
 # This adds orocos environment variables to the catkin setup.sh
 catkin_add_env_hooks(10.orocos SHELLS sh DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks)
-
-# Defines the orocos_* cmake macros. See that file for additional
-# documentation.
-include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR})
 
