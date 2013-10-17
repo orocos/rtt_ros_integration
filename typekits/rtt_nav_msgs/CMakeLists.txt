@@ -10,7 +10,6 @@ ros_generate_rtt_typekit(nav_msgs)
 ros_generate_rtt_service_proxies(nav_msgs)
 
 catkin_package(
-  DEPENDS ocl rtt
   CATKIN_DEPENDS 
   rtt_roscomm 
   nav_msgs

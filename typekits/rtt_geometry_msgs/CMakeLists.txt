@@ -10,7 +10,6 @@ ros_generate_rtt_typekit(geometry_msgs)
 ros_generate_rtt_service_proxies(geometry_msgs)
 
 catkin_package(
-  DEPENDS ocl rtt
   CATKIN_DEPENDS 
   rtt_roscomm 
   geometry_msgs

@@ -10,7 +10,6 @@ ros_generate_rtt_typekit(visualization_msgs)
 ros_generate_rtt_service_proxies(visualization_msgs)
 
 catkin_package(
-  DEPENDS ocl rtt
   CATKIN_DEPENDS 
   rtt_roscomm 
   visualization_msgs

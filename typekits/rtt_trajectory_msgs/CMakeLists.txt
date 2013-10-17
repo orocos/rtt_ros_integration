@@ -10,7 +10,6 @@ ros_generate_rtt_typekit(trajectory_msgs)
 ros_generate_rtt_service_proxies(trajectory_msgs)
 
 catkin_package(
-  DEPENDS ocl rtt
   CATKIN_DEPENDS 
   rtt_roscomm 
   trajectory_msgs

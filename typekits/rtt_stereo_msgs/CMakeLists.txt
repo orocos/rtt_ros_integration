@@ -10,7 +10,6 @@ ros_generate_rtt_typekit(stereo_msgs)
 ros_generate_rtt_service_proxies(stereo_msgs)
 
 catkin_package(
-  DEPENDS ocl rtt
   CATKIN_DEPENDS 
   rtt_roscomm 
   stereo_msgs
