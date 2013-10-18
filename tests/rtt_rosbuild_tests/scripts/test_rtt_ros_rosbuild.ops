@@ -1,0 +1,8 @@
+import("rtt_ros")
+ros.import("rtt_rosbuild_tests")
+
+loadComponent("test", "rtt_rosbuild_tests::Component")
+stream("test.string", rostopic.connection("chatter"))
+test.setPeriod(1.0)
+
+test.start()

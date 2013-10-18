@@ -1,0 +1,22 @@
+<package>
+  <description brief="rtt_ros_rosbuild_test">
+
+     rtt_ros_rosbuild_test
+
+  </description>
+  <author>Johannes Meyer</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rtt_ros_rosbuild_test</url>
+
+  <depend package="rtt_ros" />
+  <depend package="rtt_roscomm" />
+
+  <export>
+    <rtt_ros>
+      <plugin_depend>rtt_roscomm</plugin_depend>
+    </rtt_ros>
+  </export>
+</package>
+
+
