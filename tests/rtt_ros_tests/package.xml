@@ -42,8 +42,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>rtt_ros</build_depend>
-  <build_depend>ocl-logging</build_depend>
-  <build_depend>ocl-deployment</build_depend>
+  <build_depend>ocl</build_depend>
 
   <run_depend>rtt_rospack</run_depend>
 
