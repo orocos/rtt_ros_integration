@@ -1,0 +1,3 @@
+#!/bin/sh
+export ORO_LOGLEVEL=5
+exec rosrun rtt_ros deployer -s $(rospack find rtt_rosbuild_tests)/scripts/test_rtt_ros_rosbuild.ops

@@ -1,0 +1,6 @@
+find_package(rtt_roscomm REQUIRED)
+
+ros_generate_rtt_typekit(rtt_rosbuild_tests)
+ros_generate_rtt_service_proxies(rtt_rosbuild_tests)
+
+orocos_generate_package(rtt_rosbuild_tests_msgs-${OROCOS_TARGET})
