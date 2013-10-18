@@ -88,6 +88,7 @@ macro(ros_generate_rtt_typekit package)
     rosbuild_find_ros_package(${package})
     if(DEFINED ${package}_PACKAGE_PATH)
       set(${package}_FOUND TRUE)
+      set(${package}_INCLUDE_DIRS "${${package}_PACKAGE_PATH}/include")
       file(GLOB MSG_FILES "${${package}_PACKAGE_PATH}/msg/*.msg")
       set(${package}_EXPORTED_TARGETS)
     endif()
@@ -215,8 +216,9 @@ macro(ros_generate_rtt_typekit package)
     endif()
 
     # Add the typekit libraries to the dependecies exported by this project
-    LIST(APPEND ${${PROJECT_NAME}_EXPORTED_TARGETS} "rtt-${package}-typekit")
-    LIST(APPEND ${${PROJECT_NAME}_EXPORTED_TARGETS} "rtt-${package}-ros-transport")
+#    LIST(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS "rtt-${package}-typekit")        # <-- This is already done in orocos_typekit().
+#    LIST(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS "rtt-${package}-ros-transport")  # <-- This is already done in orocos_typekit().
+    LIST(APPEND ${PROJECT_NAME}_EXPORTED_INCLUDE_DIRS "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos" ${${package}_INCLUDE_DIRS})
 
     add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
     add_file_dependencies(  ${_template_types_dst_dir}/ros_${package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
@@ -290,6 +292,7 @@ macro(ros_generate_rtt_service_proxies package)
     rosbuild_find_ros_package(${package})
     if(DEFINED ${package}_PACKAGE_PATH)
       set(${package}_FOUND TRUE)
+      set(${package}_INCLUDE_DIRS "${${package}_PACKAGE_PATH}/include")
       file(GLOB SRV_FILES "${${package}_PACKAGE_PATH}/srv/*.srv")
       set(${package}_EXPORTED_TARGETS)
     endif()
