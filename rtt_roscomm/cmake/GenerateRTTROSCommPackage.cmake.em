@@ -68,7 +68,7 @@ macro(ros_generate_rtt_typekit package)
   find_package(genmsg REQUIRED)
 
   # Get all .msg files
-  if(${package}_FOUND)
+  if(${package}_FOUND AND NOT ROSBUILD_init_called)
     # Use catkin-based genmsg to find msg files
     if(genmsg_VERSION VERSION_GREATER 0.4.19)
       set(MSG_FILES)
