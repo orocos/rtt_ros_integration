@@ -6,6 +6,9 @@ find_package(catkin REQUIRED
 
 catkin_package()
 
+orocos_use_package(ocl-logging)
+orocos_use_package(ocl-deployment)
+
 if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(rtt_roscomm_api_tests test/api_tests.cpp)

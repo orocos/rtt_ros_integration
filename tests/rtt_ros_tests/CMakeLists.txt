@@ -4,6 +4,9 @@ project(rtt_ros_tests)
 find_package(catkin REQUIRED
   COMPONENTS rtt_ros)
 
+orocos_use_package(ocl-logging)
+orocos_use_package(ocl-deployment)
+
 catkin_package()
 
 if(CATKIN_ENABLE_TESTING)
