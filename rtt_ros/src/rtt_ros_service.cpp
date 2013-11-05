@@ -197,6 +197,7 @@ public:
         // Check if it's already been imported
         if(*it == "rtt_ros" || loader->isImported(*it)) {
           RTT::log(RTT::Debug) << "Package dependency '"<< *it <<"' already imported." << RTT::endlog();
+          found_packages = true;
           continue;
         }
 
