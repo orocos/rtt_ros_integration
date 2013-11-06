@@ -28,11 +28,27 @@ public:
     this->addConstant("PRIVATE",PRIVATE);
     this->addConstant("COMPONENT",COMPONENT);
 
-    this->addOperation("getAll", &ROSParamService::getParams, this) 
+    this->addOperation("getAllRelative", &ROSParamService::getParamsRelative, this)
+      .doc("Gets all properties of this component from the ROS param server in the relative namespace.");
+    this->addOperation("getAllAbsolute", &ROSParamService::getParamsAbsolute, this)
+      .doc("Gets all properties of this component from the ROS param server in the absolute namespace.");
+    this->addOperation("getAllPrivate", &ROSParamService::getParamsPrivate, this)
+      .doc("Gets all properties of this component from the ROS param server in the node's private namespace.");
+    this->addOperation("getAllComponentPrivate", &ROSParamService::getParamsComponentPrivate, this)
       .doc("Gets all properties of this component from the ROS param server in the component's private namespace.");
+    this->addOperation("getAll", &ROSParamService::getParamsComponentPrivate, this)
+      .doc("Gets all properties of this component from the ROS param server in the component's private namespace. This is just an alias for getAllComponentPrivate().");
 
-    this->addOperation("setAll", &ROSParamService::setParams, this) 
+    this->addOperation("setAllRelative", &ROSParamService::setParamsRelative, this)
+      .doc("Sets all properties of this component on the ROS param server from the similarly-named property of this component in the relative namespace.");
+    this->addOperation("setAllAbsolute", &ROSParamService::setParamsAbsolute, this)
+      .doc("Sets all properties of this component on the ROS param server from the similarly-named property of this component in the absolute namespace.");
+    this->addOperation("setAllPrivate", &ROSParamService::setParamsPrivate, this)
+      .doc("Sets all properties of this component on the ROS param server from the similarly-named property of this component in the node's private namespace.");
+    this->addOperation("setAllComponentPrivate", &ROSParamService::setParamsComponentPrivate, this)
       .doc("Sets all properties of this component on the ROS param server from the similarly-named property of this component in the component's private namespace.");
+    this->addOperation("setAll", &ROSParamService::setParamsComponentPrivate, this)
+      .doc("Sets all properties of this component on the ROS param server from the similarly-named property of this component in the component's private namespace. This is just an alias for setAll().");
 
     this->addOperation("get", &ROSParamService::getParam, this) 
       .doc("Gets one property of this component from the ROS param server based on the given resolution policy.")
@@ -78,7 +94,12 @@ private:
     const std::string &param_name, 
     const ROSParamService::ResolutionPolicy policy);
 
-  bool getParams();
+  bool getParams(const ROSParamService::ResolutionPolicy policy);
+  bool getParamsRelative() { return getParams(RELATIVE); }
+  bool getParamsAbsolute() { return getParams(ABSOLUTE); }
+  bool getParamsPrivate() { return getParams(PRIVATE); }
+  bool getParamsComponentPrivate() { return getParams(COMPONENT); }
+
   bool getParam(
     const std::string &param_name, 
     const ROSParamService::ResolutionPolicy policy = ROSParamService::COMPONENT);
@@ -87,7 +108,12 @@ private:
   bool getParamPrivate(const std::string &name) { return getParam(name, PRIVATE); }
   bool getParamComponentPrivate(const std::string &name) { return getParam(name, COMPONENT); }
 
-  bool setParams();
+  bool setParams(const ROSParamService::ResolutionPolicy policy);
+  bool setParamsRelative() { return setParams(RELATIVE); }
+  bool setParamsAbsolute() { return setParams(ABSOLUTE); }
+  bool setParamsPrivate() { return setParams(PRIVATE); }
+  bool setParamsComponentPrivate() { return setParams(COMPONENT); }
+
   bool setParam(
     const std::string &param_name, 
     const ROSParamService::ResolutionPolicy policy = ROSParamService::COMPONENT);
@@ -230,11 +256,11 @@ bool ROSParamService::setParam(
   return true;
 }
 
-bool ROSParamService::setParams()
+bool ROSParamService::setParams(const ROSParamService::ResolutionPolicy policy)
 {
   XmlRpc::XmlRpcValue xml_value;
   xml_value = rttPropertyToXmlParam(*(this->getOwner()->properties()));
-  ros::param::set(std::string("~") + this->getOwner()->getName(), xml_value);
+  ros::param::set(resolvedName("", policy), xml_value);
   return true;
 }
 
@@ -410,14 +436,14 @@ bool ROSParamService::getParam(
   return xmlParamToProp(xml_value, prop_base);
 }
 
-bool ROSParamService::getParams()
+bool ROSParamService::getParams(const ROSParamService::ResolutionPolicy policy)
 {
   RTT::Logger::In in("ROSParamService::getParams");
 
   // Get the parameter
   XmlRpc::XmlRpcValue xml_value;
 
-  const std::string resolved_name = std::string("~") + this->getOwner()->getName();
+  const std::string resolved_name = resolvedName("", policy);
   if(!ros::param::get(resolved_name, xml_value)) {
     RTT::log(RTT::Debug) << "ROS Parameter \"" << resolved_name << "\" not found on the parameter server!" << RTT::endlog();
     return false;
