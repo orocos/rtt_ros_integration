@@ -94,6 +94,7 @@ private:
     const std::string &param_name, 
     const ROSParamService::ResolutionPolicy policy);
 
+  bool getParams(RTT::Service::shared_ptr service, const std::string& ns, const ROSParamService::ResolutionPolicy policy);
   bool getParams(const ROSParamService::ResolutionPolicy policy);
   bool getParamsRelative() { return getParams(RELATIVE); }
   bool getParamsAbsolute() { return getParams(ABSOLUTE); }
@@ -108,6 +109,7 @@ private:
   bool getParamPrivate(const std::string &name) { return getParam(name, PRIVATE); }
   bool getParamComponentPrivate(const std::string &name) { return getParam(name, COMPONENT); }
 
+  bool setParams(RTT::Service::shared_ptr service, const std::string& ns, const ROSParamService::ResolutionPolicy policy);
   bool setParams(const ROSParamService::ResolutionPolicy policy);
   bool setParamsRelative() { return setParams(RELATIVE); }
   bool setParamsAbsolute() { return setParams(ABSOLUTE); }
@@ -251,16 +253,46 @@ bool ROSParamService::setParam(
     const ROSParamService::ResolutionPolicy policy)
 {
   XmlRpc::XmlRpcValue xml_value;
-  xml_value = rttPropertyBaseToXmlParam(this->getOwner()->getProperty(param_name));
-  ros::param::set(resolvedName(param_name,policy), xml_value);
-  return true;
+
+  // Try to find a property named param_name
+  RTT::base::PropertyBase *property = this->getOwner()->getProperty(param_name);
+  if (property) {
+    xml_value = rttPropertyBaseToXmlParam(this->getOwner()->getProperty(param_name));
+    ros::param::set(resolvedName(param_name,policy), xml_value);
+    return true;
+  }
+
+  // Try to find a sub-service named param_name
+  RTT::Service::shared_ptr service = this->getOwner()->provides()->getService(param_name);
+  if (service) {
+    // Set all parameters of the sub-service
+    return setParams(service, service->getName(), policy);
+  }
+
+  RTT::log(RTT::Debug) << "RTT component does not have a property or service named \"" << param_name << "\"" << RTT::endlog();
+  return false;
 }
 
 bool ROSParamService::setParams(const ROSParamService::ResolutionPolicy policy)
 {
+  return setParams(this->getOwner()->provides(), std::string(), policy);
+}
+
+bool ROSParamService::setParams(RTT::Service::shared_ptr service, const std::string& ns, const ROSParamService::ResolutionPolicy policy) {
   XmlRpc::XmlRpcValue xml_value;
-  xml_value = rttPropertyToXmlParam(*(this->getOwner()->properties()));
-  ros::param::set(resolvedName("", policy), xml_value);
+  xml_value = rttPropertyToXmlParam(*(service->properties()));
+  ros::param::set(resolvedName(ns, policy), xml_value);
+
+  // Recurse into sub-services
+  RTT::Service::ProviderNames names = service->getProviderNames();
+  for (RTT::Service::ProviderNames::const_iterator it = names.begin(); it != names.end(); ++it)
+  {
+    RTT::Service::shared_ptr sub(service->getService(*it));
+    if (sub) {
+      if (!setParams(sub, ns + "/" + sub->getName(), policy)) return false;
+    }
+  }
+
   return true;
 }
 
@@ -426,37 +458,59 @@ bool ROSParamService::getParam(
 
   // Try to get the property if it exists
   RTT::base::PropertyBase *prop_base = this->getOwner()->getProperty(param_name);
-
-  if(!prop_base) {
-    RTT::log(RTT::Debug) << "RTT component does not have a property named \"" << param_name << "\"" << RTT::endlog();
-    return false;
+  if(prop_base) {
+    // Deal with the xml value
+    return xmlParamToProp(xml_value, prop_base);
   }
 
-  // Deal with the xml value
-  return xmlParamToProp(xml_value, prop_base);
+  // Try to get the properties of a sub-service if it exists
+  RTT::Service::shared_ptr service = this->getOwner()->provides()->getService(param_name);
+  if(service) {
+    // Get all parameters of the sub-service
+    return getParams(service, service->getName(), policy);
+  }
+
+  RTT::log(RTT::Debug) << "RTT component does not have a property or service named \"" << param_name << "\"" << RTT::endlog();
+  return false;
 }
 
 bool ROSParamService::getParams(const ROSParamService::ResolutionPolicy policy)
+{
+  return getParams(this->getOwner()->provides(), std::string(), policy);
+}
+
+bool ROSParamService::getParams(RTT::Service::shared_ptr service, const std::string& ns, const ROSParamService::ResolutionPolicy policy)
 {
   RTT::Logger::In in("ROSParamService::getParams");
 
   // Get the parameter
   XmlRpc::XmlRpcValue xml_value;
 
-  const std::string resolved_name = resolvedName("", policy);
+  const std::string resolved_name = resolvedName(ns, policy);
   if(!ros::param::get(resolved_name, xml_value)) {
     RTT::log(RTT::Debug) << "ROS Parameter \"" << resolved_name << "\" not found on the parameter server!" << RTT::endlog();
     return false;
   }
 
   // Create a Property<> wrapper around the propertybag
-  RTT::PropertyBag *properties = this->getOwner()->properties();
+  RTT::PropertyBag *properties = service->properties();
   RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr datasource(new RTT::internal::ReferenceDataSource<RTT::PropertyBag>(*properties));
-
   RTT::Property<RTT::PropertyBag> prop(this->getOwner()->getName(),"",datasource);
 
   // Deal with the xml value
-  return xmlParamToProp(xml_value, &prop);
+  if (!xmlParamToProp(xml_value, &prop)) return false;
+
+  // Recurse into sub-services
+  RTT::Service::ProviderNames names = service->getProviderNames();
+  for (RTT::Service::ProviderNames::const_iterator it = names.begin(); it != names.end(); ++it)
+  {
+    RTT::Service::shared_ptr sub(service->getService(*it));
+    if (sub) {
+      if (!getParams(sub, ns + "/" + sub->getName(), policy)) return false;
+    }
+  }
+
+  return true;
 }
 
 ORO_SERVICE_NAMED_PLUGIN(ROSParamService, "rosparam")
