@@ -29,10 +29,10 @@ public:
     this->addConstant("COMPONENT",COMPONENT);
 
     this->addOperation("getAll", &ROSParamService::getParams, this) 
-      .doc("Gets all properties of this component from the ROS param server relative to the component namespace.");
+      .doc("Gets all properties of this component from the ROS param server in the component's private namespace.");
 
     this->addOperation("setAll", &ROSParamService::setParams, this) 
-      .doc("Gets all properties of this component from the ROS param server relative to the component namespace.");
+      .doc("Sets all properties of this component on the ROS param server from the similarly-named property of this component in the component's private namespace.");
 
     this->addOperation("get", &ROSParamService::getParam, this) 
       .doc("Gets one property of this component from the ROS param server based on the given resolution policy.")
@@ -324,7 +324,7 @@ bool xmlParamToProp<RTT::PropertyBag>(
     return false;
   }
 
-  // Make sure it's an array 
+  // Make sure it's a struct
   if(xml_value.getType() != XmlRpc::XmlRpcValue::TypeStruct) {
     return false;
   }
