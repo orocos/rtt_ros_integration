@@ -233,7 +233,7 @@ bool ROSParamService::setParam(
 bool ROSParamService::setParams()
 {
   XmlRpc::XmlRpcValue xml_value;
-  xml_value = rttPropertyToXmlParam(this->getOwner()->properties());
+  xml_value = rttPropertyToXmlParam(*(this->getOwner()->properties()));
   ros::param::set(std::string("~") + this->getOwner()->getName(), xml_value);
   return true;
 }
