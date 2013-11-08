@@ -30,5 +30,63 @@
 #include "ros_publish_activity.hpp"
 
 namespace ros_integration {
-  RosPublishActivity::weak_ptr RosPublishActivity::ros_pub_act;
+
+    using namespace RTT;
+
+    RosPublishActivity::weak_ptr RosPublishActivity::ros_pub_act;
+
+    RosPublishActivity::RosPublishActivity( const std::string& name)
+        : Activity(ORO_SCHED_OTHER, RTT::os::LowestPriority, 0.0, 0, name)
+    {
+      Logger::In in("RosPublishActivity");
+      log(Debug)<<"Creating RosPublishActivity"<<endlog();
+    }
+
+    void RosPublishActivity::loop(){
+        os::MutexLock lock(map_lock);
+        for(Publishers::iterator it = publishers.begin(); it != publishers.end(); ++it)
+            if (it->second) {
+                it->second = false; // protected by the mutex lock !
+                it->first->publish();
+            }
+    }
+
+    RosPublishActivity::shared_ptr RosPublishActivity::Instance() {
+        shared_ptr ret = ros_pub_act.lock();
+        if ( !ret ) {
+            ret.reset(new RosPublishActivity("RosPublishActivity"));
+            ros_pub_act = ret;
+            ret->start();
+        }
+        return ret;
+    }
+
+    void RosPublishActivity::addPublisher(RosPublisher* pub) {
+        os::MutexLock lock(map_lock);
+        publishers[pub] = false;
+    }
+
+    void RosPublishActivity::removePublisher(RosPublisher* pub) {
+        os::MutexLock lock(map_lock);
+        publishers.erase(pub);
+    }
+
+    bool RosPublishActivity::requestPublish(RosPublisher* chan){
+        // flag that data is available in a channel:
+        {
+            os::MutexLock lock(map_lock);
+            assert(publishers.find(chan) != publishers.end() );
+            publishers.find(chan)->second = true;
+        }
+        // trigger loop()
+        this->trigger();
+        return true;
+    }
+
+    RosPublishActivity::~RosPublishActivity() {
+        Logger::In in("RosPublishActivity");
+        log(Info) << "RosPublishActivity cleans up: no more work."<<endlog();
+        stop();
+    }
+
 }
