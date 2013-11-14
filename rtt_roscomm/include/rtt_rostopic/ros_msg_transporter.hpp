@@ -157,6 +157,7 @@ namespace ros_integration {
   template<typename T>
   class RosSubChannelElement: public base::ChannelElement<T>
   {
+    std::string topicname;
     ros::NodeHandle ros_node;
     ros::Subscriber ros_sub;
     
@@ -172,12 +173,17 @@ namespace ros_integration {
      */
     RosSubChannelElement(base::PortInterface* port, const ConnPolicy& policy)
     {
+      topicname=policy.name_id;
+      Logger::In in(topicname);
       log(Debug)<<"Creating ROS subscriber for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+
       ros_sub=ros_node.subscribe(policy.name_id,policy.size,&RosSubChannelElement::newData,this);
       this->ref();
     }
 
     ~RosSubChannelElement() {
+      Logger::In in(topicname);
+      log(Debug)<<"Destroying RosSubChannelElement"<<endlog();
     }
 
     virtual bool inputReady() {
