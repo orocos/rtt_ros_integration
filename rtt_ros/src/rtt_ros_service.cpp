@@ -22,7 +22,6 @@
 #include <rtt/plugin/PluginLoader.hpp>
 #include <rtt/types/TypekitRepository.hpp>
 
-#include <ros/ros.h>
 #include <rospack/rospack.h>
 
 #include <rtt_ros/time.h>

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_ros)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rospack)
+find_package(catkin REQUIRED COMPONENTS rospack rostime)
 
 find_package(OROCOS-RTT REQUIRED 
   COMPONENTS rtt-marshalling rtt-scripting)
@@ -9,7 +9,7 @@ include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp
+  CATKIN_DEPENDS rostime
   CFG_EXTRAS rtt_ros-extras.cmake)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)

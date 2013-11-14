@@ -1,8 +1,8 @@
 #ifndef __RTT_ROS_TIME_H
 #define __RTT_ROS_TIME_H
 
-#include <rtt/RTT.hpp>
-#include <ros/ros.h>
+#include <rtt/os/TimeService.hpp>
+#include <ros/time.h>
 
 namespace rtt_ros {
   namespace time {
