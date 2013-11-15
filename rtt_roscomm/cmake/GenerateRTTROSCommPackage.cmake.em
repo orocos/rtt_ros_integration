@@ -203,8 +203,8 @@ macro(ros_generate_rtt_typekit package)
     # Targets
     orocos_typekit(         rtt-${package}-typekit ${_template_types_dst_dir}/ros_${package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
     orocos_typekit(         rtt-${package}-ros-transport ${_template_types_dst_dir}/ros_${package}_transport.cpp )
-    target_link_libraries(  rtt-${package}-typekit ${catkin_LIBRARIES})
-    target_link_libraries(  rtt-${package}-ros-transport ${catkin_LIBRARIES})
+    target_link_libraries(  rtt-${package}-typekit ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
+    target_link_libraries(  rtt-${package}-ros-transport ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 
     # Add an explicit dependency between the typekits and message files
     # TODO: Add deps for all msg dependencies
@@ -335,7 +335,7 @@ macro(ros_generate_rtt_service_proxies package)
 
     # Targets
     orocos_service(         rtt_${ROSPACKAGE}_ros_service_proxies ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp)
-    target_link_libraries(  rtt_${ROSPACKAGE}_ros_service_proxies ${catkin_LIBRARIES})
+    target_link_libraries(  rtt_${ROSPACKAGE}_ros_service_proxies ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
     if(DEFINED ${package}_EXPORTED_TARGETS)
       add_dependencies(       rtt_${ROSPACKAGE}_ros_service_proxies ${${package}_EXPORTED_TARGETS})
     endif()
