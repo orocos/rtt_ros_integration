@@ -12,8 +12,6 @@ catkin_package(
   CATKIN_DEPENDS roscpp
   CFG_EXTRAS rtt_ros-extras.cmake)
 
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
-
 find_package(LibXml2 REQUIRED)
 
 # This adds orocos environment variables to the catkin setup.sh
