@@ -29,9 +29,13 @@
   <run_depend>rtt_roscomm</run_depend>
   <run_depend>rosgraph_msgs</run_depend>
 
+  <build_depend>rtt_std_msgs</build_depend>
+  <run_depend>rtt_std_msgs</run_depend>
+
   <export>
     <rtt_ros>
       <plugin_depend>rtt_roscomm</plugin_depend>
+      <plugin_depend>rtt_std_msgs</plugin_depend>
     </rtt_ros>
   </export>
 </package>
