@@ -16,25 +16,29 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-#uncomment if you have defined messages
-rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
+if(CATKIN_ENABLE_TESTING)
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+  #uncomment if you have defined messages
+  rosbuild_genmsg()
+  #uncomment if you have defined services
+  #rosbuild_gensrv()
 
-add_subdirectory(typekit)
+  #common commands for building c++ executables and libraries
+  #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
+  #target_link_libraries(${PROJECT_NAME} another_library)
+  #rosbuild_add_boost_directories()
+  #rosbuild_link_boost(${PROJECT_NAME} thread)
+  #rosbuild_add_executable(example examples/example.cpp)
+  #target_link_libraries(example ${PROJECT_NAME})
 
-find_package(rtt_ros REQUIRED)
-include_directories(include/orocos)
+  add_subdirectory(typekit)
 
-orocos_component(rtt_rosbuild_component src/component.cpp)
-target_link_libraries(rtt_rosbuild_component rtt-${PROJECT_NAME}-typekit)
+  find_package(rtt_ros REQUIRED)
+  include_directories(include/orocos)
 
-orocos_generate_package()
+  orocos_component(rtt_rosbuild_component src/component.cpp)
+  target_link_libraries(rtt_rosbuild_component rtt-${PROJECT_NAME}-typekit)
+
+  orocos_generate_package()
+
+endif()
