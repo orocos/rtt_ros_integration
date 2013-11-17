@@ -1,9 +1,10 @@
+#include <boost/algorithm/string.hpp>
 
 #include <rtt/RTT.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 
-#include <rtt_rosservice/ros_service_proxy.h> 
+#include <rtt_rosservice/rtt_rosservice_proxy.h>
 
 using namespace RTT;
 using namespace std;

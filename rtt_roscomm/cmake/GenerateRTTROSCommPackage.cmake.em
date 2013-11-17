@@ -315,7 +315,7 @@ macro(ros_generate_rtt_service_proxies package)
       set(ROS_SRV_TYPE "${ROSPACKAGE}::${ROS_SRV_NAME}")
       set(ROS_SRV_TYPENAME "${ROSPACKAGE}/${ROS_SRV_NAME}")
 
-      # rtt_ros_service_proxies.cpp.in
+      # rtt_rosservice_proxies.cpp.in
       set(ROS_SRV_HEADERS "${ROS_SRV_HEADERS}#include <${ROS_SRV_TYPENAME}.h>\n")
       set(ROS_SRV_FACTORIES "${ROS_SRV_PROXY_FACTORIES}  success = success && register_service_factory(new ROSServiceProxyFactory<${ROS_SRV_TYPE}>(\"${ROS_SRV_TYPENAME}\"));\n")
 
@@ -323,10 +323,10 @@ macro(ros_generate_rtt_service_proxies package)
     
     # Service proxy factories
     configure_file( 
-      ${_template_proxies_src_dir}/rtt_ros_service_proxies.cpp.in 
-      ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp @@ONLY )
+      ${_template_proxies_src_dir}/rtt_rosservice_proxies.cpp.in
+      ${_template_proxies_dst_dir}/rtt_rosservice_proxies.cpp @@ONLY )
 
-    add_file_dependencies( ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp ${SRV_FILES})
+    add_file_dependencies( ${_template_proxies_dst_dir}/rtt_rosservice_proxies.cpp ${SRV_FILES})
     
     include_directories(
       ${CATKIN_DEVEL_PREFIX}/include 
@@ -334,15 +334,15 @@ macro(ros_generate_rtt_service_proxies package)
       ${catkin_INCLUDE_DIRS})
 
     # Targets
-    orocos_service(         rtt_${ROSPACKAGE}_ros_service_proxies ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp)
-    target_link_libraries(  rtt_${ROSPACKAGE}_ros_service_proxies ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
+    orocos_service(         rtt_${ROSPACKAGE}_rosservice_proxies ${_template_proxies_dst_dir}/rtt_rosservice_proxies.cpp)
+    target_link_libraries(  rtt_${ROSPACKAGE}_rosservice_proxies ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
     if(DEFINED ${package}_EXPORTED_TARGETS)
-      add_dependencies(       rtt_${ROSPACKAGE}_ros_service_proxies ${${package}_EXPORTED_TARGETS})
+      add_dependencies(       rtt_${ROSPACKAGE}_rosservice_proxies ${${package}_EXPORTED_TARGETS})
     endif()
-    add_file_dependencies(  ${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp "${CMAKE_CURRENT_LIST_FILE}")
+    add_file_dependencies(  ${_template_proxies_dst_dir}/rtt_rosservice_proxies.cpp "${CMAKE_CURRENT_LIST_FILE}")
 
     get_directory_property(_additional_make_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
-    list(APPEND _additional_make_clean_files "${_template_proxies_dst_dir}/rtt_ros_service_proxies.cpp")
+    list(APPEND _additional_make_clean_files "${_template_proxies_dst_dir}/rtt_rosservice_proxies.cpp")
     set_directory_properties(PROPERTIES 
       ADDITIONAL_MAKE_CLEAN_FILES "${_additional_make_clean_files}")
 
