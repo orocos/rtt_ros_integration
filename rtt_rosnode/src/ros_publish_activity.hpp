@@ -37,6 +37,8 @@
 
 #include <ros/ros.h>
 
+#include <set>
+
 namespace ros_integration{
   
     /**
@@ -46,6 +48,11 @@ namespace ros_integration{
   struct RosPublisher
   {
   public:
+      /**
+       * Returns true if there are new data available
+       */
+      virtual bool hasWork()=0;
+
       /**
        * Publish all data in the channel to a ROS topic.
        */
@@ -69,12 +76,13 @@ namespace ros_integration{
       //! This pointer may not be refcounted since it would prevent cleanup.
       static weak_ptr ros_pub_act;
     
-      //! A map keeping track of all publishers in the current
+      //! A set keeping track of all publishers in the current
       //! process. It must be guarded by the mutex since 
       //! insertion/removal happens concurrently.
-      typedef std::map< RosPublisher*, bool> Publishers;
+      typedef std::set< RosPublisher* > Publishers;
+      typedef Publishers::iterator iterator;
       Publishers publishers;
-      RTT::os::Mutex map_lock;
+      RTT::os::Mutex publishers_lock;
 
     RosPublishActivity( const std::string& name);
 
@@ -94,13 +102,6 @@ namespace ros_integration{
       void addPublisher(RosPublisher* pub);
       void removePublisher(RosPublisher* pub);
     
-      /**
-       * Requests to publish the data of a given channel.
-       * Note that multiple calls to requestPublish may 
-       * cause only a single call to RosPublisher::publish().
-       */
-      bool requestPublish(RosPublisher* chan);
-
       ~RosPublishActivity();
       
   };//class
