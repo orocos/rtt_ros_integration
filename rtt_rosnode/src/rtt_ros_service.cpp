@@ -24,6 +24,7 @@ public:
         // stream("Simulation.ctrl", ros.topic("/cmd_vel") )
         this->addOperation("topic", &ROSService::topic, this).doc("Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last sample is kept.").arg("name", "The ros topic name");
         this->addOperation("topicBuffer", &ROSService::topicBuffer, this).doc("Creates a ConnPolicy for subscribing to or publishing a topic.").arg("name", "The ros topic name").arg("size","The size of the buffer.");
+        this->addOperation("topicUnbuffered", &ROSService::topicUnbuffered, this).doc("Creates a ConnPolicy for unbuffered publishing a topic. This may not be real-time safe!").arg("name", "The ros topic name");
         this->addConstant("protocol_id", protocol_id );
     }
 
@@ -45,6 +46,19 @@ public:
      */
     ConnPolicy topicBuffer(const std::string& name, int size) {
         ConnPolicy cp = ConnPolicy::buffer(size);
+        cp.transport = ORO_ROS_PROTOCOL_ID;
+        cp.name_id = name;
+        return cp;
+    }
+
+    /**
+     * Returns a ConnPolicy object for streaming to or from
+     * the given ROS topic. Also specifies the buffer size of
+     * the connection to be created.
+     */
+    ConnPolicy topicUnbuffered(const std::string& name) {
+        ConnPolicy cp = ConnPolicy();
+        cp.type = ORO_ROS_CONNPOLICY_TYPE_UNBUFFERED;
         cp.transport = ORO_ROS_PROTOCOL_ID;
         cp.name_id = name;
         return cp;
