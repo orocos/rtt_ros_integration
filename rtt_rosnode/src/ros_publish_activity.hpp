@@ -49,11 +49,6 @@ namespace ros_integration{
   {
   public:
       /**
-       * Returns true if there are new data available
-       */
-      virtual bool hasWork()=0;
-
-      /**
        * Publish all data in the channel to a ROS topic.
        */
       virtual void publish()=0;

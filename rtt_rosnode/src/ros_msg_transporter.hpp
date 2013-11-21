@@ -74,7 +74,6 @@ namespace ros_integration {
     ros::Publisher ros_pub;
       //! We must cache the RosPublishActivity object.
     RosPublishActivity::shared_ptr act;
-    bool has_work;
 
   public:
 
@@ -114,7 +113,6 @@ namespace ros_integration {
       ros_pub = ros_node.advertise<T>(policy.name_id, policy.size ? policy.size : 1, policy.init); // minimum 1
       act = RosPublishActivity::Instance();
       act->addPublisher( this );
-      has_work = false;
     }
 
     ~RosPubChannelElement() {
@@ -152,17 +150,10 @@ namespace ros_integration {
     bool signal(){
       //Logger::In in(topicname);
       //log(Debug)<<"Requesting publish"<<endlog();
-      has_work = true;
-      act->trigger();
-      return true;
-    }
-
-    bool hasWork(){
-      return has_work;
+      return act->trigger();
     }
     
     void publish(){
-      has_work = false;
       typename base::ChannelElement<T>::value_t sample; // XXX: real-time !
       // this read should always succeed since signal() means 'data available in a data element'.
       typename base::ChannelElement<T>::shared_ptr input = this->getInput();

@@ -45,8 +45,7 @@ namespace ros_integration {
     void RosPublishActivity::loop(){
         os::MutexLock lock(publishers_lock);
         for(iterator it = publishers.begin(); it != publishers.end(); ++it) {
-            RosPublisher *pub = *it;
-            if (pub->hasWork()) pub->publish();
+            (*it)->publish();
         }
     }
 
