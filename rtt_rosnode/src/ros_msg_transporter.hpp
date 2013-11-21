@@ -75,6 +75,8 @@ namespace ros_integration {
       //! We must cache the RosPublishActivity object.
     RosPublishActivity::shared_ptr act;
 
+    typename base::ChannelElement<T>::value_t sample;
+
   public:
 
     /** 
@@ -131,7 +133,7 @@ namespace ros_integration {
     }
     
     /** 
-     * Create a data sample, this could be used to allocate the necessary memory, it is not needed in our case
+     * Create a data sample, this could be used to allocate the necessary memory
      * 
      * @param sample 
      * 
@@ -139,6 +141,7 @@ namespace ros_integration {
      */
     virtual bool data_sample(typename base::ChannelElement<T>::param_t sample)
     {
+      this->sample = sample;
       return true;
     }
 
@@ -154,7 +157,6 @@ namespace ros_integration {
     }
     
     void publish(){
-      typename base::ChannelElement<T>::value_t sample; // XXX: real-time !
       // this read should always succeed since signal() means 'data available in a data element'.
       typename base::ChannelElement<T>::shared_ptr input = this->getInput();
       while( input && (input->read(sample,false) == NewData) )
