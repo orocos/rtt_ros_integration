@@ -9,5 +9,7 @@ catkin_package(
   CATKIN_DEPENDS rtt_roscomm std_msgs
 )
 
-orocos_generate_package()
-
+orocos_generate_package(
+  DEPENDS std_msgs
+  DEPENDS_TARGETS rtt_roscomm
+)
