@@ -3,11 +3,6 @@ project(rtt_rosparam)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
 
-catkin_package(
-  INCLUDE_DIRS include
-#  DEPENDS rtt ocl
-  CATKIN_DEPENDS roscpp)
-
 include_directories(
   include
   ${catkin_INCLUDE_DIRS})
@@ -21,5 +16,6 @@ target_link_libraries(rtt_rosparam
 # Generate install targets and pkg-config files
 orocos_install_headers(include/rtt_rosparam/rosparam.h)
 orocos_generate_package(
+  INCLUDE_DIRS include
   DEPENDS roscpp
 )

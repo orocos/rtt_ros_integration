@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_roscomm)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rtt_rospack rtt_ros)
+find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
 
 catkin_package(
-  INCLUDE_DIRS include 
-#  DEPENDS rtt ocl
-  CATKIN_DEPENDS roscpp  rtt_rospack 
-  CFG_EXTRAS GenerateRTTROSCommPackage.cmake)
+  INCLUDE_DIRS include
+  CATKIN_DEPENDS rtt_ros
+  CFG_EXTRAS GenerateRTTROSCommPackage.cmake
+)
 
 include_directories(
   include
@@ -45,6 +45,7 @@ target_link_libraries(rtt_rosservice ${catkin_LIBRARIES})
 
 # Generate install targets and pkg-config files
 orocos_generate_package(
+  INCLUDE_DIRS include
   DEPENDS roscpp
 )
 
@@ -52,9 +53,9 @@ install(PROGRAMS
   scripts/create_rtt_pkg
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-install(DIRECTORY include/
-   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
-   FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+orocos_install_headers(
+   DIRECTORY include/rtt_rostopic include/rtt_rosservice
+   INSTALL ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/orocos
 )
 
 # Install cmake macros
