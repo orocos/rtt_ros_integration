@@ -15,4 +15,7 @@ catkin_package(
   diagnostic_msgs
   rtt_std_msgs)
 
-orocos_generate_package()
+orocos_generate_package(
+  DEPENDS diagnostic_msgs
+  DEPENDS_TARGETS rtt_roscomm rtt_std_msgs
+)

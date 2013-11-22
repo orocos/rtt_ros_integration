@@ -15,4 +15,7 @@ catkin_package(
   stereo_msgs
   rtt_std_msgs  rtt_geometry_msgs  rtt_sensor_msgs)
 
-orocos_generate_package()
+orocos_generate_package(
+  DEPENDS stereo_msgs
+  DEPENDS_TARGETS rtt_roscomm rtt_std_msgs rtt_geometry_msgs rtt_sensor_msgs
+)

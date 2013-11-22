@@ -15,4 +15,7 @@ catkin_package(
   nav_msgs
   rtt_std_msgs  rtt_geometry_msgs  rtt_actionlib_msgs)
 
-orocos_generate_package()
+orocos_generate_package(
+  DEPENDS nav_msgs
+  DEPENDS_TARGETS rtt_roscomm rtt_std_msgs rtt_geometry_msgs rtt_actionlib_msgs
+)

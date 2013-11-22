@@ -15,4 +15,7 @@ catkin_package(
   visualization_msgs
   rtt_std_msgs  rtt_geometry_msgs)
 
-orocos_generate_package()
+orocos_generate_package(
+  DEPENDS visualization_msgs
+  DEPENDS_TARGETS rtt_roscomm rtt_std_msgs rtt_geometry_msgs
+)
