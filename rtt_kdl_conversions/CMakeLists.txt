@@ -8,11 +8,13 @@ catkin_package(
     CATKIN_DEPENDS tf_conversions
 )
 
-find_package(OROCOS-RTT REQUIRED ${RTT_HINTS})
+find_package(OROCOS-RTT REQUIRED)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
-include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})#
+include_directories(${catkin_INCLUDE_DIRS})
 
 orocos_typekit(kdlconversions kdl_conversions-types.cpp)
-orocos_generate_package()
+orocos_generate_package(
+  DEPENDS tf_conversions
+)
 
