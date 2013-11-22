@@ -1,15 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_tf)
 
-find_package(catkin REQUIRED COMPONENTS tf rtt_roscomm rtt_geometry_msgs)
+find_package(catkin REQUIRED COMPONENTS tf rtt_roscomm)
 
 ros_generate_rtt_typekit(tf)
-
-catkin_package(
-  INCLUDE_DIRS include
-  DEPENDS rtt 
-  CATKIN_DEPENDS tf rtt_roscomm rtt_geometry_msgs
-)
 
 find_package(OROCOS-RTT REQUIRED)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
