@@ -2,6 +2,7 @@
 #include <rtt/Component.hpp>
 
 #include <rtt_rosbuild_tests/typekit/String.h>
+#include <geometry_msgs/typekit/Pose.h>
 
 namespace rtt_rosbuild_tests {
 
@@ -12,6 +13,7 @@ public:
         : RTT::TaskContext(name)
     {
         this->addPort("string", port_string);
+        this->addPort("pose", port_pose);
     }
 
     void updateHook()
@@ -23,6 +25,7 @@ public:
 
 private:
     RTT::OutputPort<rtt_rosbuild_tests::String> port_string;
+    RTT::InputPort<geometry_msgs::Pose> port_pose;
 };
 
 } // namespace rtt_rosbuild_tests

@@ -11,10 +11,12 @@
 
   <depend package="rtt_ros" />
   <depend package="rtt_roscomm" />
+  <depend package="rtt_geometry_msgs" />
 
   <export>
     <rtt_ros>
       <plugin_depend>rtt_roscomm</plugin_depend>
+      <plugin_depend>rtt_geometry_msgs</plugin_depend>
     </rtt_ros>
   </export>
 </package>
