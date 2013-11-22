@@ -43,12 +43,10 @@ namespace ros_integration {
     }
 
     void RosPublishActivity::loop(){
-        os::MutexLock lock(map_lock);
-        for(Publishers::iterator it = publishers.begin(); it != publishers.end(); ++it)
-            if (it->second) {
-                it->second = false; // protected by the mutex lock !
-                it->first->publish();
-            }
+        os::MutexLock lock(publishers_lock);
+        for(iterator it = publishers.begin(); it != publishers.end(); ++it) {
+            (*it)->publish();
+        }
     }
 
     RosPublishActivity::shared_ptr RosPublishActivity::Instance() {
@@ -62,25 +60,13 @@ namespace ros_integration {
     }
 
     void RosPublishActivity::addPublisher(RosPublisher* pub) {
-        os::MutexLock lock(map_lock);
-        publishers[pub] = false;
+        os::MutexLock lock(publishers_lock);
+        publishers.insert(pub);
     }
 
     void RosPublishActivity::removePublisher(RosPublisher* pub) {
-        os::MutexLock lock(map_lock);
+        os::MutexLock lock(publishers_lock);
         publishers.erase(pub);
-    }
-
-    bool RosPublishActivity::requestPublish(RosPublisher* chan){
-        // flag that data is available in a channel:
-        {
-            os::MutexLock lock(map_lock);
-            assert(publishers.find(chan) != publishers.end() );
-            publishers.find(chan)->second = true;
-        }
-        // trigger loop()
-        this->trigger();
-        return true;
     }
 
     RosPublishActivity::~RosPublishActivity() {
