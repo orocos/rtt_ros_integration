@@ -20,6 +20,6 @@ target_link_libraries(rtt_rosparam
 
 # Generate install targets and pkg-config files
 orocos_install_headers(include/rtt_rosparam/rosparam.h)
-orocos_generate_package()
-
-
+orocos_generate_package(
+  DEPENDS roscpp
+)

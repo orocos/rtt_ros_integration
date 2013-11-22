@@ -14,5 +14,6 @@ orocos_plugin(rtt_rosnode src/ros_plugin.cpp)
 target_link_libraries(rtt_rosnode ${catkin_LIBRARIES})
 
 # Generate install targets and pkg-config files
-orocos_generate_package()
-
+orocos_generate_package(
+  DEPENDS roscpp
+)

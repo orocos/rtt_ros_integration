@@ -23,7 +23,9 @@ add_definitions(-DRTT_COMPONENT)
 orocos_service(rtt_ros src/rtt_ros_service.cpp)
 target_link_libraries(rtt_ros ${catkin_LIBRARIES} ${LIBXML2_LIBRARIES})
 
-orocos_generate_package()
+orocos_generate_package(
+  DEPENDS rostime
+)
 
 install(PROGRAMS 
   scripts/rtt-upgrade-2.5

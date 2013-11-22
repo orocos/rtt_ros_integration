@@ -4,7 +4,7 @@ project(rtt_@pkgname@)
 find_package(catkin REQUIRED COMPONENTS 
   rtt_roscomm 
   @pkgname@
-@catkin_deplist@)
+ @rtt_packages@)
 
 ros_generate_rtt_typekit(@pkgname@)
 ros_generate_rtt_service_proxies(@pkgname@)
@@ -14,6 +14,9 @@ catkin_package(
   CATKIN_DEPENDS 
   rtt_roscomm 
   @pkgname@
-@catkin_deplist@)
+ @rtt_packages@)
 
-orocos_generate_package()
+orocos_generate_package(
+  DEPENDS @pkgname@
+  DEPENDS_TARGETS rtt_roscomm @rtt_packages@
+)

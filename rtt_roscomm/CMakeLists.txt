@@ -44,9 +44,9 @@ orocos_service(rtt_rosservice
 target_link_libraries(rtt_rosservice ${catkin_LIBRARIES})
 
 # Generate install targets and pkg-config files
-orocos_generate_package()
-
-
+orocos_generate_package(
+  DEPENDS roscpp
+)
 
 install(PROGRAMS 
   scripts/create_rtt_pkg

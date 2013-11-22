@@ -18,7 +18,10 @@ include_directories(
 orocos_service(rtt_actionlib_service src/rtt_actionlib_service.cpp)
 target_link_libraries(rtt_actionlib_service ${catkin_LIBRARIES})
 
-orocos_generate_package()
+orocos_generate_package(
+  DEPENDS roscpp actionlib
+  DEPENDS_TARGETS rtt_ros rtt_roscomm
+)
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})

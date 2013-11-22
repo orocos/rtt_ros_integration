@@ -43,7 +43,6 @@
 
   <build_depend>rtt_roscomm</build_depend>
   <build_depend>rtt_std_msgs</build_depend>
-  <build_depend>rostest</build_depend>
   <build_depend>ocl</build_depend>
 
 
