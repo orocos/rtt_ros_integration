@@ -3,11 +3,6 @@ project(rtt_kdl_conversions)
 
 find_package(catkin REQUIRED COMPONENTS tf_conversions)
 
-catkin_package(
-    DEPENDS rtt 
-    CATKIN_DEPENDS tf_conversions
-)
-
 find_package(OROCOS-RTT REQUIRED)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
