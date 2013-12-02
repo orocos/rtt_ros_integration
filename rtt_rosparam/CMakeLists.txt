@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_rosparam)
 
-set(CMAKE_BUILD_TYPE Debug)
-
 find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
 
 catkin_package(
