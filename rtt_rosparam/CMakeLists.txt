@@ -17,7 +17,7 @@ include_directories(
 # build ROS param as a separate service
 orocos_service(rtt_rosparam src/rtt_rosparam_service.cpp)
 target_link_libraries(rtt_rosparam 
-  ${OROCOS-RTT_RTT-MARSHALLING_LIBRARY} 
+#  ${OROCOS-RTT_RTT-MARSHALLING_LIBRARY} 
   ${catkin_LIBRARIES})
 
 # Generate install targets and pkg-config files
