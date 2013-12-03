@@ -60,7 +60,7 @@ public:
       return factories_[service_type].get();
     }
 
-    RTT::log(RTT::Error)<<"Service type \""<<service_type<<"\" has not been registerd with the rosserivce_registry service."<<RTT::endlog();
+    RTT::log(RTT::Error)<<"Service type \""<<service_type<<"\" has not been registered with the rosservice_registry service."<<RTT::endlog();
 
     return NULL;
   }
