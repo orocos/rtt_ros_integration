@@ -80,5 +80,6 @@ for i in $files; do
   tgtname=$(echo $(basename "$i") | sed -e "s/pkgname/$pkgname/g;s/Pkgname/$cappkgname/g;")
   cat "$i" | sed -e "s/@PKGNAME@/$allcappkgname/g;s/@pkgname@/$pkgname/g;s/@Pkgname@/$cappkgname/g;s|@deplist@|$deplist|g;s|@rtt_deplist@|$rtt_deplist|g;s|@catkin_deplist@|$catkin_deplist|g" > rtt_$pkgname/$tgtname
 done
+rm -vf rtt_$pkgname/CATKIN_IGNORE
 
 echo "Successfully created rtt_$pkgname."
