@@ -24,6 +24,7 @@ orocos_install_headers( rtt_tf-component.hpp )
 orocos_use_package(ocl-taskbrowser REQUIRED)
 orocos_use_package(ocl-deployment REQUIRED)
 
+add_definitions(-DRTT_COMPONENT)
 orocos_executable(broadcaster_test tests/broadcaster_test.cpp)
 target_link_libraries(broadcaster_test ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 orocos_executable(lookup_test tests/lookup_test.cpp)
