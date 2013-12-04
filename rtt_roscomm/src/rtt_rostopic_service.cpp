@@ -32,6 +32,9 @@ public:
         "Creates a ConnPolicy for subscribing to or publishing a topic with a fixed-length message buffer.").arg(
             "name", "The ros topic name").arg(
             "size","The size of the buffer.");
+    this->addOperation("unbuffered", &ROSTopicService::topicUnbuffered, this).doc(
+        "Creates a ConnPolicy for unbuffered publishing a topic. This may not be real-time safe!").arg(
+            "name", "The ros topic name");
     this->addConstant("protocol_id", protocol_id );
 
   }
@@ -58,7 +61,20 @@ public:
     cp.name_id = name;
     return cp;
   }
-};
+
+  /**
+   * Returns a ConnPolicy object for streaming to or from
+   * the given ROS topic. Use this only for unbuffered
+   * publishing, where the publish() method is called
+   * in the thread of the writing TaskContext.
+   */
+  ConnPolicy topicUnbuffered(const std::string& name) {
+    ConnPolicy cp = ConnPolicy();
+    cp.type = ConnPolicy::UNBUFFERED;
+    cp.transport = ORO_ROS_PROTOCOL_ID;
+    cp.name_id = name;
+    return cp;
+  }};
 
 void loadROSTopicService(){
   RTT::Service::shared_ptr rts(new ROSTopicService(0));

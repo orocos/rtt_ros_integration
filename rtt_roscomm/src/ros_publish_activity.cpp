@@ -30,5 +30,49 @@
 #include <rtt_rostopic/ros_publish_activity.hpp>
 
 namespace ros_integration {
-  RosPublishActivity::weak_ptr RosPublishActivity::ros_pub_act;
+
+    using namespace RTT;
+
+    RosPublishActivity::weak_ptr RosPublishActivity::ros_pub_act;
+
+    RosPublishActivity::RosPublishActivity( const std::string& name)
+      : Activity(ORO_SCHED_OTHER, RTT::os::LowestPriority, 0.0, 0, name)
+    {
+      Logger::In in("RosPublishActivity");
+      log(Debug)<<"Creating RosPublishActivity"<<endlog();
+    }
+
+    void RosPublishActivity::loop(){
+      os::MutexLock lock(publishers_lock);
+      for(iterator it = publishers.begin(); it != publishers.end(); ++it) {
+        (*it)->publish();
+      }
+    }
+
+    RosPublishActivity::shared_ptr RosPublishActivity::Instance() {
+      shared_ptr ret = ros_pub_act.lock();
+      if ( !ret ) {
+        ret.reset(new RosPublishActivity("RosPublishActivity"));
+        ros_pub_act = ret;
+        ret->start();
+      }
+      return ret;
+    }
+
+    void RosPublishActivity::addPublisher(RosPublisher* pub) {
+      os::MutexLock lock(publishers_lock);
+      publishers.insert(pub);
+    }
+
+    void RosPublishActivity::removePublisher(RosPublisher* pub) {
+      os::MutexLock lock(publishers_lock);
+      publishers.erase(pub);
+    }
+
+    RosPublishActivity::~RosPublishActivity() {
+      Logger::In in("RosPublishActivity");
+      log(Info) << "RosPublishActivity cleans up: no more work."<<endlog();
+      stop();
+    }
+
 }

@@ -75,6 +75,8 @@ namespace ros_integration {
       //! We must cache the RosPublishActivity object.
     RosPublishActivity::shared_ptr act;
 
+    typename base::ChannelElement<T>::value_t sample;
+
   public:
 
     /** 
@@ -93,15 +95,24 @@ namespace ros_integration {
         std::stringstream namestr;
         gethostname(hostname, sizeof(hostname));
 
-        namestr << hostname<<'/' << port->getInterface()->getOwner()->getName()
-          << '/' << port->getName() << '/'<<this << '/' << getpid();
+        if (port->getInterface() && port->getInterface()->getOwner()) {
+          namestr << hostname<<'/' << port->getInterface()->getOwner()->getName()
+            << '/' << port->getName() << '/'<<this << '/' << getpid();
+        } else {
+          namestr << hostname<<'/' << port->getName() << '/'<<this << '/' << getpid();
+        }
         policy.name_id = namestr.str();
       }
       topicname=policy.name_id;
       Logger::In in(topicname);
-      log(Debug)<<"Creating ROS publisher for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<endlog();
 
-      ros_pub = ros_node.advertise<T>(policy.name_id, policy.size ? policy.size : 1, policy.init); // minimum 1
+      if (port->getInterface() && port->getInterface()->getOwner()) {
+        log(Debug)<<"Creating ROS publisher for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+      } else {
+        log(Debug)<<"Creating ROS publisher for port "<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+      }
+
+      ros_pub = ros_node.advertise<T>(policy.name_id, policy.size > 0 ? policy.size : 1, policy.init); // minimum 1
       act = RosPublishActivity::Instance();
       act->addPublisher( this );
     }
@@ -122,7 +133,7 @@ namespace ros_integration {
     }
     
     /** 
-     * Create a data sample, this could be used to allocate the necessary memory, it is not needed in our case
+     * Create a data sample, this could be used to allocate the necessary memory
      * 
      * @param sample 
      * 
@@ -130,6 +141,7 @@ namespace ros_integration {
      */
     virtual bool data_sample(typename base::ChannelElement<T>::param_t sample)
     {
+      this->sample = sample;
       return true;
     }
 
@@ -141,15 +153,20 @@ namespace ros_integration {
     bool signal(){
       //Logger::In in(topicname);
       //log(Debug)<<"Requesting publish"<<endlog();
-      return act->requestPublish(this);
+      return act->trigger();
     }
     
     void publish(){
-      typename base::ChannelElement<T>::value_t sample; // XXX: real-time !
       // this read should always succeed since signal() means 'data available in a data element'.
       typename base::ChannelElement<T>::shared_ptr input = this->getInput();
       while( input && (input->read(sample,false) == NewData) )
-          ros_pub.publish(sample);
+        write(sample);
+    }
+
+    bool write(typename base::ChannelElement<T>::param_t sample)
+    {
+      ros_pub.publish(sample);
+      return true;
     }
     
   };
@@ -175,8 +192,11 @@ namespace ros_integration {
     {
       topicname=policy.name_id;
       Logger::In in(topicname);
-      log(Debug)<<"Creating ROS subscriber for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<endlog();
-
+      if (port->getInterface() && port->getInterface()->getOwner()) {
+        log(Debug)<<"Creating ROS subscriber for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+      } else {
+        log(Debug)<<"Creating ROS subscriber for port "<<port->getName()<<" on topic "<<policy.name_id<<endlog();
+      }
       ros_sub=ros_node.subscribe(policy.name_id,policy.size,&RosSubChannelElement::newData,this);
       this->ref();
     }
@@ -201,23 +221,28 @@ namespace ros_integration {
     }
   };
 
-  template <class T>
-  class RosMsgTransporter : public RTT::types::TypeTransporter
-  {
-    virtual base::ChannelElementBase::shared_ptr createStream (base::PortInterface *port, const ConnPolicy &policy, bool is_sender) const{
-      base::ChannelElementBase* buf = internal::ConnFactory::buildDataStorage<T>(policy);
-      base::ChannelElementBase::shared_ptr tmp;
-      if(is_sender){
-        tmp = base::ChannelElementBase::shared_ptr(new RosPubChannelElement<T>(port,policy));
-        buf->setOutput(tmp);
-        return buf;
-      }
-      else {
-        tmp = new RosSubChannelElement<T>(port,policy);
-        tmp->setOutput(buf);
-        return tmp;
-      }
-    }
-  };
+    template <class T>
+    class RosMsgTransporter : public RTT::types::TypeTransporter{
+        virtual base::ChannelElementBase::shared_ptr createStream (base::PortInterface *port, const ConnPolicy &policy, bool is_sender) const{
+            base::ChannelElementBase::shared_ptr buf = internal::ConnFactory::buildDataStorage<T>(policy);
+            base::ChannelElementBase::shared_ptr tmp;
+            if(is_sender){
+                tmp = base::ChannelElementBase::shared_ptr(new RosPubChannelElement<T>(port,policy));
+                if (policy.type == RTT::ConnPolicy::UNBUFFERED){
+                  log(Debug) << "Creating unbuffered publisher connection for port " << port->getName() << ". This may not be real-time safe!" << endlog();
+                  return tmp;
+                }
+                if (!buf) return base::ChannelElementBase::shared_ptr();
+                buf->setOutput(tmp);
+                return buf;
+            }
+            else {
+                if (!buf) return base::ChannelElementBase::shared_ptr();
+                tmp = new RosSubChannelElement<T>(port,policy);
+                tmp->setOutput(buf);
+                return tmp;
+            }
+        }
+    };
 } 
 #endif

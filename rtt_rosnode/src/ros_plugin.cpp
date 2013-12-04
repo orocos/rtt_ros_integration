@@ -44,7 +44,7 @@ extern "C" {
       if(ros::master::check())
           ros::start();
       else{
-          log(Warning)<<"No ros::master available"<<endlog();
+          log(Warning)<<"'roscore' is not running: no ROS functions will be available."<<endlog();
           ros::shutdown();
           return true;
       }
