@@ -67,7 +67,7 @@ for dep in $(rospack depends $pkgname | grep "_msgs$"); do
   fi
   deplist="$deplist  <build_depend>rtt_$dep</build_depend>\n  <run_depend>rtt_$dep</run_depend>\n"
   rtt_deplist="$rtt_deplist      <plugin_depend>rtt_$dep</plugin_depend>\n"
-  catkin_deplist="$catkin_deplist  rtt_$dep\n"
+  rtt_packages="$rtt_packages rtt_$dep\n"
 done
 
 mkdir $force rtt_$pkgname || { echo "Package already exists, use -f to force creation." ; exit 1; }
@@ -78,7 +78,7 @@ allcappkgname=$(echo $pkgname | tr [:lower:] [:upper:])
 cappkgname=$(echo $allcappkgname | cut -c1)$(echo $pkgname | cut -c2-)
 for i in $files; do
   tgtname=$(echo $(basename "$i") | sed -e "s/pkgname/$pkgname/g;s/Pkgname/$cappkgname/g;")
-  cat "$i" | sed -e "s/@PKGNAME@/$allcappkgname/g;s/@pkgname@/$pkgname/g;s/@Pkgname@/$cappkgname/g;s|@deplist@|$deplist|g;s|@rtt_deplist@|$rtt_deplist|g;s|@catkin_deplist@|$catkin_deplist|g" > rtt_$pkgname/$tgtname
+  cat "$i" | sed -e "s/@PKGNAME@/$allcappkgname/g;s/@pkgname@/$pkgname/g;s/@Pkgname@/$cappkgname/g;s|@deplist@|$deplist|g;s|@rtt_deplist@|$rtt_deplist|g;s|@rtt_packages@|$rtt_packages|g" > rtt_$pkgname/$tgtname
 done
 rm -vf rtt_$pkgname/CATKIN_IGNORE
 

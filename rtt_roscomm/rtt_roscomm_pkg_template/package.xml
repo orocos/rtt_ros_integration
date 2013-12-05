@@ -1,6 +1,6 @@
 <package>
   <name>rtt_@pkgname@</name>
-  <version>2.6.0</version>
+  <version>0.0.0</version>
   <description>
 
     Provides an rtt typekit for ROS @pkgname@ messages.
