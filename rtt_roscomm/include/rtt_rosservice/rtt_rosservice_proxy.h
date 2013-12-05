@@ -1,14 +1,10 @@
-#ifndef __RTT_ROSSERVICE_ROS_SERVICE_PROXY_H
-#define __RTT_ROSSERVICE_ROS_SERVICE_PROXY_H
-
-#include <boost/range/iterator_range.hpp>
-#include <boost/algorithm/string.hpp>
+#ifndef __RTT_ROSSERVICE_RTT_ROSSERVICE_PROXY_H
+#define __RTT_ROSSERVICE_RTT_ROSSERVICE_PROXY_H
 
 #include <ros/ros.h>
 
 #include <rtt/RTT.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
-#include <rtt/internal/GlobalService.hpp>
 
 //! Abstract ROS Service Proxy
 class ROSServiceProxyBase
@@ -177,4 +173,4 @@ public:
   }
 };
 
-#endif // ifndef __RTT_ROSSERVICE_ROS_SERVICE_PROXY_H
+#endif // ifndef __RTT_ROSSERVICE_RTT_ROSSERVICE_PROXY_H

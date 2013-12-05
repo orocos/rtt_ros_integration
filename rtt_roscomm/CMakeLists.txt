@@ -19,29 +19,31 @@ orocos_service(rtt_rostopic
   src/ros_publish_activity.cpp)
 target_link_libraries(rtt_rostopic ${catkin_LIBRARIES})
 
-orocos_typekit( rtt-ros-primitives-typekit 
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_primitives_typekit_plugin.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_time_type.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint8_type.cpp 
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int8_type.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint16_type.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int16_type.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint32_type.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int32_type.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_uint64_type.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_int64_type.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float32_type.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_float64_type.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/orocos/types/ros_string_type.cpp )
-target_link_libraries(rtt-ros-primitives-typekit ${catkin_LIBRARIES})
-
 # ROS Service Support
 orocos_service(rtt_rosservice_registry
   src/rtt_rosservice_registry_service.cpp)
 
 orocos_service(rtt_rosservice
   src/rtt_rosservice_service.cpp)
-target_link_libraries(rtt_rosservice ${catkin_LIBRARIES})
+target_link_libraries(rtt_rosservice rtt_rosservice_registry ${catkin_LIBRARIES})
+
+# ROS Primitives typekit
+set(CMAKE_BUILD_TYPE MinSizeRel)
+orocos_typekit(rtt-ros-primitives-typekit
+  src/orocos/types/ros_primitives_typekit_plugin.cpp
+  src/orocos/types/ros_time_type.cpp
+  src/orocos/types/ros_uint8_type.cpp
+  src/orocos/types/ros_int8_type.cpp
+  src/orocos/types/ros_uint16_type.cpp
+  src/orocos/types/ros_int16_type.cpp
+  src/orocos/types/ros_uint32_type.cpp
+  src/orocos/types/ros_int32_type.cpp
+  src/orocos/types/ros_uint64_type.cpp
+  src/orocos/types/ros_int64_type.cpp
+  src/orocos/types/ros_float32_type.cpp
+  src/orocos/types/ros_float64_type.cpp
+  src/orocos/types/ros_string_type.cpp)
+target_link_libraries(rtt-ros-primitives-typekit ${catkin_LIBRARIES})
 
 # Generate install targets and pkg-config files
 orocos_generate_package(
@@ -59,10 +61,12 @@ orocos_install_headers(
 )
 
 # Install cmake macros
-install(PROGRAMS cmake/create_boost_header.py
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
+file(COPY cmake/create_boost_header.py DESTINATION "${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake")
+install(PROGRAMS cmake/create_boost_header.py DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)
 
 # Install template files to both install and develspace
-install(DIRECTORY rtt_roscomm_pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-file(COPY rtt_roscomm_pkg_template DESTINATION "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}")
+file(COPY src/templates DESTINATION "${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/src")
+install(DIRECTORY src/templates DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/src)
 
+# This one will only be used by create_rtt_pkg with `rospack find rtt_roscomm` => no devel-space installation
+install(DIRECTORY rtt_roscomm_pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

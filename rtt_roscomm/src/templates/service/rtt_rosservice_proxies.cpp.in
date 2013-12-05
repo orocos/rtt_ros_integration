@@ -3,7 +3,8 @@
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 
-#include <rtt_rosservice/ros_service_proxy.h> 
+#include <rtt_rosservice/rtt_rosservice_registry_service.h>
+#include <rtt_rosservice/rtt_rosservice_proxy.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 @ROS_SRV_HEADERS@
@@ -11,13 +12,14 @@
 
 bool registerROSServiceProxies() {
   // Get the ros service registry service
-  if(!RTT::internal::GlobalService::Instance()->hasService("rosservice_registry")) {
+  ROSServiceRegistryServicePtr rosservice_registry = ROSServiceRegistryService::Instance();
+  if(!rosservice_registry) {
     return false;
   }
 
   // Get the factory registration operation
   RTT::OperationCaller<bool(ROSServiceProxyFactoryBase*)> register_service_factory = 
-    RTT::internal::GlobalService::Instance()->getService("rosservice_registry")->getOperation("registerServiceFactory");
+    rosservice_registry->getOperation("registerServiceFactory");
 
   // Make sure the registration operation is ready
   if(!register_service_factory.ready()) {

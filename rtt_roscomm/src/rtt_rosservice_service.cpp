@@ -1,9 +1,10 @@
+#include <boost/algorithm/string.hpp>
 
 #include <rtt/RTT.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
-#include <rtt/internal/GlobalService.hpp>
 
-#include <rtt_rosservice/ros_service_proxy.h> 
+#include <rtt_rosservice/rtt_rosservice_registry_service.h>
+#include <rtt_rosservice/rtt_rosservice_proxy.h>
 
 using namespace RTT;
 using namespace std;
@@ -32,7 +33,7 @@ public:
       .arg( "service_type", "The ROS service type (like \"std_srvs/Empty\").");
 
     // Get the global ros service registry
-    rosservice_registry_ = RTT::internal::GlobalService::Instance()->getService("rosservice_registry");
+    rosservice_registry_ = ROSServiceRegistryService::Instance();
     has_service_factory = rosservice_registry_->getOperation("hasServiceFactory");
     get_service_factory = rosservice_registry_->getOperation("getServiceFactory");
   }
