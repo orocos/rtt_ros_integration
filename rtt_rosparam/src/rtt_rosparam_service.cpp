@@ -29,61 +29,61 @@ public:
     this->addConstant("COMPONENT",COMPONENT);
 
     this->addOperation("getAllRelative", &ROSParamService::getParamsRelative, this)
-      .doc("Gets all properties of this component and its services from the ROS param server in the relative namespace.");
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the relative namespace.");
     this->addOperation("getAllAbsolute", &ROSParamService::getParamsAbsolute, this)
-      .doc("Gets all properties of this component and its services from the ROS param server in the absolute namespace.");
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the absolute namespace.");
     this->addOperation("getAllPrivate", &ROSParamService::getParamsPrivate, this)
-      .doc("Gets all properties of this component and its services from the ROS param server in the node's private namespace.");
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the node's private namespace.");
     this->addOperation("getAllComponentPrivate", &ROSParamService::getParamsComponentPrivate, this)
-      .doc("Gets all properties of this component and its services from the ROS param server in the component's private namespace.");
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the component's private namespace.");
     this->addOperation("getAll", &ROSParamService::getParamsComponentPrivate, this)
-      .doc("Gets all properties of this component and its services from the ROS param server in the component's private namespace. This is just an alias for getAllComponentPrivate().");
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the component's private namespace. This is an alias for getAllComponentPrivate().");
 
     this->addOperation("setAllRelative", &ROSParamService::setParamsRelative, this)
-      .doc("Sets all properties of this component on the ROS param server from the similarly-named property or service of this component in the relative namespace.");
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the relative namespace.");
     this->addOperation("setAllAbsolute", &ROSParamService::setParamsAbsolute, this)
-      .doc("Sets all properties of this component on the ROS param server from the similarly-named property or service of this component in the absolute namespace.");
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the absolute namespace.");
     this->addOperation("setAllPrivate", &ROSParamService::setParamsPrivate, this)
-      .doc("Sets all properties of this component on the ROS param server from the similarly-named property or service of this component in the node's private namespace.");
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the node's private namespace.");
     this->addOperation("setAllComponentPrivate", &ROSParamService::setParamsComponentPrivate, this)
-      .doc("Sets all properties of this component on the ROS param server from the similarly-named property or service of this component in the component's private namespace.");
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the component's private namespace.");
     this->addOperation("setAll", &ROSParamService::setParamsComponentPrivate, this)
-      .doc("Sets all properties of this component on the ROS param server from the similarly-named property or service of this component in the component's private namespace. This is just an alias for setAll().");
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the component's private namespace. This is an alias for setAllComponentPrivate().");
 
     this->addOperation("get", &ROSParamService::getParam, this) 
-      .doc("Gets one property of this component from the ROS param server based on the given resolution policy or configures a service.")
-      .arg("name", "Name of the property / parameter.")
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server based on the given resolution policy.")
+      .arg("name", "Name of the property / service / parameter.")
       .arg("policy", "ROS parameter namespace resolution policy.");
 
     this->addOperation("getRelative", &ROSParamService::getParamRelative, this) 
-      .doc("Gets one property of this component from the ROS param server in the relative namespace or configures a service.")
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the relative namespace.")
       .arg("name", "Name of the property / service / parameter.");
     this->addOperation("getAbsolute", &ROSParamService::getParamAbsolute, this) 
-      .doc("Gets one property of this component from the ROS param server in the absolute namespace or configures a service.")
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the absolute namespace.")
       .arg("name", "Name of the property / service / parameter.");
     this->addOperation("getPrivate", &ROSParamService::getParamPrivate, this) 
-      .doc("Gets one property of this component from the ROS param server in the node's private namespace or configures a service.")
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the node's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
     this->addOperation("getComponentPrivate", &ROSParamService::getParamComponentPrivate, this) 
-      .doc("Gets one property of this component from the ROS param server in the component's private namespace or configures a service.")
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the component's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
 
     this->addOperation("set", &ROSParamService::setParam, this) 
-      .doc("Sets one parameter on the ROS param server from the similarly-named property or service of this component based on the given resolution policy.")
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the ROS parameter namespace based on the given resolution policy.")
       .arg("name", "Name of the property / service / parameter.")
       .arg("policy", "ROS parameter namespace resolution policy.");
 
     this->addOperation("setRelative", &ROSParamService::setParamRelative, this) 
-      .doc("Sets one parameter on the ROS param server from the similarly-named property or service of this component in the relative namespace.")
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the relative namespace.")
       .arg("name", "Name of the property / service / parameter.");
     this->addOperation("setAbsolute", &ROSParamService::setParamAbsolute, this) 
-      .doc("Sets one parameter on the ROS param server from the similarly-named property or service of this component in the absolute namespace.")
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the absolute namespace.")
       .arg("name", "Name of the property / service / parameter.");
     this->addOperation("setPrivate", &ROSParamService::setParamPrivate, this) 
-      .doc("Sets one parameter on the ROS param server from the similarly-named property or service of this component in the node's private namespace.")
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the node's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
     this->addOperation("setComponentPrivate", &ROSParamService::setParamComponentPrivate, this) 
-      .doc("Sets one parameter on the ROS param server from the similarly-named property or service of this component in the component's private namespace.")
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the component's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
   
   }
