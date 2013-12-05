@@ -28,17 +28,9 @@ def write_boost_includes(s, spec):
     """
     for field in spec.parsed_fields():
         if (not field.is_builtin):
-            if (field.is_header):
-                s.write('#include <ros/common.h>\n')
-                s.write('#if ROS_VERSION_MINIMUM(1,4,0)\n')
-                s.write('#include <std_msgs/Header.h>\n')
-                s.write('#else\n')
-                s.write('#include <roslib/Header.h>\n')
-                s.write('#endif\n')
-            else:
-                (pkg, name) = genmsg.names.package_resource_name(field.base_type)
-                pkg = (pkg or spec.package) # convert '' to this package
-                s.write('#include <%s/boost/%s.h>\n'%(pkg,  name))
+            (pkg, name) = genmsg.names.package_resource_name(field.base_type)
+            pkg = (pkg or spec.package) # convert '' to this package
+            s.write('#include <%s/boost/%s.h>\n'%(pkg,  name))
                 
     s.write('\n') 
 
