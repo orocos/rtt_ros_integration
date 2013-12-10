@@ -14,9 +14,6 @@ catkin_package(
 
 find_package(LibXml2 REQUIRED)
 
-# This adds orocos environment variables to the catkin setup.sh
-catkin_add_env_hooks(10.orocos SHELLS sh DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks)
-
 include_directories(include ${catkin_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR})
 
 add_definitions(-DRTT_COMPONENT)
