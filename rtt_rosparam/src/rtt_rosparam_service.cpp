@@ -506,7 +506,9 @@ bool ROSParamService::getParams(RTT::Service::shared_ptr service, const std::str
   {
     RTT::Service::shared_ptr sub(service->getService(*it));
     if (sub) {
-      if (!getParams(sub, ns + "/" + sub->getName(), policy)) return false;
+      std::string sub_ns = sub->getName();
+      if (!ns.empty()) sub_ns = ns + "/" + sub_ns;
+      getParams(sub, sub_ns, policy);
     }
   }
 
