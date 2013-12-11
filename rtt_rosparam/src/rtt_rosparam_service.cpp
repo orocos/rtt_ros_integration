@@ -28,47 +28,63 @@ public:
     this->addConstant("PRIVATE",PRIVATE);
     this->addConstant("COMPONENT",COMPONENT);
 
-    this->addOperation("getAll", &ROSParamService::getParams, this) 
-      .doc("Gets all properties of this component from the ROS param server in the component's private namespace.");
+    this->addOperation("getAllRelative", &ROSParamService::getParamsRelative, this)
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the relative namespace.");
+    this->addOperation("getAllAbsolute", &ROSParamService::getParamsAbsolute, this)
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the absolute namespace.");
+    this->addOperation("getAllPrivate", &ROSParamService::getParamsPrivate, this)
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the node's private namespace.");
+    this->addOperation("getAllComponentPrivate", &ROSParamService::getParamsComponentPrivate, this)
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the component's private namespace.");
+    this->addOperation("getAll", &ROSParamService::getParamsComponentPrivate, this)
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the component's private namespace. This is an alias for getAllComponentPrivate().");
 
-    this->addOperation("setAll", &ROSParamService::setParams, this) 
-      .doc("Sets all properties of this component on the ROS param server from the similarly-named property of this component in the component's private namespace.");
+    this->addOperation("setAllRelative", &ROSParamService::setParamsRelative, this)
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the relative namespace.");
+    this->addOperation("setAllAbsolute", &ROSParamService::setParamsAbsolute, this)
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the absolute namespace.");
+    this->addOperation("setAllPrivate", &ROSParamService::setParamsPrivate, this)
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the node's private namespace.");
+    this->addOperation("setAllComponentPrivate", &ROSParamService::setParamsComponentPrivate, this)
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the component's private namespace.");
+    this->addOperation("setAll", &ROSParamService::setParamsComponentPrivate, this)
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the component's private namespace. This is an alias for setAllComponentPrivate().");
 
     this->addOperation("get", &ROSParamService::getParam, this) 
-      .doc("Gets one property of this component from the ROS param server based on the given resolution policy.")
-      .arg("name", "Name of the property / parameter.")
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server based on the given resolution policy.")
+      .arg("name", "Name of the property / service / parameter.")
       .arg("policy", "ROS parameter namespace resolution policy.");
 
     this->addOperation("getRelative", &ROSParamService::getParamRelative, this) 
-      .doc("Gets one property of this component from the ROS param server in the relative namespace.")
-      .arg("name", "Name of the property / parameter.");
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the relative namespace.")
+      .arg("name", "Name of the property / service / parameter.");
     this->addOperation("getAbsolute", &ROSParamService::getParamAbsolute, this) 
-      .doc("Gets one property of this component from the ROS param server in the absolute namespace.")
-      .arg("name", "Name of the property / parameter.");
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the absolute namespace.")
+      .arg("name", "Name of the property / service / parameter.");
     this->addOperation("getPrivate", &ROSParamService::getParamPrivate, this) 
-      .doc("Gets one property of this component from the ROS param server in the node's private namespace.")
-      .arg("name", "Name of the property / parameter.");
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the node's private namespace.")
+      .arg("name", "Name of the property / service / parameter.");
     this->addOperation("getComponentPrivate", &ROSParamService::getParamComponentPrivate, this) 
-      .doc("Gets one property of this component from the ROS param server in the component's private namespace.")
-      .arg("name", "Name of the property / parameter.");
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the component's private namespace.")
+      .arg("name", "Name of the property / service / parameter.");
 
     this->addOperation("set", &ROSParamService::setParam, this) 
-      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component based on the given resolution policy.")
-      .arg("name", "Name of the property / parameter.")
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the ROS parameter namespace based on the given resolution policy.")
+      .arg("name", "Name of the property / service / parameter.")
       .arg("policy", "ROS parameter namespace resolution policy.");
 
     this->addOperation("setRelative", &ROSParamService::setParamRelative, this) 
-      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component in the relative namespace.")
-      .arg("name", "Name of the property / parameter.");
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the relative namespace.")
+      .arg("name", "Name of the property / service / parameter.");
     this->addOperation("setAbsolute", &ROSParamService::setParamAbsolute, this) 
-      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component in the absolute namespace.")
-      .arg("name", "Name of the property / parameter.");
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the absolute namespace.")
+      .arg("name", "Name of the property / service / parameter.");
     this->addOperation("setPrivate", &ROSParamService::setParamPrivate, this) 
-      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component in the node's private namespace.")
-      .arg("name", "Name of the property / parameter.");
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the node's private namespace.")
+      .arg("name", "Name of the property / service / parameter.");
     this->addOperation("setComponentPrivate", &ROSParamService::setParamComponentPrivate, this) 
-      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component in the component's private namespace.")
-      .arg("name", "Name of the property / parameter.");
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the component's private namespace.")
+      .arg("name", "Name of the property / service / parameter.");
   
   }
 private:
@@ -78,7 +94,13 @@ private:
     const std::string &param_name, 
     const ROSParamService::ResolutionPolicy policy);
 
-  bool getParams();
+  bool getParams(RTT::Service::shared_ptr service, const std::string& ns, const ROSParamService::ResolutionPolicy policy);
+  bool getParams(const ROSParamService::ResolutionPolicy policy);
+  bool getParamsRelative() { return getParams(RELATIVE); }
+  bool getParamsAbsolute() { return getParams(ABSOLUTE); }
+  bool getParamsPrivate() { return getParams(PRIVATE); }
+  bool getParamsComponentPrivate() { return getParams(COMPONENT); }
+
   bool getParam(
     const std::string &param_name, 
     const ROSParamService::ResolutionPolicy policy = ROSParamService::COMPONENT);
@@ -87,7 +109,13 @@ private:
   bool getParamPrivate(const std::string &name) { return getParam(name, PRIVATE); }
   bool getParamComponentPrivate(const std::string &name) { return getParam(name, COMPONENT); }
 
-  bool setParams();
+  bool setParams(RTT::Service::shared_ptr service, const std::string& ns, const ROSParamService::ResolutionPolicy policy);
+  bool setParams(const ROSParamService::ResolutionPolicy policy);
+  bool setParamsRelative() { return setParams(RELATIVE); }
+  bool setParamsAbsolute() { return setParams(ABSOLUTE); }
+  bool setParamsPrivate() { return setParams(PRIVATE); }
+  bool setParamsComponentPrivate() { return setParams(COMPONENT); }
+
   bool setParam(
     const std::string &param_name, 
     const ROSParamService::ResolutionPolicy policy = ROSParamService::COMPONENT);
@@ -225,16 +253,46 @@ bool ROSParamService::setParam(
     const ROSParamService::ResolutionPolicy policy)
 {
   XmlRpc::XmlRpcValue xml_value;
-  xml_value = rttPropertyBaseToXmlParam(this->getOwner()->getProperty(param_name));
-  ros::param::set(resolvedName(param_name,policy), xml_value);
-  return true;
+
+  // Try to find a property named param_name
+  RTT::base::PropertyBase *property = this->getOwner()->getProperty(param_name);
+  if (property) {
+    xml_value = rttPropertyBaseToXmlParam(this->getOwner()->getProperty(param_name));
+    ros::param::set(resolvedName(param_name,policy), xml_value);
+    return true;
+  }
+
+  // Try to find a sub-service named param_name
+  RTT::Service::shared_ptr service = this->getOwner()->provides()->getService(param_name);
+  if (service) {
+    // Set all parameters of the sub-service
+    return setParams(service, service->getName(), policy);
+  }
+
+  RTT::log(RTT::Debug) << "RTT component does not have a property or service named \"" << param_name << "\"" << RTT::endlog();
+  return false;
 }
 
-bool ROSParamService::setParams()
+bool ROSParamService::setParams(const ROSParamService::ResolutionPolicy policy)
 {
+  return setParams(this->getOwner()->provides(), std::string(), policy);
+}
+
+bool ROSParamService::setParams(RTT::Service::shared_ptr service, const std::string& ns, const ROSParamService::ResolutionPolicy policy) {
   XmlRpc::XmlRpcValue xml_value;
-  xml_value = rttPropertyToXmlParam(*(this->getOwner()->properties()));
-  ros::param::set(std::string("~") + this->getOwner()->getName(), xml_value);
+  xml_value = rttPropertyToXmlParam(*(service->properties()));
+  ros::param::set(resolvedName(ns, policy), xml_value);
+
+  // Recurse into sub-services
+  RTT::Service::ProviderNames names = service->getProviderNames();
+  for (RTT::Service::ProviderNames::const_iterator it = names.begin(); it != names.end(); ++it)
+  {
+    RTT::Service::shared_ptr sub(service->getService(*it));
+    if (sub) {
+      if (!setParams(sub, ns + "/" + sub->getName(), policy)) return false;
+    }
+  }
+
   return true;
 }
 
@@ -400,37 +458,61 @@ bool ROSParamService::getParam(
 
   // Try to get the property if it exists
   RTT::base::PropertyBase *prop_base = this->getOwner()->getProperty(param_name);
-
-  if(!prop_base) {
-    RTT::log(RTT::Debug) << "RTT component does not have a property named \"" << param_name << "\"" << RTT::endlog();
-    return false;
+  if(prop_base) {
+    // Deal with the xml value
+    return xmlParamToProp(xml_value, prop_base);
   }
 
-  // Deal with the xml value
-  return xmlParamToProp(xml_value, prop_base);
+  // Try to get the properties of a sub-service if it exists
+  RTT::Service::shared_ptr service = this->getOwner()->provides()->getService(param_name);
+  if(service) {
+    // Get all parameters of the sub-service
+    return getParams(service, service->getName(), policy);
+  }
+
+  RTT::log(RTT::Debug) << "RTT component does not have a property or service named \"" << param_name << "\"" << RTT::endlog();
+  return false;
 }
 
-bool ROSParamService::getParams()
+bool ROSParamService::getParams(const ROSParamService::ResolutionPolicy policy)
+{
+  return getParams(this->getOwner()->provides(), std::string(), policy);
+}
+
+bool ROSParamService::getParams(RTT::Service::shared_ptr service, const std::string& ns, const ROSParamService::ResolutionPolicy policy)
 {
   RTT::Logger::In in("ROSParamService::getParams");
 
   // Get the parameter
   XmlRpc::XmlRpcValue xml_value;
 
-  const std::string resolved_name = std::string("~") + this->getOwner()->getName();
+  const std::string resolved_name = resolvedName(ns, policy);
   if(!ros::param::get(resolved_name, xml_value)) {
     RTT::log(RTT::Debug) << "ROS Parameter \"" << resolved_name << "\" not found on the parameter server!" << RTT::endlog();
     return false;
   }
 
   // Create a Property<> wrapper around the propertybag
-  RTT::PropertyBag *properties = this->getOwner()->properties();
+  RTT::PropertyBag *properties = service->properties();
   RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr datasource(new RTT::internal::ReferenceDataSource<RTT::PropertyBag>(*properties));
-
   RTT::Property<RTT::PropertyBag> prop(this->getOwner()->getName(),"",datasource);
 
   // Deal with the xml value
-  return xmlParamToProp(xml_value, &prop);
+  if (!xmlParamToProp(xml_value, &prop)) return false;
+
+  // Recurse into sub-services
+  RTT::Service::ProviderNames names = service->getProviderNames();
+  for (RTT::Service::ProviderNames::const_iterator it = names.begin(); it != names.end(); ++it)
+  {
+    RTT::Service::shared_ptr sub(service->getService(*it));
+    if (sub) {
+      std::string sub_ns = sub->getName();
+      if (!ns.empty()) sub_ns = ns + "/" + sub_ns;
+      getParams(sub, sub_ns, policy);
+    }
+  }
+
+  return true;
 }
 
 ORO_SERVICE_NAMED_PLUGIN(ROSParamService, "rosparam")
