@@ -9,6 +9,8 @@ include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 include_directories(${catkin_INCLUDE_DIRS})
 
 orocos_typekit(kdlconversions kdl_conversions-types.cpp)
+target_link_libraries(kdlconversions ${catkin_LIBRARIES})
+
 orocos_generate_package(
   DEPENDS tf_conversions
 )
