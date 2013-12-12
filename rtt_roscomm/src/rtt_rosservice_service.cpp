@@ -106,7 +106,8 @@ public:
   {
     // Make sure the factory for this service type exists
     if(!this->has_service_factory(ros_service_type)) {
-      return false; 
+      RTT::log(RTT::Error) << "Unknown service type '" << ros_service_type << "'" << RTT::endlog();
+      return false;
     }
 
     // Check if the operation is required by the owner
@@ -122,7 +123,11 @@ public:
       }
 
       // Associate an RTT operation caller with a ROS service client
-      return client_proxies_[ros_service_name]->connect(this->getOwner(), operation_caller);
+      if (!client_proxies_[ros_service_name]->connect(this->getOwner(), operation_caller)) {
+        RTT::log(RTT::Error) << "Could not connect OperationCaller '" << rtt_operation_name << "' to ROS service client '" << ros_service_name << "'" << RTT::endlog();
+        return false;
+      }
+      return true;
     }
     
     // Check if the operation is provided by the owner
@@ -138,9 +143,14 @@ public:
       }
 
       // Associate an RTT operation with a ROS service server 
-      return server_proxies_[ros_service_name]->connect(this->getOwner(), operation);
+      if (!server_proxies_[ros_service_name]->connect(this->getOwner(), operation)) {
+        RTT::log(RTT::Error) << "Could not connect Operation '" << rtt_operation_name << "' to ROS service server '" << ros_service_name << "'" << RTT::endlog();
+        return false;
+      }
+      return true;
     }
 
+    RTT::log(RTT::Error) << "No such Operation or OperationCaller '" << rtt_operation_name << "' in '" << getOwner()->getName() << "'" << RTT::endlog();
     return false;
   }
 
