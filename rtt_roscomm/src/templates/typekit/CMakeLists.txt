@@ -113,17 +113,17 @@ foreach( FILE ${MSG_FILES} )
 
   configure_file(
     ros_msg_typekit_plugin.cpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_typekit_plugin.cpp @@ONLY )
+    ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_typekit_plugin.cpp @ONLY )
 
   # Transport for ROS
   configure_file(
     ros_msg_transport_plugin.cpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_plugin.cpp @@ONLY )
+    ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_plugin.cpp @ONLY )
 
   # Types.hpp helper for extern templates
   configure_file(
     msg_Types.hpp.in
-    ${_template_typekit_dst_dir}/${ROSMSGNAME}.h @@ONLY )
+    ${_template_typekit_dst_dir}/${ROSMSGNAME}.h @ONLY )
 
   list(APPEND ROSMSG_TYPEKIT_PLUGINS ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_typekit_plugin.cpp )
   list(APPEND ROSMSG_TRANSPORT_PLUGIN ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_plugin.cpp )
@@ -133,19 +133,19 @@ endforeach( FILE ${MSG_FILES} )
 
 configure_file(
   ros_msg_typekit_package.cpp.in
-  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp @@ONLY )
+  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp @ONLY )
 
 configure_file(
   ros_msg_transport_package.cpp.in
-  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp @@ONLY )
+  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp @ONLY )
 
 # Both are equivalent
 configure_file(
   Types.hpp.in
-  ${_template_typekit_dst_dir}/Types.hpp @@ONLY )
+  ${_template_typekit_dst_dir}/Types.hpp @ONLY )
 configure_file(
   Types.h.in
-  ${_template_typekit_dst_dir}/Types.h @@ONLY )
+  ${_template_typekit_dst_dir}/Types.h @ONLY )
 
 include_directories(
   ${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}

@@ -60,6 +60,8 @@ endif()
 # Get the ros package name
 set(ROSPACKAGE ${_package})
 
+set(ROS_SRV_HEADERS)
+set(ROS_SRV_FACTORIES)
 foreach( FILE ${SRV_FILES} )
   # Extract the service name
   string(REGEX REPLACE ".+/\(.+\).srv" "\\1" ROS_SRV_NAME ${FILE})
@@ -70,14 +72,14 @@ foreach( FILE ${SRV_FILES} )
 
   # rtt_rosservice_proxies.cpp.in
   set(ROS_SRV_HEADERS "${ROS_SRV_HEADERS}#include <${ROS_SRV_TYPENAME}.h>\n")
-  set(ROS_SRV_FACTORIES "${ROS_SRV_PROXY_FACTORIES}  success = success && register_service_factory(new ROSServiceProxyFactory<${ROS_SRV_TYPE}>(\"${ROS_SRV_TYPENAME}\"));\n")
+  set(ROS_SRV_FACTORIES "${ROS_SRV_FACTORIES}  success = success && register_service_factory(new ROSServiceProxyFactory<${ROS_SRV_TYPE}>(\"${ROS_SRV_TYPENAME}\"));\n")
 
 endforeach()
 
 # Service proxy factories
 configure_file(
   rtt_rosservice_proxies.cpp.in
-  ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp @@ONLY )
+  ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp @ONLY )
 
 add_file_dependencies( ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp ${SRV_FILES})
 
