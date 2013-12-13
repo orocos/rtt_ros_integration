@@ -2,7 +2,7 @@
 
 ## Version 2.7 (ROS Hydro Distribution)
 
-The Orocos RTT/ROS Integration has been heavily refactored and extended in the
+The Orocos RTT/ROS Integration has been **heavily refactored** and extended in the
 2.7 release. Part of this is due to the new buildsystem standard in the ROS
 community, but also it is due to long-desired enhancements to the integration.
 
@@ -11,10 +11,10 @@ community, but also it is due to long-desired enhancements to the integration.
 Prior to the 2.7 release, the packages which interfaced core RTT functionality
 with core ROS functionality was split across three "stacks":
 
- 1. rtt_ros_integration: RTT plugins for communicating with ROS
- 2. rtt_ros_comm: RTT Typekits for rosgraph_msgs and std_msgs
- 3. rtt_common_msgs: RTT Typekits for common_msgs
- 4. TODO: rtt_geometry: RTT typekits for KDL datatypes and RTT plugins for TF
+ 1. **rtt_ros_integration**: RTT plugins for communicating with ROS
+ 2. **rtt_ros_comm**: RTT Typekits for rosgraph_msgs and std_msgs
+ 3. **rtt_common_msgs**: RTT Typekits for common_msgs
+ 4. TODO: **rtt_geometry**: RTT typekits for KDL datatypes and RTT plugins for TF
 
 rtt_ros_integration contained two packages: rtt_rosnode and rtt_rospack.
 
