@@ -194,8 +194,68 @@ The `rtt_actionlib` package provides a C++ API and an RTT service for
 implementing [actionlib](http://www.ros.org/wiki/actionlib) actions with Orocos
 RTT components. See [rtt_actionlib](rtt_actionlib) for more information.
 
-## History
+# Changelog
 
+## Version 2.7 (ROS Hydro Distribution)
+
+The Orocos RTT/ROS Integration has been heavily refactored and extended in the
+2.7 release. Part of this is due to the new buildsystem standard in the ROS
+community, but also it is due to long-desired enhancements to the integration.
+
+### Reorganization
+
+Prior to the 2.7 release, the packages which interfaced core RTT functionality
+with core ROS functionality was split across three "stacks":
+
+ 1. rtt_ros_integration: RTT plugins for communicating with ROS
+ 2. rtt_ros_comm: RTT Typekits for rosgraph_msgs and std_msgs
+ 3. rtt_common_msgs: RTT Typekits for common_msgs
+ 4. TODO: rtt_geometry: RTT typekits for KDL datatypes and RTT plugins for TF
+
+rtt_ros_integration contained two packages: rtt_rosnode and rtt_rospack.
+
+#### Typekit Packages Merged into rtt_ros_integration
+
+In the new release, the packages from these four repositories have been
+reorganized. The two repositories which only contained typekits (rtt_ros_comm
+and rtt_common_msgs) were moved into rtt_ros_integration under a directory
+called "typekits". 
+
+#### Refactor of rtt_rosnode
+
+The rtt_rosnode package contained the following tools:
+
+* Scripts to create RTT/ROS packags
+* CMake build and code-generation scripts to create RTT typekits from ROS
+messages
+* An RTT plugin called "ros_integration" which instantiated a ROS node and
+  provides several services:
+  * An RTT global service called "ros" for constructing ROS topic connection policies:
+    ```cpp 
+    // Create a ROS topic connection policy
+    var ConnPolicy cp = ros.topic("topic_name");
+    // Create a buffered ROS topic connection policy
+    var ConnPolicy cp_buffered = ros.topicBuffer("topic_name",10);
+    ```
+  * An RTT activity for publishing messages to ROS topics
+  * An RTT component service called "rosparam" for loading and saving RTT
+    component properties as ROS parameter server parameters:
+    ```cpp
+    loadService("ComponentName","rosparam");
+    // Store all properties of this component to the ROS param server
+    ComponentName.rosparam.storeProperties();
+    // Refresh all properties of this component from the ROS param server
+    ComponentName.rosparam.refreshProperties();
+    // Store a specific property on the ROS param server
+    var bool private = false;
+    var bool relative = falsle;
+    ComponentName.rosparam.storeProperty("prop_name", private, relative)
+    // Refresh a specific property of this component from the ROS param server
+    var bool private = false;
+    var bool relative = falsle;
+    ComponentName.rosparam.refreshProperty("prop_name", private, relative)
+    ```
+ 
 Orocos used to include optional built-in ROS support, wherein each Orocos
 package could also be treated like a rosbuild package. This former design was
 desirable due to the challenges in incorporating ROS package management
@@ -227,3 +287,5 @@ There are a few organizational changes that have been made in
 
 There are also several API changes related to importing plugins from ROS 
 packages and creating ROS topic connections.
+
+## Version 2.6
