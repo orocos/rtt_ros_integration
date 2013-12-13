@@ -231,15 +231,18 @@ messages
 * An RTT plugin called "ros_integration" which instantiated a ROS node and
   provides several services:
   * An RTT global service called "ros" for constructing ROS topic connection policies:
+  
     ```cpp 
     // Create a ROS topic connection policy
     var ConnPolicy cp = ros.topic("topic_name");
     // Create a buffered ROS topic connection policy
     var ConnPolicy cp_buffered = ros.topicBuffer("topic_name",10);
     ```
+
   * An RTT activity for publishing messages to ROS topics
   * An RTT component service called "rosparam" for loading and saving RTT
     component properties as ROS parameter server parameters:
+
     ```cpp
     loadService("ComponentName","rosparam");
     // Store all properties of this component to the ROS param server
@@ -247,13 +250,13 @@ messages
     // Refresh all properties of this component from the ROS param server
     ComponentName.rosparam.refreshProperties();
     // Store a specific property on the ROS param server
-    var bool private = false;
-    var bool relative = falsle;
-    ComponentName.rosparam.storeProperty("prop_name", private, relative)
+    var bool private_ns = false;
+    var bool relative_ns = falsle;
+    ComponentName.rosparam.storeProperty("prop_name", private_ns, relative_ns)
     // Refresh a specific property of this component from the ROS param server
-    var bool private = false;
-    var bool relative = falsle;
-    ComponentName.rosparam.refreshProperty("prop_name", private, relative)
+    var bool private_ns = false;
+    var bool relative_ns = falsle;
+    ComponentName.rosparam.refreshProperty("prop_name", private_ns, relative_ns)
     ```
  
 Orocos used to include optional built-in ROS support, wherein each Orocos
