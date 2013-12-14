@@ -6,6 +6,12 @@ that hapens over the ROS communication protocols and an "Orocos/RTT Service" is
 a grouping of properties, functions, and data ports. "ROS Services" satisfy a
 similar role to "Orocos/RTT Operations".* 
 
+Changelog
+---------
+
+See the metapackage [rtt_ros_integration/CHANGELOG.rst](CHANGELOG.rst) for a
+comprehensive changelog.
+
 Contents 
 --------
 
