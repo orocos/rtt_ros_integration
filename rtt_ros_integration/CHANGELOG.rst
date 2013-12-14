@@ -2,7 +2,7 @@
 Orocos RTT/ROS Integration Changelog
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.7.0
+2.7.x
 =====
 
 :Orocos Version: 2.7.x
