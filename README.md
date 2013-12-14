@@ -7,6 +7,11 @@ This repository contains ROS packages necessary for building OROCOS libraries,
 plugins, and components which communicate with the ROS messaging system and the
 ROS parameter server.
 
+## Changelog
+
+See the metapackage [rtt_ros_integration/CHANGELOG.rst](CHANGELOG.rst) for a
+comprehensive changelog.
+
 ## Packages
 
 The packages in this repository provide:
