@@ -1,6 +1,12 @@
-# Orocos RTT/ROS Integration Changelog
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Orocos RTT/ROS Integration Changelog
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-## Version 2.7 (ROS Hydro Distribution)
+2.7.0
+=====
+
+Orocos Version: 2.7.x
+ROS Distribution: Hydro
 
 The Orocos RTT/ROS Integration has been **heavily refactored** and extended in the
 2.7 release. Part of this is due to the new buildsystem standard in the ROS
@@ -9,14 +15,12 @@ community, but also it is due to long-desired enhancements to the integration.
 ### Reorganization
 
 Prior to the 2.7 release, the packages which interfaced core RTT functionality
-with core ROS functionality was split across three "stacks":
+with core ROS functionality was split across four "stacks":
 
  1. **rtt_ros_integration**: RTT plugins for communicating with ROS
  2. **rtt_ros_comm**: RTT Typekits for rosgraph_msgs and std_msgs
  3. **rtt_common_msgs**: RTT Typekits for common_msgs
  4. TODO: **rtt_geometry**: RTT typekits for KDL datatypes and RTT plugins for TF
-
-rtt_ros_integration contained two packages: rtt_rosnode and rtt_rospack.
 
 #### Typekit Packages Merged into rtt_ros_integration
 
@@ -25,9 +29,10 @@ reorganized. The two repositories which only contained typekits (rtt_ros_comm
 and rtt_common_msgs) were moved into rtt_ros_integration under a directory
 called "typekits". 
 
-#### Refactor of rtt_rosnode
+#### Refactor of rtt_ros_integration
 
-The rtt_rosnode package contained the following tools:
+The rtt_rosnode package from the old rtt_ros_integration stack contained the
+following tools:
 
 * Scripts to create RTT/ROS packags
 * CMake build and code-generation scripts to create RTT typekits from ROS
@@ -95,5 +100,122 @@ There are a few organizational changes that have been made in
 There are also several API changes related to importing plugins from ROS 
 packages and creating ROS topic connections.
 
-## Version 2.6 (ROS Groovy Distribution)
+2.7.0 (forthcoming)
+-------------------
+* Major reorganization (see additional notes in CHANGELOG.rst)
+* Moved typekits from rtt_ros_comm and rtt_common_msgs into rtt_ros_integration
+* Added Catkin buildsystem support
+* Added RTT interfaces for ROS Service Calls (serving and calling)
+* Added RTT interfaces for ROS Actionlib (action serving)
+* Re-wrote RTT rosparam service to handle parameter arrays more cleanly
+* 
 
+2.6
+===
+
+Orocos Version: 2.6.x
+ROS Distribution: Fuerte, Groovy
+
+2.6.0.3 (2013-02-16)
+--------------------
+* Minor bugfixes
+
+2.6.0.2 (2013-02-16)
+--------------------
+* Minor bugfixes
+
+2.6.0-1 (2012-12-21)
+--------------------
+* Adding support for ROS Groovy 
+
+2.6.0-0 (2012-11-22)
+--------------------
+* The RTT interface to rospack has been moved to a separate package called
+  "rtt_rospack"
+* rtt_rosnode: create_boost_headers.py is now compatible with ROS Fuerte
+
+0.5
+===
+
+Orocos Version: 2.5.x
+ROS Distribution: Electric
+
+As of the ROS Electric release, the orocos_toolchain_ros stack is split up in 5
+different stacks:
+
+* orocos_toolchain: containing the bare orocos packages
+* rtt_ros_integration (now a stack!): containing all orocos-ros integration code
+* rtt_geometry: containing integration code for working with orocos and tf
+* rtt_ros_comm: RTT typekits for the ros_comm messages
+* rtt_common_msgs: RTT typekits for the common_msgs messages
+
+
+0.5.0.7 (2011-11-08)
+--------------------
+* Minor bugfixes
+
+0.5.0.6 (2011-10-21)
+--------------------
+* Minor bugfixes
+
+0.5.0.5 (2011-10-04)
+--------------------
+* Remove rosdep.yaml file, it now lives in orocos_toolchain
+* Minor bugfixes
+
+0.5.0.4 (2011-10-04)
+--------------------
+* Minor bugfixes
+
+0.5.0.3 (2011-09-29)
+--------------------
+* Added primitive typekits for ROS Time and Duration
+* Minor bugfixes
+
+0.5.0.2 (2011-09-29)
+--------------------
+* rtt_tf has been moved to the rtt_geometry stack
+
+0.5.0.1 (2011-09-25)
+--------------------
+* Adding support for ROS Electric 
+* Adding support for Orocos 2.5.x
+
+0.4
+===
+
+Orocos Version: 2.4.x
+ROS Distribution:  Diamondback
+
+The stack contains all of the Orocos Toolchain v2.4.x integrated in the ROS
+build system. The orocos_toolchain_ros stack contains utilmm, utilrb, typelib
+and orogen, to automatically create ros packages for the automatic typekit
+generation for C++ classes.
+
+On top of the Orocos Toolchain v2.4.x this stack contains:
+
+* rtt_ros_integration: This package contains the following:
+  * The ros-plugin: this RTT plugin allows Orocos/RTT components to contact the
+    ROS master
+  * CMake macro's to automatically create Orocos/RTT typekits and transport
+    plugins from .msg files
+* rtt_ros_integration_std_msgs: This package shows how the CMake macro's have to
+  be used, it creates the Orocos/RTT typekits and transport plugins for all
+  roslib and std_msgs messages
+* rtt_ros_integration_example: This package shows how the rtt_ros_integration
+  should be used from an Orocos/RTT user/developer point of view. It contains a
+  HelloRobot component which can be contacted using rostopic echo
+
+0.4.0 (2011-06-27) 
+------------------
+* Initial Stack Release
+
+0.0
+===
+
+Orocos Version: 2.4.x
+ROS Distribution:  C-Turtle
+
+0.0.0 (2010-09-10) 
+------------------
+* Initial Version
