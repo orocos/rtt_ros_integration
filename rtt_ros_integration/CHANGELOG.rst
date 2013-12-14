@@ -5,9 +5,8 @@ Orocos RTT/ROS Integration Changelog
 2.7.0
 =====
 
-**Orocos Version:** 2.7.x
-
-**ROS Distribution:** Hydro
+:Orocos Version: 2.7.x
+:ROS Distro: Hydro
 
 The Orocos RTT/ROS Integration has been **heavily refactored** and extended in the
 2.7 release. Part of this is due to the new Catkin buildsystem standard in the ROS
@@ -75,8 +74,8 @@ See each package's individual CHANGELOG.rst for more details.
 2.6
 ===
 
-**Orocos Version:** 2.6.x
-**ROS Distribution:** Fuerte, Groovy
+:Orocos Version: 2.6.x
+:ROS Distro: Fuerte, Groovy
 
 2.6.0.3 (2013-02-16)
 --------------------
@@ -99,8 +98,8 @@ See each package's individual CHANGELOG.rst for more details.
 0.5
 ===
 
-**Orocos Version:** 2.5.x
-**ROS Distribution:** Electric
+:Orocos Version: 2.5.x
+:ROS Distro: Electric
 
 As of the ROS Electric release, the orocos_toolchain_ros stack is split up in 5
 different stacks:
@@ -146,8 +145,8 @@ different stacks:
 0.4
 ===
 
-**Orocos Version:** 2.4.x
-**ROS Distribution:**  Diamondback
+:Orocos Version: 2.4.x
+:ROS Distro: Diamondback
 
 The stack contains all of the Orocos Toolchain v2.4.x integrated in the ROS
 build system. The orocos_toolchain_ros stack contains utilmm, utilrb, typelib
@@ -172,14 +171,14 @@ On top of the Orocos Toolchain v2.4.x this stack contains:
 
 0.4.0 (2011-06-27) 
 ------------------
-* Initial Stack Release
+* Initial stack release
 
 0.0
 ===
 
-**Orocos Version:** 2.4.x
-**ROS Distribution:** C-Turtle
+:Orocos Version: 2.4.x
+:ROS Distro: C-Turtle
 
 0.0.0 (2010-09-10) 
 ------------------
-* Initial Version
+* Initial development version
