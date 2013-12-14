@@ -71,11 +71,11 @@ See each package's individual CHANGELOG.rst for more details.
 * Re-wrote RTT rosparam service to handle parameter arrays more cleanly
 * 
 
-2.6
-===
+2.6.x
+=====
 
 :Orocos Version: 2.6.x
-:ROS Distro: Fuerte, Groovy
+:ROS Distro: Fuerte, Groovy, Hydro
 
 2.6.0.3 (2013-02-16)
 --------------------
@@ -95,8 +95,8 @@ See each package's individual CHANGELOG.rst for more details.
   "rtt_rospack"
 * rtt_rosnode: create_boost_headers.py is now compatible with ROS Fuerte
 
-0.5
-===
+0.5.x
+=====
 
 :Orocos Version: 2.5.x
 :ROS Distro: Electric
@@ -142,8 +142,8 @@ different stacks:
 * Adding support for ROS Electric 
 * Adding support for Orocos 2.5.x
 
-0.4
-===
+0.4.x
+=====
 
 :Orocos Version: 2.4.x
 :ROS Distro: Diamondback
@@ -173,8 +173,8 @@ On top of the Orocos Toolchain v2.4.x this stack contains:
 ------------------
 * Initial stack release
 
-0.0
-===
+0.0.x
+=====
 
 :Orocos Version: 2.4.x
 :ROS Distro: C-Turtle
