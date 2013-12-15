@@ -27,9 +27,7 @@ before_install:
   - mkdir -p ~/ws/src
   - pushd ~/ws/src
   - ln -s $CI_SOURCE_PATH
-  - git clone https://github.com/jhu-lcsr-forks/rtt_ros_integration.git
-  - git clone https://github.com/jhu-lcsr-forks/rtt_ros_comm.git
-  - git clone https://github.com/jhu-lcsr-forks/rtt_common_msgs.git
+  - git clone https://github.com/orocos/rtt_ros_integration.git
   - popd
   - rosdep install -r --from-paths ~/ws/src ~/ws_isolated/src --ignore-src --rosdistro $ROS_DISTRO -y > /dev/null
   
