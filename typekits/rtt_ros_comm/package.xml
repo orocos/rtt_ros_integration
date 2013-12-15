@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+  <name>rtt_ros_comm</name>
+  <version>2.7.0</version>
+  <description>The rtt_ros_comm package</description>
+
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>rtt_std_msgs</run_depend>
+  <run_depend>rtt_std_srvs</run_depend>
+  <run_depend>rtt_rosgraph_msgs</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
