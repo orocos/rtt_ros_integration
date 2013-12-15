@@ -1,4 +1,4 @@
-find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling)
+find_package(OROCOS-RTT 2.0.0 QUIET COMPONENTS rtt-scripting rtt-marshalling)
 if (NOT OROCOS-RTT_FOUND)
   message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
 else()
