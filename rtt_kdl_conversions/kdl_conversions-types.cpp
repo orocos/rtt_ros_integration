@@ -1,6 +1,6 @@
 #include <rtt/types/TypekitPlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
-#include <tf_conversions/tf_kdl.h>
+#include <kdl_conversions/kdl_msg.h>
 
 namespace KDL
 {
@@ -20,7 +20,7 @@ namespace KDL
           gs->provides("KDL")->addOperation("TwistToMsg",&tf::TwistKDLToMsg);
           gs->provides("KDL")->addOperation("MsgToTwist",&tf::TwistMsgToKDL);
           gs->provides("KDL")->addOperation("FrameToMsg",&tf::PoseKDLToMsg);
-          gs->provides("KDL")->addOperation("MsgToFrame",&tf::PoseKDLToMsg);
+          gs->provides("KDL")->addOperation("MsgToFrame",&tf::PoseMsgToKDL);
           return true;
       }
   };
