@@ -161,8 +161,8 @@ the README in the [rtt_ros](rtt_ros) package.
 ### Bulding ROS-Based Orocos Plugins
 
 Orocos plugins are built normally, with Orocos CMake macros. See
-[rtt_ros_integration_example](rtt_ros_integration_example/CMakeLists.txt) for 
-an example.
+[rtt_actionlib](rtt_actionlib/CMakeLists.txt) for 
+an example of an Orocos RTT service plugin.
 
 ### Running Orocos Programs
 
