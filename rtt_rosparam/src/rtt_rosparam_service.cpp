@@ -1,6 +1,7 @@
 #include <rtt/RTT.hpp>
 #include <rtt/Property.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
+#include <rtt/types/PropertyDecomposition.hpp>
 
 #include <ros/ros.h>
 
@@ -160,7 +161,7 @@ XmlRpc::XmlRpcValue rttPropertyToXmlParam<RTT::PropertyBag>(const RTT::PropertyB
 template<class T>
 XmlRpc::XmlRpcValue rttPropertyToXmlParam(const std::vector<T> &vec);
 //! Convert an abstract RTT PropertyBase to an XmlRpc value
-XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(const RTT::base::PropertyBase *prop);
+XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(RTT::base::PropertyBase *prop);
 
 template<class T>
 bool castable(const RTT::base::PropertyBase *prop) 
@@ -238,7 +239,7 @@ XmlRpc::XmlRpcValue rttPropertyToXmlParam(const std::vector<T> &vec)
 #define RETURN_RTT_PROPERTY_CONTAINER_TO_XML_PARAM(type,elem_type,prop)\
   if(castable< type >(prop)) { return rttPropertyToXmlParam< elem_type >(static_cast<const RTT::Property< type >*>(prop)->rvalue()); }
 
-XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(const RTT::base::PropertyBase *prop)
+XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(RTT::base::PropertyBase *prop)
 {
   // Primitive parameters
   RETURN_RTT_PROPERTY_TO_XML_PARAM(std::string,prop);
@@ -263,7 +264,11 @@ XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(const RTT::base::PropertyBase *pro
   // Struct parameters
   RETURN_RTT_PROPERTY_TO_XML_PARAM(RTT::PropertyBag,prop);
 
-  // Add more types here Eigen types... KDL types... etc //
+  // Try to decompose property into a property bag
+  RTT::PropertyBag bag;
+  if (RTT::types::propertyDecomposition(prop, bag)) {
+    return rttPropertyToXmlParam(bag);
+  }
 
   return XmlRpc::XmlRpcValue();
 }
@@ -483,10 +488,13 @@ bool xmlParamToProp(
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<char> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<unsigned char> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<bool> >*>(prop_base));
-        // Add more types here Eigen types... KDL types... etc //
     case XmlRpc::XmlRpcValue::TypeStruct:
-      return
-        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<RTT::PropertyBag>*>(prop_base));
+      if (xmlParamToProp(xml_value, dynamic_cast<RTT::Property<RTT::PropertyBag>*>(prop_base))) return true;
+      // try to decompose the property in a property bag:
+      {
+         RTT::Property<RTT::PropertyBag> bag(prop_base->getName());
+         return RTT::types::propertyDecomposition(prop_base, bag.set()) && xmlParamToProp(xml_value, &bag);
+      }
   };
 
   RTT::log(RTT::Debug) << "No appropriate conversion for property \"" << prop_base->getName() << "\"" << RTT::endlog();
