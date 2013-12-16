@@ -33,17 +33,7 @@ The packages in this repository provide:
   [metapackage](http://ros.org/wiki/catkin/package.xml#Metapackages) for this
   repository.
 
-See each package's README.md file for more information.
-
-The following packages are in the planning stages:
-
-* [**rtt\_rostime**](rtt_rostime) Plugin for basing RTT time off of ROS sim
-  time.
-* [**rtt\_rosops**](rtt_rosops) Plugin for executing Orocos Ops script via ROS
-  service call.
-* [**rtt\_dynamic_reconfigure**](rtt_dynamic_reconfigure) Plugin for running
-  a [dynamic\_reconfigure](http://ros.org/wiki/dynamic_reconfigure) server from
-  an RTT component.
+***See each package's README.md file for more information.***
 
 ## Usage
 
@@ -198,4 +188,18 @@ respectively. See [rtt_roscomm](rtt_roscomm) for more information.
 The `rtt_actionlib` package provides a C++ API and an RTT service for
 implementing [actionlib](http://www.ros.org/wiki/actionlib) actions with Orocos
 RTT components. See [rtt_actionlib](rtt_actionlib) for more information.
+
+
+## Future Work
+
+The following packages are in the planning stages, please contact the
+maintainers if you're interested in using or contributing to them:
+
+* [**rtt\_rostime**](rtt_rostime) Plugin for basing RTT time off of ROS sim
+  time.
+* [**rtt\_rosops**](rtt_rosops) Plugin for executing Orocos Ops script via ROS
+  service call.
+* [**rtt\_dynamic_reconfigure**](rtt_dynamic_reconfigure) Plugin for running
+  a [dynamic\_reconfigure](http://ros.org/wiki/dynamic_reconfigure) server from
+  an RTT component.
 
