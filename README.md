@@ -53,7 +53,7 @@ Orocos:
 export OROCOS_TARGET=gnulinux
 mkdir -p ~/ws/underlay_isolated/src/orocos
 cd ~/ws/underlay_isolated
-git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git src/orocos/orocos_toolchain
+git clone --recursive git@github.com:orocos-toolchain/orocos_toolchain.git src/orocos/orocos_toolchain
 catkin_make_isolated --install
 source install/setup.sh
 ```
@@ -62,7 +62,7 @@ Then, in the same shell, create an underlay for building Catkin-based packages:
 ```shell
 mkdir -p ~/ws/underlay/src
 cd ~/ws/underlay
-git clone git@github.com:jhu_lcsr_forks/rtt_ros_integration.git src/rtt_ros_integration
+git clone git@github.com:orocos/rtt_ros_integration.git src/rtt_ros_integration
 catkin_make
 source devel/setup.sh
 ```
