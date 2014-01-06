@@ -26,7 +26,7 @@ This package provides a global RTT service for creating real-time-safe
 connections between ROS topics and Orocos RTT data ports.
 
 This package provides two Orocos connection policies: buffered and 
-unbufferd connections to ROS topics. Publishing and subscribing are done
+unbuffered connections to ROS topics. Publishing and subscribing are done
 with the same command, and the topic type is inferred from the Orocos port
 type. Connection policies are created with these operations:
 
@@ -34,6 +34,9 @@ type. Connection policies are created with these operations:
   of 1.
 * `rostopic.connectionBuffered(TOPIC_NAME, BUFFER_LENGTH)`: Creates a
   connection with a user-supplied buffer length.
+* `rostopic.unbuffered(TOPIC_NAME)`: Creates an unbuffered connection, where
+  the writing thread immediately publishs the message (publishing only).
+  This is not real-time safe.
 
 #### ROS Services
 
@@ -114,27 +117,30 @@ some_component_name.rosservice.connect(
 
 ### Making a Package's ROS .msg and .srv Types Available
 
-Generally, you can crete a catkin package simply with the `create_rtt_srvs`
+Generally, you can create a catkin package simply with the `create_rtt_msgs`
 script by running:
 
 ```shell
-rosrun rtt_roscomm create_rtt_msgs my_srvs
+rosrun rtt_roscomm create_rtt_msgs my_msgs
 ```
 
 All this does is create a package with the following CMakeLists.txt and
 corresponding package.xml:
 
 ```cmake
-project(rtt_std_srvs)
-find_package(catkin REQUIRED COMPONENTS genmsg rtt_roscomm @pkgname@)
+project(rtt_my_msgs)
+find_package(catkin REQUIRED COMPONENTS rtt_roscomm)
 
 # Generate typekits for ros .msg files
-ros_generate_rtt_typekit(@pkgname@)
-# Generate the plugin which makes the services in std_srvs available
-ros_generate_rtt_service_proxies(@pkgname@)
+ros_generate_rtt_typekit(my_msgs)
+# Generate the plugin which makes the services in my_msgs available
+ros_generate_rtt_service_proxies(my_msgs)
 
-# Call catkin_package after the above to export the proper targets
-catkin_package(CATKIN_DEPENDS genmsg rtt_roscomm @pkgname@)
+# Call orocos_generate_package() after the above to export the proper targets
+orocos_generate_package(
+  DEPENDS my_msgs
+  DEPENDS_TARGETS rtt_roscomm
+)
 
 ```
 
@@ -150,15 +156,15 @@ Design
 
 The `rosservice_registry` RTT service contains a list of ROS service clients
 and servers which are associated with RTT operations and operationcallers,
-respectively.  The `rosservice.connectOperation` operation, inspects whether
-the first argument is an operation or operationcaller. If it is an **RTT
-operation**, it will instantiate a **ROS service server** wrapped in an **RTT
-operationCaller** to call the operation. If it is an **RTT operationCaller**,
-it will instantiate a **ROS service client** wrapped in an **RTT operation** to
+respectively.  The `rosservice.connect` operation, inspects whether
+the first argument is an Operation or OperationCaller. If it is an **RTT
+Operation**, it will instantiate a **ROS service server** wrapped in an **RTT
+OperationCaller** to call the operation. If it is an **RTT OperationCaller**,
+it will instantiate a **ROS service client** wrapped in an **RTT Operation** to
 be called by the operation caller. 
 
 The provided and required services on which the wrapper operations and
-operationCallers are created are private to the ROS service service. 
+operation callers are created are private to the `rosservice` service. 
 
 
 Todo
