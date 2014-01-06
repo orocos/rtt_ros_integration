@@ -1,6 +1,6 @@
 #include <rtt/types/TypekitPlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
-#include <tf_conversions/tf_kdl.h>
+#include <kdl_conversions/kdl_msg.h>
 
 namespace KDL
 {
@@ -17,10 +17,24 @@ namespace KDL
       bool loadOperators()
       {
           RTT::Service::shared_ptr gs = RTT::internal::GlobalService::Instance();
+          gs->provides("KDL")->addOperation("pointMsgToKDL",&tf::pointMsgToKDL);
+          gs->provides("KDL")->addOperation("pointKDLToMsg",&tf::pointKDLToMsg);
+          gs->provides("KDL")->addOperation("poseMsgToKDL",&tf::poseMsgToKDL);
+          gs->provides("KDL")->addOperation("poseKDLToMsg",&tf::poseKDLToMsg);
+          gs->provides("KDL")->addOperation("quaternionMsgToKDL",&tf::quaternionMsgToKDL);
+          gs->provides("KDL")->addOperation("quaternionKDLToMsg",&tf::quaternionKDLToMsg);
+          gs->provides("KDL")->addOperation("transformMsgToKDL",&tf::transformMsgToKDL);
+          gs->provides("KDL")->addOperation("transformKDLToMsg",&tf::transformKDLToMsg);
+          gs->provides("KDL")->addOperation("twistMsgToKDL",&tf::twistMsgToKDL);
+          gs->provides("KDL")->addOperation("twistKDLToMsg",&tf::twistKDLToMsg);
+          gs->provides("KDL")->addOperation("vectorMsgToKDL",&tf::vectorMsgToKDL);
+          gs->provides("KDL")->addOperation("vectorKDLToMsg",&tf::vectorKDLToMsg);
+          gs->provides("KDL")->addOperation("wrenchMsgToKDL",&tf::wrenchMsgToKDL);
+          gs->provides("KDL")->addOperation("wrenchKDLToMsg",&tf::wrenchKDLToMsg);
           gs->provides("KDL")->addOperation("TwistToMsg",&tf::TwistKDLToMsg);
           gs->provides("KDL")->addOperation("MsgToTwist",&tf::TwistMsgToKDL);
           gs->provides("KDL")->addOperation("FrameToMsg",&tf::PoseKDLToMsg);
-          gs->provides("KDL")->addOperation("MsgToFrame",&tf::PoseKDLToMsg);
+          gs->provides("KDL")->addOperation("MsgToFrame",&tf::PoseMsgToKDL);
           return true;
       }
   };
