@@ -7,6 +7,11 @@ This repository contains ROS packages necessary for building OROCOS libraries,
 plugins, and components which communicate with the ROS messaging system and the
 ROS parameter server.
 
+## Changelog
+
+See the metapackage [rtt_ros_integration/CHANGELOG.rst](CHANGELOG.rst) for a
+comprehensive changelog.
+
 ## Packages
 
 The packages in this repository provide:
@@ -28,23 +33,19 @@ The packages in this repository provide:
   [metapackage](http://ros.org/wiki/catkin/package.xml#Metapackages) for this
   repository.
 
-See each package's README.md file for more information.
-
-The following packages are in the planning stages:
-
-* [**rtt\_rostime**](rtt_rostime) Plugin for basing RTT time off of ROS sim
-  time.
-* [**rtt\_rosops**](rtt_rosops) Plugin for executing Orocos Ops script via ROS
-  service call.
-* [**rtt\_dynamic_reconfigure**](rtt_dynamic_reconfigure) Plugin for running
-  a [dynamic\_reconfigure](http://ros.org/wiki/dynamic_reconfigure) server from
-  an RTT component.
+***See each package's README.md file for more information.***
 
 ## Usage
 
 For numerous examples of usage, see the
 [**rtt\_ros\_examples**](http://github.com/jhu-lcsr/rtt_ros_examples)
 stack.
+
+### Installing Orocos From Binary Packages
+
+The Orocos toolchain and the rtt_ros_integration packages are available as 
+binary packages hosted by the Open Source Robotics Foundation (OSRF) and can be
+installed on supported operating systems.
 
 ### Building Orocos From Source
 
@@ -58,7 +59,7 @@ Orocos:
 export OROCOS_TARGET=gnulinux
 mkdir -p ~/ws/underlay_isolated/src/orocos
 cd ~/ws/underlay_isolated
-git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git src/orocos/orocos_toolchain
+git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git -b toolchain-2.7 src/orocos/orocos_toolchain
 catkin_make_isolated --install
 source install/setup.sh
 ```
@@ -67,7 +68,7 @@ Then, in the same shell, create an underlay for building Catkin-based packages:
 ```shell
 mkdir -p ~/ws/underlay/src
 cd ~/ws/underlay
-git clone git@github.com:jhu_lcsr_forks/rtt_ros_integration.git src/rtt_ros_integration
+git clone https://github.com/orocos/rtt_ros_integration.git src/rtt_ros_integration
 catkin_make
 source devel/setup.sh
 ```
@@ -166,8 +167,8 @@ the README in the [rtt_ros](rtt_ros) package.
 ### Bulding ROS-Based Orocos Plugins
 
 Orocos plugins are built normally, with Orocos CMake macros. See
-[rtt_ros_integration_example](rtt_ros_integration_example/CMakeLists.txt) for 
-an example.
+[rtt_actionlib](rtt_actionlib/CMakeLists.txt) for 
+an example of an Orocos RTT service plugin.
 
 ### Running Orocos Programs
 
@@ -194,36 +195,17 @@ The `rtt_actionlib` package provides a C++ API and an RTT service for
 implementing [actionlib](http://www.ros.org/wiki/actionlib) actions with Orocos
 RTT components. See [rtt_actionlib](rtt_actionlib) for more information.
 
-## History
 
-Orocos used to include optional built-in ROS support, wherein each Orocos
-package could also be treated like a rosbuild package. This former design was
-desirable due to the challenges in incorporating ROS package management
-standards with non-ROS libraries. Orocos now takes advantage of
-[Catkin](http://www.ros.org/wiki/catkin) in order to provide simple integration
-with a catkin workspace while removing the dependency on ROS.
+## Future Work
 
-With rosbuild, all orocos components were built within a given package's own
-build directory, and all generated typekit code was also placed in a given
-package's include and src directories. Now, all such files are built in the
-Catkin develspace.
+The following packages are in the planning stages, please contact the
+maintainers if you're interested in using or contributing to them:
 
-As of now, the new interfaces have only been developed to support catkin-based
-ROS packages, but adding backwards-compatible rosbuild support shouldn't be too hard.
+* [**rtt\_rostime**](rtt_rostime) Plugin for basing RTT time off of ROS sim
+  time.
+* [**rtt\_rosops**](rtt_rosops) Plugin for executing Orocos Ops script via ROS
+  service call.
+* [**rtt\_dynamic_reconfigure**](rtt_dynamic_reconfigure) Plugin for running
+  a [dynamic\_reconfigure](http://ros.org/wiki/dynamic_reconfigure) server from
+  an RTT component.
 
-There are a few organizational changes that have been made in
-`rtt_ros_integration` compared to the ROS Groovy Galapagos release:
-
- * "rtt_rosnode" has been split into three packages: 
-   1. "rtt_rosnode": Contains a plugin for creating a ROS node in an RTT program
-   2. "rtt_roscomm": Contains msg primitive typekit and the transport plugin for using ROS topics
-   3. "rtt_rosparam": Contains a plugin for synchronizing a component's properties with ROS parameters
-
- * A new package, "rtt_ros" has been added. This package contains convenience 
-   launchfiles and wrapper scripts for running Orocos programs (typegen, 
-   deployer, etc). This package also contains a plugin for importing ROS 
-   packages and their dependencies, instead of overloading the use of the 
-   deployer's "import()" function. 
-
-There are also several API changes related to importing plugins from ROS 
-packages and creating ROS topic connections.
