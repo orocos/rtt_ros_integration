@@ -63,7 +63,8 @@ public:
 
     boost::shared_ptr<RTT::ComponentLoader> loader = RTT::ComponentLoader::Instance();
 
-    bool found_packages = false;
+    // List of packages which could not be loaded
+    std::vector<std::string> missing_packages;
 
     // Get the dependencies for a given ROS package --> deps
     try {
@@ -196,34 +197,39 @@ public:
         // Check if it's already been imported
         if(*it == "rtt_ros" || loader->isImported(*it)) {
           RTT::log(RTT::Debug) << "Package dependency '"<< *it <<"' already imported." << RTT::endlog();
-          found_packages = true;
           continue;
         }
 
         // Import the dependency
-        RTT::log(RTT::Debug) << "Importing Orocos components from ROS package '"<<*it<<"'" << RTT::endlog();
         if(loader->import(*it, path_list)) {
-          found_packages = true;
+          RTT::log(RTT::Debug) << "Importing Orocos components from ROS package \""<<*it<<"\" SUCCEEDED.";
         } else {
-          if (*it != package) {
-            RTT::log(RTT::Debug) << "Could not load ROS package dependency \"" << *it << "\" of ROS package \"" << package << "\"" << RTT::endlog();
-          } else {
-            RTT::log(RTT::Warning) << "Could not import any plugins from ROS package \"" << package << "\"" << RTT::endlog();
-          }
+          // Temporarily store the name of the missing package
+          missing_packages.push_back(*it);
+          RTT::log(RTT::Debug) << "Importing Orocos components from ROS package \""<<*it<<"\" FAILED.";
         }
+        RTT::log(RTT::Debug) << RTT::endlog();
       }
 
     } catch(std::string arg) {
-      RTT::log(RTT::Debug) << "While processing the dependencies of " << package << ": not a ros package: " << arg << RTT::endlog();
+      RTT::log(RTT::Debug) << "While processing the dependencies of " << package << ": Dependency is not a ros package: " << arg << RTT::endlog();
+      missing_packages.push_back(arg);
     }
 
-    if(!found_packages) { 
-      RTT::log(RTT::Warning) << "Could not load any plugins from ROS package \"" << package << "\" or it's dependencies." << RTT::endlog();
+    // Report success or failure
+    if(missing_packages.size() == 0) { 
+      RTT::log(RTT::Info) << "Loaded plugins from ROS package \"" << package << "\" and its dependencies." << RTT::endlog();
     } else {
-      RTT::log(RTT::Info) << "Loaded plugins from ROS package \"" << package << "\" or it's dependencies." << RTT::endlog();
+      RTT::log(RTT::Warning) << "Could not load RTT plugins from the following ROS packages (they might be empty, in which case this message can be ignored): "<< RTT::endlog();
+      for(std::vector<std::string>::iterator it = missing_packages.begin();
+          it != missing_packages.end();
+          ++it)
+      {
+          RTT::log(RTT::Warning) << " - " << *it<< RTT::endlog();
+      }
     }
 
-    return found_packages;
+    return missing_packages.size() > 0;
   }
 
 };

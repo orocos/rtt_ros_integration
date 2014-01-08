@@ -26,6 +26,8 @@ The packages in this repository provide:
   plugin for publishing and subscribing to ROS topics as well as calling and
   responding to ROS services.
 * [**rtt\_rospack**](rtt_rospack) Plugin for locating ROS resources.
+* [**rtt\_tf**](rtt_tf) RTT-Plugin which uses [tf](http://ros.org/wiki/tf) to
+  allow RTT components to lookup and publish transforms.
 * [**rtt\_actionlib**](rtt_actionlib) RTT-Enabled
   [actionlib](http://ros.org/wiki/actionlib) action server for providing
   actions from ROS-integrated RTT components.
