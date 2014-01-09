@@ -130,11 +130,13 @@ class MyComponent : public RTT::TaskContext {
       // Get the parameters
       if(rosparam) {
         // Get the ROS parameter "/robot_description"
-        bool result = rosparam->getAbsolute("robot_description");
+        all_params_found &= rosparam->getAbsolute("robot_description");
 
         // Get the ROS parameter "~publish_period"
-        bool result = rosparam->getPrivate("publish_priod");
+        all_params_found &= rosparam->getPrivate("publish_priod");
       }
+      
+      return all_params_found;
     }
 
     // ...
