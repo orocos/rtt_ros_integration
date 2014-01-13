@@ -3,6 +3,8 @@
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/types/PropertyDecomposition.hpp>
 
+#include <Eigen/Dense>
+
 #include <ros/ros.h>
 
 using namespace RTT;
@@ -232,6 +234,33 @@ XmlRpc::XmlRpcValue rttPropertyToXmlParam(const std::vector<T> &vec)
   return xml_array;
 }
 
+template<>
+XmlRpc::XmlRpcValue rttPropertyToXmlParam(const Eigen::VectorXd &vec)
+{
+  XmlRpc::XmlRpcValue xml_array;
+  xml_array.setSize(vec.size());
+
+  for(unsigned i=0; i<vec.size(); i++) {
+    xml_array[i] = rttPropertyToXmlParam<double>(vec(i));
+  }
+
+  return xml_array;
+}
+
+template<>
+XmlRpc::XmlRpcValue rttPropertyToXmlParam(const Eigen::VectorXf &vec)
+{
+  XmlRpc::XmlRpcValue xml_array;
+  xml_array.setSize(vec.size());
+
+  for(unsigned i=0; i<vec.size(); i++) {
+    xml_array[i] = rttPropertyToXmlParam<double>(vec(i));
+  }
+
+  return xml_array;
+}
+
+
 // These just save typing
 #define RETURN_RTT_PROPERTY_TO_XML_PARAM(type,prop)\
   if(castable< type >(prop)) { return rttPropertyToXmlParam< type >(static_cast<const RTT::Property< type >*>(prop)->rvalue()); }
@@ -260,6 +289,9 @@ XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(RTT::base::PropertyBase *prop)
   RETURN_RTT_PROPERTY_CONTAINER_TO_XML_PARAM(std::vector<char>, char, prop);
   RETURN_RTT_PROPERTY_CONTAINER_TO_XML_PARAM(std::vector<unsigned char>, unsigned char, prop);
   RETURN_RTT_PROPERTY_CONTAINER_TO_XML_PARAM(std::vector<bool>, bool, prop);
+
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(Eigen::VectorXd, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(Eigen::VectorXf, prop);
 
   // Struct parameters
   RETURN_RTT_PROPERTY_TO_XML_PARAM(RTT::PropertyBag,prop);
@@ -329,6 +361,11 @@ bool xmlParamToProp(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<T>* prop
 //! Convert an XmlRpc array value into an RTT std::vector property
 template <class T>
 bool xmlParamToProp(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<std::vector<T> >* prop);
+//! Convert an XmlRpc array value into an RTT Eigen::VectorXd property
+template <>
+bool xmlParamToProp(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<Eigen::VectorXd>* prop);
+template <>
+bool xmlParamToProp(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<Eigen::VectorXf>* prop);
 //! Convert an XmlRpc structure value into an RTT PropertyBag property
 template <> 
 bool xmlParamToProp<RTT::PropertyBag>(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<RTT::PropertyBag>* prop);
@@ -425,6 +462,60 @@ bool xmlParamToProp<bool>(
 }
 
 template <>
+bool xmlParamToProp(
+    const XmlRpc::XmlRpcValue &xml_value,
+    RTT::Property<Eigen::VectorXd >* prop)
+{
+  // Check if the property value is the requested type T
+  if(!prop) {
+    return false;
+  }
+
+  // Make sure it's an array
+  if(xml_value.getType() != XmlRpc::XmlRpcValue::TypeArray) {
+    return false;
+  }
+
+  // Copy the data into the vector property
+  Eigen::VectorXd &vec = prop->value();
+  vec.resize(xml_value.size());
+  for(size_t i=0; i<vec.size(); i++) {
+    double temp;
+    xmlParamToValue(xml_value[i], temp);
+    vec[i] = temp;
+  }
+
+  return true;
+}
+
+template <>
+bool xmlParamToProp(
+    const XmlRpc::XmlRpcValue &xml_value,
+    RTT::Property<Eigen::VectorXf >* prop)
+{
+  // Check if the property value is the requested type T
+  if(!prop) {
+    return false;
+  }
+
+  // Make sure it's an array
+  if(xml_value.getType() != XmlRpc::XmlRpcValue::TypeArray) {
+    return false;
+  }
+
+  // Copy the data into the vector property
+  Eigen::VectorXf &vec = prop->value();
+  vec.resize(xml_value.size());
+  for(size_t i=0; i<vec.size(); i++) {
+    double temp;
+    xmlParamToValue(xml_value[i], temp);
+    vec[i] = temp;
+  }
+
+  return true;
+}
+
+template <>
 bool xmlParamToProp<RTT::PropertyBag>(
     const XmlRpc::XmlRpcValue &xml_value,
     RTT::Property<RTT::PropertyBag>* prop)
@@ -460,6 +551,8 @@ bool xmlParamToProp(
     const XmlRpc::XmlRpcValue &xml_value,
     RTT::base::PropertyBase* prop_base)
 {
+  bool array_ret = false;
+
   // Switch based on the type of XmlRpcValue 
   switch(xml_value.getType()) {
     case XmlRpc::XmlRpcValue::TypeString:
@@ -479,7 +572,7 @@ bool xmlParamToProp(
       return 
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<bool>*>(prop_base)); 
     case XmlRpc::XmlRpcValue::TypeArray:
-      return 
+      array_ret =
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<std::string> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<double> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<float> >*>(prop_base)) ||
@@ -487,13 +580,26 @@ bool xmlParamToProp(
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<unsigned int> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<char> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<unsigned char> >*>(prop_base)) ||
-        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<bool> >*>(prop_base));
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<bool> >*>(prop_base)) ||
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<Eigen::VectorXd >*>(prop_base));
+      // Return true if it gets parsed into an array structure, otherwise, try property bag decomposition
+      if(array_ret) {
+        return true;
+      }
     case XmlRpc::XmlRpcValue::TypeStruct:
-      if (xmlParamToProp(xml_value, dynamic_cast<RTT::Property<RTT::PropertyBag>*>(prop_base))) return true;
-      // try to decompose the property in a property bag:
+      // Try to decompose the property in a property bag:
+      if(xmlParamToProp(xml_value, dynamic_cast<RTT::Property<RTT::PropertyBag>*>(prop_base))) {
+        return true;
+      }
       {
-         RTT::Property<RTT::PropertyBag> bag(prop_base->getName());
-         return RTT::types::propertyDecomposition(prop_base, bag.set()) && xmlParamToProp(xml_value, &bag);
+        RTT::Property<RTT::PropertyBag> bag(prop_base->getName());
+        if(RTT::types::propertyDecomposition(prop_base, bag.set()) && xmlParamToProp(xml_value, &bag)) {
+          return true;
+        } else {
+          RTT::log(RTT::Debug) << "Could not decompose property bag for property type \"" << prop_base->getName() << "\"" << RTT::endlog();
+          return false;
+        }
+
       }
   };
 
@@ -521,7 +627,11 @@ bool ROSParamService::getParam(
   RTT::base::PropertyBase *prop_base = this->getOwner()->getProperty(param_name);
   if(prop_base) {
     // Deal with the xml value
-    return xmlParamToProp(xml_value, prop_base);
+    bool ret = xmlParamToProp(xml_value, prop_base);
+    if(!ret) {
+      RTT::log(RTT::Error) << "Could not convert \"" << resolved_name << "\" from an XMLRPC value to an RTT property." << RTT::endlog();
+    }
+    return ret;
   }
 
   // Try to get the properties of a sub-service if it exists
@@ -559,7 +669,11 @@ bool ROSParamService::getParams(RTT::Service::shared_ptr service, const std::str
   RTT::Property<RTT::PropertyBag> prop(this->getOwner()->getName(),"",datasource);
 
   // Deal with the xml value
-  if (!xmlParamToProp(xml_value, &prop)) return false;
+  bool ret = xmlParamToProp(xml_value, &prop);
+  if (!ret) {
+    RTT::log(RTT::Error) << "Could not convert \"" << resolved_name << "\" from an XMLRPC value to an RTT property." << RTT::endlog();
+    return false;
+  }
 
   // Recurse into sub-services
   RTT::Service::ProviderNames names = service->getProviderNames();

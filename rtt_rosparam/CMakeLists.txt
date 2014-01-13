@@ -3,9 +3,12 @@ project(rtt_rosparam)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
 
+find_package(Eigen REQUIRED)
+
 include_directories(
   include
-  ${catkin_INCLUDE_DIRS})
+  ${catkin_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS})
 
 # build ROS param as a separate service
 orocos_service(rtt_rosparam src/rtt_rosparam_service.cpp)
