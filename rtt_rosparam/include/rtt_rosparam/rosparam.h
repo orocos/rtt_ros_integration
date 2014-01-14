@@ -10,7 +10,36 @@ namespace rtt_rosparam {
   {
 
   public:
-    ROSParam(RTT::TaskContext *owner);
+    ROSParam(RTT::TaskContext *owner) :
+      RTT::ServiceRequester("rosparam",owner),
+      getAll("getAll"),
+      setAll("setAll"),
+      get("get"),
+      getRelative("getRelative"),
+      getAbsolute("getAbsolute"),
+      getPrivate("getPrivate"),
+      getComponentPrivate("getComponentPrivate"),
+      set("set"),
+      setRelative("setRelative"),
+      setAbsolute("setAbsolute"),
+      setPrivate("setPrivate"),
+      setComponentPrivate("setComponentPrivate")
+    {
+      this->addOperationCaller(getAll);
+      this->addOperationCaller(setAll);
+
+      this->addOperationCaller(get);
+      this->addOperationCaller(getRelative);
+      this->addOperationCaller(getAbsolute);
+      this->addOperationCaller(getPrivate);
+      this->addOperationCaller(getComponentPrivate);
+
+      this->addOperationCaller(set);
+      this->addOperationCaller(setRelative);
+      this->addOperationCaller(setAbsolute);
+      this->addOperationCaller(setPrivate);
+      this->addOperationCaller(setComponentPrivate);
+    }
 
     enum ResolutionPolicy {
       RELATIVE, //! Relative resolution:  "name" -> "name"
@@ -34,38 +63,6 @@ namespace rtt_rosparam {
     RTT::OperationCaller<bool(const std::string &)> setPrivate;
     RTT::OperationCaller<bool(const std::string &)> setComponentPrivate;
   };
-
-  ROSParam::ROSParam(RTT::TaskContext *owner) :
-    RTT::ServiceRequester("rosparam",owner),
-    getAll("getAll"),
-    setAll("setAll"),
-    get("get"),
-    getRelative("getRelative"),
-    getAbsolute("getAbsolute"),
-    getPrivate("getPrivate"),
-    getComponentPrivate("getComponentPrivate"),
-    set("set"),
-    setRelative("setRelative"),
-    setAbsolute("setAbsolute"),
-    setPrivate("setPrivate"),
-    setComponentPrivate("setComponentPrivate")
-  {
-    this->addOperationCaller(getAll);
-    this->addOperationCaller(setAll);
-
-    this->addOperationCaller(get);
-    this->addOperationCaller(getRelative);
-    this->addOperationCaller(getAbsolute);
-    this->addOperationCaller(getPrivate);
-    this->addOperationCaller(getComponentPrivate);
-
-    this->addOperationCaller(set);
-    this->addOperationCaller(setRelative);
-    this->addOperationCaller(setAbsolute);
-    this->addOperationCaller(setPrivate);
-    this->addOperationCaller(setComponentPrivate);
-  }
-
 }
 
 #endif // ifndef __RTT_ROSPARAM_ROSPARAM_H
