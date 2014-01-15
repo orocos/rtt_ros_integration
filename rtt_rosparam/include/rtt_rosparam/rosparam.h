@@ -41,23 +41,23 @@ namespace rtt_rosparam {
       this->addOperationCaller(setComponentPrivate);
     }
 
-    enum ResolutionPolicy {
+    typedef enum  {
       RELATIVE, //! Relative resolution:  "name" -> "name"
       ABSOLUTE, //! Absolute resolution:  "name" -> "/name"
       PRIVATE,  //! Private resolution:   "name" -> "~name"
       COMPONENT //! Component resolution: "name" -> "~COMPONENT_NAME/name"
-    };
+    }ResolutionPolicy;
 
     RTT::OperationCaller<bool(void)> getAll;
     RTT::OperationCaller<bool(void)> setAll;
 
-    RTT::OperationCaller<bool(const std::string &, const ResolutionPolicy)> get;
+    RTT::OperationCaller<bool(const std::string &, const unsigned int)> get;
     RTT::OperationCaller<bool(const std::string &)> getRelative;
     RTT::OperationCaller<bool(const std::string &)> getAbsolute;
     RTT::OperationCaller<bool(const std::string &)> getPrivate;
     RTT::OperationCaller<bool(const std::string &)> getComponentPrivate;
 
-    RTT::OperationCaller<bool(const std::string &, const ResolutionPolicy)> set;
+    RTT::OperationCaller<bool(const std::string &, const unsigned int)> set;
     RTT::OperationCaller<bool(const std::string &)> setRelative;
     RTT::OperationCaller<bool(const std::string &)> setAbsolute;
     RTT::OperationCaller<bool(const std::string &)> setPrivate;
