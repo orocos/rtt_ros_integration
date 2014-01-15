@@ -10,35 +10,41 @@
 @ROS_SRV_HEADERS@
 ////////////////////////////////////////////////////////////////////////////////
 
-bool registerROSServiceProxies() {
-  // Get the ros service registry service
-  ROSServiceRegistryServicePtr rosservice_registry = ROSServiceRegistryService::Instance();
-  if(!rosservice_registry) {
-    return false;
-  }
+namespace rtt_@ROSPACKAGE@_ros_service_proxies { 
 
-  // Get the factory registration operation
-  RTT::OperationCaller<bool(ROSServiceProxyFactoryBase*)> register_service_factory = 
-    rosservice_registry->getOperation("registerServiceFactory");
+  bool registerROSServiceProxies() {
+    // Get the ros service registry service
+    ROSServiceRegistryServicePtr rosservice_registry = ROSServiceRegistryService::Instance();
+    if(!rosservice_registry) {
+      RTT::log(RTT::Error) << "Could not get an instance of the ROSServiceRegistryService! Not registering service proxies for @ROSPACKAGE@" << RTT::endlog();
+      return false;
+    }
 
-  // Make sure the registration operation is ready
-  if(!register_service_factory.ready()) {
-    return false;
-  }
+    // Get the factory registration operation
+    RTT::OperationCaller<bool(ROSServiceProxyFactoryBase*)> register_service_factory = 
+      rosservice_registry->getOperation("registerServiceFactory");
 
-  // True at the end if all factories have been registered
-  bool success = true;
+    // Make sure the registration operation is ready
+    if(!register_service_factory.ready()) {
+      RTT::log(RTT::Error) << "The ROSServiceRegistryService isn't ready! Not registering service proxies for @ROSPACKAGE@" << RTT::endlog();
+      return false;
+    }
 
-  //////////////////////////////////////////////////////////////////////////////
-  //success = success && register_service_factory(new ROSServiceProxyFactory<std_srvs::Empty>("std_srvs/Empty"));
+    // True at the end if all factories have been registered
+    bool success = true;
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Example: success = success && register_service_factory(new ROSServiceProxyFactory<std_srvs::Empty>("std_srvs/Empty"));
   @ROS_SRV_FACTORIES@
-  //////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
 
-  return success;
+    return success;
+  }
+
 }
 
 extern "C" {
-  bool loadRTTPlugin(RTT::TaskContext* c) { return registerROSServiceProxies(); }
+  bool loadRTTPlugin(RTT::TaskContext* c) { return rtt_@ROSPACKAGE@_ros_service_proxies::registerROSServiceProxies(); }
   std::string getRTTPluginName () { return "rtt_@ROSPACKAGE@_ros_service_proxies"; }
   std::string getRTTTargetName () { return OROCOS_TARGET_NAME; }
 }
