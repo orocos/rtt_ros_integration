@@ -107,6 +107,14 @@ this->ports()->addPort("my_port", my_port_);
 my_port_.createStream(rostopic.connection("my_ros_topic"));
 ```
 
+To create a privately-scoped or component-scoped topic, you can do the following:
+```
+// Privately-scoped (resolves to NODE_NAME/TOPIC_NAME)
+my_port_.createStream(rostopic.connection("~my_private_ros_topic"));
+// Component-scoped (resolves to NODE_NAME/COMPONENT_NAME/TOPIC_NAME)
+my_port_.createStream(rostopic.connection("~" + this->getName() + "/my_component_scoped_ros_topic"));
+```
+
 ### Connecting RTT Operations to ROS Services
 
 To connect an Orocos operation to a ROS service via .ops script from within an
