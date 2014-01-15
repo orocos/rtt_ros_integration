@@ -71,6 +71,7 @@ namespace ros_integration {
     char hostname[1024];
     std::string topicname;
     ros::NodeHandle ros_node;
+    ros::NodeHandle ros_node_private;
     ros::Publisher ros_pub;
       //! We must cache the RosPublishActivity object.
     RosPublishActivity::shared_ptr act;
@@ -89,7 +90,9 @@ namespace ros_integration {
      * 
      * @return ChannelElement that will publish data to topics
      */
-    RosPubChannelElement(base::PortInterface* port,const ConnPolicy& policy)
+    RosPubChannelElement(base::PortInterface* port,const ConnPolicy& policy):
+      ros_node(),
+      ros_node_private("~")
     {
       if ( policy.name_id.empty() ){
         std::stringstream namestr;
@@ -112,7 +115,12 @@ namespace ros_integration {
         log(Debug)<<"Creating ROS publisher for port "<<port->getName()<<" on topic "<<policy.name_id<<endlog();
       }
 
-      ros_pub = ros_node.advertise<T>(policy.name_id, policy.size > 0 ? policy.size : 1, policy.init); // minimum 1
+      // Handle private names
+      if(topicname.length() > 1 && topicname.at(0) == '~') {
+        ros_pub = ros_node_private.advertise<T>(policy.name_id.substr(1), policy.size > 0 ? policy.size : 1, policy.init); // minimum 1
+      } else {
+        ros_pub = ros_node.advertise<T>(policy.name_id, policy.size > 0 ? policy.size : 1, policy.init); // minimum 1
+      }
       act = RosPublishActivity::Instance();
       act->addPublisher( this );
     }
@@ -176,6 +184,7 @@ namespace ros_integration {
   {
     std::string topicname;
     ros::NodeHandle ros_node;
+    ros::NodeHandle ros_node_private;
     ros::Subscriber ros_sub;
     
   public:
@@ -188,7 +197,9 @@ namespace ros_integration {
      * 
      * @return ChannelElement that will publish data to topics
      */
-    RosSubChannelElement(base::PortInterface* port, const ConnPolicy& policy)
+    RosSubChannelElement(base::PortInterface* port, const ConnPolicy& policy) :
+      ros_node(),
+      ros_node_private("~")
     {
       topicname=policy.name_id;
       Logger::In in(topicname);
@@ -197,7 +208,11 @@ namespace ros_integration {
       } else {
         log(Debug)<<"Creating ROS subscriber for port "<<port->getName()<<" on topic "<<policy.name_id<<endlog();
       }
-      ros_sub=ros_node.subscribe(policy.name_id,policy.size,&RosSubChannelElement::newData,this);
+      if(topicname.length() > 1 && topicname.at(0) == '~') {
+        ros_sub = ros_node_private.subscribe(policy.name_id.substr(1),policy.size,&RosSubChannelElement::newData,this);
+      } else {
+        ros_sub = ros_node.subscribe(policy.name_id,policy.size,&RosSubChannelElement::newData,this);
+      }
       this->ref();
     }
 

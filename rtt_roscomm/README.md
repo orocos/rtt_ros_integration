@@ -38,6 +38,10 @@ type. Connection policies are created with these operations:
   the writing thread immediately publishs the message (publishing only).
   This is not real-time safe.
 
+Note that if `TOPIC_NAME` is prefixed with a tilde `~`, it will be resolved to
+the process's private namespace, similarly to how topic names are resolved in
+rospy.
+
 #### ROS Services
 
 This package provides both a global RTT service and a task-scoped service for
