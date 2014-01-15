@@ -88,6 +88,21 @@ stream("my_component.my_output", rostopic.connection("my_ros_output"))
 stream("my_component.my_input", rostopic.connection("my_ros_input"))
 ```
 
+You can also set up these connections in C++ code:
+```cpp
+
+#include <rtt_rostopic/rostopic.h>
+#include <rtt/internal/GlobalService.hpp>
+
+// ...
+
+rtt_rostopic::ROSTopic rostopic(NULL);
+rostopic.connectTo(RTT::internal::GlobalService::Instance()->provides("rostopic"));
+
+this->ports()->addPort("my_port", my_port_);
+my_port_.createStream(rostopic.connection("my_ros_topic"));
+```
+
 ### Connecting RTT Operations to ROS Services
 
 To connect an Orocos operation to a ROS service via .ops script from within an

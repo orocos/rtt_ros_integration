@@ -3,6 +3,7 @@
 
 #include <rtt/RTT.hpp>
 #include <rtt/Property.hpp>
+#include <rtt_rostopic/rtt_rostopic.h> 
 
 namespace rtt_rostopic {
 
@@ -13,16 +14,21 @@ namespace rtt_rostopic {
       RTT::ServiceRequester("rostopic",owner),
       connection("connection"),
       bufferedConnection("bufferedConnection"),
-      unbufferedConnection("unbufferedConnection")
+      unbufferedConnection("unbufferedConnection"),
+      protocol_id(ORO_ROS_PROTOCOL_ID)
     {
       this->addOperationCaller(connection);
       this->addOperationCaller(bufferedConnection);
       this->addOperationCaller(unbufferedConnection);
+
+
     }
 
     RTT::OperationCaller<RTT::ConnPolicy(const std::string &)> connection;
     RTT::OperationCaller<RTT::ConnPolicy(const std::string &, int)> bufferedConnection;
     RTT::OperationCaller<RTT::ConnPolicy(const std::string &)> unbufferedConnection;
+
+    int protocol_id;
   };
 }
 
