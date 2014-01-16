@@ -3,6 +3,8 @@
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/types/PropertyDecomposition.hpp>
 
+#include <XmlRpcException.h>
+
 #include <Eigen/Dense>
 
 #include <ros/ros.h>
@@ -614,35 +616,41 @@ bool ROSParamService::getParam(
 {
   RTT::Logger::In in("ROSParamService::getParam");
 
-  // Get the parameter
-  XmlRpc::XmlRpcValue xml_value;
+  try {
+    // Get the parameter
+    XmlRpc::XmlRpcValue xml_value;
 
-  const std::string resolved_name = resolvedName(param_name,ResolutionPolicy(policy));
-  if(!ros::param::get(resolved_name, xml_value)) {
-    RTT::log(RTT::Debug) << "ROS Parameter \"" << resolved_name << "\" not found on the parameter server!" << RTT::endlog();
+    const std::string resolved_name = resolvedName(param_name,ResolutionPolicy(policy));
+    if(!ros::param::get(resolved_name, xml_value)) {
+      RTT::log(RTT::Debug) << "ROS Parameter \"" << resolved_name << "\" not found on the parameter server!" << RTT::endlog();
+      return false;
+    }
+
+    // Try to get the property if it exists
+    RTT::base::PropertyBase *prop_base = this->getOwner()->getProperty(param_name);
+    if(prop_base) {
+      // Deal with the xml value
+      bool ret = xmlParamToProp(xml_value, prop_base);
+      if(!ret) {
+        RTT::log(RTT::Error) << "Could not convert \"" << resolved_name << "\" from an XMLRPC value to an RTT property." << RTT::endlog();
+      }
+      return ret;
+    }
+
+    // Try to get the properties of a sub-service if it exists
+    RTT::Service::shared_ptr service = this->getOwner()->provides()->getService(param_name);
+    if(service) {
+      // Get all parameters of the sub-service
+      return getParams(service, service->getName(), ResolutionPolicy(policy));
+    }
+
+    RTT::log(RTT::Debug) << "RTT component does not have a property or service named \"" << param_name << "\"" << RTT::endlog();
+    return false;
+  } catch(XmlRpc::XmlRpcException &err) {
+    RTT::log(RTT::Error) << "XmlRpcException when getting ROS parameter: " << err.getMessage() << RTT::endlog();
+    RTT::log(RTT::Debug) << " -- Make sure your parameters are the right primitive type." << RTT::endlog();
     return false;
   }
-
-  // Try to get the property if it exists
-  RTT::base::PropertyBase *prop_base = this->getOwner()->getProperty(param_name);
-  if(prop_base) {
-    // Deal with the xml value
-    bool ret = xmlParamToProp(xml_value, prop_base);
-    if(!ret) {
-      RTT::log(RTT::Error) << "Could not convert \"" << resolved_name << "\" from an XMLRPC value to an RTT property." << RTT::endlog();
-    }
-    return ret;
-  }
-
-  // Try to get the properties of a sub-service if it exists
-  RTT::Service::shared_ptr service = this->getOwner()->provides()->getService(param_name);
-  if(service) {
-    // Get all parameters of the sub-service
-    return getParams(service, service->getName(), ResolutionPolicy(policy));
-  }
-
-  RTT::log(RTT::Debug) << "RTT component does not have a property or service named \"" << param_name << "\"" << RTT::endlog();
-  return false;
 }
 
 bool ROSParamService::getParams(const ROSParamService::ResolutionPolicy policy)
