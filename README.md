@@ -161,6 +161,7 @@ The package.xml file is a normal Catkin package.xml file, with some additional e
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <!-- Build deps are queried automatically with orocos_use_package() -->
   <build_depend>rtt</build_depend>
   <build_depend>ocl</build_depend>
   <build_depend>rtt_ros</build_depend>
@@ -169,11 +170,13 @@ The package.xml file is a normal Catkin package.xml file, with some additional e
   <run_depend>ocl</run_depend>
   <run_depend>rtt_ros</run_depend>
 
+  <!-- ROS Msg Typekits and Srv Proxies -->
   <build_depend>rtt_sensor_msgs</build_depend>
   <run_depend>rtt_sensor_msgs</run_depend>
 
   <export>
     <rtt_ros>
+      <!-- Plugin deps are loaded automatically by the rtt_ros import service -->
       <plugin_depend>rtt_sensor_msgs</plugin_depend>
     </rtt_ros>
   </export>
