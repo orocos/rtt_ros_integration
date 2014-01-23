@@ -3,6 +3,7 @@
 
 #include <rtt/RTT.hpp>
 #include <rtt/Property.hpp>
+#include <rtt/internal/GlobalService.hpp>
 #include <rtt_rostopic/rtt_rostopic.h> 
 
 namespace rtt_rostopic {
@@ -10,8 +11,8 @@ namespace rtt_rostopic {
   class ROSTopic : public RTT::ServiceRequester
   {
   public:
-    ROSTopic(RTT::TaskContext *owner) :
-      RTT::ServiceRequester("rostopic",owner),
+    ROSTopic() :
+      RTT::ServiceRequester("rostopic",NULL),
       connection("connection"),
       bufferedConnection("bufferedConnection"),
       unbufferedConnection("unbufferedConnection"),
@@ -21,7 +22,7 @@ namespace rtt_rostopic {
       this->addOperationCaller(bufferedConnection);
       this->addOperationCaller(unbufferedConnection);
 
-
+      this->connectTo(RTT::internal::GlobalService::Instance()->provides("rostopic"));
     }
 
     RTT::OperationCaller<RTT::ConnPolicy(const std::string &)> connection;

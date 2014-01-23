@@ -96,15 +96,17 @@ You can also set up these connections in C++ code:
 ```cpp
 
 #include <rtt_rostopic/rostopic.h>
-#include <rtt/internal/GlobalService.hpp>
 
 // ...
 
-rtt_rostopic::ROSTopic rostopic(NULL);
-rostopic.connectTo(RTT::internal::GlobalService::Instance()->provides("rostopic"));
+  // Get an instance of the rtt_rostopic service requester
+  rtt_rostopic::ROSTopic rostopic;
 
-this->ports()->addPort("my_port", my_port_);
-my_port_.createStream(rostopic.connection("my_ros_topic"));
+  // Add the port and stream it to a ROS topic
+  this->ports()->addPort("my_port", my_port_);
+  my_port_.createStream(rostopic.connection("my_ros_topic"));
+
+// ...
 ```
 
 To create a privately-scoped or component-scoped topic, you can do the following:
