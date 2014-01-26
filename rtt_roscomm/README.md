@@ -32,7 +32,7 @@ type. Connection policies are created with these operations:
 
 * `rostopic.connection(TOPIC_NAME)`: Creates a connection with a buffer length
   of 1.
-* `rostopic.connectionBuffered(TOPIC_NAME, BUFFER_LENGTH)`: Creates a
+* `rostopic.bufferedConnection(TOPIC_NAME, BUFFER_LENGTH)`: Creates a
   connection with a user-supplied buffer length.
 * `rostopic.unbufferedConnection(TOPIC_NAME)`: Creates an unbuffered connection, where
   the writing thread immediately publishs the message (publishing only).
