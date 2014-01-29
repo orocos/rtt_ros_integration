@@ -11,7 +11,7 @@
 
 #include <rtt_actionlib/rtt_actionlib.h>
 
-#include <rtt_ros/time.h>
+#include <rtt_rosclock/rtt_rosclock.h>
 
 namespace rtt_actionlib {
 
@@ -200,7 +200,7 @@ namespace rtt_actionlib {
 
       // Create the action result container
       ActionResult action_result;
-      action_result.header.stamp = rtt_ros::time::now();
+      action_result.header.stamp = rtt_rosclock::host_rt_now();
       action_result.status = status;
       action_result.result = result;
 
@@ -223,7 +223,7 @@ namespace rtt_actionlib {
 
       // Create the action result container
       ActionFeedback action_feedback;
-      action_feedback.header.stamp = rtt_ros::time::now();
+      action_feedback.header.stamp = rtt_rosclock::host_rt_now();
       action_feedback.status = status;
       action_feedback.feedback = feedback;
 
@@ -241,7 +241,7 @@ namespace rtt_actionlib {
       // Build a status array
       actionlib_msgs::GoalStatusArray status_array;
 
-      status_array.header.stamp = rtt_ros::time::now();
+      status_array.header.stamp = rtt_rosclock::host_rt_now();
 
       status_array.status_list.resize(this->status_list_.size());
 
@@ -254,7 +254,7 @@ namespace rtt_actionlib {
 
         // Check if the item is due for deletion from the status list
         if((*it).handle_destruction_time_ != ros::Time() &&
-           (*it).handle_destruction_time_ + this->status_list_timeout_ < rtt_ros::time::now()){
+           (*it).handle_destruction_time_ + this->status_list_timeout_ < rtt_rosclock::host_rt_now()){
           it = this->status_list_.erase(it);
         } else {
           ++it;
