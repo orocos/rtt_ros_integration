@@ -8,7 +8,6 @@ find_package(OROCOS-RTT REQUIRED
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 catkin_package(
-  INCLUDE_DIRS include
   CFG_EXTRAS rtt_ros-extras.cmake
 )
 
@@ -25,7 +24,6 @@ target_link_libraries(rtt_ros
   )
 
 orocos_generate_package(
-  INCLUDE_DIRS include
   DEPENDS rostime
 )
 
@@ -41,7 +39,3 @@ install(PROGRAMS
   scripts/rttscript
   scripts/typegen
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
-orocos_install_headers(
-  DIRECTORY include/${PROJECT_NAME}
-)
