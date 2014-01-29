@@ -220,7 +220,7 @@ public:
     // Report success or failure
     if(missing_packages.size() == 0) { 
       RTT::log(RTT::Info) << "Loaded plugins from ROS package \"" << package << "\" and its dependencies." << RTT::endlog();
-    } lse {
+    } else {
       RTT::log(RTT::Warning) << "Could not load RTT plugins from the following ROS packages (they might be empty, in which case this message can be ignored): "<< RTT::endlog();
       for(std::vector<std::string>::iterator it = missing_packages.begin();
           it != missing_packages.end();
