@@ -20,5 +20,5 @@ orocos_generate_package(
 )
 
 orocos_install_headers(
-  DIRECTORY include/${PROJECT_NAME}
+  DIRECTORY include/${PROJECT_NAME}/
 )

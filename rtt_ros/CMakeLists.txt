@@ -39,5 +39,5 @@ install(PROGRAMS
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 orocos_install_headers(
-  DIRECTORY include/${PROJECT_NAME}
+  DIRECTORY include/${PROJECT_NAME}/
 )

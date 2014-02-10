@@ -55,9 +55,9 @@ install(PROGRAMS
   scripts/create_rtt_pkg
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-orocos_install_headers(
-   DIRECTORY include/rtt_rostopic include/rtt_rosservice
-   INSTALL ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/orocos
+install(
+  DIRECTORY include/
+  DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/orocos
 )
 
 # Install cmake macros
