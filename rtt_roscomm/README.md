@@ -32,11 +32,15 @@ type. Connection policies are created with these operations:
 
 * `rostopic.connection(TOPIC_NAME)`: Creates a connection with a buffer length
   of 1.
-* `rostopic.connectionBuffered(TOPIC_NAME, BUFFER_LENGTH)`: Creates a
+* `rostopic.bufferedConnection(TOPIC_NAME, BUFFER_LENGTH)`: Creates a
   connection with a user-supplied buffer length.
-* `rostopic.unbuffered(TOPIC_NAME)`: Creates an unbuffered connection, where
+* `rostopic.unbufferedConnection(TOPIC_NAME)`: Creates an unbuffered connection, where
   the writing thread immediately publishs the message (publishing only).
   This is not real-time safe.
+
+Note that if `TOPIC_NAME` is prefixed with a tilde `~`, it will be resolved to
+the process's private namespace, similarly to how topic names are resolved in
+rospy.
 
 #### ROS Services
 
@@ -86,6 +90,31 @@ import("rtt_roscomm")
 stream("my_component.my_output", rostopic.connection("my_ros_output"))
 # Subscribe
 stream("my_component.my_input", rostopic.connection("my_ros_input"))
+```
+
+You can also set up these connections in C++ code:
+```cpp
+
+#include <rtt_rostopic/rostopic.h>
+
+// ...
+
+  // Get an instance of the rtt_rostopic service requester
+  rtt_rostopic::ROSTopic rostopic;
+
+  // Add the port and stream it to a ROS topic
+  this->ports()->addPort("my_port", my_port_);
+  my_port_.createStream(rostopic.connection("my_ros_topic"));
+
+// ...
+```
+
+To create a privately-scoped or component-scoped topic, you can do the following:
+```
+// Privately-scoped (resolves to NODE_NAME/TOPIC_NAME)
+my_port_.createStream(rostopic.connection("~my_private_ros_topic"));
+// Component-scoped (resolves to NODE_NAME/COMPONENT_NAME/TOPIC_NAME)
+my_port_.createStream(rostopic.connection("~" + this->getName() + "/my_component_scoped_ros_topic"));
 ```
 
 ### Connecting RTT Operations to ROS Services

@@ -32,7 +32,7 @@ public:
         "Creates a ConnPolicy for subscribing to or publishing a topic with a fixed-length message buffer.").arg(
             "name", "The ros topic name").arg(
             "size","The size of the buffer.");
-    this->addOperation("unbuffered", &ROSTopicService::topicUnbuffered, this).doc(
+    this->addOperation("unbufferedConnection", &ROSTopicService::topicUnbuffered, this).doc(
         "Creates a ConnPolicy for unbuffered publishing a topic. This may not be real-time safe!").arg(
             "name", "The ros topic name");
     this->addConstant("protocol_id", protocol_id );

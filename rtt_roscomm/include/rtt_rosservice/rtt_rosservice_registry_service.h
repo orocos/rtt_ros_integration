@@ -25,6 +25,8 @@ public:
 
   ROSServiceProxyFactoryBase* getServiceFactory(const std::string &service_type);
 
+  void listSrvs();
+
 private:
   /**
    * Instantiates this service.
