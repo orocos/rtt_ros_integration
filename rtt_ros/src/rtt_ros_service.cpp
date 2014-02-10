@@ -229,7 +229,7 @@ public:
       }
     }
 
-    return missing_packages.size() > 0;
+    return missing_packages.size() == 0;
   }
 
 };
