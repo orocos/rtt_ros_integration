@@ -647,7 +647,7 @@ bool ROSParamService::getParam(
     RTT::log(RTT::Debug) << "RTT component does not have a property or service named \"" << param_name << "\"" << RTT::endlog();
     return false;
   } catch(XmlRpc::XmlRpcException &err) {
-    RTT::log(RTT::Error) << "XmlRpcException when getting ROS parameter: " << err.getMessage() << RTT::endlog();
+    RTT::log(RTT::Error) << "XmlRpcException when getting ROS parameter \""<<param_name<<"\": " << err.getMessage() << RTT::endlog();
     RTT::log(RTT::Debug) << " -- Make sure your parameters are the right primitive type." << RTT::endlog();
     return false;
   }

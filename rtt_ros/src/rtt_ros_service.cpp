@@ -2,6 +2,7 @@
 #include <list>
 #include <queue>
 #include <sstream>
+#include <set>
 
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
@@ -21,10 +22,11 @@
 #include <rtt/os/StartStopManager.hpp>
 #include <rtt/plugin/PluginLoader.hpp>
 #include <rtt/types/TypekitRepository.hpp>
+#include <rtt/scripting/Scripting.hpp>
+#include <rtt/internal/GlobalService.hpp>
 
+#include <ros/package.h>
 #include <rospack/rospack.h>
-
-#include <rtt_ros/time.h>
 
 using namespace RTT;
 using namespace std;
@@ -48,10 +50,9 @@ public:
     this->addOperation("import", &ROSService::import, this).doc(
         "Imports the Orocos plugins from a given ROS package (if found) along with the plugins of all of the package's run or exec dependencies as listed in the package.xml.").arg(
             "package", "The ROS package name.");
-
-    this->provides("time")->addOperation("now", &rtt_ros::time::now).doc(
-        "Get a ros::Time structure based on the RTT time source.");
   }
+
+  std::set<std::string> executed_scripts_;
 
   /**
    * Returns a ConnPolicy object for streaming to or from 
@@ -231,11 +232,10 @@ public:
 
     return missing_packages.size() > 0;
   }
-
 };
 
 void loadROSService(){
-  RTT::Service::shared_ptr rts(new ROSService(0));
+  RTT::Service::shared_ptr rts(new ROSService(NULL));
   RTT::internal::GlobalService::Instance()->addService(rts);
 }
 
