@@ -27,24 +27,6 @@ orocos_service(rtt_rosservice
   src/rtt_rosservice_service.cpp)
 target_link_libraries(rtt_rosservice rtt_rosservice_registry ${catkin_LIBRARIES})
 
-# ROS Primitives typekit
-set(CMAKE_BUILD_TYPE MinSizeRel)
-orocos_typekit(rtt-ros-primitives-typekit
-  src/orocos/types/ros_primitives_typekit_plugin.cpp
-  src/orocos/types/ros_time_type.cpp
-  src/orocos/types/ros_uint8_type.cpp
-  src/orocos/types/ros_int8_type.cpp
-  src/orocos/types/ros_uint16_type.cpp
-  src/orocos/types/ros_int16_type.cpp
-  src/orocos/types/ros_uint32_type.cpp
-  src/orocos/types/ros_int32_type.cpp
-  src/orocos/types/ros_uint64_type.cpp
-  src/orocos/types/ros_int64_type.cpp
-  src/orocos/types/ros_float32_type.cpp
-  src/orocos/types/ros_float64_type.cpp
-  src/orocos/types/ros_string_type.cpp)
-target_link_libraries(rtt-ros-primitives-typekit ${catkin_LIBRARIES})
-
 # Generate install targets and pkg-config files
 orocos_generate_package(
   INCLUDE_DIRS include
