@@ -63,7 +63,7 @@ mkdir -p ~/ws/underlay_isolated/src/orocos
 cd ~/ws/underlay_isolated
 git clone --recursive git://gitorious.org/orocos-toolchain/orocos_toolchain.git -b toolchain-2.7 src/orocos/orocos_toolchain
 catkin_make_isolated --install
-source install/setup.sh
+source install_isolated/setup.sh
 ```
 
 Then, in the same shell, create an underlay for building Catkin-based packages:
