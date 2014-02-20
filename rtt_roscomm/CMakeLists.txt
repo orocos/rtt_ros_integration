@@ -34,7 +34,7 @@ orocos_generate_package(
 )
 
 install(PROGRAMS 
-  scripts/create_rtt_pkg
+  scripts/create_rtt_msgs
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(
@@ -50,5 +50,5 @@ install(PROGRAMS cmake/create_boost_header.py DESTINATION ${CATKIN_PACKAGE_SHARE
 file(COPY src/templates DESTINATION "${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/src")
 install(DIRECTORY src/templates DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/src)
 
-# This one will only be used by create_rtt_pkg with `rospack find rtt_roscomm` => no devel-space installation
+# This one will only be used by create_rtt_msgs with `rospack find rtt_roscomm` => no devel-space installation
 install(DIRECTORY rtt_roscomm_pkg_template DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
