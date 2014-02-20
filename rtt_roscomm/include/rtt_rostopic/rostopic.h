@@ -22,6 +22,7 @@ namespace rtt_rostopic {
       this->addOperationCaller(bufferedConnection);
       this->addOperationCaller(unbufferedConnection);
 
+      RTT::log(RTT::Warning) << "Ignore the following warnings about callers not being set." << RTT::endlog();
       this->connectTo(RTT::internal::GlobalService::Instance()->provides("rostopic"));
     }
 

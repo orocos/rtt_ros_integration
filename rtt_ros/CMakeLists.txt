@@ -24,6 +24,7 @@ target_link_libraries(rtt_ros
   )
 
 orocos_generate_package(
+  INCLUDE_DIRS include
   DEPENDS rostime
 )
 
