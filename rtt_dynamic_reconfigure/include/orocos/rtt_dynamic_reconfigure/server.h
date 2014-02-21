@@ -90,7 +90,7 @@ private:
     typedef dynamic_reconfigure_traits<ConfigType> traits;
 
     RTT::os::MutexRecursive mutex_;
-    ros::NodeHandle node_handle_;
+    ros::NodeHandle *node_handle_;
     ros::ServiceServer set_service_;
     ros::Publisher update_pub_;
     ros::Publisher descr_pub_;
@@ -103,29 +103,20 @@ private:
 public:
     Server(const std::string &name, RTT::TaskContext *owner)
         : RTT::Service(name, owner)
-        , node_handle_(getDefaultNamespace())
+        , node_handle_(0)
     {
         construct();
     }
 
     Server(RTT::TaskContext *owner)
         : RTT::Service("reconfigure", owner)
-        , node_handle_(getDefaultNamespace())
-    {
-        construct();
-    }
-
-    Server(RTT::TaskContext *owner, const std::string &ns)
-        : RTT::Service("reconfigure", owner)
-        , node_handle_(ns)
+        , node_handle_(0)
     {
         construct();
     }
 
     virtual ~Server() {
-        set_service_.shutdown();
-        descr_pub_.shutdown();
-        update_pub_.shutdown();
+        shutdown();
     }
 
     void updateConfig(const ConfigType &config)
@@ -133,23 +124,26 @@ public:
         updateConfigInternal(config);
     }
 
-    void getConfigMax(ConfigType &config)
+    void getConfigMax(ConfigType &config) const
     {
         config = max_;
     }
     const ConfigType &getConfigMax() const { return max_; }
+    ConfigType &getConfigMax() { return max_; }
 
-    void getConfigMin(ConfigType &config)
+    void getConfigMin(ConfigType &config) const
     {
         config = min_;
     }
     const ConfigType &getConfigMin() const { return min_; }
+    ConfigType &getConfigMin() { return min_; }
 
-    void getConfigDefault(ConfigType &config)
+    void getConfigDefault(ConfigType &config) const
     {
         config = default_;
     }
     const ConfigType &getConfigDefault() const { return default_; }
+    ConfigType &getConfigDefault() { return default_; }
 
     void setConfigMax(const ConfigType &config)
     {
@@ -167,6 +161,39 @@ public:
     {
         default_ = config;
         PublishDescription();
+    }
+
+    void advertise(std::string ns = std::string())
+    {
+        // set default namespace
+        if (ns.empty()) {
+            if (getOwner()->getName() == "Deployer")
+                ns = "~";
+            else
+                ns = "~" + getOwner()->getName();
+        }
+
+        // create NodeHandle
+        if (node_handle_) delete node_handle_;
+        node_handle_ = new ros::NodeHandle(ns);
+
+        // advertise service server and publishers
+        set_service_ = node_handle_->advertiseService("set_parameters", &Server<ConfigType>::setConfigCallback, this);
+        descr_pub_ = node_handle_->advertise<dynamic_reconfigure::ConfigDescription>("parameter_descriptions", 1, true);
+        update_pub_ = node_handle_->advertise<dynamic_reconfigure::Config>("parameter_updates", 1, true);
+
+        // publish update once
+        PublishDescription();
+        updateConfigInternal(config_);
+    }
+
+    void shutdown()
+    {
+        if (node_handle_) {
+            node_handle_->shutdown();
+            delete node_handle_;
+            node_handle_ = 0;
+        }
     }
 
     bool updated()
@@ -204,7 +231,8 @@ public:
         config_ = ConfigType();
         traits::getDefault(config_, this);
         updater::configFromProperties(config_, *(getOwner()->properties()));
-        config_.__fromServer__(node_handle_);
+        if (node_handle_)
+            config_.__fromServer__(*node_handle_);
         traits::clamp(config_, this);
 
         // At startup we need to load the configuration with all level bits set. (Everything has changed.)
@@ -218,31 +246,26 @@ public:
 private:
     void construct()
     {
-        this->addOperation("updated", &Server<ConfigType>::updated, this);
+        this->addOperation("advertise", &Server<ConfigType>::advertise, this)
+                .doc("Advertise this dynamic_reconfigure server at the master.")
+                .arg("namespace", "The namespace this server should be advertised in. Defaults to ~component.");
+        this->addOperation("shutdown", &Server<ConfigType>::shutdown, this)
+                .doc("Shutdown this dynamic_reconfigure server.");
+        this->addOperation("updated", &Server<ConfigType>::updated, this)
+                .doc("Notify the dynamic_reconfigure server that properties have been updated. This will update the GUI.");
+
         if (traits::canRefresh)
-            this->addOperation("refresh", &Server<ConfigType>::refresh, this);
+            this->addOperation("refresh", &Server<ConfigType>::refresh, this)
+                .doc("Rediscover the owner's properties. Call this operation after having added properties.");
 
-        set_service_ = node_handle_.advertiseService("set_parameters", &Server<ConfigType>::setConfigCallback, this);
-        descr_pub_ = node_handle_.advertise<dynamic_reconfigure::ConfigDescription>("parameter_descriptions", 1, true);
-        update_pub_ = node_handle_.advertise<dynamic_reconfigure::Config>("parameter_updates", 1, true);
-
+        // refresh once
         refresh();
-    }
-
-    std::string getDefaultNamespace(const std::string &name = std::string())
-    {
-        if (name.empty()) {
-            if (getOwner()->getName() == "Deployer")
-                return "~";
-            else
-                return "~" + getOwner()->getName();
-        } else {
-            return "~" + name;
-        }
     }
 
     void PublishDescription()
     {
+        if (!descr_pub_) return;
+
         RTT::os::MutexLock lock(mutex_);
         dynamic_reconfigure::ConfigDescriptionPtr description_message = traits::getDescriptionMessage(this);
 
@@ -276,10 +299,13 @@ private:
     {
         RTT::os::MutexLock lock(mutex_);
         config_ = config;
-        config_.__toServer__(node_handle_);
+        if (node_handle_)
+            config_.__toServer__(*node_handle_);
         dynamic_reconfigure::Config msg;
         config_.__toMessage__(msg);
-        update_pub_.publish(msg);
+
+        if (update_pub_)
+            update_pub_.publish(msg);
     }
 };
 
