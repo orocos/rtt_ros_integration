@@ -103,6 +103,7 @@ void loadROSServiceRegistryService()
 using namespace RTT;
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
+    if (c != 0) return false;
     loadROSServiceRegistryService();
     return true;
   }

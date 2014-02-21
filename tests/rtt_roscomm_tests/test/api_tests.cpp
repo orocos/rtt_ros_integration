@@ -35,7 +35,7 @@ TEST(BasicTest, ImportTypekit)
 {
   // Import rtt_ros plugin
   EXPECT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_std_msgs", "" ));
-  EXPECT_TRUE(scripting_service->eval("var ConnPolicy float_out = rostopic.connection(\"float_out\")"));
+  EXPECT_TRUE(scripting_service->eval("var ConnPolicy float_out = ros.topic(\"float_out\")"));
 }
 
 int main(int argc, char** argv) {

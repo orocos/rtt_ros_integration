@@ -11,18 +11,18 @@ namespace rtt_rostopic {
   class ROSTopic : public RTT::ServiceRequester
   {
   public:
-    ROSTopic() :
-      RTT::ServiceRequester("rostopic",NULL),
-      connection("connection"),
-      bufferedConnection("bufferedConnection"),
-      unbufferedConnection("unbufferedConnection"),
+    ROSTopic(RTT::TaskContext *owner = 0) :
+      RTT::ServiceRequester("rostopic", owner),
+      connection("topic"),
+      bufferedConnection("topicBuffer"),
+      unbufferedConnection("topicUnbuffered"),
       protocol_id(ORO_ROS_PROTOCOL_ID)
     {
       this->addOperationCaller(connection);
       this->addOperationCaller(bufferedConnection);
       this->addOperationCaller(unbufferedConnection);
 
-      this->connectTo(RTT::internal::GlobalService::Instance()->provides("rostopic"));
+      this->connectTo(RTT::internal::GlobalService::Instance()->provides("ros"));
     }
 
     RTT::OperationCaller<RTT::ConnPolicy(const std::string &)> connection;

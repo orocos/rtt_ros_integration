@@ -1,5 +1,4 @@
 #include <rtt/RTT.hpp>
-#include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 #include <rtt_rostopic/rtt_rostopic.h> 
 
@@ -9,43 +8,17 @@ using namespace std;
 /**
  * The globally loadable ROS service.
  */
-class ROSTopicService : public RTT::Service {
+class ROSTopicService {
 public:
-  int protocol_id;
-  /**
-   * Instantiates this service.
-   * @param owner The owner or null in case of global.
-   */
-  ROSTopicService(TaskContext* owner) 
-    : Service("rostopic", owner),
-    protocol_id(ORO_ROS_PROTOCOL_ID)
-  {
-    this->doc("Main RTT Service for connecting RTT ports to ROS message topics. See also the 'rosparam' service which can be added to a component and the 'rospack' global service for finding ros packages.");
-
-    // ROS Package-importing
-
-    // ROS Topic-based Operations
-    this->addOperation("connection", &ROSTopicService::topic, this).doc(
-        "Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last message is kept.").arg(
-            "name", "The ros topic name");
-    this->addOperation("bufferedConnection", &ROSTopicService::topicBuffer, this).doc(
-        "Creates a ConnPolicy for subscribing to or publishing a topic with a fixed-length message buffer.").arg(
-            "name", "The ros topic name").arg(
-            "size","The size of the buffer.");
-    this->addOperation("unbufferedConnection", &ROSTopicService::topicUnbuffered, this).doc(
-        "Creates a ConnPolicy for unbuffered publishing a topic. This may not be real-time safe!").arg(
-            "name", "The ros topic name");
-    this->addConstant("protocol_id", protocol_id );
-
-  }
+  static const int protocol_id;
 
   /**
    * Returns a ConnPolicy object for streaming to or from 
    * the given ROS topic. No buffering is done.
    */
-  ConnPolicy topic(const std::string& name) {
+  static ConnPolicy topic(const std::string& name) {
     ConnPolicy cp = ConnPolicy::data();
-    cp.transport = ORO_ROS_PROTOCOL_ID;
+    cp.transport = protocol_id;
     cp.name_id = name;
     return cp;
   }
@@ -55,9 +28,9 @@ public:
    * the given ROS topic. Also specifies the buffer size of
    * the connection to be created.
    */
-  ConnPolicy topicBuffer(const std::string& name, int size) {
+  static ConnPolicy topicBuffer(const std::string& name, int size) {
     ConnPolicy cp = ConnPolicy::buffer(size);
-    cp.transport = ORO_ROS_PROTOCOL_ID;
+    cp.transport = protocol_id;
     cp.name_id = name;
     return cp;
   }
@@ -68,22 +41,37 @@ public:
    * publishing, where the publish() method is called
    * in the thread of the writing TaskContext.
    */
-  ConnPolicy topicUnbuffered(const std::string& name) {
+  static ConnPolicy topicUnbuffered(const std::string& name) {
     ConnPolicy cp = ConnPolicy();
     cp.type = ConnPolicy::UNBUFFERED;
-    cp.transport = ORO_ROS_PROTOCOL_ID;
+    cp.transport = protocol_id;
     cp.name_id = name;
     return cp;
   }};
 
+const int ROSTopicService::protocol_id = ORO_ROS_PROTOCOL_ID;
+
 void loadROSTopicService(){
-  RTT::Service::shared_ptr rts(new ROSTopicService(0));
-  RTT::internal::GlobalService::Instance()->addService(rts);
+  RTT::Service::shared_ptr ros = RTT::internal::GlobalService::Instance()->provides("ros");
+
+  // ROS Topic-based Operations
+  ros->addOperation("topic", &ROSTopicService::topic).doc(
+      "Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last message is kept.").arg(
+          "name", "The ros topic name");
+  ros->addOperation("topicBuffer", &ROSTopicService::topicBuffer).doc(
+      "Creates a ConnPolicy for subscribing to or publishing a topic with a fixed-length message buffer.").arg(
+          "name", "The ros topic name").arg(
+          "size","The size of the buffer.");
+  ros->addOperation("topicUnbuffered", &ROSTopicService::topicUnbuffered).doc(
+      "Creates a ConnPolicy for unbuffered publishing a topic. This may not be real-time safe!").arg(
+          "name", "The ros topic name");
+  ros->addConstant("protocol_id", ROSTopicService::protocol_id);
 }
 
 using namespace RTT;
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
+    if (c != 0) return false;
     loadROSTopicService();
     return true;
   }
