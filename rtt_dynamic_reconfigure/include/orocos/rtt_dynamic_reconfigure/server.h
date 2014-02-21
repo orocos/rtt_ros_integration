@@ -63,21 +63,22 @@ template <class ConfigType>
 struct dynamic_reconfigure_traits {
     typedef Server<ConfigType> ServerType;
 
-    static void getMin(ConfigType &config, ServerType *)           { config = ConfigType::__getMin__(); }
-    static void getMax(ConfigType &config, ServerType *)           { config = ConfigType::__getMax__(); }
-    static void getDefault(ConfigType &config, ServerType *)       { config = ConfigType::__getDefault__(); }
-    static dynamic_reconfigure::ConfigDescriptionPtr getDescriptionMessage(ServerType *) { return dynamic_reconfigure::ConfigDescriptionPtr(new dynamic_reconfigure::ConfigDescription(ConfigType::__getDescriptionMessage__())); }
+    static void getMin(ConfigType &config, const ServerType *)           { config = ConfigType::__getMin__(); }
+    static void getMax(ConfigType &config, const ServerType *)           { config = ConfigType::__getMax__(); }
+    static void getDefault(ConfigType &config, const ServerType *)       { config = ConfigType::__getDefault__(); }
+    static dynamic_reconfigure::ConfigDescriptionPtr getDescriptionMessage(const ServerType *) { return dynamic_reconfigure::ConfigDescriptionPtr(new dynamic_reconfigure::ConfigDescription(ConfigType::__getDescriptionMessage__())); }
 
     static const bool canRefresh = false;
-    static void refreshDescription(ServerType *) {}
+    static void refreshDescription(const ServerType *) {}
 
-    static void toMessage(ConfigType &config, dynamic_reconfigure::Config &message, ServerType *) { config.__toMessage__(message); }
-    static void fromMessage(ConfigType &config, dynamic_reconfigure::Config &message, ServerType *) { config.__fromMessage__(message); }
-    static void clamp(ConfigType &config, ServerType *) { config.__clamp__(); }
+    static void toMessage(ConfigType &config, dynamic_reconfigure::Config &message, const ServerType *) { config.__toMessage__(message); }
+    static void fromMessage(ConfigType &config, dynamic_reconfigure::Config &message, const ServerType *) { config.__fromMessage__(message); }
+    static void clamp(ConfigType &config, const ServerType *) { config.__clamp__(); }
 
-    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(ConfigType &config, ServerType *) {
+    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(ConfigType &config, const ServerType *) {
         RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr ds(new RTT::internal::ValueDataSource<RTT::PropertyBag>());
-        Updater<ConfigType>::propertiesFromConfig(config, ~0, ds->set());
+        if (!Updater<ConfigType>::propertiesFromConfig(config, ~0, ds->set()))
+            ds.reset();
         return ds;
     }
 };
@@ -161,6 +162,17 @@ public:
     {
         default_ = config;
         PublishDescription();
+    }
+
+    dynamic_reconfigure::ConfigDescriptionPtr getDescriptionMessage() {
+        dynamic_reconfigure::ConfigDescriptionPtr description_message = traits::getDescriptionMessage(this);
+
+        // Copy over min_ max_ default_
+        traits::toMessage(max_, description_message->max, this);
+        traits::toMessage(min_, description_message->min, this);
+        traits::toMessage(default_, description_message->dflt, this);
+
+        return description_message;
     }
 
     void advertise(std::string ns = std::string())
@@ -262,20 +274,9 @@ private:
         refresh();
     }
 
-    void PublishDescription()
-    {
+    void PublishDescription() {
         if (!descr_pub_) return;
-
-        RTT::os::MutexLock lock(mutex_);
-        dynamic_reconfigure::ConfigDescriptionPtr description_message = traits::getDescriptionMessage(this);
-
-        // Copy over min_ max_ default_
-        traits::toMessage(max_, description_message->max, this);
-        traits::toMessage(min_, description_message->min, this);
-        traits::toMessage(default_, description_message->dflt, this);
-
-        // Publish description
-        descr_pub_.publish(description_message);
+        descr_pub_.publish(getDescriptionMessage());
     }
 
     bool setConfigCallback(dynamic_reconfigure::Reconfigure::Request &req,

@@ -45,37 +45,40 @@ class AutoConfig : public RTT::PropertyBag
 public:
     typedef Server<AutoConfig> ServerType;
 
+    std::string prefix_;
+    std::string name;
+    std::string type;
+    int parent;
+    int id;
+    bool state;
+
     AutoConfig();
-    AutoConfig(RTT::TaskContext *owner);
-    AutoConfig(RTT::PropertyBag *bag);
+    AutoConfig(const RTT::PropertyBag &bag);
     ~AutoConfig();
 
     bool __fromMessage__(dynamic_reconfigure::Config &msg, const AutoConfig &sample);
-    bool __fromMessage__(dynamic_reconfigure::Config &msg, const AutoConfig &sample, const std::string &prefix);
+    static bool __fromMessage__(AutoConfig &config, dynamic_reconfigure::Config &msg, const AutoConfig &sample);
     void __toMessage__(dynamic_reconfigure::Config &msg) const;
+    static void __toMessage__(const AutoConfig &config, dynamic_reconfigure::Config &msg);
+
     void __toServer__(const ros::NodeHandle &nh) const;
     void __fromServer__(const ros::NodeHandle &nh);
-    void __clamp__(ServerType *server);
+    void __clamp__(const ServerType *server);
     uint32_t __level__(const AutoConfig &config) const;
 
-    static dynamic_reconfigure::ConfigDescriptionPtr __getDescriptionMessage__(ServerType *owner);
-    static const AutoConfig& __getDefault__(ServerType *owner);
-    static const AutoConfig& __getMax__(ServerType *owner);
-    static const AutoConfig& __getMin__(ServerType *owner);
+    static dynamic_reconfigure::ConfigDescriptionPtr __getDescriptionMessage__(const ServerType *server);
+    static const AutoConfig& __getDefault__(const ServerType *server);
+    static const AutoConfig& __getMax__(const ServerType *server);
+    static const AutoConfig& __getMin__(const ServerType *server);
 
-    static void __refreshDescription__(ServerType *owner);
+    static void __refreshDescription__(const ServerType *server);
 
 private:
-    RTT::TaskContext *owner_;
-    std::string prefix_;
-    bool state_;
-    int group_id_;
-
     struct Cache;
     typedef boost::shared_ptr<Cache> CachePtr;
-    static std::map<ServerType *, CachePtr> cache_;
+    static std::map<const ServerType *, CachePtr> cache_;
     static boost::shared_mutex cache_mutex_;
-    static void buildCache(ServerType *server, RTT::TaskContext *owner);
+    static void buildCache(const ServerType *server, RTT::TaskContext *owner);
 };
 
 struct AutoConfig::Cache {
@@ -87,7 +90,6 @@ struct AutoConfig::Cache {
 
 } // namespace rtt_dynamic_reconfigure
 
-extern template class RTT::Property<rtt_dynamic_reconfigure::AutoConfig>;
 
 #include "server.h"
 
@@ -103,19 +105,19 @@ template <>
 struct dynamic_reconfigure_traits<AutoConfig> {
     typedef Server<AutoConfig> ServerType;
 
-    static void getMin(AutoConfig &config, ServerType *server)           { config = AutoConfig::__getMin__(server); }
-    static void getMax(AutoConfig &config, ServerType *server)           { config = AutoConfig::__getMax__(server); }
-    static void getDefault(AutoConfig &config, ServerType *server)       { config = AutoConfig::__getDefault__(server); }
-    static dynamic_reconfigure::ConfigDescriptionPtr getDescriptionMessage(ServerType *server) { return AutoConfig::__getDescriptionMessage__(server); }
+    static void getMin(AutoConfig &config, const ServerType *server)           { config = AutoConfig::__getMin__(server); }
+    static void getMax(AutoConfig &config, const ServerType *server)           { config = AutoConfig::__getMax__(server); }
+    static void getDefault(AutoConfig &config, const ServerType *server)       { config = AutoConfig::__getDefault__(server); }
+    static dynamic_reconfigure::ConfigDescriptionPtr getDescriptionMessage(const ServerType *server) { return AutoConfig::__getDescriptionMessage__(server); }
 
     static const bool canRefresh = true;
-    static void refreshDescription(ServerType *server) { AutoConfig::__refreshDescription__(server); }
+    static void refreshDescription(const ServerType *server) { AutoConfig::__refreshDescription__(server); }
 
-    static void toMessage(AutoConfig &config, dynamic_reconfigure::Config &message, ServerType *server) { config.__toMessage__(message); }
-    static void fromMessage(AutoConfig &config, dynamic_reconfigure::Config &message, ServerType *server) { config.__fromMessage__(message, config); }
-    static void clamp(AutoConfig &config, ServerType *server) { config.__clamp__(server); }
+    static void toMessage(AutoConfig &config, dynamic_reconfigure::Config &message, const ServerType *server) { config.__toMessage__(message); }
+    static void fromMessage(AutoConfig &config, dynamic_reconfigure::Config &message, const ServerType *server) { config.__fromMessage__(message, config); }
+    static void clamp(AutoConfig &config, const ServerType *server) { config.__clamp__(server); }
 
-    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(AutoConfig &config, ServerType *server) {
+    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(AutoConfig &config, const ServerType *server) {
         return RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr(new RTT::internal::ReferenceDataSource<RTT::PropertyBag>(config));
     }
 };

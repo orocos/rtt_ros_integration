@@ -21,50 +21,61 @@
 #include <rtt/internal/GlobalService.hpp>
 #include <rtt/OperationCaller.hpp>
 
+#include <dynamic_reconfigure/ConfigDescription.h>
+#include <dynamic_reconfigure/config_tools.h>
+
 using namespace rtt_dynamic_reconfigure;
 
 class DynamicReconfigureTest : public ::testing::Test
 {
-protected:
-    RTT::TaskContext tc;
-
-    // types directly supported by dynamic_reconfigure
-    int int_property;
-    double double_property;
-    std::string str_property;
-    bool bool_property;
-
-    // other property types
-    float float_property;
-    unsigned int uint_property;
-
-    // PropertyBag properties
-    RTT::PropertyBag bag_property;
-    std::string str_property_in_bag;
-
 public:
-    DynamicReconfigureTest()
-        : tc("taskcontext")
-        , int_property()
-        , double_property()
-        , str_property()
-        , bool_property()
-        , float_property()
-        , uint_property()
-        , bag_property()
-        , str_property_in_bag()
+    struct Properties {
+        Properties()
+        : int_param()
+        , double_param()
+        , str_param()
+        , bool_param()
+        , float_param()
+        , uint_param()
+        , bag_param()
+        , str_param_in_bag()
+        {}
+
+        int int_param;
+        double double_param;
+        std::string str_param;
+        bool bool_param;
+
+        // other property types
+        float float_param;
+        unsigned int uint_param;
+
+        // PropertyBag properties
+        RTT::PropertyBag bag_param;
+        std::string str_param_in_bag;
+    };
+
+    class Component : public RTT::TaskContext
     {
-        tc.addProperty("int_param", int_property);
-        tc.addProperty("double_param", double_property);
-        tc.addProperty("str_param", str_property);
-        tc.addProperty("bool_param", bool_property);
+    public:
+        Properties props;
 
-        tc.addProperty("float_param", float_property);
-        tc.addProperty("uint_param", uint_property);
+        // types directly supported by dynamic_reconfigure
+        Component()
+            : RTT::TaskContext("component")
+        {
+            this->addProperty("int_param", props.int_param);
+            this->addProperty("double_param", props.double_param);
+            this->addProperty("str_param", props.str_param);
+            this->addProperty("bool_param", props.bool_param);
 
-        bag_property.addProperty("str_param", str_property_in_bag);
-        tc.addProperty("bag", bag_property);
-    }
+            this->addProperty("float_param", props.float_param);
+            this->addProperty("uint_param", props.uint_param);
+
+            props.bag_param.addProperty("str_param", props.str_param_in_bag);
+            this->addProperty("bag", props.bag_param);
+        }
+    } tc;
 
     // virtual void SetUp() {}
     // virtual void TearDown() {}
@@ -77,10 +88,10 @@ TEST_F(DynamicReconfigureTest, LoadService)
     ASSERT_TRUE(tc.provides()->hasService("test_reconfigure"));
 
     // properties should still have their original default value
-    EXPECT_EQ(0,     int_property);
-    EXPECT_EQ(0,     double_property);
-    EXPECT_EQ("",    str_property);
-    EXPECT_FALSE(bool_property);
+    EXPECT_EQ(0,     tc.props.int_param);
+    EXPECT_EQ(0,     tc.props.double_param);
+    EXPECT_EQ("",    tc.props.str_param);
+    EXPECT_FALSE(tc.props.bool_param);
 
     // non-existent properties should have been created with the default value
     ASSERT_TRUE(tc.properties()->getPropertyType<double>("non_existent"));
@@ -120,35 +131,76 @@ TEST_F(DynamicReconfigureTest, AutoConfig)
     ASSERT_TRUE(tc.loadService("reconfigure"));
     ASSERT_TRUE(tc.provides()->hasService("reconfigure"));
 
+    // get a pointer to the reconfigure service
+    boost::shared_ptr<Server<AutoConfig> > server = boost::shared_dynamic_cast<Server<AutoConfig> >(tc.provides("reconfigure"));
+    ASSERT_TRUE(server.get());
+
+    // min/max/default property bag should exist with the same number of properties
+    ASSERT_TRUE(tc.provides("reconfigure")->properties()->getPropertyType<RTT::PropertyBag>("min"));
+    ASSERT_TRUE(tc.provides("reconfigure")->properties()->getPropertyType<RTT::PropertyBag>("max"));
+    ASSERT_TRUE(tc.provides("reconfigure")->properties()->getPropertyType<RTT::PropertyBag>("default"));
+    ASSERT_EQ(tc.properties()->size(), tc.provides("reconfigure")->properties()->getPropertyType<RTT::PropertyBag>("min")->rvalue().size());
+    ASSERT_EQ(tc.properties()->size(), tc.provides("reconfigure")->properties()->getPropertyType<RTT::PropertyBag>("max")->rvalue().size());
+    ASSERT_EQ(tc.properties()->size(), tc.provides("reconfigure")->properties()->getPropertyType<RTT::PropertyBag>("default")->rvalue().size());
+
     // properties should still have their original default value
-    EXPECT_EQ(0,     int_property);
-    EXPECT_EQ(0.0,   double_property);
-    EXPECT_EQ("",    str_property);
-    EXPECT_FALSE(bool_property);
-    EXPECT_EQ(0.0,   float_property);
-    EXPECT_EQ(0,     uint_property);
-    EXPECT_TRUE(bag_property.size() == 1);
-    EXPECT_EQ("",    str_property_in_bag);
+    EXPECT_EQ(0,     tc.props.int_param);
+    EXPECT_EQ(0.0,   tc.props.double_param);
+    EXPECT_EQ("",    tc.props.str_param);
+    EXPECT_FALSE(tc.props.bool_param);
+    EXPECT_EQ(0.0,   tc.props.float_param);
+    EXPECT_EQ(0,     tc.props.uint_param);
+    EXPECT_TRUE(tc.props.bag_param.size() == 1);
+    EXPECT_EQ("",    tc.props.str_param_in_bag);
 
     // default value properties should exists with the initial value of the properties
     const RTT::PropertyBag &dflt = tc.provides("reconfigure")->properties()->getPropertyType<RTT::PropertyBag>("default")->rvalue();
     ASSERT_TRUE(dflt.getPropertyType<int>("int_param"));
-    EXPECT_EQ(int_property,    *(dflt.getPropertyType<int>("int_param")));
+    EXPECT_EQ(tc.props.int_param,    *(dflt.getPropertyType<int>("int_param")));
     ASSERT_TRUE(dflt.getPropertyType<double>("double_param"));
-    EXPECT_EQ(double_property, *(dflt.getPropertyType<double>("double_param")));
+    EXPECT_EQ(tc.props.double_param, *(dflt.getPropertyType<double>("double_param")));
     ASSERT_TRUE(dflt.getPropertyType<std::string>("str_param"));
-    EXPECT_EQ(str_property,    dflt.getPropertyType<std::string>("str_param")->rvalue());
+    EXPECT_EQ(tc.props.str_param,    dflt.getPropertyType<std::string>("str_param")->rvalue());
     ASSERT_TRUE(dflt.getPropertyType<bool>("bool_param"));
-    EXPECT_EQ(bool_property,   *(dflt.getPropertyType<bool>("bool_param")));
+    EXPECT_EQ(tc.props.bool_param,   *(dflt.getPropertyType<bool>("bool_param")));
     ASSERT_TRUE(dflt.getPropertyType<float>("float_param"));
-    EXPECT_EQ(bool_property,   *(dflt.getPropertyType<float>("float_param")));
+    EXPECT_EQ(tc.props.float_param,   *(dflt.getPropertyType<float>("float_param")));
     ASSERT_TRUE(dflt.getPropertyType<unsigned int>("uint_param"));
-    EXPECT_EQ(bool_property,   *(dflt.getPropertyType<unsigned int>("uint_param")));
+    EXPECT_EQ(tc.props.uint_param,   *(dflt.getPropertyType<unsigned int>("uint_param")));
 
     ASSERT_TRUE(dflt.getPropertyType<RTT::PropertyBag>("bag"));
-    EXPECT_TRUE(dflt.getPropertyType<RTT::PropertyBag>("bag")->rvalue().size() == 1);
-    ASSERT_TRUE(dflt.getPropertyType<RTT::PropertyBag>("bag")->rvalue().getPropertyType<std::string>("str_param"));
-    EXPECT_EQ(str_property_in_bag, dflt.getPropertyType<RTT::PropertyBag>("bag")->rvalue().getPropertyType<std::string>("str_param")->rvalue());
+    const RTT::PropertyBag &dflt_bag = *(dflt.getPropertyType<RTT::PropertyBag>("bag"));
+    EXPECT_TRUE(dflt_bag.size() == 1);
+    ASSERT_TRUE(dflt_bag.getPropertyType<std::string>("str_param"));
+    EXPECT_EQ(tc.props.str_param_in_bag, dflt_bag.getPropertyType<std::string>("str_param")->rvalue());
+
+    // check ConfigDescription
+    dynamic_reconfigure::ConfigDescriptionPtr description = server->getDescriptionMessage();
+    ASSERT_TRUE(description->groups.size() == 2);
+    const dynamic_reconfigure::Group &default_group = description->groups[0];
+    ASSERT_EQ("Default", default_group.name);
+    ASSERT_EQ("", default_group.type);
+    ASSERT_EQ(6, default_group.parameters.size());
+    ASSERT_EQ(0, default_group.parent);
+    ASSERT_EQ(0, default_group.id);
+
+    // check default values in description message
+    struct {
+        int int_param;
+        double double_param;
+        std::string str_param;
+        bool bool_param;
+        double float_param;
+        int uint_param;
+        std::string str_param_in_bag;
+    } temp;
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "int_param", temp.int_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "double_param", temp.double_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "str_param", temp.str_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "bool_param", temp.bool_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "float_param", temp.float_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "uint_param", temp.uint_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "bag__str_param", temp.str_param_in_bag));
 }
 
 TEST_F(DynamicReconfigureTest, AutoConfigAddPropertiesAndRefresh)
@@ -168,7 +220,7 @@ TEST_F(DynamicReconfigureTest, AutoConfigAddPropertiesAndRefresh)
     server->refresh();
 
     // check ConfigDescription
-    dynamic_reconfigure::ConfigDescriptionPtr description = server->getConfigDefault().__getDescriptionMessage__(server.get());
+    dynamic_reconfigure::ConfigDescriptionPtr description = server->getDescriptionMessage();
     // ...
 }
 
