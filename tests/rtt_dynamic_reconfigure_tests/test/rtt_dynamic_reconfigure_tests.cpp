@@ -177,14 +177,18 @@ TEST_F(DynamicReconfigureTest, AutoConfig)
     // check ConfigDescription
     dynamic_reconfigure::ConfigDescriptionPtr description = server->getDescriptionMessage();
     ASSERT_TRUE(description->groups.size() == 2);
-    const dynamic_reconfigure::Group &default_group = description->groups[0];
-    ASSERT_EQ("Default", default_group.name);
-    ASSERT_EQ("", default_group.type);
-    ASSERT_EQ(6, default_group.parameters.size());
-    ASSERT_EQ(0, default_group.parent);
-    ASSERT_EQ(0, default_group.id);
+    EXPECT_EQ("Default", description->groups[0].name);
+    EXPECT_EQ("", description->groups[0].type);
+    EXPECT_EQ(6, description->groups[0].parameters.size());
+    EXPECT_EQ(0, description->groups[0].parent);
+    EXPECT_EQ(0, description->groups[0].id);
+    EXPECT_EQ("bag", description->groups[1].name);
+    EXPECT_EQ("", description->groups[1].type);
+    EXPECT_EQ(1, description->groups[1].parameters.size());
+    EXPECT_EQ(0, description->groups[1].parent);
+    EXPECT_EQ(1, description->groups[1].id);
 
-    // check default values in description message
+    // check default/minimum/maximum values in description message
     struct {
         int int_param;
         double double_param;
@@ -201,6 +205,20 @@ TEST_F(DynamicReconfigureTest, AutoConfig)
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "float_param", temp.float_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "uint_param", temp.uint_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "bag__str_param", temp.str_param_in_bag));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "int_param", temp.int_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "double_param", temp.double_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "str_param", temp.str_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "bool_param", temp.bool_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "float_param", temp.float_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "uint_param", temp.uint_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "bag__str_param", temp.str_param_in_bag));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "int_param", temp.int_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "double_param", temp.double_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "str_param", temp.str_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "bool_param", temp.bool_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "float_param", temp.float_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "uint_param", temp.uint_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "bag__str_param", temp.str_param_in_bag));
 }
 
 TEST_F(DynamicReconfigureTest, AutoConfigAddPropertiesAndRefresh)
