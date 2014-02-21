@@ -23,7 +23,3 @@ orocos_generate_package(
   DEPENDS roscpp actionlib dynamic_reconfigure
   DEPENDS_TARGETS rtt_ros
 )
-
-if(CATKIN_ENABLE_TESTING)
-  add_subdirectory(tests)
-endif()

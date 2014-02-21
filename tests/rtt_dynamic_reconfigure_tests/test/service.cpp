@@ -19,7 +19,7 @@ struct Updater<TestConfig> {
     setProperty("double_param", bag, config.double_param);
     setProperty("str_param", bag, config.str_param);
     setProperty("bool_param", bag, config.bool_param);
-    setProperty("size", bag, config.size);
+    setProperty("non_existent", bag, config.non_existent);
     return true;
   }
   static bool configFromProperties(TestConfig &config, const RTT::PropertyBag &bag) {
@@ -27,7 +27,7 @@ struct Updater<TestConfig> {
     getProperty("double_param", bag, config.double_param);
     getProperty("str_param", bag, config.str_param);
     getProperty("bool_param", bag, config.bool_param);
-    getProperty("size", bag, config.size);
+    getProperty("non_existent", bag, config.non_existent);
     return true;
   }
 };
