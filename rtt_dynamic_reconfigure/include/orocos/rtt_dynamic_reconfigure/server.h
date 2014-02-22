@@ -89,6 +89,7 @@ class Server : public RTT::Service
 private:
     typedef Updater<ConfigType> updater;
     typedef dynamic_reconfigure_traits<ConfigType> traits;
+    typedef boost::shared_ptr< Server<ConfigType> > shared_ptr;
 
     RTT::os::MutexRecursive mutex_;
     ros::NodeHandle *node_handle_;
