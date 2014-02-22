@@ -12,7 +12,7 @@ namespace rtt_rostopic {
   {
   public:
     ROSTopic() :
-      RTT::ServiceRequester("rostopic",NULL),
+      RTT::ServiceRequester("rostopic"),
       connection("connection"),
       bufferedConnection("bufferedConnection"),
       unbufferedConnection("unbufferedConnection"),
