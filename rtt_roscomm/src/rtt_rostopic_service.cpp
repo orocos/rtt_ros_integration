@@ -12,16 +12,16 @@ void loadROSTopicService(){
   // New topic construction operators
   roscomm->addConstant("protocol_id", rtt_roscomm::protocol_id);
 
-  roscomm->addOperation("topicDataConnPolicy", &rtt_roscomm::topic).doc(
+  roscomm->addOperation("topic", &rtt_roscomm::topic).doc(
       "Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last message is kept.").arg(
           "name", "The ros topic name");
 
-  roscomm->addOperation("topicBufferedConnPolicy", &rtt_roscomm::topicBuffer).doc(
+  roscomm->addOperation("topicBuffer", &rtt_roscomm::topicBuffer).doc(
       "Creates a ConnPolicy for subscribing to or publishing a topic with a fixed-length message buffer.").arg(
           "name", "The ros topic name").arg(
           "size","The size of the buffer.");
 
-  roscomm->addOperation("topicUnbufferedConnPolicy", &rtt_roscomm::topicUnbuffered).doc(
+  roscomm->addOperation("topicUnbuffered", &rtt_roscomm::topicUnbuffered).doc(
       "Creates a ConnPolicy for unbuffered publishing a topic. This may not be real-time safe!").arg(
           "name", "The ros topic name");
 
