@@ -26,8 +26,8 @@
  ***************************************************************************/
 
 
-#ifndef _ROS_MSG_ACTIVITY_HPP_
-#define _ROS_MSG_ACTIVITY_HPP_
+#ifndef __RTT_ROSCOMM_ROS_MSG_ACTIVITY_HPP_
+#define __RTT_ROSCOMM_ROS_MSG_ACTIVITY_HPP_
 
 #include <rtt/Activity.hpp>
 #include <rtt/os/Mutex.hpp>
@@ -39,7 +39,7 @@
 
 #include <set>
 
-namespace ros_integration{
+namespace rtt_roscomm{
 
   /**
    * The interface a channel element must implement in
@@ -63,7 +63,8 @@ namespace ros_integration{
    * channel may exist as well. See the usage recommendations
    * for Instance() 
    */
-  class RosPublishActivity : public RTT::Activity {
+  class RosPublishActivity : public RTT::Activity 
+  {
   public:
     typedef boost::shared_ptr<RosPublishActivity> shared_ptr;
   private:

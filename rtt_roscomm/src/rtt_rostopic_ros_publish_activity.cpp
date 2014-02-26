@@ -27,9 +27,9 @@
 
 
 
-#include <rtt_rostopic/ros_publish_activity.hpp>
+#include <rtt_roscomm/rtt_rostopic_ros_publish_activity.hpp>
 
-namespace ros_integration {
+namespace rtt_roscomm {
 
     using namespace RTT;
 

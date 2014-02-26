@@ -50,18 +50,6 @@ first loading plugins from packages `rtt_roscomm` and `pkg_two`, then
 </package>
 ```
 
-#### Time Service
-
-The "ros" RTT service also provides a service "time" which provides the
-following operations:
-
- * `ros::Time ros.time.now(void)` Get a ROS time structure from the RTT clock.
-
-### C++ API
-
- * `ros::Time rtt_ros::time::now(void)` Get a ROS time structure from the RTT
-   clock.
-
 ### Launch Files
 
  * **[deployer.launch](launch/deployer.launch)** Launch the orocos deployer
