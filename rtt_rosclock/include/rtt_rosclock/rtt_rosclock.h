@@ -1,9 +1,8 @@
-#ifndef __RTT_ROS_CLOCK_H
-#define __RTT_ROS_CLOCK_H
+#ifndef __RTT_ROSCLOCK_RTT_ROSCLOCK_H
+#define __RTT_ROSCLOCK_RTT_ROSCLOCK_H
 
 #include <rtt/os/TimeService.hpp>
 #include <ros/time.h>
-#include <time.h>
 
 namespace rtt_rosclock {
   //! Get the current time according to RTT
@@ -19,4 +18,4 @@ namespace rtt_rosclock {
   const RTT::Seconds host_rt_offset_from_rtt();
 }
 
-#endif // ifndef __RTT_ROS_CLOCK_H
+#endif // ifndef __RTT_ROSCLOCK_RTT_ROSCLOCK_H
