@@ -20,9 +20,6 @@ void loadROSService(){
   ros->addOperation("import", &rtt_ros::import).doc(
       "Imports the Orocos plugins from a given ROS package (if found) along with the plugins of all of the package's run or exec dependencies as listed in the package.xml.").arg(
           "package", "The ROS package name.");
-
-  ros->provides("time")->addOperation("now", &rtt_ros::time::now).doc(
-      "Get a ros::Time structure based on the RTT time source.");
 }
 
 using namespace RTT;
