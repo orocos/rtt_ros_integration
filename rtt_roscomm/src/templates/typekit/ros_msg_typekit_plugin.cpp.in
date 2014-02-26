@@ -20,7 +20,7 @@ template class RTT_EXPORT RTT::Property< @ROSMSGTYPE@ >;
 template class RTT_EXPORT RTT::Attribute< @ROSMSGTYPE@ >;
 template class RTT_EXPORT RTT::Constant< @ROSMSGTYPE@ >;
 
-namespace ros_integration {
+namespace rtt_roscomm {
   using namespace RTT;
     // Factory function
     @ROSMSGTYPELINE@

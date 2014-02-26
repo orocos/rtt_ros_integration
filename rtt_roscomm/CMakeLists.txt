@@ -15,8 +15,9 @@ include_directories(
 
 # ROS Message / Topic Support
 orocos_service(rtt_rostopic
+  src/rtt_rostopic.cpp
   src/rtt_rostopic_service.cpp
-  src/ros_publish_activity.cpp)
+  src/rtt_rostopic_ros_publish_activity.cpp)
 target_link_libraries(rtt_rostopic ${catkin_LIBRARIES})
 
 # ROS Service Support
