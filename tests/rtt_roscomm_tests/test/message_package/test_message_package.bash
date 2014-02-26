@@ -18,6 +18,6 @@ catkin_make -j1
 # Generate and build the rtt typekit package
 source devel/setup.bash
 cd src
-rosrun rtt_roscomm create_rtt_pkg my_msgs
+rosrun rtt_roscomm create_rtt_msgs my_msgs
 cd ..
 catkin_make -j1
