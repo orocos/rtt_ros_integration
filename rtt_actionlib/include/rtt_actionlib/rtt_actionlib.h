@@ -7,7 +7,7 @@
 #include <actionlib_msgs/GoalID.h>
 #include <actionlib_msgs/GoalStatusArray.h>
 
-#include <rtt_rostopic/rtt_rostopic.h>
+#include <rtt_roscomm/rtt_rostopic.h>
 
 namespace rtt_actionlib {
 

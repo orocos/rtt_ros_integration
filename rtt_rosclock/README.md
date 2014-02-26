@@ -23,10 +23,10 @@ On a gnu/linux system, this call will just return the result of the standard
 The "rosclock" RTT service also provides a service "time" which provides the
 following operations:
 
- * `ros::Time rosclock.rtt_now(void)` Get a ROS time structure from the RTT clock source.
- * `ros::Time rosclock.ros_now(void)` Get a ROS time structure from the ROS clock.
- * `ros::Time rosclock.host_rt_now(void)` Get a ROS time structure from the NTP-adjusted realtime clock (`CLOCK_HOST_REALTIME`).
- * `RTT::Seconds host_rt_offset_from_rtt(void)` Get the differences from the RTT clock source to the NTP-adjusted realtime clock.
+ * `ros::Time ros.clock.rtt_now(void)` Get a ROS time structure from the RTT clock source.
+ * `ros::Time ros.clock.ros_now(void)` Get a ROS time structure from the ROS clock.
+ * `ros::Time ros.clock.host_rt_now(void)` Get a ROS time structure from the NTP-adjusted realtime clock (`CLOCK_HOST_REALTIME`).
+ * `RTT::Seconds ros.clock.host_rt_offset_from_rtt(void)` Get the differences from the RTT clock source to the NTP-adjusted realtime clock.
 
 #### C++ API
 

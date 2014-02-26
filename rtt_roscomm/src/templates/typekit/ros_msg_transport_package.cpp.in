@@ -1,7 +1,7 @@
 
 @ROSMSGBOOSTHEADERS@
-#include <rtt_rostopic/rtt_rostopic_ros_msg_transporter.hpp>
-#include <rtt_rostopic/rtt_rostopic.h>
+#include <rtt_roscomm/rtt_rostopic_ros_msg_transporter.hpp>
+#include <rtt_roscomm/rtt_rostopic.h>
 #include <rtt/types/TransportPlugin.hpp>
 #include <rtt/types/TypekitPlugin.hpp>
 
@@ -30,4 +30,4 @@ namespace rtt_roscomm {
     };
 }
 
-ORO_TYPEKIT_PLUGIN( ros_integration::ROS@ROSPACKAGE@Plugin )
+ORO_TYPEKIT_PLUGIN( rtt_roscomm::ROS@ROSPACKAGE@Plugin )

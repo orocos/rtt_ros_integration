@@ -55,7 +55,7 @@
 #include <rtt/internal/ConnFactory.hpp>
 #include <ros/ros.h>
 
-#include <rtt_roscomm/ros_publish_activity.hpp>
+#include <rtt_roscomm/rtt_rostopic_ros_publish_activity.hpp>
 
 namespace rtt_roscomm {
 

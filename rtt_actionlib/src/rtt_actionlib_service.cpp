@@ -5,7 +5,7 @@
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 
-#include <rtt_rostopic/rtt_rostopic.h>
+#include <rtt_roscomm/rtt_rostopic.h>
 
 #include <rtt_actionlib/rtt_actionlib.h>
 
