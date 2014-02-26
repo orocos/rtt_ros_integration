@@ -1,5 +1,5 @@
 
-#include <time>
+#include <time.h>
 #include <rtt/RTT.hpp>
 
 #include <rtt_rosclock/rtt_rosclock.h>
