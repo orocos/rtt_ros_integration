@@ -42,25 +42,6 @@
 #ifndef __RTT_ROSCLOCK_RTT_ROSCLOCK_SIM_CLOCK_ACTIVITY_H
 #define __RTT_ROSCLOCK_RTT_ROSCLOCK_SIM_CLOCK_ACTIVITY_H
 
-namespace rtt_rosclock {
-
-  class SimClockActivity;
-
-  class SimClockActivityManager {
-
-  };
-
-  class SimClockActivity {
-
-  };
-}
-
-//////
-//
-
-#ifndef RTT_GAZEBO_ACTIVITY_GAZEBO_ACTIVITY_HPP
-#define RTT_GAZEBO_ACTIVITY_GAZEBO_ACTIVITY_HPP
-
 #include <rtt/base/ActivityInterface.hpp>
 
 #include <rtt/os/TimeService.hpp>
@@ -68,27 +49,20 @@ namespace rtt_rosclock {
 
 #include <list>
 
-namespace rtt_gazebo_activity {
 
-class GazeboActivity;
+namespace rtt_rosclock {
 
-/**
- * \brief A centralized list of all TaskContexts using GazeboActivity
- *
- * The GazeboActivityManager is used to synchronously update all TaskContexts
- * using a GazeboActivity. This is the primary interface to executing a set of
- * periodic tasks in simulation. 
- *
- */
-class GazeboActivityManager
-{
-public:
+  class SimClockActivity;
+
+  class SimClockActivityManager 
+  {
+  public:
     //! Get an instance of the singleton
-    static boost::shared_ptr<GazeboActivityManager> Instance();
-    ~GazeboActivityManager();
+    static boost::shared_ptr<SimClockActivityManager> Instance();
+    ~SimClockActivityManager();
 
     //! Get an instance of the singleton if it exists, null pointer otherwise
-    static boost::shared_ptr<GazeboActivityManager> GetInstance();
+    static boost::shared_ptr<SimClockActivityManager> GetInstance();
 
     RTT::Seconds getSimulationPeriod() const;
     void setSimulationPeriod(RTT::Seconds s);
@@ -96,24 +70,24 @@ public:
     //! Execute all activities modulo their desired periods
     void update();
 
-private:
-    friend class GazeboActivity;
-    void add(GazeboActivity *activity);
-    void remove(GazeboActivity *activity);
+  private:
+    friend class SimClockActivity;
+    void add(SimClockActivity *activity);
+    void remove(SimClockActivity *activity);
 
-private:
-    static boost::weak_ptr<GazeboActivityManager> sinstance;
-    RTT::os::Mutex mmutex;
-    std::list<GazeboActivity *> mactivities;
-    RTT::Seconds msimulation_period;
-};
+  private:
+    static boost::weak_ptr<SimClockActivityManager> sinstance;
+    RTT::os::Mutex mutex_;
+    std::list<SimClockActivity *> activities_;
+    RTT::Seconds simulation_period_;
+  };
 
-class GazeboActivity : public RTT::base::ActivityInterface
-{
-public:
-    GazeboActivity(RTT::base::RunnableInterface* run = 0, const std::string& name = "GazeboActivity");
-    GazeboActivity(RTT::Seconds period, RTT::base::RunnableInterface* r = 0, const std::string& name ="GazeboActivity");
-    virtual ~GazeboActivity();
+  class SimClockActivity : public RTT::base::ActivityInterface
+  {
+  public:
+    SimClockActivity(RTT::base::RunnableInterface* run = 0, const std::string& name = "GazeboActivity");
+    SimClockActivity(RTT::Seconds period, RTT::base::RunnableInterface* r = 0, const std::string& name ="GazeboActivity");
+    virtual ~SimClockActivity();
 
     virtual RTT::Seconds getPeriod() const;
     virtual bool setPeriod(RTT::Seconds s);
@@ -141,18 +115,15 @@ public:
 
     virtual RTT::os::TimeService::ticks getLastExecutionTicks() const;
 
-private:
-    std::string mname;
-    RTT::Seconds mperiod;
-    bool mrunning;
-    bool mactive;
-    RTT::os::TimeService::ticks mlast;
+  private:
+    std::string name_;
+    RTT::Seconds period_;
+    bool running_;
+    bool active_;
+    RTT::os::TimeService::ticks last_;
 
-    boost::shared_ptr<GazeboActivityManager> mmanager;
-};
+    boost::shared_ptr<SimClockActivityManager> manager_;
+  };
+}
 
-} // namespace rtt_gazebo_activity
-
-#endif // RTT_GAZEBO_ACTIVITY_GAZEBO_ACTIVITY_HPP
-
-#endif 
+#endif  // ifndef __RTT_ROSCLOCK_RTT_ROSCLOCK_SIM_CLOCK_ACTIVITY_H
