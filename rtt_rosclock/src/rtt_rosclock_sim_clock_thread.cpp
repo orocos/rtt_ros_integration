@@ -40,6 +40,7 @@
 
 #include <rtt_rosclock/rtt_rosclock_sim_clock_thread.h>
 #include <rtt_rosclock/rtt_rosclock_sim_clock_activity.h>
+#include <rtt_rosclock/rtt_rosclock_sim_clock_activity_manager.h>
 
 #include <rtt/TaskContext.hpp>
 #include <rtt/internal/GlobalService.hpp>

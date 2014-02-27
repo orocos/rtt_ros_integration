@@ -40,6 +40,7 @@
  *********************************************************************/
 
 #include <rtt_rosclock/rtt_rosclock_sim_clock_activity.h>
+#include <rtt_rosclock/rtt_rosclock_sim_clock_activity_manager.h>
 
 #include <rtt/base/RunnableInterface.hpp>
 #include <rtt/os/TimeService.hpp>
@@ -50,71 +51,6 @@
 using namespace RTT::base;
 using namespace rtt_rosclock;
 
-boost::weak_ptr<SimClockActivityManager> SimClockActivityManager::sinstance;
-
-boost::shared_ptr<SimClockActivityManager> SimClockActivityManager::GetInstance()
-{
-  return sinstance.lock();
-}
-
-boost::shared_ptr<SimClockActivityManager> SimClockActivityManager::Instance()
-{
-  // Create a new instance, if necessary
-  boost::shared_ptr<SimClockActivityManager> shared = GetInstance();
-  if(sinstance.expired()) {
-    shared.reset(new SimClockActivityManager());
-    sinstance = shared;
-  }
-
-  return shared;
-}
-
-SimClockActivityManager::~SimClockActivityManager()
-{
-}
-
-RTT::Seconds SimClockActivityManager::getSimulationPeriod() const
-{
-  return simulation_period_;
-}
-
-void SimClockActivityManager::setSimulationPeriod(RTT::Seconds s)
-{
-  simulation_period_ = s;
-}
-
-void SimClockActivityManager::update()
-{
-  RTT::os::MutexLock lock(mutex_);
-  RTT::os::TimeService::ticks now = RTT::os::TimeService::Instance()->getTicks();
-
-  for(std::list<SimClockActivity *>::const_iterator it = activities_.begin(); it != activities_.end(); it++)
-  {
-    SimClockActivity *activity = *it;
-    if (RTT::os::TimeService::ticks2nsecs(now - activity->getLastExecutionTicks()) * 1e-9 >= activity->getPeriod())
-    {
-      activity->execute();
-    }
-  }
-}
-
-void SimClockActivityManager::add(SimClockActivity *activity)
-{
-  RTT::os::MutexLock lock(mutex_);
-  std::list<SimClockActivity *>::iterator it = std::find(activities_.begin(), activities_.end(), activity);
-  if (it == activities_.end()) {
-    activities_.push_back(activity);
-  }
-}
-
-void SimClockActivityManager::remove(SimClockActivity *activity)
-{
-  RTT::os::MutexLock lock(mutex_);
-  std::list<SimClockActivity *>::iterator it = std::find(activities_.begin(), activities_.end(), activity);
-  if (it != activities_.end()) {
-    activities_.erase(it);
-  }
-}
 
 SimClockActivity::SimClockActivity(RunnableInterface* run, const std::string& name)
 : ActivityInterface(run), name_(name), running_(false), active_(false), manager_(SimClockActivityManager::Instance())

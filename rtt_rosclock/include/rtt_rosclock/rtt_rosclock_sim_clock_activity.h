@@ -52,49 +52,20 @@
 
 namespace rtt_rosclock {
 
-  class SimClockActivity;
-
-  /**
-   * \brief A centralized list of all TaskContexts using SimClockActivity
-   *
-   * The SimClockActivityManager is used to synchronously update all TaskContexts
-   * using a SimClockActivity. This is the primary interface to executing a set of
-   * periodic tasks in simulation. 
-   *
-   */
-  class SimClockActivityManager 
-  {
-  public:
-    //! Get an instance of the singleton
-    static boost::shared_ptr<SimClockActivityManager> Instance();
-    ~SimClockActivityManager();
-
-    //! Get an instance of the singleton if it exists, null pointer otherwise
-    static boost::shared_ptr<SimClockActivityManager> GetInstance();
-
-    RTT::Seconds getSimulationPeriod() const;
-    void setSimulationPeriod(RTT::Seconds s);
-
-    //! Execute all activities modulo their desired periods
-    void update();
-
-  private:
-    friend class SimClockActivity;
-    void add(SimClockActivity *activity);
-    void remove(SimClockActivity *activity);
-
-  private:
-    static boost::weak_ptr<SimClockActivityManager> sinstance;
-    RTT::os::Mutex mutex_;
-    std::list<SimClockActivity *> activities_;
-    RTT::Seconds simulation_period_;
-  };
+  class SimClockActivityManager;
 
   class SimClockActivity : public RTT::base::ActivityInterface
   {
   public:
-    SimClockActivity(RTT::base::RunnableInterface* run = 0, const std::string& name = "SimClockActivity");
-    SimClockActivity(RTT::Seconds period, RTT::base::RunnableInterface* r = 0, const std::string& name ="SimClockActivity");
+    SimClockActivity(
+        RTT::base::RunnableInterface* run = 0,
+        const std::string& name = "SimClockActivity");
+
+    SimClockActivity(
+        RTT::Seconds period, 
+        RTT::base::RunnableInterface* r = 0,
+        const std::string& name ="SimClockActivity");
+
     virtual ~SimClockActivity();
 
     virtual RTT::Seconds getPeriod() const;
@@ -130,6 +101,7 @@ namespace rtt_rosclock {
     bool active_;
     RTT::os::TimeService::ticks last_;
 
+    //! Parent activity manager
     boost::shared_ptr<SimClockActivityManager> manager_;
   };
 }

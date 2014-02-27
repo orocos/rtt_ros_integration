@@ -14,7 +14,8 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${Xenomai_POSIX_INCLUDE_DIRS}
 orocos_library(rtt_rosclock 
   src/rtt_rosclock.cpp
   src/rtt_rosclock_sim_clock_thread.cpp
-  src/rtt_rosclock_sim_clock_activity.cpp)
+  src/rtt_rosclock_sim_clock_activity.cpp
+  src/rtt_rosclock_sim_clock_activity_manager.cpp)
 target_link_libraries(rtt_rosclock ${catkin_LIBRARIES})
 
 # Link against Xenomai POSIX skin to get 
