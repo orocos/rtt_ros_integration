@@ -46,21 +46,40 @@ const RTT::Seconds rtt_rosclock::host_rt_offset_from_rtt()
 }
 
 //! Use ROS /clock topic for time measurement
+void rtt_rosclock::use_ros_clock_topic()
+{
+  SimClockThread::Instance()->useROSClockTopic();
+}
+
+//! Use manual clock updates
+void rtt_rosclock::use_manual_clock()
+{
+  SimClockThread::Instance()->useManualClock();
+}
+
+//! Set a TaskContext to use a periodic simulation clock activity
+const bool rtt_rosclock::set_sim_clock_activity(RTT::TaskContext *t)
+{
+  if (!t) return false;
+  return t->setActivity(new SimClockActivity(t->getPeriod()));
+}
+
+//! Use a simulated clock source
 const bool rtt_rosclock::enable_sim()
 {
   return SimClockThread::Instance()->start();
 }
 
-//! Don't use ROS /clock topic for time measurement
+//! Do't use a simulated clock source
 const bool rtt_rosclock::disable_sim() 
 {
   return SimClockThread::Instance()->stop();
 }
 
-
-bool rtt_rosclock::set_sim_clock_activity(RTT::TaskContext *t)
+//! Update the simulated time
+void rtt_rosclock::update_sim_clock(const RTT::os::Seconds now)
 {
-  if (!t) return false;
-  return t->setActivity(new SimClockActivity(t->getPeriod()));
+  SimClockThread::Instance()->updateClock(now);
 }
+
 

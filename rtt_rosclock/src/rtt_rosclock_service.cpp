@@ -41,13 +41,25 @@ void loadROSClockService(){
   rosclock->addOperation("host_rt_offset_from_rtt", &rtt_rosclock::host_rt_offset_from_rtt).doc(
       "Get the difference between the Orocos clock and the ROS clock in seconds (host_time - rtt_time).");
 
-  // Enabling/Disabling simulation clock
-  rosclock->addOperation("enable_sim", &rtt_rosclock::enable_sim).doc(
-      "Enable simulation time based on the ROS /clock topic if the /use_sim_time parameter is set. This will override RTT::os::TimeService");
-  rosclock->addOperation("disable_sim", &rtt_rosclock::disble_sim).doc(
-      "Disable simulation time based on the ROS /clock topic.");
+  // Setting the source for the simulation clock
+  rosclock->addOperation("useROSClockTopic", &rtt_rosclock::use_ros_clock_topic).doc(
+      "Use the ROS /clock topic source for updating simulation time.");
+  rosclock->addOperation("useManualClock", &rtt_rosclock::use_manual_clock).doc(
+      "Use a manual source for simulation time by calling updateSimClock.");
+
   rosclock->addOperation("setSimClockActivity", &rtt_rosclock::set_sim_clock_activity).doc(
-      "Set a TaskContext's activity to a periodic activity driven by the ROS /clock topic.");
+      "Set a TaskContext's activity to a periodic activity driven by the simulated clock.").arg(
+          "task","A TaskContext which should be run periodically according to the simulation time.");
+
+  // Enabling/Disabling simulation clock
+  rosclock->addOperation("enableSimClock", &rtt_rosclock::enable_sim).doc(
+      "Enable simulation time based on the ROS /clock topic if the /use_sim_time parameter is set. This will override RTT::os::TimeService");
+  rosclock->addOperation("disableSimClock", &rtt_rosclock::disble_sim).doc(
+      "Disable simulation time based on the ROS /clock topic.");
+
+  rosclock->addOperation("updateSimClock", &rtt_rosclock::update_sim_clock).doc(
+      "Update the current simulation time and update all SimClockActivities as per their respective frequencies.").arg(
+          "time","Current simulated time in seconds.");
 }
 
 using namespace RTT;
