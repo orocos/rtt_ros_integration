@@ -64,6 +64,8 @@ namespace rtt_rosclock {
     //! Get an instance to the singleton SimClockThread or NULL
     static boost::shared_ptr<SimClockThread> GetInstance();
 
+    virtual ~SimClockThread();
+
     //! Simulation clock sources
     enum SimClockSource {
       SIM_CLOCK_SOURCE_MANUAL = 0,
@@ -88,9 +90,12 @@ namespace rtt_rosclock {
      * can be called manually via the ros.clock global service's updateSimClock()
      * operation.
      */
-    void updateClock(RTT::os::TimeService::Seconds clock_secs);
+    bool updateClock(const RTT::os::TimeService::Seconds clock_secs);
 
   protected:
+
+    //! Constructor is protected, use Instance() to create and get a singleton
+    SimClockThread();
 
     //! SimClockThread singleton
     static boost::weak_ptr<SimClockThread> singleton;
@@ -99,7 +104,7 @@ namespace rtt_rosclock {
     void resetTimeService();
 
     //! Update the RTT clock and SimClockActivities with a new time (see updateClock() for manually updating)
-    void updateClockInternal(RTT::os::TimeService::Seconds clock_secs);
+    bool updateClockInternal(const RTT::os::TimeService::Seconds clock_secs);
 
     // RTT::os::Thread interface
     virtual bool initialize();

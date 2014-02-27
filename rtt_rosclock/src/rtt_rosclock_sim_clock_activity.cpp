@@ -41,220 +41,215 @@
 
 #include <rtt_rosclock/rtt_rosclock_sim_clock_activity.h>
 
-#include <rtt_gazebo_activity/gazebo_activity.hpp>
-
 #include <rtt/base/RunnableInterface.hpp>
 #include <rtt/os/TimeService.hpp>
 #include <rtt/Logger.hpp>
 
 #include <boost/weak_ptr.hpp>
 
-namespace rtt_gazebo_activity {
-
 using namespace RTT::base;
+using namespace rtt_rosclock;
 
-boost::weak_ptr<GazeboActivityManager> GazeboActivityManager::sinstance;
+boost::weak_ptr<SimClockActivityManager> SimClockActivityManager::sinstance;
 
-boost::shared_ptr<GazeboActivityManager> GazeboActivityManager::GetInstance()
+boost::shared_ptr<SimClockActivityManager> SimClockActivityManager::GetInstance()
 {
-    return sinstance.lock();
+  return sinstance.lock();
 }
 
-boost::shared_ptr<GazeboActivityManager> GazeboActivityManager::Instance()
+boost::shared_ptr<SimClockActivityManager> SimClockActivityManager::Instance()
 {
-    // Create a new instance, if necessary
-    boost::shared_ptr<GazeboActivityManager> shared = GetInstance();
-    if(sinstance.expired()) {
-        shared.reset(new GazeboActivityManager());
-        sinstance = shared;
-    }
+  // Create a new instance, if necessary
+  boost::shared_ptr<SimClockActivityManager> shared = GetInstance();
+  if(sinstance.expired()) {
+    shared.reset(new SimClockActivityManager());
+    sinstance = shared;
+  }
 
-    return shared;
+  return shared;
 }
 
-GazeboActivityManager::~GazeboActivityManager()
+SimClockActivityManager::~SimClockActivityManager()
 {
 }
 
-RTT::Seconds GazeboActivityManager::getSimulationPeriod() const
+RTT::Seconds SimClockActivityManager::getSimulationPeriod() const
 {
-    return simulation_period_;
+  return simulation_period_;
 }
 
-void GazeboActivityManager::setSimulationPeriod(RTT::Seconds s)
+void SimClockActivityManager::setSimulationPeriod(RTT::Seconds s)
 {
-    simulation_period_ = s;
+  simulation_period_ = s;
 }
 
-void GazeboActivityManager::update()
+void SimClockActivityManager::update()
 {
-    RTT::os::MutexLock lock(mutex_);
-    RTT::os::TimeService::ticks now = RTT::os::TimeService::Instance()->getTicks();
+  RTT::os::MutexLock lock(mutex_);
+  RTT::os::TimeService::ticks now = RTT::os::TimeService::Instance()->getTicks();
 
-    for(std::list<GazeboActivity *>::const_iterator it = activities_.begin(); it != activities_.end(); it++)
+  for(std::list<SimClockActivity *>::const_iterator it = activities_.begin(); it != activities_.end(); it++)
+  {
+    SimClockActivity *activity = *it;
+    if (RTT::os::TimeService::ticks2nsecs(now - activity->getLastExecutionTicks()) * 1e-9 >= activity->getPeriod())
     {
-        GazeboActivity *activity = *it;
-        if (RTT::os::TimeService::ticks2nsecs(now - activity->getLastExecutionTicks()) * 1e-9 >= activity->getPeriod())
-        {
-            activity->execute();
-        }
+      activity->execute();
     }
+  }
 }
 
-void GazeboActivityManager::add(GazeboActivity *activity)
+void SimClockActivityManager::add(SimClockActivity *activity)
 {
-    RTT::os::MutexLock lock(mutex_);
-    std::list<GazeboActivity *>::iterator it = std::find(activities_.begin(), activities_.end(), activity);
-    if (it == activities_.end()) {
-        activities_.push_back(activity);
-    }
+  RTT::os::MutexLock lock(mutex_);
+  std::list<SimClockActivity *>::iterator it = std::find(activities_.begin(), activities_.end(), activity);
+  if (it == activities_.end()) {
+    activities_.push_back(activity);
+  }
 }
 
-void GazeboActivityManager::remove(GazeboActivity *activity)
+void SimClockActivityManager::remove(SimClockActivity *activity)
 {
-    RTT::os::MutexLock lock(mutex_);
-    std::list<GazeboActivity *>::iterator it = std::find(activities_.begin(), activities_.end(), activity);
-    if (it != activities_.end()) {
-        activities_.erase(it);
-    }
+  RTT::os::MutexLock lock(mutex_);
+  std::list<SimClockActivity *>::iterator it = std::find(activities_.begin(), activities_.end(), activity);
+  if (it != activities_.end()) {
+    activities_.erase(it);
+  }
 }
 
-GazeboActivity::GazeboActivity(RunnableInterface* run, const std::string& name)
-    : ActivityInterface(run), name_(name), running_(false), active_(false), manager_(GazeboActivityManager::Instance())
+SimClockActivity::SimClockActivity(RunnableInterface* run, const std::string& name)
+: ActivityInterface(run), name_(name), running_(false), active_(false), manager_(SimClockActivityManager::Instance())
 {
-    manager_->add(this);
+  manager_->add(this);
 }
 
-GazeboActivity::GazeboActivity(RTT::Seconds period, RunnableInterface* run, const std::string& name)
-    : ActivityInterface(run), name_(name), period_(period), running_(false), active_(false), manager_(GazeboActivityManager::Instance())
+SimClockActivity::SimClockActivity(RTT::Seconds period, RunnableInterface* run, const std::string& name)
+: ActivityInterface(run), name_(name), period_(period), running_(false), active_(false), manager_(SimClockActivityManager::Instance())
 {
-    manager_->add(this);
+  manager_->add(this);
 }
 
-GazeboActivity::~GazeboActivity()
+SimClockActivity::~SimClockActivity()
 {
-    stop();
-    manager_->remove(this);
+  stop();
+  manager_->remove(this);
 }
 
-RTT::Seconds GazeboActivity::getPeriod() const
+RTT::Seconds SimClockActivity::getPeriod() const
 {
-    if (period_ > 0.0)
-        return period_;
-    else
-        return manager_->getSimulationPeriod();
+  if (period_ > 0.0)
+    return period_;
+  else
+    return manager_->getSimulationPeriod();
 }
 
-bool GazeboActivity::setPeriod(RTT::Seconds s)
+bool SimClockActivity::setPeriod(RTT::Seconds s)
 {
-    period_ = s;
-    return true;
+  period_ = s;
+  return true;
 }
 
-unsigned GazeboActivity::getCpuAffinity() const
+unsigned SimClockActivity::getCpuAffinity() const
 {
-    return ~0;
+  return ~0;
 }
 
-bool GazeboActivity::setCpuAffinity(unsigned cpu)
+bool SimClockActivity::setCpuAffinity(unsigned cpu)
 {
+  return false;
+}
+
+RTT::os::ThreadInterface* SimClockActivity::thread()
+{
+  return 0;
+}
+
+bool SimClockActivity::initialize()
+{
+  return true;
+}
+
+void SimClockActivity::step()
+{
+}
+
+void SimClockActivity::loop()
+{
+  this->step();
+}
+
+bool SimClockActivity::breakLoop()
+{
+  return false;
+}
+
+
+void SimClockActivity::finalize()
+{
+}
+
+bool SimClockActivity::start()
+{
+  if ( active_ == true )
+  {
+    RTT::log(RTT::Error) << "Unable to start slave as it is already started" << RTT::endlog();
     return false;
-}
+  }
 
-RTT::os::ThreadInterface* GazeboActivity::thread()
-{
-    return 0;
-}
+  active_ = true;
+  last_ = 0;
 
-bool GazeboActivity::initialize()
-{
-    return true;
-}
-
-void GazeboActivity::step()
-{
-}
-
-void GazeboActivity::loop()
-{
-    this->step();
-}
-
-bool GazeboActivity::breakLoop()
-{
-    return false;
-}
-
-
-void GazeboActivity::finalize()
-{
-}
-
-bool GazeboActivity::start()
-{
-    if ( active_ == true )
-    {
-        RTT::log(RTT::Error) << "Unable to start slave as it is already started" << RTT::endlog();
-        return false;
-    }
-
-    active_ = true;
-    last_ = 0;
-
-    if ( runner ? runner->initialize() : this->initialize() ) {
-        running_ = true;
-    } else {
-        active_ = false;
-    }
-
-    return active_;
-}
-
-bool GazeboActivity::stop()
-{
-    if ( !active_ )
-        return false;
-
-    running_ = false;
-    if (runner)
-        runner->finalize();
-    else
-        this->finalize();
+  if ( runner ? runner->initialize() : this->initialize() ) {
+    running_ = true;
+  } else {
     active_ = false;
-    return true;
+  }
+
+  return active_;
 }
 
-bool GazeboActivity::isRunning() const
+bool SimClockActivity::stop()
 {
-    return running_;
-}
-
-bool GazeboActivity::isPeriodic() const
-{
-    return true;
-}
-
-bool GazeboActivity::isActive() const
-{
-    return active_;
-}
-
-bool GazeboActivity::trigger()
-{
+  if ( !active_ )
     return false;
+
+  running_ = false;
+  if (runner)
+    runner->finalize();
+  else
+    this->finalize();
+  active_ = false;
+  return true;
 }
 
-bool GazeboActivity::execute()
+bool SimClockActivity::isRunning() const
 {
-    if (!running_) return false;
-    if (runner) runner->step(); else this->step();
-    last_ = RTT::os::TimeService::Instance()->getTicks();
-    return true;
+  return running_;
 }
 
-RTT::os::TimeService::ticks GazeboActivity::getLastExecutionTicks() const
+bool SimClockActivity::isPeriodic() const
 {
-    return last_;
+  return true;
 }
 
-} // namespace rtt_gazebo_activity
+bool SimClockActivity::isActive() const
+{
+  return active_;
+}
+
+bool SimClockActivity::trigger()
+{
+  return false;
+}
+
+bool SimClockActivity::execute()
+{
+  if (!running_) return false;
+  if (runner) runner->step(); else this->step();
+  last_ = RTT::os::TimeService::Instance()->getTicks();
+  return true;
+}
+
+RTT::os::TimeService::ticks SimClockActivity::getLastExecutionTicks() const
+{
+  return last_;
+}

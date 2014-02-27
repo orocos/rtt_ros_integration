@@ -54,6 +54,14 @@ namespace rtt_rosclock {
 
   class SimClockActivity;
 
+  /**
+   * \brief A centralized list of all TaskContexts using SimClockActivity
+   *
+   * The SimClockActivityManager is used to synchronously update all TaskContexts
+   * using a SimClockActivity. This is the primary interface to executing a set of
+   * periodic tasks in simulation. 
+   *
+   */
   class SimClockActivityManager 
   {
   public:
@@ -85,8 +93,8 @@ namespace rtt_rosclock {
   class SimClockActivity : public RTT::base::ActivityInterface
   {
   public:
-    SimClockActivity(RTT::base::RunnableInterface* run = 0, const std::string& name = "GazeboActivity");
-    SimClockActivity(RTT::Seconds period, RTT::base::RunnableInterface* r = 0, const std::string& name ="GazeboActivity");
+    SimClockActivity(RTT::base::RunnableInterface* run = 0, const std::string& name = "SimClockActivity");
+    SimClockActivity(RTT::Seconds period, RTT::base::RunnableInterface* r = 0, const std::string& name ="SimClockActivity");
     virtual ~SimClockActivity();
 
     virtual RTT::Seconds getPeriod() const;
