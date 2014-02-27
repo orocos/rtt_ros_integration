@@ -162,10 +162,12 @@ bool SimClockThread::updateClockInternal(const RTT::os::TimeService::Seconds clo
     // Update the RTT clock
     time_service_->secondsChange(dt);
 
-    // trigger all SimClockActivities
+    // Trigger all SimClockActivities
     boost::shared_ptr<SimClockActivityManager> manager = SimClockActivityManager::GetInstance();
     if (manager) {
+      // Update the simulation period
       manager->setSimulationPeriod(dt);
+      // Update all the SimClockActivities
       manager->update();
     }
   }

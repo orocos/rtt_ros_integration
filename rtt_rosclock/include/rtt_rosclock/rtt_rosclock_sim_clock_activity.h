@@ -96,9 +96,17 @@ namespace rtt_rosclock {
 
   private:
     std::string name_;
+
+    //! The desired minimum execution period
     RTT::Seconds period_;
+
+    //! True after start() has succeeded
     bool running_;
+
+    //! True if start() has been called 
     bool active_;
+
+    //! The last time the activity was executed
     RTT::os::TimeService::ticks last_;
 
     //! Parent activity manager

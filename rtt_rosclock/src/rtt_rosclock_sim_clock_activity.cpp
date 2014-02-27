@@ -53,13 +53,23 @@ using namespace rtt_rosclock;
 
 
 SimClockActivity::SimClockActivity(RunnableInterface* run, const std::string& name)
-: ActivityInterface(run), name_(name), running_(false), active_(false), manager_(SimClockActivityManager::Instance())
+: ActivityInterface(run)
+  , name_(name)
+  , period_(0.0)
+  , running_(false)
+  , active_(false)
+  , manager_(SimClockActivityManager::Instance())
 {
   manager_->add(this);
 }
 
 SimClockActivity::SimClockActivity(RTT::Seconds period, RunnableInterface* run, const std::string& name)
-: ActivityInterface(run), name_(name), period_(period), running_(false), active_(false), manager_(SimClockActivityManager::Instance())
+: ActivityInterface(run)
+  , name_(name)
+  , period_(period)
+  , running_(false)
+  , active_(false)
+  , manager_(SimClockActivityManager::Instance())
 {
   manager_->add(this);
 }
