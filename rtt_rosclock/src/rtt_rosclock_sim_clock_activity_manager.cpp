@@ -73,7 +73,7 @@ SimClockActivityManager::SimClockActivityManager()
 { 
 }
 
-SimClockActivityManager::SimClockActivityManager(const SimClockActivityManager& copy) = delete;
+SimClockActivityManager::SimClockActivityManager(const SimClockActivityManager&) = delete;
 
 SimClockActivityManager::~SimClockActivityManager()
 {
