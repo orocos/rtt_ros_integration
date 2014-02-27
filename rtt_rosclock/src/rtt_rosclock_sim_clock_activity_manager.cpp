@@ -68,6 +68,13 @@ boost::shared_ptr<SimClockActivityManager> SimClockActivityManager::Instance()
   return shared;
 }
 
+SimClockActivityManager::SimClockActivityManager() 
+  : simulation_period_(0.0) 
+{ 
+}
+
+SimClockActivityManager::SimClockActivityManager(const SimClockActivityManager& copy) = delete;
+
 SimClockActivityManager::~SimClockActivityManager()
 {
 }
