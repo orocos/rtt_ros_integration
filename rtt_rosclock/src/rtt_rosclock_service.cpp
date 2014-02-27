@@ -17,9 +17,14 @@
 #include <rospack/rospack.h>
 
 #include <rtt_rosclock/rtt_rosclock.h>
+#include <rtt_rosclock/rtt_rosclock_sim_clock_thread.h>
 
 using namespace RTT;
 using namespace std;
+
+namespace {
+  boost::shared_ptr<rtt_rosclock::SimClockThread> sim_clock_thread;
+}
 
 void loadROSClockService(){
   RTT::Service::shared_ptr rosclock = RTT::internal::GlobalService::Instance()->provides("ros")->provides("clock");
@@ -54,7 +59,7 @@ void loadROSClockService(){
   // Enabling/Disabling simulation clock
   rosclock->addOperation("enableSimClock", &rtt_rosclock::enable_sim).doc(
       "Enable simulation time based on the ROS /clock topic if the /use_sim_time parameter is set. This will override RTT::os::TimeService");
-  rosclock->addOperation("disableSimClock", &rtt_rosclock::disble_sim).doc(
+  rosclock->addOperation("disableSimClock", &rtt_rosclock::disable_sim).doc(
       "Disable simulation time based on the ROS /clock topic.");
 
   rosclock->addOperation("updateSimClock", &rtt_rosclock::update_sim_clock).doc(
