@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_rosclock)
 
-find_package(catkin REQUIRED COMPONENTS rtt_ros rospack rostime cmake_modules)
+find_package(catkin REQUIRED COMPONENTS rtt_ros rospack rostime cmake_modules rosgraph_msgs)
 
 catkin_package(
   INCLUDE_DIRS include

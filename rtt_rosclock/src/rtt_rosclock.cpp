@@ -3,6 +3,7 @@
 #include <rtt/RTT.hpp>
 
 #include <rtt_rosclock/rtt_rosclock.h>
+#include <rtt_rosclock/rtt_rosclock_sim_clock_activity.h>
 #include <rtt_rosclock/rtt_rosclock_sim_clock_thread.h>
 
 const ros::Time rtt_rosclock::rtt_now() 
@@ -67,7 +68,7 @@ const bool rtt_rosclock::disable_sim()
   return SimClockThread::Instance()->stop();
 }
 
-void rtt_rosclock::update_sim_clock(const RTT::os::Seconds now)
+void rtt_rosclock::update_sim_clock(const RTT::Seconds now)
 {
   SimClockThread::Instance()->updateClock(now);
 }

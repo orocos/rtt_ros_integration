@@ -23,10 +23,10 @@ namespace rtt_rosclock {
   const bool set_sim_clock_activity(RTT::TaskContext *t);
 
   //! Use ROS /clock topic for time measurement
-  void rtt_rosclock::use_ros_clock_topic();
+  void use_ros_clock_topic();
 
   //! Use manual clock updates
-  void rtt_rosclock::use_manual_clock();
+  void use_manual_clock();
 
   //! Use a simulated clock source
   const bool enable_sim();
@@ -35,7 +35,7 @@ namespace rtt_rosclock {
   const bool disable_sim();
 
   //! Update the current simulation time and trigger all simulated TaskContexts
-  void update_sim_time(const RTT::os::Seconds now)
+  void update_sim_time(const RTT::Seconds now);
 }
 
 #endif // ifndef __RTT_ROSCLOCK_RTT_ROSCLOCK_H
