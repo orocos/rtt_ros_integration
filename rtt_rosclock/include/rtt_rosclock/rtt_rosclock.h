@@ -19,16 +19,22 @@ namespace rtt_rosclock {
   //! Get the difference in seconds between RTT and CLOCK_HOST_REALTIME
   const RTT::Seconds host_rt_offset_from_rtt();
 
-  //! Set a TaskContext's activity to use the simulation clock periodically
+  //! Set a TaskContext to use a periodic simulation clock activity
   const bool set_sim_clock_activity(RTT::TaskContext *t);
 
   //! Use ROS /clock topic for time measurement
+  void rtt_rosclock::use_ros_clock_topic();
+
+  //! Use manual clock updates
+  void rtt_rosclock::use_manual_clock();
+
+  //! Use a simulated clock source
   const bool enable_sim();
   
-  //! Don't use ROS /clock topic for time measurement
+  //! Do't use a simulated clock source
   const bool disable_sim();
 
-  //! Update the current simulation time
+  //! Update the current simulation time and trigger all simulated TaskContexts
   void update_sim_time(const RTT::os::Seconds now)
 }
 
