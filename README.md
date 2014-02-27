@@ -19,7 +19,8 @@ The packages in this repository provide:
 * [**rtt\_ros**](rtt_ros) ROS package import plugin as well as wrapper scripts
   and launchfiles for using Orocos with ROS.
 * [**rtt\_rosclock**](rtt_rosclock) Realtime-Safe NTP clock measurement and ROS
-  `Time` structure construction.
+  `Time` structure construction as well as a simulation-clock-based periodic
+  RTT activity.
 * [**rtt\_rosnode**](rtt_rosnode) Plugin for ROS node instantiation inside an
   Orocos program.
 * [**rtt\_rosparam**](rtt_rosparam) Plugin for synchronizing ROS parameters
