@@ -46,9 +46,12 @@
 #include <rtt/internal/GlobalService.hpp>
 #include <rtt/plugin/Plugin.hpp>
 
+#include <ros/time.h>
 #include <ros/node_handle.h>
 #include <ros/param.h>
 #include <ros/subscribe_options.h>
+
+#include <rtt_rosclock/rtt_rosclock.h>
 
 using namespace rtt_rosclock;
 
@@ -115,35 +118,31 @@ bool SimClockThread::simTimeEnabled() const
 
 void SimClockThread::clockMsgCallback(const rosgraph_msgs::ClockConstPtr& clock)
 {
-  // Get the simulation time
-  using namespace RTT::os;
-  TimeService::Seconds clock_secs =
-    (TimeService::Seconds)clock->clock.sec +
-    ((TimeService::Seconds)clock->clock.nsec)*1E-9;
-
   // Update the RTT clock
-  updateClockInternal(clock_secs);
+  updateClockInternal(ros::Time(clock->clock.sec, clock->clock.nsec));
 }
 
-bool SimClockThread::updateClock(const RTT::os::TimeService::Seconds clock_secs)
+bool SimClockThread::updateClock(const ros::Time new_time)
 {
   if(clock_source_ != SIM_CLOCK_SOURCE_MANUAL) {
     RTT::log(RTT::Error) << "Cannot update simulation clock manually unless the clock source is set to MANUAL_CLOCK." << RTT::endlog();
     return false;
   }
 
-  return this->updateClockInternal(clock_secs);
+  return this->updateClockInternal(new_time);
 }
 
-bool SimClockThread::updateClockInternal(const RTT::os::TimeService::Seconds clock_secs)
+bool SimClockThread::updateClockInternal(const ros::Time new_time)
 {
-  // Update the RTT time to match the sim time
-  using namespace RTT::os;
-  TimeService::ticks rtt_ticks = time_service_->getTicks();
-  TimeService::Seconds rtt_secs = RTT::nsecs_to_Seconds(TimeService::ticks2nsecs(rtt_ticks));
+  RTT::Logger::Instance()->in("SimClockThread::updateClockInternal");
+
+  // Make sure the system time isn't being used
+  if(time_service_->systemClockEnabled()) {
+    time_service_->enableSystemClock(false);
+  }
 
   // Check if time restarted
-  if(clock_secs == 0.0) {
+  if(new_time.isZero()) {
     
     RTT::log(RTT::Warning) << "Time has reset to 0! Re-setting time service..." << RTT::endlog();
 
@@ -151,12 +150,17 @@ bool SimClockThread::updateClockInternal(const RTT::os::TimeService::Seconds clo
     this->resetTimeService();
 
   } else {
+    // Update the RTT time to match the sim time
+    using namespace RTT::os;
+    //TimeService::ticks rtt_ticks = time_service_->getTicks();
+    //TimeService::Seconds rtt_secs = RTT::nsecs_to_Seconds(TimeService::ticks2nsecs(rtt_ticks));
+
     // Compute the time update
-    TimeService::Seconds dt = clock_secs - rtt_secs;
+    TimeService::Seconds dt = (new_time - rtt_rosclock::rtt_now()).toSec();
 
     // Check if time went backwards
     if(dt < 0) {
-      RTT::log(RTT::Warning) << "Time went backwards by " << dt << " seconds!" << RTT::endlog();
+      RTT::log(RTT::Warning) << "Time went backwards by " << dt << " seconds! (" << rtt_rosclock::rtt_now() << " --> " << new_time <<")" << RTT::endlog();
     }
 
     // Update the RTT clock
@@ -188,17 +192,23 @@ void SimClockThread::resetTimeService()
 
   // Disable the RTT system clock so Gazebo can manipulate time and reset it to 0
   time_service_->enableSystemClock(false);
-  time_service_->secondsChange(-time_service_->secondsSince(0));
-  // assert(time_service_->getTicks() == 0);
+  assert(time_service_->systemClockEnabled() == false);
+
+  time_service_->ticksChange(-time_service_->ticksSince(0));
+  assert(time_service_->getTicks() == 0);
 
   // Restart the RTT Logger with reference time 0
   RTT::Logger::Instance()->startup();
-  // assert(RTT::Logger::Instance()->getReferenceTime() == 0)
+  assert(RTT::Logger::Instance()->getReferenceTime() == 0);
 }
 
 bool SimClockThread::initialize()
 {
-  switch(clock_source_) {
+
+  std::cout << "[rtt_rosclock] Attempting to enable global simulation clock source..." << std::endl;
+
+  switch(clock_source_) 
+  {
     case SIM_CLOCK_SOURCE_ROS_CLOCK_TOPIC:
       {
         // Get /use_sim_time parameter from ROS
@@ -206,12 +216,12 @@ bool SimClockThread::initialize()
         ros::param::get("/use_sim_time", use_sim_time);
 
         if(!use_sim_time) {
-          RTT::log(RTT::Info) << "Did not enable ROS simulation clock because the ROS parameter '/use_sim_time' is not set to true." << RTT::endlog();
+          std::cerr << "[rtt_rosclock] Did not enable ROS simulation clock because the ROS parameter '/use_sim_time' is not set to true." << std::endl;
           process_callbacks_ = false;
           return false;
         }
 
-        RTT::log(RTT::Info) << "Switching to simulated time based on ROS /clock topic..." << RTT::endlog();
+        std::cout << "[rtt_rosclock] Switching to simulated time based on ROS /clock topic..." << std::endl;
 
         // Reset the timeservice and logger
         this->resetTimeService();
@@ -229,7 +239,7 @@ bool SimClockThread::initialize()
 
     case SIM_CLOCK_SOURCE_MANUAL:
       {
-        RTT::log(RTT::Info) << "Switching to simulated time based on a manual clock source..." << RTT::endlog();
+        std::cout << "[rtt_rosclock] Switching to simulated time based on a manual clock source..." << std::endl;
 
         // Reset the timeservice and logger
         this->resetTimeService();

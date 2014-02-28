@@ -57,7 +57,8 @@ namespace rtt_rosclock {
    * This activity subscribes to the ROS /clock topic and overrides the RTT
    * TimeService if the `/use_sim_time` ROS parameter is set.
    */
-  class SimClockThread : public RTT::os::Thread {
+  class SimClockThread : public RTT::os::Thread 
+  {
   public:
     //! Get an instance to the singleton SimClockThread or create one
     static boost::shared_ptr<SimClockThread> Instance();
@@ -90,7 +91,7 @@ namespace rtt_rosclock {
      * can be called manually via the ros.clock global service's updateSimClock()
      * operation.
      */
-    bool updateClock(const RTT::os::TimeService::Seconds clock_secs);
+    bool updateClock(const ros::Time new_time);
 
   protected:
 
@@ -106,7 +107,7 @@ namespace rtt_rosclock {
     void resetTimeService();
 
     //! Update the RTT clock and SimClockActivities with a new time (see updateClock() for manually updating)
-    bool updateClockInternal(const RTT::os::TimeService::Seconds clock_secs);
+    bool updateClockInternal(const ros::Time new_time);
 
     // RTT::os::Thread interface
     virtual bool initialize();

@@ -35,7 +35,7 @@ namespace rtt_rosclock {
   const bool disable_sim();
 
   //! Update the current simulation time and trigger all simulated TaskContexts
-  void update_sim_clock(const RTT::Seconds now);
+  void update_sim_clock(const ros::Time new_time);
 }
 
 #endif // ifndef __RTT_ROSCLOCK_RTT_ROSCLOCK_H
