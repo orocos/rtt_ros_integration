@@ -204,4 +204,4 @@ namespace rtt_ros {
 
 }
 
-#endif __RTT_ROS_RTT_ROS_H
+#endif // ifndef __RTT_ROS_RTT_ROS_H
