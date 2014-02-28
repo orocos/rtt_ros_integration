@@ -96,6 +96,8 @@ namespace rtt_rosclock {
 
     //! Constructor is protected, use Instance() to create and get a singleton
     SimClockThread();
+    SimClockThread(SimClockThread const&);
+    void operator=(SimClockThread const&);
 
     //! SimClockThread singleton
     static boost::weak_ptr<SimClockThread> singleton;

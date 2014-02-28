@@ -81,10 +81,10 @@ namespace rtt_rosclock {
     //! The SimClockActivityManager is a singleton and is constructed by calling Instance()
     SimClockActivityManager();
     //! The SimClockActivityManager is a singleton and is constructed by calling Instance()
-    SimClockActivityManager(const SimClockActivityManager& copy);
+    SimClockActivityManager(SimClockActivityManager const&);
+    void operator=(SimClockActivityManager const&);
 
   private:
-
     //! Only SimClockActivities can add or remove themselves
     friend class SimClockActivity;
 
