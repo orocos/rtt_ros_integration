@@ -58,6 +58,8 @@ install(PROGRAMS
   scripts/typegen
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION} )
+
 orocos_install_headers(
   DIRECTORY include/${PROJECT_NAME}/
 )
