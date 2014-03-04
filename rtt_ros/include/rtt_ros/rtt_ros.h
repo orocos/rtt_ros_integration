@@ -27,7 +27,7 @@
 namespace rtt_ros {
 
   //! Import a ROS package and all of its rtt_ros/plugin_depend dependencies
-  static bool import(const std::string& package)
+  bool import(const std::string& package)
   {
     RTT::Logger::In in("ROSService::import(\""+package+"\")");
 

@@ -3,10 +3,6 @@ project(rtt_rosclock)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros rospack rostime cmake_modules rosgraph_msgs)
 
-catkin_package(
-  INCLUDE_DIRS include
-)
-
 find_package(Xenomai)
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${Xenomai_POSIX_INCLUDE_DIRS})

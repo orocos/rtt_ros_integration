@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rtt_actionlib)
 
 find_package(catkin REQUIRED COMPONENTS
-  roscpp rtt_ros rtt_rosclock actionlib rtt_roscomm)
+  roscpp rtt_ros actionlib rtt_roscomm)
 
 include_directories(
   include
