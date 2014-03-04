@@ -57,6 +57,7 @@ first loading plugins from packages `rtt_roscomm` and `pkg_two`, then
    * **DEPLOYER_ARGS** (default "") Additional arguments passed to the deployer
    * **OROCOS_TARGET** (default `$OROCOS_TARGET`)
    * **RTT_COMPONENT_PATH** (default `$LD_LIBRARY_PATH`)
+   * **DEBUG** (default `false`) Launch the deployer in GDB.
 
 #### Launchfile Examples
 
