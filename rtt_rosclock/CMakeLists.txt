@@ -14,6 +14,11 @@ orocos_library(rtt_rosclock
   src/rtt_rosclock_sim_clock_activity_manager.cpp)
 target_link_libraries(rtt_rosclock ${catkin_LIBRARIES})
 
+orocos_service(sim_clock_activity_service
+  src/rtt_rosclock_sim_clock_activity_service.cpp)
+target_link_libraries(sim_clock_activity_service
+  rtt_rosclock ${catkin_LIBRARIES})
+
 # Link against Xenomai POSIX skin to get 
 if(OROCOS_TARGET STREQUAL "xenomai")
   if(Xenomai_POSIX_FOUND)

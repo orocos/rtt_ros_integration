@@ -52,10 +52,6 @@ void loadROSClockService(){
   rosclock->addOperation("useManualClock", &rtt_rosclock::use_manual_clock).doc(
       "Use a manual source for simulation time by calling updateSimClock.");
 
-  rosclock->addOperation("setSimClockActivity", &rtt_rosclock::set_sim_clock_activity).doc(
-      "Set a TaskContext's activity to a periodic activity driven by the simulated clock.").arg(
-          "task","A TaskContext which should be run periodically according to the simulation time.");
-
   // Enabling/Disabling simulation clock
   rosclock->addOperation("enableSimClock", &rtt_rosclock::enable_sim).doc(
       "Enable simulation time based on the ROS /clock topic if the /use_sim_time parameter is set. This will override RTT::os::TimeService");

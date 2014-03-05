@@ -134,8 +134,6 @@ bool SimClockThread::updateClock(const ros::Time new_time)
 
 bool SimClockThread::updateClockInternal(const ros::Time new_time)
 {
-  RTT::Logger::Instance()->in("SimClockThread::updateClockInternal");
-
   // Make sure the system time isn't being used
   if(time_service_->systemClockEnabled()) {
     time_service_->enableSystemClock(false);
