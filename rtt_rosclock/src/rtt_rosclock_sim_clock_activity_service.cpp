@@ -18,6 +18,7 @@ public:
   {
     this->doc("RTT Service for synchronizing ROS parameters with the properties of a corresponding RTT component");
 
+    // TODO: load rosclock global service
     rtt_rosclock::set_sim_clock_activity(owner);
   }
 
