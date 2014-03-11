@@ -27,7 +27,8 @@ const ros::Time rtt_rosclock::host_rt_now() {
 
   return ros::Time(ts.tv_sec, ts.tv_nsec);
 #else 
-  return ros::Time::now();
+  ros::WallTime now(ros::WallTime::now());
+  return ros::Time(now.sec, now.nsec);
 #endif
 }
 
