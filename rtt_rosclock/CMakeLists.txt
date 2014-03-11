@@ -3,9 +3,7 @@ project(rtt_rosclock)
 
 find_package(catkin REQUIRED COMPONENTS rtt_ros rospack rostime cmake_modules)
 
-catkin_package(
-  INCLUDE_DIRS include
-)
+catkin_package()
 
 find_package(Xenomai)
 
