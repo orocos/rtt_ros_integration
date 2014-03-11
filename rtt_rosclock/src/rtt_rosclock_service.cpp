@@ -1,25 +1,7 @@
-#include <cstdlib>
-#include <list>
-#include <queue>
-#include <sstream>
-
 #include <rtt/RTT.hpp>
-#include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 
-#include <rtt/deployment/ComponentLoader.hpp>
-#include <rtt/TaskContext.hpp>
-#include <rtt/Logger.hpp>
-#include <rtt/os/StartStopManager.hpp>
-#include <rtt/plugin/PluginLoader.hpp>
-#include <rtt/types/TypekitRepository.hpp>
-
-#include <rospack/rospack.h>
-
 #include <rtt_rosclock/rtt_rosclock.h>
-
-using namespace RTT;
-using namespace std;
 
 void loadROSClockService(){
   RTT::Service::shared_ptr rosclock = RTT::internal::GlobalService::Instance()->provides("ros")->provides("clock");
