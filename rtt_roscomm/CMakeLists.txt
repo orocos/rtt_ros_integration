@@ -14,11 +14,14 @@ include_directories(
   ${catkin_INCLUDE_DIRS})
 
 # ROS Message / Topic Support
-orocos_service(rtt_rostopic
-  src/rtt_rostopic.cpp
+orocos_library(rtt_rostopic
+  src/rtt_rostopic.cpp)
+target_link_libraries(rtt_rostopic ${catkin_LIBRARIES})
+
+orocos_service(rtt_rostopic_service
   src/rtt_rostopic_service.cpp
   src/rtt_rostopic_ros_publish_activity.cpp)
-target_link_libraries(rtt_rostopic ${catkin_LIBRARIES})
+target_link_libraries(rtt_rostopic_service rtt_rostopic ${catkin_LIBRARIES})
 
 # ROS Service Support
 orocos_service(rtt_rosservice_registry
