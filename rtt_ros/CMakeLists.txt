@@ -15,10 +15,18 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR})
 
 add_definitions(-DRTT_COMPONENT)
-orocos_service(rtt_ros src/rtt_ros_service.cpp)
-target_link_libraries(rtt_ros 
+
+orocos_library(rtt_ros src/rtt_ros.cpp)
+target_link_libraries(rtt_ros
   ${catkin_LIBRARIES} 
   ${LIBXML2_LIBRARIES}
+  ${OROCOS-RTT_RTT-SCRIPTING_LIBRARY}
+  )
+
+orocos_service(rtt_ros_service src/rtt_ros_service.cpp)
+target_link_libraries(rtt_ros_service
+  rtt_ros
+  ${catkin_LIBRARIES} 
   ${OROCOS-RTT_RTT-SCRIPTING_LIBRARY}
   )
 
