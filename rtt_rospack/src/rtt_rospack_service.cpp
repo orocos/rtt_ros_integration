@@ -37,20 +37,11 @@
 using namespace RTT;
 using namespace std;
 
-class ROSPackService : public RTT::Service {
-public:
-    ROSPackService(TaskContext* owner) 
-        : Service("rospack", owner) 
-    {
-      this->doc("RTT Service for locating ROS resources using rospack.");
-      this->addOperation("find", &ros::package::getPath).doc(
-          "Returns the fully-qualified path to a package, or an empty string if the package is not found");
-    }
-};
-
 void loadROSPackService(){
-  RTT::Service::shared_ptr rps(new ROSPackService(0));
-  RTT::internal::GlobalService::Instance()->addService(rps);
+  RTT::Service::shared_ptr ros = RTT::internal::GlobalService::Instance()->provides("ros");
+
+  ros->addOperation("find", &ros::package::getPath).doc(
+      "Returns the fully-qualified path to a package, or an empty string if the package is not found");
 }
 
 using namespace RTT;

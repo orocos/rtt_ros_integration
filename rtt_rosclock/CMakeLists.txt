@@ -1,16 +1,23 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_rosclock)
 
-find_package(catkin REQUIRED COMPONENTS rtt_ros rospack rostime cmake_modules)
-
-catkin_package()
+find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros rospack rostime cmake_modules rosgraph_msgs)
 
 find_package(Xenomai)
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${Xenomai_POSIX_INCLUDE_DIRS})
 
-orocos_library(rtt_rosclock src/rtt_rosclock.cpp)
+orocos_library(rtt_rosclock 
+  src/rtt_rosclock.cpp
+  src/rtt_rosclock_sim_clock_thread.cpp
+  src/rtt_rosclock_sim_clock_activity.cpp
+  src/rtt_rosclock_sim_clock_activity_manager.cpp)
 target_link_libraries(rtt_rosclock ${catkin_LIBRARIES})
+
+orocos_service(sim_clock_activity_service
+  src/rtt_rosclock_sim_clock_activity_service.cpp)
+target_link_libraries(sim_clock_activity_service
+  rtt_rosclock ${catkin_LIBRARIES})
 
 # Link against Xenomai POSIX skin to get 
 if(OROCOS_TARGET STREQUAL "xenomai")

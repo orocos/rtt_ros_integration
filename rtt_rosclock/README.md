@@ -20,8 +20,8 @@ On a gnu/linux system, this call will just return the result of the standard
 
 #### Clock Service
 
-The "rosclock" RTT service also provides a service "time" which provides the
-following operations:
+The "rosclock" RTT service also provides a sub-service of the global "ros"
+service called "ros.clock" which provides the following operations:
 
  * `ros::Time ros.clock.rtt_now(void)` Get a ROS time structure from the RTT clock source.
  * `ros::Time ros.clock.ros_now(void)` Get a ROS time structure from the ROS clock.
@@ -37,3 +37,52 @@ The calls are also available via the `rtt_rosclock/rtt_rosclock.h` header:
  * `ros::Time rtt_rosclock::host_rt_now(void)`
  * `RTT::Seconds rtt_rosclock::host_rt_offset_from_rtt(void)`
 
+### Simulation Clock Activity
+
+This package also provides an RTT `SimClockActivity` which will periodically execute
+a task subject to the progression of a simulated clock source. This clock source can
+either be the ROS `/clock` topic if it exists and the `/use_sim_time` parameter is
+set to `true`, or it can use a manual time update from some other in-process source.
+
+The simulation clock activity is implemented with three classes:
+
+ * `SimClockActivity` The actual activity which executes a given task.
+ * `SimClockActivityManager` A singleton class which is responsible for
+   coordinating execution of all `SimClockActivity` periodically (subject to
+   their minimum desired periods).
+ * `SimClockThread` A singleton thread which is responsible for the acutal
+   updates to the `RTT::os::TimeService` and optinally subscribing to ROS
+   messages on the `/clock` topic.
+
+By default, `SimClockThread` is not running, but when it is started, it will
+override the normal RTT `TimeService` and update it based on the update rate of
+whatever `SimClockThread` is using as a clock source.
+
+#### Usage
+
+The `SimClockActivity` is used similarly to the `RTT::PeriodicActivity`. Once
+the `rtt_rosclock` service plugin has been loaded, you can set a number of
+tasks' activities to SimClockActivities, set the clock source, and then enable
+the `SimClockThread`.
+
+```cpp
+
+import("rtt_ros");
+ros.import("rtt_rosclock");
+
+// ... create components ...
+
+my_component_1.setPeriod(0.01);
+my_component_2.setPeriod(1.0);
+
+// Set simulation clock activities
+ros.clock.setSimClockActivity(my_component_1);
+ros.clock.setSimClockActivity(my_component_2);
+
+// Set the SimClockThread to use the ROS /clock topic for time
+ros.clock.useROSClockTopic();
+
+// Start simulation clock thread and override RTT clock
+ros.clock.enableSim();
+
+```

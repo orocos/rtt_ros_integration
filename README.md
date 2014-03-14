@@ -19,7 +19,8 @@ The packages in this repository provide:
 * [**rtt\_ros**](rtt_ros) ROS package import plugin as well as wrapper scripts
   and launchfiles for using Orocos with ROS.
 * [**rtt\_rosclock**](rtt_rosclock) Realtime-Safe NTP clock measurement and ROS
-  `Time` structure construction.
+  `Time` structure construction as well as a simulation-clock-based periodic
+  RTT activity.
 * [**rtt\_rosnode**](rtt_rosnode) Plugin for ROS node instantiation inside an
   Orocos program.
 * [**rtt\_rosparam**](rtt_rosparam) Plugin for synchronizing ROS parameters
@@ -231,11 +232,12 @@ Orocos target- and package-definition macros like `orocos_executable()`,
 Also, while the `orocos_use_package()` macro can be used to find both
 Orocos-based packages and normal pkg-config-based packages, you should only use
 it for Orocos-based packages. You should use the normal CMake and Catkin
-mechanisms for all non-Orocos dependencies. As long as the names of orocos
-packages are listed as `<build_depend>` dependencies in your package.xml files,
-their build flags will automatically be made available when buildinf your
-package. Listing them in the package.xml file will also enforce proper build
-ordering.
+mechanisms for all non-Orocos dependencies. As long as the names of _orocos_
+packages are listed as `<build_depend>` dependencies in your package.xml file,
+their build flags will automatically be made available when building your
+package. _Do not_ use `find_package(catkin COMPONENTS)` to find orocos packages,
+since catkin doesn't properly handle the orocos-target-specific packages. Listing 
+them in the package.xml file will also enforce proper build ordering.
 
 To build components, libraries, typekits, and other Orocos plugins, use the
 standard `orocos_*()` CMake macros. Then to make these available to other
