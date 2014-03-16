@@ -24,7 +24,10 @@
 #include <dynamic_reconfigure/ConfigDescription.h>
 #include <dynamic_reconfigure/config_tools.h>
 
+#include <rtt_dynamic_reconfigure_tests/TestConfig.h>
+
 using namespace rtt_dynamic_reconfigure;
+using namespace rtt_dynamic_reconfigure_tests;
 
 class DynamicReconfigureTest : public ::testing::Test
 {
@@ -81,7 +84,25 @@ public:
     // virtual void TearDown() {}
 };
 
-TEST_F(DynamicReconfigureTest, LoadService)
+static const dynamic_reconfigure::Group *getGroup(const dynamic_reconfigure::ConfigDescription::_groups_type *groups, const std::string &name)
+{
+    if (!groups) return 0;
+    for(dynamic_reconfigure::ConfigDescription::_groups_type::const_iterator it = groups->begin(); it != groups->end(); ++it) {
+        if (it->name == name) return &(*it);
+    }
+    return 0;
+}
+
+static const dynamic_reconfigure::ParamDescription *getParamDescription(const dynamic_reconfigure::Group *group, const std::string &name)
+{
+    if (!group) return 0;
+    for(dynamic_reconfigure::Group::_parameters_type::const_iterator it = group->parameters.begin(); it != group->parameters.end(); ++it) {
+        if (it->name == name) return &(*it);
+    }
+    return 0;
+}
+
+TEST_F(DynamicReconfigureTest, ConfigDescription)
 {
     // load test_reconfigure service
     ASSERT_TRUE(tc.loadService("test_reconfigure"));
@@ -96,6 +117,44 @@ TEST_F(DynamicReconfigureTest, LoadService)
     // non-existent properties should have been created with the default value
     ASSERT_TRUE(tc.properties()->getPropertyType<double>("non_existent"));
     EXPECT_EQ(5.0, *(tc.properties()->getPropertyType<double>("non_existent")));
+
+    // get a pointer to the reconfigure service
+    boost::shared_ptr<Server<TestConfig> > server = boost::shared_dynamic_cast<Server<TestConfig> >(tc.provides("test_reconfigure"));
+    ASSERT_TRUE(server.get());
+
+    // check ConfigDescription groups
+    dynamic_reconfigure::ConfigDescriptionPtr description = server->getDescriptionMessage();
+    EXPECT_TRUE(getParamDescription(getGroup(&(description->groups), "Default"), "int_param"));
+    EXPECT_TRUE(getParamDescription(getGroup(&(description->groups), "Default"), "double_param"));
+    EXPECT_TRUE(getParamDescription(getGroup(&(description->groups), "Default"), "str_param"));
+    EXPECT_TRUE(getParamDescription(getGroup(&(description->groups), "Default"), "bool_param"));
+    EXPECT_TRUE(getParamDescription(getGroup(&(description->groups), "Default"), "non_existent"));
+    EXPECT_TRUE(getGroup(&(description->groups), "a_group"));
+    EXPECT_TRUE(getParamDescription(getGroup(&(description->groups), "a_group"), "group_param"));
+
+    // check ConfigDescription dflt/min/max values
+    struct {
+        int int_param;
+        double double_param;
+        std::string str_param;
+        bool bool_param;
+        std::string group_param;
+    } temp;
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "int_param", temp.int_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "double_param", temp.double_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "str_param", temp.str_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "bool_param", temp.bool_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "group_param", temp.group_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "int_param", temp.int_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "double_param", temp.double_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "str_param", temp.str_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "bool_param", temp.bool_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "group_param", temp.group_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "int_param", temp.int_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "double_param", temp.double_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "str_param", temp.str_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "bool_param", temp.bool_param));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "group_param", temp.group_param));
 }
 
 TEST_F(DynamicReconfigureTest, MinMaxDefault)
@@ -232,14 +291,18 @@ TEST_F(DynamicReconfigureTest, AutoConfigAddPropertiesAndRefresh)
     ASSERT_TRUE(server.get());
 
     // add a property to the TaskContext after having loaded the reconfigure service
-    // ...
+    tc.properties()->ownProperty(new RTT::Property<std::string>("new_param"));
 
     // refresh dynamic reconfigure service
     server->refresh();
 
     // check ConfigDescription
     dynamic_reconfigure::ConfigDescriptionPtr description = server->getDescriptionMessage();
-    // ...
+    std::string str;
+    EXPECT_TRUE(getParamDescription(getGroup(&(description->groups), "Default"), "new_param"));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "new_param", str));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "new_param", str));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "new_param", str));
 }
 
 int main(int argc, char **argv) {

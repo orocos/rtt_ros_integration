@@ -5,8 +5,6 @@ find_package(catkin REQUIRED COMPONENTS rtt_ros dynamic_reconfigure)
 
 if(CATKIN_ENABLE_TESTING)
 
-  set(CMAKE_BUILD_TYPE Debug)
-
   generate_dynamic_reconfigure_options(
     cfg/Test.cfg
   )

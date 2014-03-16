@@ -47,6 +47,10 @@ namespace rtt_dynamic_reconfigure {
 
 using namespace dynamic_reconfigure;
 
+/**
+ * @brief A special datasource that holds an instance of an AutoConfig description.
+ * The AutoConfigDataSource is used internally to store AutoConfig instances in a Property<RTT::PropertyBag>.
+ */
 class AutoConfigDataSource
     : public RTT::internal::AssignableDataSource<RTT::PropertyBag>
 {
@@ -174,7 +178,7 @@ static AutoConfig *getAutoConfigFromProperty(const RTT::base::PropertyBase *pb)
 {
     const RTT::Property<RTT::PropertyBag> *prop = dynamic_cast<const RTT::Property<RTT::PropertyBag> *>(pb);
     if (!prop) return 0;
-    AutoConfigDataSource::shared_ptr ds = AutoConfigDataSource::narrow(prop->getDataSource().get());
+    AutoConfigDataSource *ds = AutoConfigDataSource::narrow(prop->getDataSource().get());
     if (!ds) return 0;
     return &(ds->set());
 }
@@ -247,12 +251,12 @@ bool AutoConfig::__fromMessage__(AutoConfig &config, Config &msg, const AutoConf
         const AutoConfig *sample_sub = getAutoConfigFromProperty(*i);
         if (sample_sub) {
             RTT::Property<RTT::PropertyBag> *sub = config.getPropertyType<RTT::PropertyBag>((*i)->getName());
-            AutoConfigDataSource::shared_ptr ds;
+            AutoConfigDataSource *ds;
             if (sub) {
                 ds = AutoConfigDataSource::narrow(sub->getDataSource().get());
             } else {
-                ds.reset(new AutoConfigDataSource());
-                sub = new RTT::Property<RTT::PropertyBag>((*i)->getName(), (*i)->getDescription(), ds);
+                ds = new AutoConfigDataSource();
+                sub = new RTT::Property<RTT::PropertyBag>((*i)->getName(), (*i)->getDescription(), AutoConfigDataSource::shared_ptr(ds));
                 config.ownProperty(sub);
             }
 
@@ -368,8 +372,10 @@ static bool buildParamDescription(const RTT::base::PropertyBase *pb, const std::
 
 static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBag *bag, ConfigDescription& config_description, AutoConfig& dflt, AutoConfig& min, AutoConfig& max, const std::string &prefix, const std::string &name, const std::string &type, int32_t parent, int32_t id)
 {
+    std::size_t group_index = config_description.groups.size();
     config_description.groups.push_back(Group());
-    Group &group = config_description.groups.back();
+
+    Group &group = config_description.groups[group_index];
     group.name = name.empty() ? "Default" : name;
     group.type = type;
     group.parent = parent;
@@ -396,13 +402,14 @@ static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBa
     max.id = group.id;
     max.state = true;
 
+    // for loop might invalidate group reference -> use index group_index instead
     for(RTT::PropertyBag::const_iterator i = bag->begin(); i != bag->end(); ++i) {
-        if (buildParamDescription<bool>(*i, prefix, group.parameters, dflt, min, max) ||
-            buildParamDescription<int>(*i, prefix, group.parameters, dflt, min, max) ||
-            buildParamDescription<unsigned int>(*i, prefix, group.parameters, dflt, min, max) ||
-            buildParamDescription<std::string>(*i, prefix, group.parameters, dflt, min, max) ||
-            buildParamDescription<double>(*i, prefix, group.parameters, dflt, min, max) ||
-            buildParamDescription<float>(*i, prefix, group.parameters, dflt, min, max)
+        if (buildParamDescription<bool>(*i, prefix, config_description.groups[group_index].parameters, dflt, min, max) ||
+            buildParamDescription<int>(*i, prefix, config_description.groups[group_index].parameters, dflt, min, max) ||
+            buildParamDescription<unsigned int>(*i, prefix, config_description.groups[group_index].parameters, dflt, min, max) ||
+            buildParamDescription<std::string>(*i, prefix, config_description.groups[group_index].parameters, dflt, min, max) ||
+            buildParamDescription<double>(*i, prefix, config_description.groups[group_index].parameters, dflt, min, max) ||
+            buildParamDescription<float>(*i, prefix, config_description.groups[group_index].parameters, dflt, min, max)
            ) continue;
 
         const RTT::Property<RTT::PropertyBag> *sub = dynamic_cast<RTT::Property<RTT::PropertyBag> *>(*i);
@@ -428,7 +435,7 @@ static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBa
                 max.ownProperty(new RTT::Property<RTT::PropertyBag>(sub->getName(), sub->getDescription(), ds));
             }
 
-            buildGroupDescription(owner, &(sub->rvalue()), config_description, *sub_dflt, *sub_min, *sub_max, prefix + sub->getName() + "__", prefix + sub->getName(), "", group.id, ++id);
+            buildGroupDescription(owner, &(sub->rvalue()), config_description, *sub_dflt, *sub_min, *sub_max, prefix + sub->getName() + "__", prefix + sub->getName(), "", config_description.groups[group_index].id, ++id);
         }
     }
 }
