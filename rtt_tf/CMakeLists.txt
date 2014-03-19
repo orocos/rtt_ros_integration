@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_tf)
 
-find_package(catkin REQUIRED COMPONENTS tf rtt_roscomm)
+find_package(catkin REQUIRED COMPONENTS tf rtt_roscomm tf2)
 
 ros_generate_rtt_typekit(tf)
 
