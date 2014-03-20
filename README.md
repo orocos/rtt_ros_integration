@@ -326,8 +326,6 @@ RTT components. See [rtt_actionlib](rtt_actionlib) for more information.
 The following packages are in the planning stages, please contact the
 maintainers if you're interested in using or contributing to them:
 
-* [**rtt\_rostime**](rtt_rostime) Plugin for basing RTT time off of ROS sim
-  time.
 * [**rtt\_rosops**](rtt_rosops) Plugin for executing Orocos Ops script via ROS
   service call.
 * [**rtt\_dynamic_reconfigure**](rtt_dynamic_reconfigure) Plugin for running

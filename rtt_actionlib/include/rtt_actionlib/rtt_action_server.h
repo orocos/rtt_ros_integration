@@ -12,6 +12,7 @@
 #include <rtt_actionlib/rtt_actionlib.h>
 
 #include <rtt_rosclock/rtt_rosclock.h>
+#include <rtt_roscomm/rtt_rostopic.h>
 
 namespace rtt_actionlib {
 
@@ -53,7 +54,9 @@ namespace rtt_actionlib {
     virtual ~RTTActionServer();
 
     //! Add actionlib ports to a given rtt service
-    bool addPorts(RTT::Service::shared_ptr service);
+    bool addPorts(RTT::Service::shared_ptr service,
+        const bool create_topics = false,
+        const std::string &topic_namespace = "");
 
     //! Check if the server is ready to be started
     bool ready();
@@ -132,7 +135,9 @@ namespace rtt_actionlib {
 
   template <class ActionSpec>
     bool RTTActionServer<ActionSpec>::addPorts(
-        RTT::Service::shared_ptr service)
+        RTT::Service::shared_ptr service,
+        const bool create_topics,
+        const std::string &topic_namespace)
     {
       // Try to get existing ports from service
       if(!action_bridge_.setPortsFromService(service)) {
@@ -161,6 +166,15 @@ namespace rtt_actionlib {
 
       service->addPort(action_bridge_.feedbackOutput<ActionSpec>())
         .doc("Actionlib result port. Do not write to this port directly.");
+
+      // Create ROS topics
+      if(create_topics) {
+        action_bridge_.goalInput<ActionSpec>().createStream(rtt_roscomm::topic(topic_namespace+"goal"));
+        action_bridge_.cancelInput().createStream(rtt_roscomm::topic(topic_namespace+"cancel"));
+        action_bridge_.resultOutput<ActionSpec>().createStream(rtt_roscomm::topic(topic_namespace+"result"));
+        action_bridge_.statusOutput().createStream(rtt_roscomm::topic(topic_namespace+"status"));
+        action_bridge_.feedbackOutput<ActionSpec>().createStream(rtt_roscomm::topic(topic_namespace+"feedback"));
+      }
 
       return true;
     }
