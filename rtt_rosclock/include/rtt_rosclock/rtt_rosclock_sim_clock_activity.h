@@ -48,7 +48,7 @@
 #include <rtt/os/Mutex.hpp>
 
 #include <list>
-
+#include <string>
 
 namespace rtt_rosclock {
 
