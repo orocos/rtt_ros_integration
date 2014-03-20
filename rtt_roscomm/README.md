@@ -87,24 +87,21 @@ Usage
 ## Imports
 import("rtt_roscomm")
 # Publish
-stream("my_component.my_output", rostopic.connection("my_ros_output"))
+stream("my_component.my_output", ros.comm.topic("my_ros_output"))
 # Subscribe
-stream("my_component.my_input", rostopic.connection("my_ros_input"))
+stream("my_component.my_input", ros.comm.topic("my_ros_input"))
 ```
 
 You can also set up these connections in C++ code:
 ```cpp
 
-#include <rtt_rostopic/rostopic.h>
+#include <rtt_roscomm/rtt_rostopic.h>
 
 // ...
 
-  // Get an instance of the rtt_rostopic service requester
-  rtt_rostopic::ROSTopic rostopic;
-
   // Add the port and stream it to a ROS topic
   this->ports()->addPort("my_port", my_port_);
-  my_port_.createStream(rostopic.connection("my_ros_topic"));
+  my_port_.createStream(rtt_roscomm::topic("my_ros_topic"));
 
 // ...
 ```
@@ -112,9 +109,9 @@ You can also set up these connections in C++ code:
 To create a privately-scoped or component-scoped topic, you can do the following:
 ```
 // Privately-scoped (resolves to NODE_NAME/TOPIC_NAME)
-my_port_.createStream(rostopic.connection("~my_private_ros_topic"));
+my_port_.createStream(rtt_roscomm::topic("~my_private_ros_topic"));
 // Component-scoped (resolves to NODE_NAME/COMPONENT_NAME/TOPIC_NAME)
-my_port_.createStream(rostopic.connection("~" + this->getName() + "/my_component_scoped_ros_topic"));
+my_port_.createStream(rtt_roscomm::topic("~" + this->getName() + "/my_component_scoped_ros_topic"));
 ```
 
 ### Connecting RTT Operations to ROS Services

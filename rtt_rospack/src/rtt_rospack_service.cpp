@@ -56,6 +56,7 @@ void loadROSPackService(){
 using namespace RTT;
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
+    if (c != 0) return false;
     loadROSPackService();
     return true;
   }

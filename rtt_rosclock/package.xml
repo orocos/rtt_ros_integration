@@ -1,0 +1,35 @@
+<package>
+  <name>rtt_rosclock</name>
+  <version>2.7.0</version>
+
+  <description>
+    This package provides an RTT plugin to access different time measurements on a realtime host.</description>
+  <author>Ruben Smits</author>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <license>BSD</license>
+
+  <url>http://ros.org/wiki/rtt_rosclock</url>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rtt</build_depend>
+  <build_depend>ocl</build_depend>
+  <build_depend>rostime</build_depend>
+  <build_depend>rospack</build_depend>
+  <build_depend>libxml2</build_depend>
+  <build_depend>cmake_modules</build_depend>
+
+  <run_depend>rtt</run_depend>
+  <run_depend>ocl</run_depend>
+  <run_depend>rostime</run_depend>
+  <run_depend>rospack</run_depend>
+  <run_depend>libxml2</run_depend>
+  <run_depend>cmake_modules</run_depend>
+
+  <export>
+    <rtt_ros>
+      <plugin_depend>rtt_ros</plugin_depend>
+    </rtt_ros>
+  </export>
+
+</package>

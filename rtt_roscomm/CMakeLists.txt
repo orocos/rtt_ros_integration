@@ -4,7 +4,6 @@ project(rtt_roscomm)
 find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
 
 catkin_package(
-  INCLUDE_DIRS include
   CATKIN_DEPENDS rtt_ros
   CFG_EXTRAS GenerateRTTROSCommPackage.cmake
 )
@@ -15,8 +14,9 @@ include_directories(
 
 # ROS Message / Topic Support
 orocos_service(rtt_rostopic
+  src/rtt_rostopic.cpp
   src/rtt_rostopic_service.cpp
-  src/ros_publish_activity.cpp)
+  src/rtt_rostopic_ros_publish_activity.cpp)
 target_link_libraries(rtt_rostopic ${catkin_LIBRARIES})
 
 # ROS Service Support

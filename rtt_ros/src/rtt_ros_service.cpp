@@ -2,6 +2,7 @@
 #include <list>
 #include <queue>
 #include <sstream>
+#include <set>
 
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
@@ -12,52 +13,23 @@
 #include <libxml/tree.h>
 
 #include <rtt/RTT.hpp>
-#include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 
 #include <rtt/deployment/ComponentLoader.hpp>
-#include <rtt/TaskContext.hpp>
 #include <rtt/Logger.hpp>
-#include <rtt/os/StartStopManager.hpp>
-#include <rtt/plugin/PluginLoader.hpp>
-#include <rtt/types/TypekitRepository.hpp>
 
 #include <rospack/rospack.h>
 
-#include <rtt_ros/time.h>
+#include <rtt_ros/rtt_ros.h>
 
 using namespace RTT;
 using namespace std;
 
-/**
- * The globally loadable ROS service.
- */
-class ROSService : public RTT::Service {
-public:
-  int protocol_id;
-  /**
-   * Instantiates this service.
-   * @param owner The owner or null in case of global.
-   */
-  ROSService(TaskContext* owner) 
-    : Service("ros", owner)
-  {
-    this->doc("RTT service for loading RTT plugins ");
+namespace rtt_ros
+{
 
-    // ROS Package-importing
-    this->addOperation("import", &ROSService::import, this).doc(
-        "Imports the Orocos plugins from a given ROS package (if found) along with the plugins of all of the package's run or exec dependencies as listed in the package.xml.").arg(
-            "package", "The ROS package name.");
-
-    this->provides("time")->addOperation("now", &rtt_ros::time::now).doc(
-        "Get a ros::Time structure based on the RTT time source.");
-  }
-
-  /**
-   * Returns a ConnPolicy object for streaming to or from 
-   * the given ROS topic. No buffering is done.
-   */
-  bool import(const std::string& package) 
+  //! Import a ROS package and all of its rtt_ros/plugin_depend dependencies
+  bool import(const std::string& package)
   {
     RTT::Logger::In in("ROSService::import(\""+package+"\")");
 
@@ -97,7 +69,7 @@ public:
 
       const xmlChar * rtt_plugin_depend_xpath = xmlCharStrdup("/package/export/rtt_ros/plugin_depend/text()");
 
-      while(!dep_names.empty()) 
+      while(!dep_names.empty())
       {
         namespace fs = boost::filesystem;
 
@@ -217,7 +189,7 @@ public:
     }
 
     // Report success or failure
-    if(missing_packages.size() == 0) { 
+    if(missing_packages.size() == 0) {
       RTT::log(RTT::Info) << "Loaded plugins from ROS package \"" << package << "\" and its dependencies." << RTT::endlog();
     } else {
       RTT::log(RTT::Warning) << "Could not load RTT plugins from the following ROS packages (they might be empty, in which case this message can be ignored): "<< RTT::endlog();
@@ -232,16 +204,23 @@ public:
     return missing_packages.size() == 0;
   }
 
-};
+} // namespace rtt_ros
 
 void loadROSService(){
-  RTT::Service::shared_ptr rts(new ROSService(0));
-  RTT::internal::GlobalService::Instance()->addService(rts);
+  RTT::Service::shared_ptr ros = RTT::internal::GlobalService::Instance()->provides("ros");
+
+  ros->doc("RTT service for loading RTT plugins ");
+
+  // ROS Package-importing
+  ros->addOperation("import", &rtt_ros::import).doc(
+      "Imports the Orocos plugins from a given ROS package (if found) along with the plugins of all of the package's run or exec dependencies as listed in the package.xml.").arg(
+          "package", "The ROS package name.");
 }
 
 using namespace RTT;
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
+    if (c != 0) return false;
     loadROSService();
     return true;
   }

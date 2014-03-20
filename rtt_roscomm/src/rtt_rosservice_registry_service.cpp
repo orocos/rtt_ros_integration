@@ -3,8 +3,8 @@
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 
-#include <rtt_rosservice/rtt_rosservice_registry_service.h>
-#include <rtt_rosservice/rtt_rosservice_proxy.h>
+#include <rtt_roscomm/rtt_rosservice_registry_service.h>
+#include <rtt_roscomm/rtt_rosservice_proxy.h>
 
 ROSServiceRegistryServicePtr ROSServiceRegistryService::s_instance_;
 
@@ -103,6 +103,7 @@ void loadROSServiceRegistryService()
 using namespace RTT;
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
+    if (c != 0) return false;
     loadROSServiceRegistryService();
     return true;
   }

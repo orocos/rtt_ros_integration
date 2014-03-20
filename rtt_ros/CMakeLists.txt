@@ -3,12 +3,10 @@ project(rtt_ros)
 
 find_package(catkin REQUIRED COMPONENTS rospack rostime)
 
-find_package(OROCOS-RTT REQUIRED 
-  COMPONENTS rtt-marshalling rtt-scripting)
+find_package(OROCOS-RTT REQUIRED)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 catkin_package(
-  INCLUDE_DIRS include
   CFG_EXTRAS rtt_ros-extras.cmake
 )
 
