@@ -203,7 +203,7 @@ void SimClockThread::resetTimeService()
 bool SimClockThread::initialize()
 {
 
-  std::cout << "[rtt_rosclock] Attempting to enable global simulation clock source..." << std::endl;
+  RTT::log(RTT::Debug) << "[rtt_rosclock] Attempting to enable global simulation clock source..." << RTT::endlog();
 
   switch(clock_source_) 
   {
@@ -214,12 +214,12 @@ bool SimClockThread::initialize()
         ros::param::get("/use_sim_time", use_sim_time);
 
         if(!use_sim_time) {
-          std::cerr << "[rtt_rosclock] Did not enable ROS simulation clock because the ROS parameter '/use_sim_time' is not set to true." << std::endl;
+          RTT::log(RTT::Error) << "[rtt_rosclock] Did not enable ROS simulation clock because the ROS parameter '/use_sim_time' is not set to true." << RTT::endlog();
           process_callbacks_ = false;
           return false;
         }
 
-        std::cout << "[rtt_rosclock] Switching to simulated time based on ROS /clock topic..." << std::endl;
+        RTT::log(RTT::Debug) << "[rtt_rosclock] Switching to simulated time based on ROS /clock topic..." << RTT::endlog();
 
         // Reset the timeservice and logger
         this->resetTimeService();
@@ -237,7 +237,7 @@ bool SimClockThread::initialize()
 
     case SIM_CLOCK_SOURCE_MANUAL:
       {
-        std::cout << "[rtt_rosclock] Switching to simulated time based on a manual clock source..." << std::endl;
+        RTT::log(RTT::Debug) << "[rtt_rosclock] Switching to simulated time based on a manual clock source..." << RTT::endlog();
 
         // Reset the timeservice and logger
         this->resetTimeService();
