@@ -12,7 +12,15 @@ namespace rtt_rosparam {
   public:
     ROSParam(RTT::TaskContext *owner) :
       RTT::ServiceRequester("rosparam",owner),
+      getAllRelative("getAllRelative"),
+      getAllAbsolute("getAllAbsolute"),
+      getAllPrivate("getAllPrivate"),
+      getAllComponentPrivate("getAllComponentPrivate"),
       getAll("getAll"),
+      setAllRelative("setAllRelative"),
+      setAllAbsolute("setAllAbsolute"),
+      setAllPrivate("setAllPrivate"),
+      setAllComponentPrivate("setAllComponentPrivate"),
       setAll("setAll"),
       get("get"),
       getRelative("getRelative"),
@@ -25,7 +33,16 @@ namespace rtt_rosparam {
       setPrivate("setPrivate"),
       setComponentPrivate("setComponentPrivate")
     {
+      this->addOperationCaller(getAllRelative);
+      this->addOperationCaller(getAllAbsolute);
+      this->addOperationCaller(getAllPrivate);
+      this->addOperationCaller(getAllComponentPrivate);
       this->addOperationCaller(getAll);
+
+      this->addOperationCaller(setAllRelative);
+      this->addOperationCaller(setAllAbsolute);
+      this->addOperationCaller(setAllPrivate);
+      this->addOperationCaller(setAllComponentPrivate);
       this->addOperationCaller(setAll);
 
       this->addOperationCaller(get);
@@ -48,7 +65,15 @@ namespace rtt_rosparam {
       COMPONENT //! Component resolution: "name" -> "~COMPONENT_NAME/name"
     }ResolutionPolicy;
 
+    RTT::OperationCaller<bool(void)> getAllRelative;
+    RTT::OperationCaller<bool(void)> getAllAbsolute;
+    RTT::OperationCaller<bool(void)> getAllPrivate;
+    RTT::OperationCaller<bool(void)> getAllComponentPrivate;
     RTT::OperationCaller<bool(void)> getAll;
+    RTT::OperationCaller<bool(void)> setAllRelative;
+    RTT::OperationCaller<bool(void)> setAllAbsolute;
+    RTT::OperationCaller<bool(void)> setAllPrivate;
+    RTT::OperationCaller<bool(void)> setAllComponentPrivate;
     RTT::OperationCaller<bool(void)> setAll;
 
     RTT::OperationCaller<bool(const std::string &, const unsigned int)> get;

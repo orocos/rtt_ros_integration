@@ -632,7 +632,7 @@ bool ROSParamService::getParam(
       // Deal with the xml value
       bool ret = xmlParamToProp(xml_value, prop_base);
       if(!ret) {
-        RTT::log(RTT::Error) << "Could not convert \"" << resolved_name << "\" from an XMLRPC value to an RTT property." << RTT::endlog();
+        RTT::log(RTT::Warning) << "Could not convert \"" << resolved_name << "\" from an XMLRPC value to an RTT property." << RTT::endlog();
       }
       return ret;
     }
@@ -679,7 +679,7 @@ bool ROSParamService::getParams(RTT::Service::shared_ptr service, const std::str
   // Deal with the xml value
   bool ret = xmlParamToProp(xml_value, &prop);
   if (!ret) {
-    RTT::log(RTT::Error) << "Could not convert \"" << resolved_name << "\" from an XMLRPC value to an RTT property." << RTT::endlog();
+    RTT::log(RTT::Warning) << "Could not convert \"" << resolved_name << "\" from an XMLRPC value to an RTT property." << RTT::endlog();
     return false;
   }
 
