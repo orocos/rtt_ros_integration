@@ -10,4 +10,4 @@ namespace rtt_ros {
 
 }
 
-#endif // ifndef __RTT_ROS_RTT_ROS_H
+#endif // __RTT_ROS_RTT_ROS_H

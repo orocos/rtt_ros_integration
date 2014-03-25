@@ -1,4 +1,16 @@
 #include <cstdlib>
+#include <list>
+#include <queue>
+#include <sstream>
+#include <set>
+
+#include <boost/filesystem.hpp>
+#include <boost/version.hpp>
+
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
+#include <libxml/tree.h>
 
 #include <rtt/RTT.hpp>
 #include <rtt/internal/GlobalService.hpp>
@@ -6,10 +18,9 @@
 #include <rtt/deployment/ComponentLoader.hpp>
 #include <rtt/Logger.hpp>
 
-#include <rtt_ros/rtt_ros.h>
+#include <rospack/rospack.h>
 
-using namespace RTT;
-using namespace std;
+#include <rtt_ros/rtt_ros.h>
 
 void loadROSService(){
   RTT::Service::shared_ptr ros = RTT::internal::GlobalService::Instance()->provides("ros");

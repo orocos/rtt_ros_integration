@@ -1,15 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_ros)
 
-find_package(catkin REQUIRED COMPONENTS rospack rostime cmake_modules roslib)
+find_package(catkin REQUIRED COMPONENTS rospack rostime)
 find_package(LibXml2 REQUIRED)
-find_package(OROCOS-RTT REQUIRED 
-  COMPONENTS rtt-marshalling rtt-scripting)
+find_package(OROCOS-RTT REQUIRED)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 catkin_package(
   CFG_EXTRAS rtt_ros-extras.cmake
-  SKIP_PKG_CONFIG_GENERATION
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR})
@@ -20,14 +18,12 @@ orocos_library(rtt_ros src/rtt_ros.cpp)
 target_link_libraries(rtt_ros
   ${catkin_LIBRARIES} 
   ${LIBXML2_LIBRARIES}
-  ${OROCOS-RTT_RTT-SCRIPTING_LIBRARY}
   )
 
 orocos_service(rtt_ros_service src/rtt_ros_service.cpp)
 target_link_libraries(rtt_ros_service
   rtt_ros
   ${catkin_LIBRARIES} 
-  ${OROCOS-RTT_RTT-SCRIPTING_LIBRARY}
   )
 
 # ROS Primitives typekit
@@ -49,8 +45,8 @@ orocos_typekit(rtt-ros-primitives-typekit
 target_link_libraries(rtt-ros-primitives-typekit ${catkin_LIBRARIES})
 
 orocos_generate_package(
-  INCLUDE_DIRS include ${LIBXML2_INCLUDE_DIR}
-  DEPENDS rospack rostime
+  INCLUDE_DIRS include
+  DEPENDS rostime
 )
 
 install(PROGRAMS 

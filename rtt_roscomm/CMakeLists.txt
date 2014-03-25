@@ -4,7 +4,6 @@ project(rtt_roscomm)
 find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
 
 catkin_package(
-  INCLUDE_DIRS include
   CATKIN_DEPENDS rtt_ros
   CFG_EXTRAS GenerateRTTROSCommPackage.cmake
 )

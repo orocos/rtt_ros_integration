@@ -1,26 +1,8 @@
-#include <cstdlib>
-#include <list>
-#include <queue>
-#include <sstream>
-
 #include <rtt/RTT.hpp>
-#include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
-
-#include <rtt/deployment/ComponentLoader.hpp>
-#include <rtt/TaskContext.hpp>
-#include <rtt/Logger.hpp>
-#include <rtt/os/StartStopManager.hpp>
-#include <rtt/plugin/PluginLoader.hpp>
-#include <rtt/types/TypekitRepository.hpp>
-
-#include <rospack/rospack.h>
 
 #include <rtt_rosclock/rtt_rosclock.h>
 #include <rtt_rosclock/rtt_rosclock_sim_clock_thread.h>
-
-using namespace RTT;
-using namespace std;
 
 namespace {
   boost::shared_ptr<rtt_rosclock::SimClockThread> sim_clock_thread;
