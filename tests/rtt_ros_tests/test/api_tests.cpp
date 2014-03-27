@@ -34,7 +34,7 @@ TEST(BasicTest, ImportChaining)
 {
   // Import rtt_ros plugin
   EXPECT_TRUE(scripting_service->eval("ros.import(\"rtt_ros_tests\")"));
-  EXPECT_TRUE(scripting_service->eval("rospack.find(\"rtt_ros\")"));
+  EXPECT_TRUE(scripting_service->eval("ros.find(\"rtt_ros\")"));
 }
 
 
