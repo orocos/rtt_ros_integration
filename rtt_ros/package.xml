@@ -19,12 +19,14 @@
   <build_depend>ocl</build_depend>
   <build_depend>rostime</build_depend>
   <build_depend>rospack</build_depend>
+  <build_depend>roslib</build_depend>
   <build_depend>libxml2</build_depend>
 
   <run_depend>rtt</run_depend>
   <run_depend>ocl</run_depend>
   <run_depend>rostime</run_depend>
   <run_depend>rospack</run_depend>
+  <run_depend>roslib</run_depend>
   <run_depend>libxml2</run_depend>
 
   <!--<run_depend>rtt_rosnode</run_depend>-->
