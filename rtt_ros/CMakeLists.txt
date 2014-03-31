@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_ros)
 
-find_package(catkin REQUIRED COMPONENTS rospack rostime)
+find_package(catkin REQUIRED COMPONENTS rostime rospack roslib)
 find_package(LibXml2 REQUIRED)
 find_package(OROCOS-RTT REQUIRED)
 include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)

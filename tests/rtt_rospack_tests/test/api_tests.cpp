@@ -39,7 +39,7 @@ TEST(BasicTest, PackageFinding)
   // Import rtt_ros plugin
   EXPECT_TRUE(scripting_service->eval("ros.import(\"rtt_rospack_tests\")"));
 
-  RTT::OperationCaller<std::string(const std::string&)> rpf = global_service->provides("rospack")->getOperation("find");
+  RTT::OperationCaller<std::string(const std::string&)> rpf = global_service->provides("ros")->getOperation("find");
   std::string roscpp_dir = ros::package::getPath("roscpp");
   EXPECT_EQ(roscpp_dir,rpf("roscpp"));
 
