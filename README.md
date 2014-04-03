@@ -28,12 +28,16 @@ The packages in this repository provide:
 * [**rtt\_roscomm**](rtt_roscomm) ROS message typekit generation and Orocos
   plugin for publishing and subscribing to ROS topics as well as calling and
   responding to ROS services.
+* [**rtt\_rosdeployment**](rtt_rosdeployment) An RTT service which advertises
+  common DeploymentComponent operations as ROS services.
 * [**rtt\_rospack**](rtt_rospack) Plugin for locating ROS resources.
 * [**rtt\_tf**](rtt_tf) RTT-Plugin which uses [tf](http://ros.org/wiki/tf) to
   allow RTT components to lookup and publish transforms.
 * [**rtt\_actionlib**](rtt_actionlib) RTT-Enabled
   [actionlib](http://ros.org/wiki/actionlib) action server for providing
   actions from ROS-integrated RTT components.
+* [**rtt\_ros\_msgs**](rtt_ros_msgs) ROS .msg and .srv types for use with these
+  plugins.
 * [**rtt\_ros\_integration**](rtt_ros_integration) Catkin
   [metapackage](http://ros.org/wiki/catkin/package.xml#Metapackages) for this
   repository.
@@ -326,8 +330,6 @@ RTT components. See [rtt_actionlib](rtt_actionlib) for more information.
 The following packages are in the planning stages, please contact the
 maintainers if you're interested in using or contributing to them:
 
-* [**rtt\_rosops**](rtt_rosops) Plugin for executing Orocos Ops script via ROS
-  service call.
 * [**rtt\_dynamic_reconfigure**](rtt_dynamic_reconfigure) Plugin for running
   a [dynamic\_reconfigure](http://ros.org/wiki/dynamic_reconfigure) server from
   an RTT component.

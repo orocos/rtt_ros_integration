@@ -1,0 +1,23 @@
+<package>
+  <name>rtt_rosdeployment</name>
+  <version>2.7.0</version>
+  <description>rtt_rosdeployment provides an RTT plugin to control an ocl deployment component over ROS service calls..</description>
+  <maintainer email="jbo@jhu.edu">Jonthan Bohren</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/rtt_rospack</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author email="jbo@jhu.edu">Jonthan Bohren</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rtt_ros</build_depend> 
+  <build_depend>rtt_ros_msgs</build_depend> 
+  <build_depend>roscpp</build_depend> 
+
+  <run_depend>rtt_ros</run_depend> 
+  <run_depend>rtt_ros_msgs</run_depend> 
+  <run_depend>roscpp</run_depend> 
+</package>
