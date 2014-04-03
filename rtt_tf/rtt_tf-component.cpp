@@ -91,6 +91,11 @@ namespace rtt_tf
     service->addOperation("broadcastTransforms", &RTT_TF::broadcastTransforms, this, RTT::OwnThread)
       .doc("Broadcast a stamped transform immediately.")
       .arg("transforms", "[std::vector<geometry_msgs::TransformStamped>]");
+
+    service->addOperation("canTransform", &RTT_TF::canTransform, this)
+      .doc("Check if the transform from source to target can be resolved..")
+      .arg("target", "Target frame")
+      .arg("source", "Source frame");
   }
 
   bool RTT_TF::configureHook()
@@ -119,7 +124,7 @@ namespace rtt_tf
   {
     Logger::In(this->getName());
 #ifndef NDEBUG
-    log(Debug) << "In update" << endlog();
+    //log(Debug) << "In update" << endlog();
 #endif
     try {
       tf::tfMessage msg_in;
@@ -166,6 +171,16 @@ namespace rtt_tf
     geometry_msgs::TransformStamped msg;
     tf::transformStampedTFToMsg(stamped_tf,msg);
     return msg;
+  }
+
+  bool RTT_TF::canTransform(
+      const std::string& target,
+      const std::string& source)
+  {
+    tf::StampedTransform stamped_tf;
+    ros::Time common_time;
+    this->getLatestCommonTime(source, target, common_time,NULL);
+    return static_cast<tf::Transformer*>(this)->canTransform(target, source, common_time);
   }
 
   geometry_msgs::TransformStamped RTT_TF::lookupTransformAtTime(

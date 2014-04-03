@@ -1,20 +1,19 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_tf)
 
-find_package(catkin REQUIRED COMPONENTS tf rtt_roscomm)
+find_package(catkin REQUIRED COMPONENTS tf rtt_ros rtt_roscomm tf2)
 
 ros_generate_rtt_typekit(tf)
-
-find_package(OROCOS-RTT REQUIRED)
-include(${OROCOS-RTT_USE_FILE_PATH}/UseOROCOS-RTT.cmake)
 
 include_directories(${catkin_INCLUDE_DIRS})
 
 orocos_component(rtt_tf rtt_tf-component.cpp)
 target_link_libraries(rtt_tf ${catkin_LIBRARIES})
 orocos_install_headers( rtt_tf-component.hpp )
+orocos_install_headers(include/rtt_tf/tf_interface.h)
 
 orocos_generate_package(
+  INCLUDE_DIRS include
   DEPENDS tf
   DEPENDS_TARGETS rtt_roscomm rtt_geometry_msgs
 )

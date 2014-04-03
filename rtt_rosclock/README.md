@@ -11,10 +11,29 @@ different from the NTP-corrected time and any timestamped messages published
 to ROS will be dramatically delayed.
 
 To avoid these problems while staying realtime-safe (and portable), you can 
-use the `rtt_rosclock::host_rt_now()` function to get a ROS time structure
+use the `rtt_rosclock::host_now()` function to get a ROS time structure
 that uses the `CLOCK_HOST_REALTIME` realtime time source on a Xenomai system. 
 On a gnu/linux system, this call will just return the result of the standard
 `ros::Time::now()` function.
+
+### Use host_now() for broadcasting ROS Header Stamps
+
+The `rtt_rosclock::host_now()` function is the time source that should always be used
+with ROS header timestamps because it is the time that you want to use to
+broadcast ROS messages to other machines or processes. It is assumed that
+if the `/clock` topic is active, then any ROS messages broadcasted are
+based on that time source.
+
+When compiled against Xenomai and not running in simulation mode, this function
+will return the NTP-synchronized clock time via the `CLOCK_HOST_REALTIME` clock
+source. *Note that this is only supported under Xenomai 2.6 and above.*
+
+When **not** compiled against Xenomai and not running in simulation mode, it is
+a pass-through to `ros::Time::now()`.
+
+When running in simulation mode, this will always use the simulation clock,
+which is based off of the ROS `/clock` topic. It is a pass-through to
+`rtt_rosclock::rtt_now()`.
 
 ### RTT Services
 
@@ -23,19 +42,21 @@ On a gnu/linux system, this call will just return the result of the standard
 The "rosclock" RTT service also provides a sub-service of the global "ros"
 service called "ros.clock" which provides the following operations:
 
- * `ros::Time ros.clock.rtt_now(void)` Get a ROS time structure from the RTT clock source.
- * `ros::Time ros.clock.ros_now(void)` Get a ROS time structure from the ROS clock.
- * `ros::Time ros.clock.host_rt_now(void)` Get a ROS time structure from the NTP-adjusted realtime clock (`CLOCK_HOST_REALTIME`).
- * `RTT::Seconds ros.clock.host_rt_offset_from_rtt(void)` Get the differences from the RTT clock source to the NTP-adjusted realtime clock.
+ * `ros::Time ros.clock.host_now(void)` Get a ROS time structure from the NTP-adjusted realtime clock or the sim clock.
+ * `ros::Time ros.clock.host_wall_now(void)` Get a ROS time structure from the NTP-adjusted realtime clock or the wall clock.
+ * `ros::Time ros.clock.rtt_now(void)` Get a ROS time structure from the RTT clock or the sim clock.
+ * `ros::Time ros.clock.rtt_wall_now(void)` Get a ROS time structure from the RTT wall clock.
+ * `RTT::Seconds ros.clock.host_offset_from_rtt(void)` Get the differences from the RTT wall clock source to the NTP-adjusted realtime clock source.
 
 #### C++ API
 
 The calls are also available via the `rtt_rosclock/rtt_rosclock.h` header:
 
+ * `ros::Time rtt_rosclock::host_now(void)`
+ * `ros::Time rtt_rosclock::host_wall_now(void)`
  * `ros::Time rtt_rosclock::rtt_now(void)`
- * `ros::Time rtt_rosclock::ros_now(void)`
- * `ros::Time rtt_rosclock::host_rt_now(void)`
- * `RTT::Seconds rtt_rosclock::host_rt_offset_from_rtt(void)`
+ * `ros::Time rtt_rosclock::rtt_wall_now(void)`
+ * `RTT::Seconds rtt_rosclock::host_offset_from_rtt(void)`
 
 ### Simulation Clock Activity
 
