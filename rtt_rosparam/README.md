@@ -52,7 +52,8 @@ policy (see below).
 
 ##### Operations for getting single properties
 
-* **get(name,policy)** Attempt to get the property named **name** (or populates the properties of a named RTT sub-service)
+* **getParam(ros_name, rtt_name)** Get the ROS param **ros_name** and store it in the RTT property **rtt_name**. Use leaders like `~` and `/` for private and absolute resolution.
+* **get(name ,policy)** Attempt to get the property named **name** (or populates the properties of a named RTT sub-service)
   from the ROS parameter namespace specified by **policy**.
 * **getRelative(name)**
 * **getAbsolute(name)**
@@ -61,7 +62,8 @@ policy (see below).
 
 ##### Operations for setting single properties
 
-* **set(name,policy)** Attempt to set the property named **name** (or stores the properties of a named RTT sub-service)
+* **setParam(ros_name, rtt_name)** Set the ROS param **ros_name** from the value in the RTT property **rtt_name**. Use leaders like `~` and `/` for private and absolute resolution.
+* **set(name, policy)** Attempt to set the property named **name** (or stores the properties of a named RTT sub-service)
   in the ROS parameter namespace specified by **policy**.
 * **setRelative(name)**
 * **setAbsolute(name)**
