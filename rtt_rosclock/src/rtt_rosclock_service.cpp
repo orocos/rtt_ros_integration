@@ -4,8 +4,14 @@
 #include <rtt_rosclock/rtt_rosclock.h>
 #include <rtt_rosclock/rtt_rosclock_sim_clock_thread.h>
 
+#include <rtt/os/StartStopManager.hpp>
+
 namespace {
   boost::shared_ptr<rtt_rosclock::SimClockThread> sim_clock_thread;
+}
+
+void unloadROSClockService() {
+  sim_clock_thread.reset();
 }
 
 void loadROSClockService(){
@@ -15,6 +21,7 @@ void loadROSClockService(){
 
   // Create sim time thread
   sim_clock_thread = rtt_rosclock::SimClockThread::Instance();
+  RTT::os::StartStopManager::Instance()->stopFunction(&unloadROSClockService);
 
   // Getting current time 
   rosclock->addOperation("rtt_now", &rtt_rosclock::rtt_now).doc(

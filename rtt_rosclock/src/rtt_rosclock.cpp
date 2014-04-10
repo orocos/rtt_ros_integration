@@ -6,10 +6,6 @@
 #include <rtt_rosclock/rtt_rosclock_sim_clock_activity.h>
 #include <rtt_rosclock/rtt_rosclock_sim_clock_thread.h>
 
-namespace rtt_rosclock {
-  boost::shared_ptr<rtt_rosclock::SimClockThread> sim_clock_thread;
-}
-
 const ros::Time rtt_rosclock::rtt_now() 
 {
   //return ros::Time(((double)RTT::os::TimeService::ticks2nsecs(RTT::os::TimeService::Instance()->getTicks()))*1E-9);
@@ -52,37 +48,31 @@ const RTT::Seconds rtt_rosclock::host_rt_offset_from_rtt()
 
 void rtt_rosclock::use_ros_clock_topic()
 {
-  sim_clock_thread = SimClockThread::Instance();
   SimClockThread::Instance()->useROSClockTopic();
 }
 
 void rtt_rosclock::use_manual_clock()
 {
-  sim_clock_thread = SimClockThread::Instance();
   SimClockThread::Instance()->useManualClock();
 }
 
 const bool rtt_rosclock::set_sim_clock_activity(RTT::TaskContext *t)
 {
-  sim_clock_thread = SimClockThread::Instance();
   if (!t) return false;
   return t->setActivity(new SimClockActivity(t->getPeriod()));
 }
 
 const bool rtt_rosclock::enable_sim()
 {
-  sim_clock_thread = SimClockThread::Instance();
   return SimClockThread::Instance()->start();
 }
 
 const bool rtt_rosclock::disable_sim() 
 {
-  sim_clock_thread = SimClockThread::Instance();
   return SimClockThread::Instance()->stop();
 }
 
 void rtt_rosclock::update_sim_clock(const ros::Time new_time)
 {
-  sim_clock_thread = SimClockThread::Instance();
   SimClockThread::Instance()->updateClock(new_time);
 }
