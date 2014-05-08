@@ -147,7 +147,7 @@ Generally, you can create a catkin package simply with the `create_rtt_msgs`
 script by running:
 
 ```shell
-rosrun rtt_roscomm create_rtt_msgs my_msgs
+rosrun rtt_roscomm create_rtt_pkg my_msgs
 ```
 
 All this does is create a package with the following CMakeLists.txt and
