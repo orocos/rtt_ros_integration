@@ -24,16 +24,18 @@ void loadROSClockService(){
   RTT::os::StartStopManager::Instance()->stopFunction(&unloadROSClockService);
 
   // Getting current time 
+  rosclock->addOperation("host_now", &rtt_rosclock::host_now).doc(
+      "Get a ros::Time structure based on the NTP-corrected RT time or the ROS simulation time.");
+  rosclock->addOperation("host_wall_now", &rtt_rosclock::host_now).doc(
+      "Get a ros::Time structure based on the NTP-corrected RT time or the ROS wall time.");
   rosclock->addOperation("rtt_now", &rtt_rosclock::rtt_now).doc(
       "Get a ros::Time structure based on the RTT time source.");
-  rosclock->addOperation("ros_now", &rtt_rosclock::ros_now).doc(
-      "Get a ros::Time structure based on the ROS time.");
-  rosclock->addOperation("host_rt_now", &rtt_rosclock::host_rt_now).doc(
-      "Get a ros::Time structure based on the NTP-corrected RT time. This is equivalent to the CLOCK_HOST_REALTIME clock source.");
+  rosclock->addOperation("rtt_wall_now", &rtt_rosclock::rtt_wall_now).doc(
+      "Get a ros::Time structure based on the RTT wall clock time.");
 
   // Getting time offset
-  rosclock->addOperation("host_rt_offset_from_rtt", &rtt_rosclock::host_rt_offset_from_rtt).doc(
-      "Get the difference between the Orocos clock and the ROS clock in seconds (host_time - rtt_time).");
+  rosclock->addOperation("host_offset_from_rtt", &rtt_rosclock::host_offset_from_rtt).doc(
+      "Get the difference between the Orocos wall clock and the NTP-corrected wall clock in seconds (host_wall - rtt_wall).");
 
   // Setting the source for the simulation clock
   rosclock->addOperation("useROSClockTopic", &rtt_rosclock::use_ros_clock_topic).doc(

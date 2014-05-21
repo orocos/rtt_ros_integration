@@ -51,7 +51,7 @@ public:
     }
 
     // Iterate through the tokens except for the last one (the operation name)
-    RTT::ServiceRequester::shared_ptr required = this->getOwner()->requires();
+    boost::shared_ptr<RTT::ServiceRequester> required = this->getOwner()->requires();
     for(std::vector<std::string>::iterator it = rtt_uri_tokens.begin();
         it+1 != rtt_uri_tokens.end();
         ++it)

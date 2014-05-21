@@ -20,6 +20,10 @@ namespace rtt_tf
     RTT::InputPort<tf::tfMessage> port_tf_in;
     RTT::OutputPort<tf::tfMessage> port_tf_out;
 
+    bool canTransform(
+        const std::string& parent,
+        const std::string& child);
+
     geometry_msgs::TransformStamped lookupTransform(
         const std::string& parent,
         const std::string& child);

@@ -7,17 +7,47 @@
 
 namespace rtt_rosclock {
 
-  //! Get the current time according to RTT
+  /** \brief Get the current time according to CLOCK_HOST_REALTIME or the
+   * simulation time.
+   *
+   * This is the time source that should always be used with ROS header
+   * timestamps because it is the time that you want to use to broadcast ROS
+   * messages to other machines or processes. 
+   *
+   * When compiled against Xenomai and not running in simulation mode,
+   * this function will return the NTP-synchronized clock time via the
+   * CLOCK_HOST_REALTIME clock source. Note that this is only supported under
+   * Xenomai 2.6 and above.
+   *
+   * When not compiled against Xenomai and not running in simulation mode, it
+   * is a pass-through to ros::Time::now().
+   *
+   * When running in simulation mode, this will always use the simulation
+   * clock, which is based off of the ROS /clock topic. It is a pass-through to
+   * rtt_now().
+   */
+  const ros::Time host_now();
+
+  /** \brief Get the current time according to CLOCK_HOST_REALTIME or the
+   * wall time.
+   */
+  const ros::Time host_wall_now();
+
+  /** \brief Get the current time according to RTT
+   *
+   * If the simulation clock is enabled, this will return the simulated time.
+   */
   const ros::Time rtt_now();
+  
+  /** \brief Get the current wall time according to RTT
+   *
+   * Even if the simualtion clock is enabled, this will still return the wall
+   * clock time.
+   */
+  const ros::Time rtt_wall_now();
 
-  //! Get the current time according to ROS
-  const ros::Time ros_now();
-
-  //! Get the current time according to CLOCK_HOST_REALTIME
-  const ros::Time host_rt_now();
-
-  //! Get the difference in seconds between RTT and CLOCK_HOST_REALTIME
-  const RTT::Seconds host_rt_offset_from_rtt();
+  //! Get the difference in seconds between rtt_wall_now() and host_wall_now()
+  const RTT::Seconds host_offset_from_rtt();
 
   //! Set a TaskContext to use a periodic simulation clock activity
   const bool set_sim_clock_activity(RTT::TaskContext *t);
