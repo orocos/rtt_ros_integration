@@ -117,7 +117,7 @@ struct dynamic_reconfigure_traits<AutoConfig> {
     static void fromMessage(AutoConfig &config, dynamic_reconfigure::Config &message, const ServerType *server) { config.__fromMessage__(message, config); }
     static void clamp(AutoConfig &config, const ServerType *server) { config.__clamp__(server); }
 
-    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(AutoConfig &config, const ServerType *server) {
+    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(AutoConfig &config, const ServerType *) {
         return RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr(new RTT::internal::ReferenceDataSource<RTT::PropertyBag>(config));
     }
 };

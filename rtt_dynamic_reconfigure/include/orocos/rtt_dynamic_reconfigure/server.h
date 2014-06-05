@@ -55,8 +55,8 @@ template <class ConfigType> class Server;
 
 template <class ConfigType>
 struct Updater {
-    static bool propertiesFromConfig(ConfigType &config, uint32_t level, RTT::PropertyBag &) { return false; }
-    static bool configFromProperties(ConfigType &config, const RTT::PropertyBag &) { return false; }
+    virtual bool propertiesFromConfig(ConfigType &config, uint32_t level, RTT::PropertyBag &) { return false; }
+    virtual bool configFromProperties(ConfigType &config, const RTT::PropertyBag &) { return false; }
 };
 
 template <class ConfigType>
@@ -75,19 +75,25 @@ struct dynamic_reconfigure_traits {
     static void fromMessage(ConfigType &config, dynamic_reconfigure::Config &message, const ServerType *) { config.__fromMessage__(message); }
     static void clamp(ConfigType &config, const ServerType *) { config.__clamp__(); }
 
-    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(ConfigType &config, const ServerType *) {
+    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(ConfigType &config, const ServerType *server) {
         RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr ds(new RTT::internal::ValueDataSource<RTT::PropertyBag>());
-        if (!Updater<ConfigType>::propertiesFromConfig(config, ~0, ds->set()))
+        if (!server->updater()->propertiesFromConfig(config, ~0, ds->set()))
             ds.reset();
         return ds;
     }
 };
 
+namespace {
+  struct null_deleter {
+      void operator()(const void *) const {}
+  };
+}
+
 template <class ConfigType>
 class Server : public RTT::Service
 {
 private:
-    typedef Updater<ConfigType> updater;
+    typedef Updater<ConfigType> UpdaterType;
     typedef dynamic_reconfigure_traits<ConfigType> traits;
     typedef boost::shared_ptr< Server<ConfigType> > shared_ptr;
 
@@ -101,6 +107,8 @@ private:
     ConfigType min_;
     ConfigType max_;
     ConfigType default_;
+
+    mutable boost::shared_ptr<UpdaterType> updater_;
 
 public:
     Server(const std::string &name, RTT::TaskContext *owner)
@@ -212,7 +220,7 @@ public:
     bool updated()
     {
         ConfigType new_config = config_;
-        if (!updater::configFromProperties(new_config, *(getOwner()->properties()))) return false;
+        if (!updater()->configFromProperties(new_config, *(getOwner()->properties()))) return false;
         updateConfig(new_config);
         return true;
     }
@@ -243,18 +251,29 @@ public:
         // Get initial values from current property settings
         config_ = ConfigType();
         traits::getDefault(config_, this);
-        updater::configFromProperties(config_, *(getOwner()->properties()));
+        updater()->configFromProperties(config_, *(getOwner()->properties()));
         if (node_handle_)
             config_.__fromServer__(*node_handle_);
         traits::clamp(config_, this);
 
         // At startup we need to load the configuration with all level bits set. (Everything has changed.)
         RTT::PropertyBag init_config;
-        updater::propertiesFromConfig(config_, ~0, init_config);
+        updater()->propertiesFromConfig(config_, ~0, init_config);
         RTT::updateProperties(*(getOwner()->properties()), init_config);
 
         updateConfigInternal(config_);
-   }
+    }
+
+    UpdaterType *updater() const
+    {
+        if (!updater_) updater_.reset(new UpdaterType());
+        return updater_.get();
+    }
+
+    void setUpdater(UpdaterType *updater)
+    {
+        updater_.reset(updater, null_deleter());
+    }
 
 private:
     void construct()
@@ -270,6 +289,10 @@ private:
         if (traits::canRefresh)
             this->addOperation("refresh", &Server<ConfigType>::refresh, this)
                 .doc("Rediscover the owner's properties. Call this operation after having added properties.");
+
+        // check if owner implements the Updater interface
+        UpdaterType *updater = dynamic_cast<UpdaterType *>(getOwner());
+        if (updater) setUpdater(updater);
 
         // refresh once
         refresh();
@@ -290,7 +313,7 @@ private:
         traits::clamp(new_config, this);
         uint32_t level = config_.__level__(new_config);
 
-        if (!updater::propertiesFromConfig(new_config, level, *(getOwner()->properties()))) return false;
+        if (!updater()->propertiesFromConfig(new_config, level, *(getOwner()->properties()))) return false;
 
         updateConfigInternal(new_config);
         new_config.__toMessage__(rsp.config);
@@ -311,8 +334,8 @@ private:
     }
 };
 
-template <typename T>
-bool setProperty(const std::string &name, RTT::PropertyBag &bag, T &value)
+template <typename T, typename ValueType>
+bool setProperty(const std::string &name, RTT::PropertyBag &bag, ValueType &value)
 {
     if (bag.getProperty(name)) {
         RTT::Property<T> *prop = bag.getPropertyType<T>(name);
@@ -322,13 +345,16 @@ bool setProperty(const std::string &name, RTT::PropertyBag &bag, T &value)
             prop->set() = value;
         }
     } else {
-        /* bag.ownProperty(new RTT::Property<TYPE>(name, std::string(), value)); */
-        bag.addProperty(name, value);
+        if (boost::is_same<T,ValueType>::value) {
+            bag.addProperty(name, value);
+        } else {
+            bag.ownProperty(new RTT::Property<T>(name, std::string(), value));
+        }
     }
 }
 
-template <typename T>
-bool getProperty(const std::string &name, const RTT::PropertyBag &bag, T &value)
+template <typename T, typename ValueType>
+bool getProperty(const std::string &name, const RTT::PropertyBag &bag, ValueType &value)
 {
     RTT::Property<T> *prop = bag.getPropertyType<T>(name);
     if (!prop) {
