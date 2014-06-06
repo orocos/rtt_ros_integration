@@ -15,19 +15,19 @@ namespace rtt_dynamic_reconfigure {
 template <>
 struct Updater<TestConfig> {
   static bool propertiesFromConfig(TestConfig &config, uint32_t level, RTT::PropertyBag &bag) {
-    setProperty("int_param", bag, config.int_param);
-    setProperty("double_param", bag, config.double_param);
-    setProperty("str_param", bag, config.str_param);
-    setProperty("bool_param", bag, config.bool_param);
-    setProperty("non_existent", bag, config.non_existent);
+    setProperty<int>("int_param", bag, config.int_param);
+    setProperty<double>("double_param", bag, config.double_param);
+    setProperty<std::string>("str_param", bag, config.str_param);
+    setProperty<bool>("bool_param", bag, config.bool_param);
+    setProperty<double>("non_existent", bag, config.non_existent);
     return true;
   }
   static bool configFromProperties(TestConfig &config, const RTT::PropertyBag &bag) {
-    getProperty("int_param", bag, config.int_param);
-    getProperty("double_param", bag, config.double_param);
-    getProperty("str_param", bag, config.str_param);
-    getProperty("bool_param", bag, config.bool_param);
-    getProperty("non_existent", bag, config.non_existent);
+    getProperty<int>("int_param", bag, config.int_param);
+    getProperty<double>("double_param", bag, config.double_param);
+    getProperty<std::string>("str_param", bag, config.str_param);
+    getProperty<bool>("bool_param", bag, config.bool_param);
+    getProperty<double>("non_existent", bag, config.non_existent);
     return true;
   }
 };
