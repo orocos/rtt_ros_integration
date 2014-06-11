@@ -53,6 +53,11 @@ namespace rtt_dynamic_reconfigure {
 
 template <class ConfigType> class Server;
 
+/**
+ * This class converts between a dynamic_reconfigure Config class and an RTT::PropertyBag.
+ * The user should specialize this class for custom config types or inherit from it and reimplement
+ * the propertiesFromConfig() and configFromProperties() member functions in a child class.
+ */
 template <class ConfigType>
 struct Updater {
     virtual bool propertiesFromConfig(ConfigType &config, uint32_t level, RTT::PropertyBag &) { return false; }
@@ -63,18 +68,82 @@ template <class ConfigType>
 struct dynamic_reconfigure_traits {
     typedef Server<ConfigType> ServerType;
 
-    static void getMin(ConfigType &config, const ServerType *)           { config = ConfigType::__getMin__(); }
-    static void getMax(ConfigType &config, const ServerType *)           { config = ConfigType::__getMax__(); }
-    static void getDefault(ConfigType &config, const ServerType *)       { config = ConfigType::__getDefault__(); }
+    /**
+     * Get the minimum values of config ConfigType.
+     *
+     * \param config reference to the config instance to be filled with the minimum values
+     * \param server pointer to the rtt_dynamic_reconfigure server instance (only used for AutoConfig)
+     */
+    static void getMin(ConfigType &min, const ServerType *) { min = ConfigType::__getMin__(); }
+
+    /**
+     * Get the maximum values of config ConfigType.
+     *
+     * \param config reference to the config instance to be filled with the maximum values
+     * \param server pointer to the rtt_dynamic_reconfigure server instance (only used for AutoConfig)
+     */
+    static void getMax(ConfigType &max, const ServerType *) { max = ConfigType::__getMax__(); }
+
+    /**
+     * Get the default values of config ConfigType.
+     *
+     * \param config reference to the config instance to be filled with the default values
+     * \param server pointer to the rtt_dynamic_reconfigure server instance (only used for AutoConfig)
+     */
+    static void getDefault(ConfigType &dflt, const ServerType *) { dflt = ConfigType::__getDefault__(); }
+
+    /**
+     * Get the ConfigDescription of config ConfigType.
+     *
+     * \param server pointer to the rtt_dynamic_reconfigure server instance (only used for AutoConfig)
+     * \return a shared_ptr to the dynamic_reconfigure::ConfigDescription for ConfigType
+     */
     static dynamic_reconfigure::ConfigDescriptionPtr getDescriptionMessage(const ServerType *) { return dynamic_reconfigure::ConfigDescriptionPtr(new dynamic_reconfigure::ConfigDescription(ConfigType::__getDescriptionMessage__())); }
 
+    /**
+     * If true, the description of ConfigType is dynamic and can be changed during run-time (e.g. by adding/removing properties).
+     */
     static const bool canRefresh = false;
+
+    /**
+     * Refresh the ConfigDescription from the properties of the owning TaskContext (no-op unless for ConfigType AutoConfig)
+     *
+     * \param server pointer to the rtt_dynamic_reconfigure server instance
+     */
     static void refreshDescription(const ServerType *) {}
 
+    /**
+     * Convert an instance of ConfigType to a dynamic_reconfigure::Config message
+     *
+     * \param config referencte to the ConfigType instance to be read
+     * \param message reference to the Config message to be filled
+     * \param server pointer to the rtt_dynamic_reconfigure server instance (only used for AutoConfig)
+     */
     static void toMessage(ConfigType &config, dynamic_reconfigure::Config &message, const ServerType *) { config.__toMessage__(message); }
+
+    /**
+     * Convert a dynamic_reconfigure::Config message to an instance of ConfigType
+     *
+     * \param config referencte to the ConfigType instance to be filled
+     * \param message reference to the Config message to be read
+     * \param server pointer to the rtt_dynamic_reconfigure server instance (only used for AutoConfig)
+     */
     static void fromMessage(ConfigType &config, dynamic_reconfigure::Config &message, const ServerType *) { config.__fromMessage__(message); }
+
+    /**
+     * Clamp the values in the ConfigType instance to the limits given in the config description/properties
+     *
+     * \param config referencte to the ConfigType instance to be clamped
+     * \param server pointer to the rtt_dynamic_reconfigure server instance (only used for AutoConfig)
+     */
     static void clamp(ConfigType &config, const ServerType *) { config.__clamp__(); }
 
+    /**
+     * Create a new RTT::internal::ValueDataSource<RTT::PropertyBag> filled with properties from a ConfigType instance.
+     *
+     * \param config referencte to the ConfigType instance to be read
+     * \param server pointer to the rtt_dynamic_reconfigure server instance whose updater is going to be used
+     */
     static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(ConfigType &config, const ServerType *server) {
         RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr ds(new RTT::internal::ValueDataSource<RTT::PropertyBag>());
         if (!server->updater()->propertiesFromConfig(config, ~0, ds->set()))
@@ -89,6 +158,10 @@ namespace {
   };
 }
 
+/**
+ * The Server<ConfigType> class implements a dynamic_reconfigure server as an RTT service.
+ * It provides a similar API than the pure cpp dynamic_reconfigure server implemented in the <a href="http://wiki.ros.org/dynamic_reconfigure">dynamic_reconfigure</a> package.
+ */
 template <class ConfigType>
 class Server : public RTT::Service
 {
@@ -109,8 +182,15 @@ private:
     ConfigType default_;
 
     mutable boost::shared_ptr<UpdaterType> updater_;
+    bool initialized_;
 
 public:
+    /**
+     * Construct a named rtt_dynamic_reconfigure server.
+     *
+     * \param name name of the service instance
+     * \param owner pointer to the TaskContext instance owning this service/to be configured
+     */
     Server(const std::string &name, RTT::TaskContext *owner)
         : RTT::Service(name, owner)
         , node_handle_(0)
@@ -118,6 +198,11 @@ public:
         construct();
     }
 
+    /**
+     * Construct an rtt_dynamic_reconfigure server named "reconfigure".
+     *
+     * \param owner pointer to the TaskContext instance owning this service/to be configured
+     */
     Server(RTT::TaskContext *owner)
         : RTT::Service("reconfigure", owner)
         , node_handle_(0)
@@ -125,54 +210,134 @@ public:
         construct();
     }
 
+    /**
+     * Destruct the rtt_dynamic_reconfigure server.
+     * This unadvertises the dynamic_reconfigure topics and services.
+     */
     virtual ~Server() {
         shutdown();
     }
 
+    /**
+     * Update the config from an instance of ConfigType
+     *
+     * \param config the ConfigType instance
+     */
     void updateConfig(const ConfigType &config)
     {
         updateConfigInternal(config);
     }
 
-    void getConfigMax(ConfigType &config) const
+    /**
+     * Get the maximum values of all configuration parameters
+     *
+     * \param config the ConfigType instance to be filled
+     */
+    void getConfigMax(ConfigType &max) const
     {
-        config = max_;
+        max = max_;
     }
+
+    /**
+     * Get the maximum values of all configuration parameters
+     *
+     * \return a const reference to the ConfigType instance holding the maximum values
+     */
     const ConfigType &getConfigMax() const { return max_; }
+
+    /**
+     * Get the maximum values of all configuration parameters
+     *
+     * \return a reference to the ConfigType instance holding the maximum values
+     */
     ConfigType &getConfigMax() { return max_; }
 
-    void getConfigMin(ConfigType &config) const
+    /**
+     * Get the minimum values of all configuration parameters
+     *
+     * \param config the ConfigType instance to be filled
+     */
+    void getConfigMin(ConfigType &min) const
     {
-        config = min_;
+        min = min_;
     }
+
+    /**
+     * Get the minimum values of all configuration parameters
+     *
+     * \return a const reference to the ConfigType instance holding the minimum values
+     */
     const ConfigType &getConfigMin() const { return min_; }
+
+    /**
+     * Get the minimum values of all configuration parameters
+     *
+     * \return a reference to the ConfigType instance holding the minimum values
+     */
     ConfigType &getConfigMin() { return min_; }
 
+    /**
+     * Get the default values of all configuration parameters
+     *
+     * \param config the ConfigType instance to be filled
+     */
     void getConfigDefault(ConfigType &config) const
     {
         config = default_;
     }
+
+    /**
+     * Get the default values of all configuration parameters
+     *
+     * \return a const reference to the ConfigType instance holding the default values
+     */
     const ConfigType &getConfigDefault() const { return default_; }
+
+    /**
+     * Get the default values of all configuration parameters
+     *
+     * \return a reference to the ConfigType instance holding the default values
+     */
     ConfigType &getConfigDefault() { return default_; }
 
+    /**
+     * Set the maximum values of all configuration parameters and republish the description
+     *
+     * \return a const reference to the ConfigType instance holding the maximum values
+     */
     void setConfigMax(const ConfigType &config)
     {
         max_ = config;
         PublishDescription();
     }
 
+    /**
+     * Set the minimum values of all configuration parameters and republish the description
+     *
+     * \return a const reference to the ConfigType instance holding the minimum values
+     */
     void setConfigMin(const ConfigType &config)
     {
         min_ = config;
         PublishDescription();
     }
 
+    /**
+     * Set the default values of all configuration parameters and republish the description
+     *
+     * \return a const reference to the ConfigType instance holding the default values
+     */
     void setConfigDefault(const ConfigType &config)
     {
         default_ = config;
         PublishDescription();
     }
 
+    /**
+     * Construct a new instance of the description message including the current values of the minimum, maximum and default values.
+     *
+     * \return a dynamic_reconfigure::ConfigDescriptionPtr instance holding the decription message
+     */
     dynamic_reconfigure::ConfigDescriptionPtr getDescriptionMessage() {
         dynamic_reconfigure::ConfigDescriptionPtr description_message = traits::getDescriptionMessage(this);
 
@@ -184,8 +349,17 @@ public:
         return description_message;
     }
 
+    /**
+     * Advertise the dynamic_reconfigure topics and services at the master.
+     * Needs to be called explicitly after construction, e.g from the owner's configureHook().
+     *
+     * \param ns The ROS namespace this dynamic_reconfigure server should be advertised in. If empty, defaults to the name of the owning TaskContext.
+     */
     void advertise(std::string ns = std::string())
     {
+        // shutdown publishers/service servers from previous runs
+        shutdown();
+
         // set default namespace
         if (ns.empty()) {
             if (getOwner()->getName() == "Deployer")
@@ -195,7 +369,6 @@ public:
         }
 
         // create NodeHandle
-        if (node_handle_) delete node_handle_;
         node_handle_ = new ros::NodeHandle(ns);
 
         // advertise service server and publishers
@@ -208,6 +381,10 @@ public:
         updateConfigInternal(config_);
     }
 
+    /**
+     * Unadvertise the dynamic_reconfigure topics and services at the master.
+     * This is the contrary of the advertise() member function.
+     */
     void shutdown()
     {
         if (node_handle_) {
@@ -217,6 +394,11 @@ public:
         }
     }
 
+    /**
+     * Inform the server that some properties have been updated.
+     *
+     * This will republish the parameter values and updates the UI.
+     */
     bool updated()
     {
         ConfigType new_config = config_;
@@ -225,6 +407,10 @@ public:
         return true;
     }
 
+    /**
+     * Refresh the config description, minimum and maximum values, get and publish the current config from the default values and the TaskContext's properties.
+     * Call this function whenever properties have been added or removed or the minimum, maximum or default values have been changed.
+     */
     void refresh()
     {
         RTT::os::MutexLock lock(mutex_);
@@ -256,20 +442,31 @@ public:
             config_.__fromServer__(*node_handle_);
         traits::clamp(config_, this);
 
-        // At startup we need to load the configuration with all level bits set. (Everything has changed.)
-        RTT::PropertyBag init_config;
-        updater()->propertiesFromConfig(config_, ~0, init_config);
-        RTT::updateProperties(*(getOwner()->properties()), init_config);
+        // At startup we need to load the configuration with all level bits set (everything has changed).
+//        RTT::PropertyBag init_config;
+//        updater()->propertiesFromConfig(config_, ~0, init_config);
+//        RTT::updateProperties(*(getOwner()->properties()), init_config);
+        updater()->propertiesFromConfig(config_, ~0, *(getOwner()->properties()));
 
         updateConfigInternal(config_);
     }
 
+    /**
+     * Retrieve/construct the Updater instance of this rtt_dynamic_reconfigure server.
+     *
+     * \return a pointer to an instance of Updater<ConfigType>
+     */
     UpdaterType *updater() const
     {
         if (!updater_) updater_.reset(new UpdaterType());
         return updater_.get();
     }
 
+    /**
+     * Sets the Updater instance to use to update config from properties or vice-versa.
+     *
+     * \param updater a pointer to an instance of Updater<ConfigType>
+     */
     void setUpdater(UpdaterType *updater)
     {
         updater_.reset(updater, null_deleter());
@@ -279,16 +476,15 @@ private:
     void construct()
     {
         this->addOperation("advertise", &Server<ConfigType>::advertise, this)
-                .doc("Advertise this dynamic_reconfigure server at the master.")
-                .arg("namespace", "The namespace this server should be advertised in. Defaults to ~component.");
+            .doc("Advertise this dynamic_reconfigure server at the master.")
+            .arg("namespace", "The namespace this server should be advertised in. Defaults to ~component.");
         this->addOperation("shutdown", &Server<ConfigType>::shutdown, this)
-                .doc("Shutdown this dynamic_reconfigure server.");
+            .doc("Shutdown this dynamic_reconfigure server.");
         this->addOperation("updated", &Server<ConfigType>::updated, this)
-                .doc("Notify the dynamic_reconfigure server that properties have been updated. This will update the GUI.");
+            .doc("Notify the dynamic_reconfigure server that properties have been updated. This will update the GUI.");
 
-        if (traits::canRefresh)
-            this->addOperation("refresh", &Server<ConfigType>::refresh, this)
-                .doc("Rediscover the owner's properties. Call this operation after having added properties.");
+        this->addOperation("refresh", &Server<ConfigType>::refresh, this)
+            .doc("Rediscover the owner's properties or update advertised min/max/default values. Call this operation after having added properties.");
 
         // check if owner implements the Updater interface
         UpdaterType *updater = dynamic_cast<UpdaterType *>(getOwner());
@@ -334,6 +530,16 @@ private:
     }
 };
 
+/**
+ * Sets a named property in a PropertyBag by its name.
+ * If the property does not exists, it is created as a reference to the given value if the type matches or as a copy if the type is different.
+ *
+ * Use this function in Updater<ConfigType>::propertiesFromConfig() to fill the PropertyBag from config values.
+ *
+ * \param name the name of the property
+ * \param bag the PropertyBag in which the property should be set/added
+ * \param value the value of the property
+ */
 template <typename T, typename ValueType>
 bool setProperty(const std::string &name, RTT::PropertyBag &bag, ValueType &value)
 {
@@ -353,6 +559,16 @@ bool setProperty(const std::string &name, RTT::PropertyBag &bag, ValueType &valu
     }
 }
 
+/**
+ * Gets a named property in a PropertyBag by its name.
+ * If the property does not exists, it is created as a reference to the given value if the type matches or as a copy if the type is different.
+ *
+ * Use this function in Updater<ConfigType>::configFromProperties() to fill the ConfigType struct with the values in the PropertyBag.
+ *
+ * \param name the name of the property
+ * \param bag the PropertyBag to be searched for the named property
+ * \param value the value of the property
+ */
 template <typename T, typename ValueType>
 bool getProperty(const std::string &name, const RTT::PropertyBag &bag, ValueType &value)
 {

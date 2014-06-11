@@ -40,6 +40,9 @@
 
 namespace rtt_dynamic_reconfigure {
 
+/**
+ * The AutoConfig class serves as a generic config type for rtt_dynamic_reconfigure::Server that dynamically creates the Config and ConfigDescription from the owner TaskContext's properties.
+ */
 class AutoConfig : public RTT::PropertyBag
 {
 public:

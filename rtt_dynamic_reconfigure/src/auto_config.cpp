@@ -48,7 +48,8 @@ namespace rtt_dynamic_reconfigure {
 using namespace dynamic_reconfigure;
 
 /**
- * @brief A special datasource that holds an instance of an AutoConfig description.
+ * A special datasource that holds an instance of an AutoConfig description.
+ *
  * The AutoConfigDataSource is used internally to store AutoConfig instances in a Property<RTT::PropertyBag>.
  */
 class AutoConfigDataSource
