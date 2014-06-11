@@ -551,7 +551,7 @@ private:
 
         RTT::PropertyBag bag;
         if (!updater()->propertiesFromConfig(new_config, level, bag)) return false;
-        if (!update_callback_(bag, level)) return false;
+        if (!update_callback_.ready() || !update_callback_(bag, level)) return false;
         if (notify_callback_.ready()) notify_callback_(level);
 
         updateConfigInternal(new_config);
