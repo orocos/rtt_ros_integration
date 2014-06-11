@@ -36,6 +36,9 @@ The packages in this repository provide:
 * [**rtt\_actionlib**](rtt_actionlib) RTT-Enabled
   [actionlib](http://ros.org/wiki/actionlib) action server for providing
   actions from ROS-integrated RTT components.
+* [**rtt\_dynamic_reconfigure**](rtt_dynamic_reconfigure) A service plugin
+  that implements a [dynamic_reconfigure](http://wiki.ros.org/dynamic_reconfigure) server to
+  update properties dynamically during runtime.
 * [**rtt\_ros\_msgs**](rtt_ros_msgs) ROS .msg and .srv types for use with these
   plugins.
 * [**rtt\_ros\_integration**](rtt_ros_integration) Catkin
@@ -323,14 +326,3 @@ respectively. See [rtt_roscomm](rtt_roscomm) for more information.
 The `rtt_actionlib` package provides a C++ API and an RTT service for
 implementing [actionlib](http://www.ros.org/wiki/actionlib) actions with Orocos
 RTT components. See [rtt_actionlib](rtt_actionlib) for more information.
-
-
-## Future Work
-
-The following packages are in the planning stages, please contact the
-maintainers if you're interested in using or contributing to them:
-
-* [**rtt\_dynamic_reconfigure**](rtt_dynamic_reconfigure) Plugin for running
-  a [dynamic\_reconfigure](http://ros.org/wiki/dynamic_reconfigure) server from
-  an RTT component.
-
