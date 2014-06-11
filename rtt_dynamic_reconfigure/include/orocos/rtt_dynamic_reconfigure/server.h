@@ -186,9 +186,9 @@ private:
     mutable boost::shared_ptr<UpdaterType> updater_;
     bool initialized_;
 
-    RTT::OperationCaller<bool(const RTT::PropertyBag &source)> update_callback_;
-    RTT::OperationCaller<void()> notify_callback_;
-    RTT::Operation<bool(const RTT::PropertyBag &source)> update_callback_default_impl_;
+    RTT::OperationCaller<bool(const RTT::PropertyBag &source, uint32_t level)> update_callback_;
+    RTT::OperationCaller<void(uint32_t level)> notify_callback_;
+    RTT::Operation<bool(const RTT::PropertyBag &source, uint32_t level)> update_callback_default_impl_;
 
 public:
     /**
@@ -453,8 +453,8 @@ public:
         // At startup we need to load the configuration with all level bits set (everything has changed).
         RTT::PropertyBag init_config;
         updater()->propertiesFromConfig(config_, ~0, init_config);
-        update_callback_(init_config);
-        if (notify_callback_.ready()) notify_callback_();
+        update_callback_(init_config, ~0);
+        if (notify_callback_.ready()) notify_callback_(~0);
 
         updateConfigInternal(config_);
     }
@@ -551,8 +551,8 @@ private:
 
         RTT::PropertyBag bag;
         if (!updater()->propertiesFromConfig(new_config, level, bag)) return false;
-        if (!update_callback_(bag)) return false;
-        if (notify_callback_.ready()) notify_callback_();
+        if (!update_callback_(bag, level)) return false;
+        if (notify_callback_.ready()) notify_callback_(level);
 
         updateConfigInternal(new_config);
         new_config.__toMessage__(rsp.config);
@@ -572,7 +572,7 @@ private:
             update_pub_.publish(msg);
     }
 
-    bool updatePropertiesDefaultImpl(const RTT::PropertyBag &source)
+    bool updatePropertiesDefaultImpl(const RTT::PropertyBag &source, uint32_t)
     {
         return RTT::updateProperties(*(getOwner()->properties()), source);
     }

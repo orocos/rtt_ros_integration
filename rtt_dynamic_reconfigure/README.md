@@ -113,11 +113,11 @@ my_component.reconfigure.advertise("~/my_component")
 
 Normally rtt_dynamic_reconfigure updates all properties of the TaskContext with the standard `RTT::updateProperties()` call
 running in the owner's thread. Properties cannot be updated while the `updateHook()` is executed. For the case
-you want more control over the property updates, you can add a `bool updateProperties(const RTT::PropertyBag &source)` operation with a custom implementation to the owner component. If this operation exists, it is used instead of the default implementation. The `source` bag is the bag filled in a previous `Updater<ConfigType>::propertiesFromConfig(...)` call.
+you want more control over the property updates, you can add a `bool updateProperties(const RTT::PropertyBag &source, uint32_t level)` operation with a custom implementation to the owner component. If this operation exists, it is used instead of the default implementation. The `source` bag is the bag filled in a previous `Updater<ConfigType>::propertiesFromConfig(...)` call.
 
 #### Adding a property update notification callback
 
-Sometimes it is required that the component is notified whenever properties have been updated by rtt_dynamic_reconfigure. If a `void notifyPropertiesUpdated()` operation exists, it is called after every parameter update from a ROS service call.
+Sometimes it is required that the component is notified whenever properties have been updated by rtt_dynamic_reconfigure. If a `void notifyPropertiesUpdated(uint32_t level)` operation exists, it is called after every parameter update from a ROS service call.
 
 ## Service API
 
