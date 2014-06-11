@@ -55,12 +55,16 @@ extern "C" {
       }
     }
 
+    // get number of spinners from parameter server, if available
+    int thread_count = 1;
+    ros::param::get("~spinner_threads", thread_count);
+
     // Create an asynchronous spinner to handle the default callback queue 
-    static ros::AsyncSpinner spinner(1); // Use 1 threads
+    static ros::AsyncSpinner spinner(thread_count); // Use thread_count threads
 
     // TODO: Check spinner.canStart() to suppress errors / warnings once it's incorporated into ROS
     spinner.start();
-    log(Info)<<"ROS node spinner started."<<endlog();
+    log(Info)<<"ROS node spinner started (" << thread_count << " " << (thread_count > 1 ? "threads" : "thread") << ")."<<endlog();
 
     return true;
   }
