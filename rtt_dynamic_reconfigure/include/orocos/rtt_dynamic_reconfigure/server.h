@@ -40,6 +40,8 @@
 #include <rtt/TaskContext.hpp>
 #include <rtt/os/Mutex.hpp>
 #include <rtt/Logger.hpp>
+#include <rtt/Operation.hpp>
+#include <rtt/OperationCaller.hpp>
 
 #include <rtt/internal/DataSources.hpp>
 
@@ -184,6 +186,10 @@ private:
     mutable boost::shared_ptr<UpdaterType> updater_;
     bool initialized_;
 
+    RTT::OperationCaller<bool(const RTT::PropertyBag &source)> update_callback_;
+    RTT::OperationCaller<void()> notify_callback_;
+    RTT::Operation<bool(const RTT::PropertyBag &source)> update_callback_default_impl_;
+
 public:
     /**
      * Construct a named rtt_dynamic_reconfigure server.
@@ -194,6 +200,7 @@ public:
     Server(const std::string &name, RTT::TaskContext *owner)
         : RTT::Service(name, owner)
         , node_handle_(0)
+        , update_callback_default_impl_("updateProperties", &Server<ConfigType>::updatePropertiesDefaultImpl, this, RTT::OwnThread)
     {
         construct();
     }
@@ -206,6 +213,7 @@ public:
     Server(RTT::TaskContext *owner)
         : RTT::Service("reconfigure", owner)
         , node_handle_(0)
+        , update_callback_default_impl_("updateProperties", &Server<ConfigType>::updatePropertiesDefaultImpl, this, RTT::OwnThread)
     {
         construct();
     }
@@ -443,10 +451,10 @@ public:
         traits::clamp(config_, this);
 
         // At startup we need to load the configuration with all level bits set (everything has changed).
-//        RTT::PropertyBag init_config;
-//        updater()->propertiesFromConfig(config_, ~0, init_config);
-//        RTT::updateProperties(*(getOwner()->properties()), init_config);
-        updater()->propertiesFromConfig(config_, ~0, *(getOwner()->properties()));
+        RTT::PropertyBag init_config;
+        updater()->propertiesFromConfig(config_, ~0, init_config);
+        update_callback_(init_config);
+        if (notify_callback_.ready()) notify_callback_();
 
         updateConfigInternal(config_);
     }
@@ -472,6 +480,26 @@ public:
         updater_.reset(updater, null_deleter());
     }
 
+    /**
+     * Sets the property update callback (defaults to RTT::updateProperties(*(getOwner()->properties()), ...))
+     *
+     * \param impl an Operation with the signature bool(const RTT::PropertyBag &)
+     */
+    void setUpdateCallback(RTT::OperationInterfacePart *impl)
+    {
+        update_callback_ = impl;
+    }
+
+    /**
+     * Sets the notification callback that notifies a TaskContext that its properties have been updated
+     *
+     * \param impl an Operation with the signature void()
+     */
+    void setNotificationCallback(RTT::OperationInterfacePart *impl)
+    {
+        notify_callback_ = impl;
+    }
+
 private:
     void construct()
     {
@@ -489,6 +517,18 @@ private:
         // check if owner implements the Updater interface
         UpdaterType *updater = dynamic_cast<UpdaterType *>(getOwner());
         if (updater) setUpdater(updater);
+
+        // check if owner provides the updateProperties operation
+        if (getOwner() && getOwner()->provides()->hasOperation("updateProperties")) {
+            update_callback_ = getOwner()->provides()->getOperation("updateProperties");
+        } else {
+            update_callback_ = update_callback_default_impl_.getOperationCaller();
+        }
+
+        // check if owner provides the notifyPropertiesUpdate operation
+        if (getOwner() && getOwner()->provides()->hasOperation("notifyPropertiesUpdate")) {
+            notify_callback_ = getOwner()->provides()->getOperation("notifyPropertiesUpdate");
+        }
 
         // refresh once
         refresh();
@@ -509,7 +549,10 @@ private:
         traits::clamp(new_config, this);
         uint32_t level = config_.__level__(new_config);
 
-        if (!updater()->propertiesFromConfig(new_config, level, *(getOwner()->properties()))) return false;
+        RTT::PropertyBag bag;
+        if (!updater()->propertiesFromConfig(new_config, level, bag)) return false;
+        if (!update_callback_(bag)) return false;
+        if (notify_callback_.ready()) notify_callback_();
 
         updateConfigInternal(new_config);
         new_config.__toMessage__(rsp.config);
@@ -527,6 +570,11 @@ private:
 
         if (update_pub_)
             update_pub_.publish(msg);
+    }
+
+    bool updatePropertiesDefaultImpl(const RTT::PropertyBag &source)
+    {
+        return RTT::updateProperties(*(getOwner()->properties()), source);
     }
 };
 
