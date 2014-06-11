@@ -520,14 +520,14 @@ private:
 
         // check if owner provides the updateProperties operation
         if (getOwner() && getOwner()->provides()->hasOperation("updateProperties")) {
-            update_callback_ = getOwner()->provides()->getOperation("updateProperties");
+            update_callback_ = getOwner()->provides()->getLocalOperation("updateProperties");
         } else {
             update_callback_ = update_callback_default_impl_.getOperationCaller();
         }
 
         // check if owner provides the notifyPropertiesUpdate operation
         if (getOwner() && getOwner()->provides()->hasOperation("notifyPropertiesUpdate")) {
-            notify_callback_ = getOwner()->provides()->getOperation("notifyPropertiesUpdate");
+            notify_callback_ = getOwner()->provides()->getLocalOperation("notifyPropertiesUpdate");
         }
 
         // refresh once
