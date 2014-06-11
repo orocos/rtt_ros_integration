@@ -10,7 +10,7 @@ network.
 
 ## Usage
 
-### With an automatically generated config
+#### With an automatically generated config
 
 The easiest way to use rtt_dynamic_reconfigure is to use the special `AutoConfig` config type. `AutoConfig` automatically
 generates a dynamic_reconfigure config description from the set of properties of the `TaskContext` it is loaded into. No
@@ -37,7 +37,7 @@ my_component.reconfigure.max.int_property = 100
 my_component.reconfigure.advertise("~/my_component")
 ```
 
-### Using a custom config file
+#### Using a custom config file
 
 The rtt_dynamic_reconfigure package comes with a templated `rtt_dynamic_reconfigure::Server<ConfigType>`
 class that implements the core functionality of a dynamic_reconfigure server. Usually the `ConfigType`
@@ -95,7 +95,7 @@ The `rtt_dynamic_reconfigure::setProperty<T>(...)` and `rtt_dynamic_reconfigure:
 
 Alternatively, the TaskContext in which the service is loaded can inherit and implement the `Updater<MyPackageConfig>` class directly. In this case you do not need to provide a specialized version of it.
 
-*Note:* The `Updater<ConfigType>::propertiesFromConfig()` implementation should create properties that are
+*Note:* The `Updater<ConfigType>::propertiesFromConfig(...)` implementation should create properties that are
 references to the respective fields in the `ConfigType` struct. This is the case if the properties
 are added with `bag->addProperty(const std::string &name, T &attr)` or with the `rtt_dynamic_reconfigure::setProperty<T>(...)`
 helper function.
@@ -108,6 +108,16 @@ ros.import("my_package");
 loadService("my_component", "my_package_reconfigure")
 my_component.reconfigure.advertise("~/my_component")
 ```
+
+#### Overriding the update operation
+
+Normally rtt_dynamic_reconfigure updates all properties of the TaskContext with the standard `RTT::updateProperties()` call
+running in the owner's thread. Properties cannot be updated while the `updateHook()` is executed. For the case
+you want more control over the property updates, you can add a `bool updateProperties(const RTT::PropertyBag &source)` operation with a custom implementation to the owner component. If this operation exists, it is used instead of the default implementation. The `source` bag is the bag filled in a previous `Updater<ConfigType>::propertiesFromConfig(...)` call.
+
+#### Adding a property update notification callback
+
+Sometimes it is required that the component is notified whenever properties have been updated by rtt_dynamic_reconfigure. If a `void notifyPropertiesUpdated()` operation exists, it is called after every parameter update from a ROS service call.
 
 ## Service API
 
