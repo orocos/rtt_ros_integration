@@ -134,6 +134,9 @@ namespace rtt_tf
           StampedTransform trans;
           transformStampedMsgToTF(msg_in.transforms[i], trans);
           try {
+#if ROS_VERSION_MINIMUM(1,11,0)
+            this->setTransform(trans);
+#else
             std::map<std::string, std::string>* msg_header_map =
               msg_in.__connection_header.get();
             std::string authority;
@@ -147,6 +150,7 @@ namespace rtt_tf
               authority = it->second;
             }
             this->setTransform(trans, authority);
+#endif
           } catch (TransformException& ex) {
             log(Error) << "Failure to set received transform from "
               << msg_in.transforms[i].child_frame_id << " to "
