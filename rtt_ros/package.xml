@@ -1,18 +1,21 @@
+<?xml version="1.0"?>
 <package>
   <name>rtt_ros</name>
   <version>2.7.0</version>
-
   <description>
     This package provides an RTT plugin to add a ROS node to the RTT process,
     as well as several wrapper scripts to enable roslaunching of orocos
     programs.
   </description>
-  <author>Ruben Smits</author>
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+
   <license>BSD</license>
 
-  <url>http://ros.org/wiki/rtt_ros</url>
+  <url type="website">http://ros.org/wiki/rtt_ros_integration</url>
+  <url type="bugtracker">https://github.com/orocos/rtt_ros_integration/issues</url>
   
+  <author>Ruben Smits</author>
+
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>rtt</build_depend>

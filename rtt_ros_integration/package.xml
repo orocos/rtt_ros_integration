@@ -1,8 +1,9 @@
+<?xml version="1.0"?>
 <package>
   <name>rtt_ros_integration</name>
   <version>2.7.0</version>
-  <description>This stack contains all software necessary to build systems using both Orocos and ROS infrastructures. It depends on the</description>
-  <maintainer email="ruben.smits@mech.kuleuven.be">Ruben Smits</maintainer>
+  <description>This stack contains all software necessary to build systems using both Orocos and ROS infrastructures</description>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
 
   <license>GPL</license>
   <license>BSD</license>
@@ -10,15 +11,22 @@
   <license>GPL + runtime exception</license>
 
   <url type="website">http://ros.org/wiki/rtt_ros_integration</url>
-  <!-- <url type="bugtracker"></url> -->
+  <url type="bugtracker">https://github.com/orocos/rtt_ros_integration/issues</url>
 
-  <author>Maintained by Ruben Smits - Steven Bellens</author>
+  <author>Ruben Smits</author>
+  <author>Steven Bellens</author>
+  <author>Jonathan Boren</author>
+  <author>Johannes Meyer</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>rtt_actionlib</run_depend>
+  <run_depend>rtt_dynamic_reconfigure</run_depend>
   <run_depend>rtt_ros</run_depend>
+  <run_depend>rtt_rosclock</run_depend>
   <run_depend>rtt_roscomm</run_depend>
+  <run_depend>rtt_rosdeployment</run_depend>
+  <run_depend>rtt_ros_msgs</run_depend>
   <run_depend>rtt_rosnode</run_depend>
   <run_depend>rtt_rospack</run_depend>
   <run_depend>rtt_rosparam</run_depend>

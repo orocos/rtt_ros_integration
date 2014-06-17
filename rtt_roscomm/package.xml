@@ -1,19 +1,21 @@
+<?xml version="1.0"?>
 <package>
   <name>rtt_roscomm</name>
   <version>2.7.0</version>
-
   <description>
     rtt_roscomm provides the necessary template files and cmake macros for
     automatic rtt typekit and transport generation from ROS msg files
   </description>
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+
   <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/rtt_ros_integration</url>
+  <url type="bugtracker">https://github.com/orocos/rtt_ros_integration/issues</url>
 
   <author>Ruben Smits</author>
   <author>Jonathan Bohren</author>
 
-  <url>http://ros.org/wiki/rtt_rostopic</url>
-  
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>rtt_ros</build_depend>

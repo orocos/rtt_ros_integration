@@ -1,14 +1,14 @@
+<?xml version="1.0"?>
 <package>
   <name>rtt_rosclock</name>
   <version>2.7.0</version>
-
-  <description>
-    This package provides an RTT plugin to access different time measurements on a realtime host.</description>
-  <author>Ruben Smits</author>
+  <description>This package provides an RTT plugin to access different time measurements on a realtime host.</description>
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+
   <license>BSD</license>
 
-  <url>http://ros.org/wiki/rtt_rosclock</url>
+  <url type="website">http://ros.org/wiki/rtt_ros_integration</url>
+  <url type="bugtracker">https://github.com/orocos/rtt_ros_integration/issues</url>
   
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -35,5 +35,4 @@
       <plugin_depend>rtt_rosnode</plugin_depend>
     </rtt_ros>
   </export>
-
 </package>

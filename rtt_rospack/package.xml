@@ -1,13 +1,14 @@
+<?xml version="1.0"?>
 <package>
   <name>rtt_rospack</name>
   <version>2.7.0</version>
   <description>rtt_rospack provides an RTT plugin to use rospack to find packages in your ROS_PACKAGE_PATH</description>
-  <maintainer email="ruben.smits@mech.kuleuven.be">Ruben Smits</maintainer>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
 
   <license>BSD</license>
 
-  <url type="website">http://ros.org/wiki/rtt_rospack</url>
-  <!-- <url type="bugtracker"></url> -->
+  <url type="website">http://ros.org/wiki/rtt_ros_integration</url>
+  <url type="bugtracker">https://github.com/orocos/rtt_ros_integration/issues</url>
 
   <author email="ruben.smits@mech.kuleuven.be">Ruben Smits</author>
 

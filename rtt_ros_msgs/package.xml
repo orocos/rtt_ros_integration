@@ -3,10 +3,12 @@
   <name>rtt_ros_msgs</name>
   <version>2.7.0</version>
   <description>This package provides .msg and .srv files for use with the rtt_ros_integration packages.</description>
-
-  <maintainer email="jbo@jhu.edu">Jonathan Bohren</maintainer>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
 
   <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/rtt_ros_integration</url>
+  <url type="bugtracker">https://github.com/orocos/rtt_ros_integration/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 
