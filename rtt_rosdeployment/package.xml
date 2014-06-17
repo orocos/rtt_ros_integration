@@ -2,7 +2,7 @@
 <package>
   <name>rtt_rosdeployment</name>
   <version>2.7.0</version>
-  <description>rtt_rosdeployment provides an RTT plugin to control an ocl deployment component over ROS service calls..</description>
+  <description>rtt_rosdeployment provides an RTT plugin to control an ocl deployment component over ROS service calls.</description>
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
 
   <license>BSD</license>
@@ -24,8 +24,8 @@
 
   <export>
     <rtt_ros>
-      <plugin_depend>rtt_rosnode</rtt_ros>
-      <plugin_depend>rtt_ros_msgs</rtt_ros>
+      <plugin_depend>rtt_rosnode</plugin_depend>
+      <plugin_depend>rtt_ros_msgs</plugin_depend>
     </rtt_ros>
   </export>
 </package>
