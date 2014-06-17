@@ -9,7 +9,7 @@ ROS parameter server.
 
 ## Changelog
 
-See the metapackage [rtt_ros_integration/CHANGELOG.rst](CHANGELOG.rst) for a
+See the metapackage [rtt_ros_integration/CHANGELOG.rst](rtt_ros_integration/CHANGELOG.rst) for a
 comprehensive changelog.
 
 ## Packages
