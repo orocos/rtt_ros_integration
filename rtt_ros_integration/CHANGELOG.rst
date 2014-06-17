@@ -69,7 +69,8 @@ See each package's individual CHANGELOG.rst for more details.
 * Added RTT interfaces for ROS Service Calls (serving and calling)
 * Added RTT interfaces for ROS Actionlib (action serving)
 * Re-wrote RTT rosparam service to handle parameter arrays more cleanly
-* 
+* Added ROS service interface to interact with the Orocos deployer (rtt_rosdeployment)
+* Added RTT interface to dynamic_reconfigure (rtt_dynamic_reconfigure)
 
 2.6.x
 =====
