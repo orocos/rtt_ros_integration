@@ -46,6 +46,8 @@
 #include <rtt/internal/GlobalService.hpp>
 #include <rtt/plugin/Plugin.hpp>
 
+#include <rtt/os/StartStopManager.hpp>
+
 #include <ros/time.h>
 #include <ros/node_handle.h>
 #include <ros/param.h>
@@ -55,23 +57,32 @@
 
 using namespace rtt_rosclock;
 
-boost::weak_ptr<SimClockThread> SimClockThread::singleton;
+boost::shared_ptr<SimClockThread> SimClockThread::singleton;
 
 boost::shared_ptr<SimClockThread> SimClockThread::GetInstance()
 {
-  return singleton.lock();
+  return singleton;
 }
 
 boost::shared_ptr<SimClockThread> SimClockThread::Instance()
 {
   // Create a new singleton, if necessary
   boost::shared_ptr<SimClockThread> shared = GetInstance();
-  if(singleton.expired()) {
+  if(!shared) {
     shared.reset(new SimClockThread());
     singleton = shared;
   }
 
   return shared;
+}
+
+void SimClockThread::Release()
+{
+  singleton.reset();
+}
+
+namespace {
+  RTT::os::CleanupFunction cleanup(&SimClockThread::Release);
 }
 
 SimClockThread::SimClockThread() 

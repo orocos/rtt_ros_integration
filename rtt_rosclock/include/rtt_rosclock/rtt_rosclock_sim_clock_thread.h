@@ -64,6 +64,8 @@ namespace rtt_rosclock {
     static boost::shared_ptr<SimClockThread> Instance();
     //! Get an instance to the singleton SimClockThread or NULL
     static boost::shared_ptr<SimClockThread> GetInstance();
+    //! Release the singleton SimClockThread
+    static void Release();
 
     virtual ~SimClockThread();
 
@@ -101,7 +103,7 @@ namespace rtt_rosclock {
     void operator=(SimClockThread const&);
 
     //! SimClockThread singleton
-    static boost::weak_ptr<SimClockThread> singleton;
+    static boost::shared_ptr<SimClockThread> singleton;
 
     //! Re-set the RTT::os::TimeService to zero and restart logging
     void resetTimeService();
