@@ -16,7 +16,7 @@ target_link_libraries(rtt_actionlib_service ${catkin_LIBRARIES})
 orocos_generate_package(
   INCLUDE_DIRS include
   DEPENDS roscpp actionlib
-  DEPENDS_TARGETS rtt_ros rtt_roscomm
+  DEPENDS_TARGETS rtt_ros rtt_roscomm rtt_rosclock
 )
 
 orocos_install_headers(
