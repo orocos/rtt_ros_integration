@@ -25,10 +25,15 @@ namespace rtt_actionlib {
   class RTTActionServerStatusTimer : public RTT::os::Timer 
   {
   public:
-    RTTActionServerStatusTimer(RTTActionServer<ActionSpec> &server) :
-      RTT::os::Timer(1,ORO_SCHED_OTHER),
+    RTTActionServerStatusTimer(RTTActionServer<ActionSpec> &server, int scheduler = ORO_SCHED_OTHER) :
+      RTT::os::Timer(1,-1),
       server_(server) 
-    { }
+    { 
+      mThread = new RTT::Activity(scheduler, 0, 0.0, this, server.getName()+"_status_timer");
+      mThread->start();
+    }
+
+    virtual ~RTTActionServerStatusTimer() { }
 
     //! Publish the action server status
     virtual void timeout(RTT::os::Timer::TimerId timer_id) {
@@ -50,8 +55,12 @@ namespace rtt_actionlib {
     typedef actionlib::ServerGoalHandle<ActionSpec> GoalHandle;
 
     //! Constructor
-    RTTActionServer(const double status_period = 0.200);
+    RTTActionServer(const double status_period = 0.200, const int sched = ORO_SCHED_OTHER);
+    RTTActionServer(const std::string name, const double status_period = 0.200, const int sched = ORO_SCHED_OTHER);
     virtual ~RTTActionServer();
+
+    //! Get the name
+    const std::string getName() const { return name_; };
 
     //! Add actionlib ports to a given rtt service
     bool addPorts(RTT::Service::shared_ptr service,
@@ -72,6 +81,15 @@ namespace rtt_actionlib {
 
     //! Explicitly publish status
     virtual void publishStatus();
+
+    void registerGoalOperation(RTT::OperationInterfacePart* operation) {
+      goal_operation_ = operation; 
+      this->registerGoalCallback(boost::bind(&RTTActionServer<ActionSpec>::goalCallbackWrapper, this, _1));
+    }
+
+    void registerCancelOperation(RTT::OperationInterfacePart* operation) {
+      cancel_operation_ = operation; 
+    }
     
   private:
 
@@ -81,6 +99,7 @@ namespace rtt_actionlib {
      * turn, calls the user supplied goal callback.
      */
     void goalCallback(RTT::base::PortInterface* port);
+    void goalCallbackWrapper(GoalHandle gh);
 
     /* \brief Wrapper for action server base cancelCallback 
      * This function is called when messages arrive on the goal RTT port. It
@@ -88,6 +107,9 @@ namespace rtt_actionlib {
      * turn, calls the user supplied cancel callback.
      */
     void cancelCallback(RTT::base::PortInterface* port);
+
+    //! Server name (used for naming timers and other resources)
+    std::string name_;
 
     //! Period (Hz) at which the status should be published
     double status_period_;
@@ -97,13 +119,26 @@ namespace rtt_actionlib {
 
     //! RTT Timer for periodic status updates
     RTTActionServerStatusTimer<ActionSpec> status_timer_;
+
+    RTT::OperationCaller<void(GoalHandle)> goal_operation_;
+    RTT::OperationCaller<void(GoalHandle)> cancel_operation_;
   };
 
   template <class ActionSpec>
-    RTTActionServer<ActionSpec>::RTTActionServer(const double status_period) :
+    RTTActionServer<ActionSpec>::RTTActionServer(const double status_period, const int sched) :
       actionlib::ActionServerBase<ActionSpec>(boost::function<void (GoalHandle)>(), boost::function<void (GoalHandle)>(), false),
+      name_("action_server"),
       status_period_(status_period),
-      status_timer_(*this)
+      status_timer_(*this,sched)
+  {
+  }
+
+  template <class ActionSpec>
+    RTTActionServer<ActionSpec>::RTTActionServer(const std::string name, const double status_period, const int sched) :
+      actionlib::ActionServerBase<ActionSpec>(boost::function<void (GoalHandle)>(), boost::function<void (GoalHandle)>(), false),
+      name_(name),
+      status_period_(status_period),
+      status_timer_(*this, sched)
   {
 
   }
@@ -189,6 +224,14 @@ namespace rtt_actionlib {
         actionlib::ActionServerBase<ActionSpec>::goalCallback(
             boost::make_shared<const ActionGoal>(goal));
       }
+    }
+
+  template <class ActionSpec>
+    void RTTActionServer<ActionSpec>::goalCallbackWrapper(GoalHandle gh)
+    {
+      if(goal_operation_.ready()) {
+        goal_operation_(gh);
+      } 
     }
 
   template <class ActionSpec>
