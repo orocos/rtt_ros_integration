@@ -595,9 +595,11 @@ bool setProperty(const std::string &name, RTT::PropertyBag &bag, ValueType &valu
         RTT::Property<T> *prop = bag.getPropertyType<T>(name);
         if (!prop) {
             RTT::log(RTT::Error) << "Could not assign property '" << name << "': Property exists with a different type." << RTT::endlog();
-        } else {
-            prop->set() = value;
+            return false;
         }
+
+        prop->set() = value;
+
     } else {
         if (boost::is_same<T,ValueType>::value) {
             bag.addProperty(name, value);
@@ -605,6 +607,8 @@ bool setProperty(const std::string &name, RTT::PropertyBag &bag, ValueType &valu
             bag.ownProperty(new RTT::Property<T>(name, std::string(), value));
         }
     }
+
+    return true;
 }
 
 /**
@@ -623,9 +627,11 @@ bool getProperty(const std::string &name, const RTT::PropertyBag &bag, ValueType
     RTT::Property<T> *prop = bag.getPropertyType<T>(name);
     if (!prop) {
         RTT::log(RTT::Error) << "Could not get property '" << name << "': No such property in the bag." << RTT::endlog();
-    } else {
-        value = prop->rvalue();
+        return false;
     }
+
+    value = prop->rvalue();
+    return true;
 }
 
 } // namespace rtt_dynamic_reconfigure
