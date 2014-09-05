@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_dynamic_reconfigure_tests)
 
-find_package(catkin REQUIRED COMPONENTS rtt_ros dynamic_reconfigure)
+find_package(catkin REQUIRED COMPONENTS rtt_dynamic_reconfigure)
 
 if(CATKIN_ENABLE_TESTING)
 
