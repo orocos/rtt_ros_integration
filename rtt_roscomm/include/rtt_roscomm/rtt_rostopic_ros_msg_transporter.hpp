@@ -53,6 +53,7 @@
 #include <rtt/Port.hpp>
 #include <rtt/TaskContext.hpp>
 #include <rtt/internal/ConnFactory.hpp>
+#include <rtt/internal/GlobalService.hpp>
 #include <ros/ros.h>
 
 #include <rtt_roscomm/rtt_rostopic_ros_publish_activity.hpp>
@@ -66,6 +67,7 @@ namespace rtt_roscomm {
   template<typename T>
   class RosPubChannelElement: public base::ChannelElement<T>,public RosPublisher
   {
+    RTT::OperationCaller<std::string(const std::string&)> resolveName;
     char hostname[1024];
     std::string topicname;
     ros::NodeHandle ros_node;
@@ -89,8 +91,9 @@ namespace rtt_roscomm {
      * @return ChannelElement that will publish data to topics
      */
     RosPubChannelElement(base::PortInterface* port,const ConnPolicy& policy):
-      ros_node(),
-      ros_node_private("~")
+      resolveName(RTT::internal::GlobalService::Instance()->provides("ros")->getOperation("resolveName")),
+      ros_node(resolveName("")),
+      ros_node_private(resolveName("~"))
     {
       if ( policy.name_id.empty() ){
         std::stringstream namestr;
@@ -183,6 +186,7 @@ namespace rtt_roscomm {
   template<typename T>
   class RosSubChannelElement: public base::ChannelElement<T>
   {
+    RTT::OperationCaller<std::string(const std::string&)> resolveName;
     std::string topicname;
     ros::NodeHandle ros_node;
     ros::NodeHandle ros_node_private;
@@ -199,8 +203,9 @@ namespace rtt_roscomm {
      * @return ChannelElement that will publish data to topics
      */
     RosSubChannelElement(base::PortInterface* port, const ConnPolicy& policy) :
-      ros_node(),
-      ros_node_private("~")
+      resolveName(RTT::internal::GlobalService::Instance()->provides("ros")->getOperation("resolveName")),
+      ros_node(resolveName("")),
+      ros_node_private(resolveName("~"))
     {
       topicname=policy.name_id;
       Logger::In in(topicname);

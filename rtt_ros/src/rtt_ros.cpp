@@ -22,6 +22,8 @@
 #include <rospack/rospack.h>
 
 #include <rtt_ros/rtt_ros.h>
+#include <ros/names.h>
+#include <ros/this_node.h>
 
 
 bool rtt_ros::import(const std::string& package)
@@ -197,4 +199,47 @@ bool rtt_ros::import(const std::string& package)
   }
 
   return missing_packages.size() == 0;
+}
+
+static std::string head(const std::string& name)
+{
+  size_t last_token = name.find_last_of("/", name.size()>0 ? name.size() - 1 : name.size());
+  return name.substr(0, last_token);
+}
+
+static std::string tail(const std::string& name)
+{
+  size_t last_token = name.find_last_of("/", name.size()>0 ? name.size() - 1 : name.size());
+  return name.substr(last_token);
+}
+
+std::string rtt_ros::resolveName(const std::string& name)
+{
+  return ros::names::resolve(head(active_ns), name);
+}
+
+std::string rtt_ros::setNS(const std::string& ns)
+{
+  active_ns = ros::names::clean(ns);
+  return active_ns;
+}
+
+std::string rtt_ros::resetNS()
+{
+  return setNS(ros::names::append(ros::this_node::getNamespace(), ros::this_node::getName()));
+}
+
+std::string rtt_ros::getNS()
+{
+  return active_ns;
+}
+
+std::string rtt_ros::pushNS(const std::string& ns)
+{
+  return setNS(ros::names::append(active_ns, ns));
+}
+
+std::string rtt_ros::popNS()
+{
+  return setNS(head(active_ns));
 }

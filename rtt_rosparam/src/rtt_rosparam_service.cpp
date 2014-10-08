@@ -2,6 +2,7 @@
 #include <rtt/Property.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/types/PropertyDecomposition.hpp>
+#include <rtt/internal/GlobalService.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_convertible.hpp>
@@ -102,6 +103,7 @@ public:
       .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the component's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
   
+    this->resolveName = RTT::internal::GlobalService::Instance()->provides("ros")->getOperation("resolveName");
   }
 private:
 
@@ -145,6 +147,8 @@ private:
   bool setParamAbsolute(const std::string &name) { return set(name, ABSOLUTE); }
   bool setParamPrivate(const std::string &name) { return set(name, PRIVATE); }
   bool setParamComponentPrivate(const std::string &name) { return set(name, COMPONENT); }
+
+  RTT::OperationCaller<std::string(const std::string&)> resolveName;
 };
 
 const std::string ROSParamService::resolvedName(
@@ -172,6 +176,9 @@ const std::string ROSParamService::resolvedName(
       resolved_name = std::string("~") + ros::names::append(this->getOwner()->getName(),param_name);
       break;
   };
+
+  // Apply the active rtt_ros ns
+  resolved_name = this->resolveName(resolved_name);
 
   RTT::log(RTT::Debug) << "["<<this->getOwner()->getName()<<"] Resolving ROS param \""<<param_name<<"\" to \""<<resolved_name<<"\"" << RTT::endlog();
 

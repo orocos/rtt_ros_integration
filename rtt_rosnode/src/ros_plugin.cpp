@@ -26,12 +26,17 @@
  ***************************************************************************/
 
 
+#include <rtt/RTT.hpp>
 #include <rtt/plugin/Plugin.hpp>
 #include <rtt/TaskContext.hpp>
 #include <rtt/Activity.hpp>
 #include <rtt/Logger.hpp>
 #include <rtt/os/startstop.h>
 #include <ros/ros.h>
+#include <ros/names.h>
+#include <ros/this_node.h>
+#include <rtt/internal/GlobalService.hpp>
+#include <string>
 
 using namespace RTT;
 extern "C" {
@@ -54,6 +59,12 @@ extern "C" {
         return true;
       }
     }
+
+    // Initialize default ns from node name
+    RTT::OperationCaller<std::string(const std::string&)> setNS =
+      RTT::internal::GlobalService::Instance()->provides("ros")->getOperation("setNS");
+    setNS(ros::names::append(ros::this_node::getNamespace(), ros::this_node::getName()));
+    //setNS(ros::names::append(ros::this_node::getNamespace(), ros::this_node::getName()));
 
     // get number of spinners from parameter server, if available
     int thread_count = 1;

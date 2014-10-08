@@ -5,6 +5,7 @@
 
 #include <rtt/RTT.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
+#include <rtt/internal/GlobalService.hpp>
 
 //! Abstract ROS Service Proxy
 class ROSServiceProxyBase
@@ -60,7 +61,10 @@ public:
     proxy_operation_caller_.reset(new ProxyOperationCallerType("ROS_SERVICE_SERVER_PROXY"));
 
     // Construct the ROS service server
-    ros::NodeHandle nh;
+    RTT::OperationCaller<std::string(const std::string&)> resolveName =
+      RTT::internal::GlobalService::Instance()->provides("ros")->getOperation("resolveName");
+
+    ros::NodeHandle nh(resolveName(""));
     server_ = nh.advertiseService(
         service_name, 
         &ROSServiceServerProxy<ROS_SERVICE_T>::ros_service_callback, 
@@ -118,7 +122,10 @@ public:
     proxy_operation_.reset(new ProxyOperationType("ROS_SERVICE_CLIENT_PROXY"));
 
     // Construct the underlying service client
-    ros::NodeHandle nh;
+    RTT::OperationCaller<std::string(const std::string&)> resolveName =
+      RTT::internal::GlobalService::Instance()->provides("ros")->getOperation("resolveName");
+
+    ros::NodeHandle nh(resolveName(""));
     client_ = nh.serviceClient<ROS_SERVICE_T>(service_name);
 
     // Link the operation with the service client
