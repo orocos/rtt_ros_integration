@@ -119,7 +119,7 @@ TEST_F(DynamicReconfigureTest, ConfigDescription)
     EXPECT_EQ(5.0, *(tc.properties()->getPropertyType<double>("non_existent")));
 
     // get a pointer to the reconfigure service
-    boost::shared_ptr<Server<TestConfig> > server = boost::shared_dynamic_cast<Server<TestConfig> >(tc.provides("test_reconfigure"));
+    boost::shared_ptr<Server<TestConfig> > server = boost::dynamic_pointer_cast<Server<TestConfig> >(tc.provides("test_reconfigure"));
     ASSERT_TRUE(server.get());
 
     // check ConfigDescription groups
@@ -191,7 +191,7 @@ TEST_F(DynamicReconfigureTest, AutoConfig)
     ASSERT_TRUE(tc.provides()->hasService("reconfigure"));
 
     // get a pointer to the reconfigure service
-    boost::shared_ptr<Server<AutoConfig> > server = boost::shared_dynamic_cast<Server<AutoConfig> >(tc.provides("reconfigure"));
+    boost::shared_ptr<Server<AutoConfig> > server = boost::dynamic_pointer_cast<Server<AutoConfig> >(tc.provides("reconfigure"));
     ASSERT_TRUE(server.get());
 
     // min/max/default property bag should exist with the same number of properties
@@ -287,7 +287,7 @@ TEST_F(DynamicReconfigureTest, AutoConfigAddPropertiesAndRefresh)
     ASSERT_TRUE(tc.provides()->hasService("reconfigure"));
 
     // get a pointer to the reconfigure service
-    boost::shared_ptr<Server<AutoConfig> > server = boost::shared_dynamic_cast<Server<AutoConfig> >(tc.provides("reconfigure"));
+    boost::shared_ptr<Server<AutoConfig> > server = boost::dynamic_pointer_cast<Server<AutoConfig> >(tc.provides("reconfigure"));
     ASSERT_TRUE(server.get());
 
     // add a property to the TaskContext after having loaded the reconfigure service
