@@ -100,8 +100,8 @@ namespace rtt_dynamic_reconfigure {
 
 template <>
 struct Updater<AutoConfig> {
-    static bool propertiesFromConfig(AutoConfig &config, uint32_t, RTT::PropertyBag &bag) { RTT::refreshProperties(bag, config); }
-    static bool configFromProperties(AutoConfig &config, const RTT::PropertyBag &bag)     { RTT::updateProperties(config, bag); }
+    static bool propertiesFromConfig(AutoConfig &config, uint32_t, RTT::PropertyBag &bag) { return RTT::refreshProperties(bag, config); }
+    static bool configFromProperties(AutoConfig &config, const RTT::PropertyBag &bag)     { return RTT::updateProperties(config, bag); }
 };
 
 template <>

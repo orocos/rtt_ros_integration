@@ -9,8 +9,9 @@ catkin_package(
 )
 
 include_directories(
-  include/orocos
+  BEFORE
   ${catkin_INCLUDE_DIRS}
+  include/orocos
 )
 
 orocos_library(rtt_dynamic_reconfigure src/auto_config.cpp)

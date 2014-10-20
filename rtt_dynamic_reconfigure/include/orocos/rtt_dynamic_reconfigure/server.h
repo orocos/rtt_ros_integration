@@ -641,10 +641,6 @@ bool getProperty(const std::string &name, const RTT::PropertyBag &bag, ValueType
 
 } // namespace rtt_dynamic_reconfigure
 
-#include <rtt/plugin/ServicePlugin.hpp>
-//#define RTT_DYNAMIC_RECONFIGURE_SERVICE_PLUGIN(CONFIG, NAME) \
-//    ORO_SERVICE_NAMED_PLUGIN(rtt_dynamic_reconfigure::Server<CONFIG>, NAME)
-
 #define RTT_DYNAMIC_RECONFIGURE_SERVICE_PLUGIN(CONFIG, NAME) \
     extern "C" {\
         RTT_EXPORT bool loadRTTPlugin(RTT::TaskContext* tc);  \
