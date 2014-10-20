@@ -44,6 +44,7 @@
 #include <rtt/OperationCaller.hpp>
 
 #include <rtt/internal/DataSources.hpp>
+#include <rtt/internal/GlobalEngine.hpp>
 
 #include <ros/ros.h>
 
@@ -529,6 +530,10 @@ private:
         if (getOwner() && getOwner()->provides()->hasOperation("notifyPropertiesUpdate")) {
             notify_callback_ = getOwner()->provides()->getLocalOperation("notifyPropertiesUpdate");
         }
+
+        // update_callback_ and notify_callback_ are called from the ROS spinner thread -> set GlobalEngine as caller engine
+        update_callback_.setCaller(RTT::internal::GlobalEngine::Instance());
+        notify_callback_.setCaller(RTT::internal::GlobalEngine::Instance());
 
         // refresh once
         refresh();
