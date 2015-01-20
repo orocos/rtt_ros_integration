@@ -49,17 +49,8 @@ orocos_generate_package(
   DEPENDS rostime
 )
 
-install(PROGRAMS 
-  scripts/rtt-upgrade-2.5
-  # Wrapper scripts
-  scripts/deployer
-  scripts/orocreate-pkg
-  scripts/orogen
-  scripts/orogen-unregister
-  scripts/rttlua
-  scripts/rttlua-tlsf
-  scripts/rttscript
-  scripts/typegen
+install(DIRECTORY scripts/
+  USE_SOURCE_PERMISSIONS
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION} )
