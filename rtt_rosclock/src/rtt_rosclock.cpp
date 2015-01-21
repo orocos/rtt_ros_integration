@@ -52,21 +52,28 @@ const ros::Time rtt_rosclock::host_wall_now()
 const ros::Time rtt_rosclock::rtt_now() 
 {
   // count the zeros...   -987654321--
-  const uint64_t one_E9 = 1000000000ll;
+  const uint64_t one_E9 = 1000000000ULL;
   // NOTE: getNSecs returns wall time, getTicks returns offset time
+#ifdef __XENO__
+  uint64_t nsec64 = RTT::os::TimeService::Instance()->getNSecs(); //RTT::os::TimeService::Instance()->getNSecs();
+#else
   uint64_t nsec64 = RTT::os::TimeService::ticks2nsecs(RTT::os::TimeService::Instance()->getTicks()); //RTT::os::TimeService::Instance()->getNSecs();
-  uint32_t sec = nsec64 / one_E9;
-  uint32_t nsec = (uint32_t)(nsec64 - (sec*one_E9));
-  return ros::Time(sec, nsec);
+#endif
+  uint32_t sec32_part = nsec64 / one_E9;
+  uint32_t nsec32_part = nsec64 % one_E9;
+  //RTT::log(RTT::Error) << "sec: " << sec32 << " nsec: " << nsec32 << RTT::endlog();
+  return ros::Time(sec32_part, nsec32_part);
 }
 
 const ros::Time rtt_rosclock::rtt_wall_now()
 {
+  const uint64_t one_E9 = 1000000000ll;
   // NOTE: getNSecs returns wall time, getTicks returns offset time
   uint64_t nsec64 = RTT::os::TimeService::Instance()->getNSecs();
-  uint32_t sec = nsec64 / 1E9;
-  uint32_t nsec = (uint32_t)(nsec64 - (sec*1E9));
-  return ros::Time(sec, nsec);
+  uint64_t sec64_part = nsec64 / one_E9;
+  uint64_t nsec64_part = nsec64 % one_E9;
+  //RTT::log(RTT::Error) << "sec: " << sec32 << " nsec: " << nsec32 << RTT::endlog();
+  return ros::Time(sec64_part, nsec64_part);
 }
 
 const RTT::Seconds rtt_rosclock::host_offset_from_rtt() 
