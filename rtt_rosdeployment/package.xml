@@ -25,7 +25,10 @@
   <export>
     <rtt_ros>
       <plugin_depend>rtt_rosnode</plugin_depend>
-      <plugin_depend>rtt_ros_msgs</plugin_depend>
+      <!--
+        rtt_ros_msgs is not an RTT plugin
+        <plugin_depend>rtt_ros_msgs</plugin_depend>
+      -->
     </rtt_ros>
   </export>
 </package>

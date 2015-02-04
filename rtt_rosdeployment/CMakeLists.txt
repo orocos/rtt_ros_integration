@@ -8,7 +8,7 @@ include_directories(${catkin_INCLUDE_DIRS})
 orocos_use_package(ocl-deployment)
 
 orocos_plugin(rtt_rosdeployment src/rtt_rosdeployment_service.cpp)
-target_link_libraries(rtt_rosdeployment ${catkin_LIBRARIES})
+target_link_libraries(rtt_rosdeployment ${catkin_LIBRARIES} ${OROCOS-RTT_RTT-SCRIPTING_LIBRARY})
 
 orocos_generate_package(
   DEPENDS rtt_ros_msgs

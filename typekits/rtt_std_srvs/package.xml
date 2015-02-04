@@ -2,6 +2,7 @@
   <name>rtt_std_srvs</name>
   <version>2.8.0</version>
   <description>
+
     Provides an rtt typekit for ROS std_msgs messages.
 
     It allows you to use ROS messages transparently in
@@ -14,14 +15,10 @@
     See the http://ros.org/wiki/std_msgs documentation
     for the documentation of the ROS messages in this
     typekit.
+
   </description>
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
-
   <license>BSD</license>
-
-  <url type="website">http://ros.org/wiki/rtt_roscomm</url>
-
-  <author>create_rtt_msgs Generator</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 

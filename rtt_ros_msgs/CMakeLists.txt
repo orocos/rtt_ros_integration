@@ -37,6 +37,7 @@ find_package(catkin REQUIRED COMPONENTS message_generation std_msgs)
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
+  Eval.srv
   RunScript.srv
   GetPeerList.srv
   )

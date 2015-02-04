@@ -5,12 +5,9 @@
     This package contains the components of the kdl_conversions package
   </description>
   <license>GPL</license>
- 
-  <maintainer email="ruben.smits@mech.kuleuven.be">ruben smits</maintainer>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
 
-  <license>gpl</license>
-
-  <author>ruben smits</author>
+  <author>Ruben Smits</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
