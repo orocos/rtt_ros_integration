@@ -3,6 +3,9 @@
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/types/PropertyDecomposition.hpp>
 
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_convertible.hpp>
+
 #include <XmlRpcException.h>
 
 #include <Eigen/Dense>
@@ -414,25 +417,35 @@ bool xmlParamToProp<RTT::PropertyBag>(const XmlRpc::XmlRpcValue &xml_value, RTT:
 //! Convert an XmlRpc structure value into an abstract RTT PropertyBase
 bool xmlParamToProp( const XmlRpc::XmlRpcValue &xml_value, RTT::base::PropertyBase* prop_base);
 
+template <class XMLRPCType,class PropertyType, class enabled=void> struct XmlParamToValue{
+    static bool assign(const XMLRPCType& xml_value, PropertyType &prop_value)
+    {
+        return false;
+    }
+};
+
+template <class XMLRPCType, class PropertyType >
+struct XmlParamToValue <XMLRPCType, PropertyType, typename boost::enable_if<boost::is_convertible<XMLRPCType,PropertyType> >::type >{
+    static bool assign(const XMLRPCType& xml_value, PropertyType &prop_value)
+    {
+        prop_value = xml_value;
+        return true;
+    }
+};
+
 //! Convert an XmlRpc value to type T
-template <class T> void xmlParamToValue(const XmlRpc::XmlRpcValue &xml_value, T &value) {
-  value = static_cast<const T&>(const_cast<XmlRpc::XmlRpcValue &>(xml_value));
-}
-
-template <> void xmlParamToValue<float>(const XmlRpc::XmlRpcValue &xml_value, float &value) {
-  value = static_cast<const double&>(const_cast<XmlRpc::XmlRpcValue &>(xml_value));
-}
-
-template <> void xmlParamToValue<unsigned int>(const XmlRpc::XmlRpcValue &xml_value, unsigned int &value) {
-  value = static_cast<const int&>(const_cast<XmlRpc::XmlRpcValue &>(xml_value));
-}
-
-template <> void xmlParamToValue<char>(const XmlRpc::XmlRpcValue &xml_value, char &value) {
-  value = static_cast<const int&>(const_cast<XmlRpc::XmlRpcValue &>(xml_value));
-}
-
-template <> void xmlParamToValue<unsigned char>(const XmlRpc::XmlRpcValue &xml_value, unsigned char &value) {
-  value = static_cast<const int&>(const_cast<XmlRpc::XmlRpcValue &>(xml_value));
+template <class PropertyType> bool xmlParamToValue(const XmlRpc::XmlRpcValue &xml_value, PropertyType &value) {
+    switch(xml_value.getType()) {
+    case XmlRpc::XmlRpcValue::TypeString:
+        return XmlParamToValue<std::string, PropertyType>::assign(static_cast<const std::string&>(const_cast<XmlRpc::XmlRpcValue &>(xml_value)),value);
+    case XmlRpc::XmlRpcValue::TypeDouble:
+        return XmlParamToValue<double, PropertyType>::assign(static_cast<double>(const_cast<XmlRpc::XmlRpcValue &>(xml_value)),value);
+    case XmlRpc::XmlRpcValue::TypeInt:
+        return XmlParamToValue<int, PropertyType>::assign(static_cast<int>(const_cast<XmlRpc::XmlRpcValue &>(xml_value)),value);
+    case XmlRpc::XmlRpcValue::TypeBoolean:
+        return XmlParamToValue<bool, PropertyType>::assign(static_cast<bool>(const_cast<XmlRpc::XmlRpcValue &>(xml_value)),value);
+    }
+    return false;
 }
 
 template <class T>
@@ -446,9 +459,8 @@ bool xmlParamToProp(
   }
 
   // Set the value
-  xmlParamToValue(xml_value, prop->set());
+  return xmlParamToValue(xml_value, prop->set());
 
-  return true;
 }
 
 template <class T>
@@ -469,11 +481,12 @@ bool xmlParamToProp(
   // Copy the data into the vector property
   std::vector<T> &vec = prop->value();
   vec.resize(xml_value.size());
+  bool result = true;
   for(size_t i=0; i<vec.size(); i++) {
-    xmlParamToValue(xml_value[i], vec[i]);
+    result &= xmlParamToValue(xml_value[i], vec[i]);
   }
 
-  return true;
+  return result;
 }
 
 template <>
@@ -494,13 +507,14 @@ bool xmlParamToProp<bool>(
   // Copy the data into the vector property
   std::vector<bool> &vec = prop->value();
   vec.resize(xml_value.size());
+  bool result = true;
   for(size_t i=0; i<vec.size(); i++) {
     bool temp;
-    xmlParamToValue(xml_value[i], temp);
+    result &= xmlParamToValue(xml_value[i], temp);
     vec[i] = temp;
   }
 
-  return true;
+  return result;
 }
 
 template <>
@@ -521,13 +535,14 @@ bool xmlParamToProp(
   // Copy the data into the vector property
   Eigen::VectorXd &vec = prop->value();
   vec.resize(xml_value.size());
+  bool result = true;
   for(size_t i=0; i<vec.size(); i++) {
     double temp;
-    xmlParamToValue(xml_value[i], temp);
+    result &= xmlParamToValue(xml_value[i], temp);
     vec[i] = temp;
   }
 
-  return true;
+  return result;
 }
 
 template <>
@@ -548,13 +563,14 @@ bool xmlParamToProp(
   // Copy the data into the vector property
   Eigen::VectorXf &vec = prop->value();
   vec.resize(xml_value.size());
+  bool result = true;
   for(size_t i=0; i<vec.size(); i++) {
     double temp;
-    xmlParamToValue(xml_value[i], temp);
+    result &= xmlParamToValue(xml_value[i], temp);
     vec[i] = temp;
   }
 
-  return true;
+  return result;
 }
 
 template <>
@@ -606,6 +622,8 @@ bool xmlParamToProp(
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<float>*>(prop_base));
     case XmlRpc::XmlRpcValue::TypeInt:
       return 
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<double>*>(prop_base)) ||
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<float>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<int>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<unsigned int>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<char>*>(prop_base)) ||
