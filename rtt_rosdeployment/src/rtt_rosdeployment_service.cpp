@@ -3,7 +3,9 @@
 #include <rtt/plugin/Plugin.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
+#include <rtt/scripting/Scripting.hpp>
 
+#include <rtt_ros_msgs/Eval.h>
 #include <rtt_ros_msgs/RunScript.h>
 #include <rtt_ros_msgs/GetPeerList.h>
 
@@ -24,8 +26,13 @@ private:
 
   ros::NodeHandle nh_;
 
+  ros::ServiceServer eval_service_;
   ros::ServiceServer run_script_service_;
   ros::ServiceServer get_peer_list_service_;
+
+  bool eval_cb(
+      rtt_ros_msgs::Eval::Request& request,
+      rtt_ros_msgs::Eval::Response& response);
 
   bool run_script_cb(
       rtt_ros_msgs::RunScript::Request& request,
@@ -34,6 +41,8 @@ private:
   bool get_peer_list_cb(
       rtt_ros_msgs::GetPeerList::Request& request,
       rtt_ros_msgs::GetPeerList::Response& response);
+
+  RTT::OperationCaller<bool(std::string const&)> eval_;
 };
 
 
@@ -44,11 +53,23 @@ ROSDeploymentService::ROSDeploymentService(OCL::DeploymentComponent* deployer) :
 {
   if(deployer_) {
     // Create services
+    eval_service_ = nh_.advertiseService("eval",&ROSDeploymentService::eval_cb,this);
     run_script_service_ = nh_.advertiseService("run_script",&ROSDeploymentService::run_script_cb,this);
     get_peer_list_service_ = nh_.advertiseService("get_peer_list",&ROSDeploymentService::get_peer_list_cb,this);
+
+    eval_ = deployer_->getProvider<RTT::Scripting>("scripting")->eval;
   } else {
     RTT::log(RTT::Error) << "Attempted to load the rosdeployment service on a TaskContext which is not an OCL::DeploymentComponent. No ROS services will be advertised." << RTT::endlog();
   }
+}
+
+bool ROSDeploymentService::eval_cb(
+    rtt_ros_msgs::Eval::Request& request,
+    rtt_ros_msgs::Eval::Response& response)
+{
+  if (!eval_.ready()) return false;
+  response.success = eval_(request.code);
+  return true;
 }
 
 bool ROSDeploymentService::run_script_cb(
