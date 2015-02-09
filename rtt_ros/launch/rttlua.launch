@@ -1,0 +1,33 @@
+<launch>
+  <!-- The node name for the deployer -->
+  <arg name="NAME" default="$(anon rttlua)"/>
+  <!-- Additional Orocos deployer args -->
+  <arg name="RTTLUA_ARGS" default=""/>
+  <!-- Orocos target (gnulinux, xenomai, etc) -->
+  <arg name="OROCOS_TARGET" default="$(optenv OROCOS_TARGET)"/>
+  <!-- Path to look for dynamically-loaded plugins and components (something like /lib/orocos) -->
+  <arg name="RTT_COMPONENT_PATH" default="$(env RTT_COMPONENT_PATH)"/>
+
+  <!-- Set DEBUG to true to run in GDB (don't forget to build in Debug mode) -->
+  <arg name="DEBUG" default="false"/>
+  <arg if="$(arg DEBUG)" name="SUFFIX" value="-debug"/>
+  <arg unless="$(arg DEBUG)" name="SUFFIX" value=""/>
+
+  <arg name="SCREEN" default="false"/>
+  <arg if="$(arg SCREEN)" name="SUFFIX2" value="-screen"/>
+  <arg unless="$(arg SCREEN)" name="SUFFIX2" value="$(arg SUFFIX2)"/>
+
+  <arg name="INTERACTIVE" default="true"/>
+  <arg if="$(arg INTERACTIVE)" name="INTERACTIVE_ARG" value="-i"/>
+  <arg unless="$(arg INTERACTIVE)" name="INTERACTIVE_ARG" value=""/>
+
+  <!-- Launch deployer -->
+  <node 
+    name="$(arg NAME)"
+    pkg="rtt_ros" type="rttlua$(arg SUFFIX2)" 
+    args="$(arg INTERACTIVE_ARG) $(arg RTTLUA_ARGS) -"
+    output="screen">
+    <env name="OROCOS_TARGET" value="$(arg OROCOS_TARGET)"/>
+    <env name="RTT_COMPONENT_PATH" value="$(arg RTT_COMPONENT_PATH)"/>
+  </node>
+</launch>
