@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# Wrapper script 
+
+SCREEN_NAME=RTTLUA
+screen -dmS $SCREEN_NAME rttlua "$@"
+SCREEN_ID=$(screen -list | grep $SCREEN_NAME | head -n 1 | awk '{print $1}')
+
+cleanup()
+{
+  echo "CLEANING UP!"
+  screen -S $SCREEN_ID -p 0 -X stuff ""
+}
+
+trap cleanup SIGINT
+
+#screen -r $SCREEN_ID
+
+#wait $SCREEN_PID (won't work snce it's not a child process)
+while screen -list | grep -q $SCREEN_ID
+do
+  sleep 1
+done
+
