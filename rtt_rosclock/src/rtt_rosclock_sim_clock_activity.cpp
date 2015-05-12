@@ -111,16 +111,24 @@ RTT::os::ThreadInterface* SimClockActivity::thread()
 
 bool SimClockActivity::initialize()
 {
-  return true;
+  if (runner != 0)
+    return runner->initialize();
+  else
+    return true;
 }
 
 void SimClockActivity::step()
 {
+  // override this method to avoid running runner.
+  if (runner != 0)
+    runner->step();
 }
 
-void SimClockActivity::loop()
+void SimClockActivity::work(RunnableInterface::WorkReason reason)
 {
-  this->step();
+  // override this method to avoid running runner.
+  if (runner != 0)
+    runner->work(reason);
 }
 
 bool SimClockActivity::breakLoop()
@@ -128,9 +136,10 @@ bool SimClockActivity::breakLoop()
   return false;
 }
 
-
 void SimClockActivity::finalize()
 {
+  if (runner != 0)
+    runner->finalize();
 }
 
 bool SimClockActivity::start()
@@ -144,7 +153,7 @@ bool SimClockActivity::start()
   active_ = true;
   last_ = 0;
 
-  if ( runner ? runner->initialize() : this->initialize() ) {
+  if ( this->initialize() ) {
     running_ = true;
   } else {
     active_ = false;
@@ -159,10 +168,7 @@ bool SimClockActivity::stop()
     return false;
 
   running_ = false;
-  if (runner)
-    runner->finalize();
-  else
-    this->finalize();
+  this->finalize();
   active_ = false;
   return true;
 }
@@ -189,10 +195,17 @@ bool SimClockActivity::trigger()
 
 bool SimClockActivity::execute()
 {
-  if (!running_) return false;
-  if (runner) runner->step(); else this->step();
-  last_ = RTT::os::TimeService::Instance()->getTicks();
-  return true;
+  if ( this->isRunning() ) {
+    this->step();
+    this->work(RunnableInterface::TimeOut);
+    return true;
+  }
+  return false;
+}
+
+bool SimClockActivity::timeout()
+{
+  return false;
 }
 
 RTT::os::TimeService::ticks SimClockActivity::getLastExecutionTicks() const

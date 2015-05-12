@@ -43,6 +43,7 @@
 #define __RTT_ROSCLOCK_RTT_ROSCLOCK_SIM_CLOCK_ACTIVITY_H
 
 #include <rtt/base/ActivityInterface.hpp>
+#include <rtt/base/RunnableInterface.hpp>
 
 #include <rtt/os/TimeService.hpp>
 #include <rtt/os/Mutex.hpp>
@@ -78,7 +79,7 @@ namespace rtt_rosclock {
 
     virtual bool initialize();
     virtual void step();
-    virtual void loop();
+    virtual void work(RTT::base::RunnableInterface::WorkReason reason);
     virtual bool breakLoop();
     virtual void finalize();
 
@@ -91,6 +92,7 @@ namespace rtt_rosclock {
 
     virtual bool execute();
     virtual bool trigger();
+    virtual bool timeout();
 
     virtual RTT::os::TimeService::ticks getLastExecutionTicks() const;
 
