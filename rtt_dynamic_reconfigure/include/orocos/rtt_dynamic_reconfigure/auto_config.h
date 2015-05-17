@@ -76,6 +76,9 @@ public:
 
     static void __refreshDescription__(const ServerType *server);
 
+    bool updateProperties(RTT::PropertyBag &) const;
+    bool fromProperties(const RTT::PropertyBag &);
+
 private:
     struct Cache;
     typedef boost::shared_ptr<Cache> CachePtr;
@@ -100,8 +103,8 @@ namespace rtt_dynamic_reconfigure {
 
 template <>
 struct Updater<AutoConfig> {
-    static bool propertiesFromConfig(AutoConfig &config, uint32_t, RTT::PropertyBag &bag) { return RTT::updateProperties(bag, config); }
-    static bool configFromProperties(AutoConfig &config, const RTT::PropertyBag &bag)     { return RTT::updateProperties(config, bag); }
+    static bool propertiesFromConfig(AutoConfig &config, uint32_t, RTT::PropertyBag &bag) { return config.updateProperties(bag); }
+    static bool configFromProperties(AutoConfig &config, const RTT::PropertyBag &bag)     { return config.fromProperties(bag); }
 };
 
 template <>
@@ -120,7 +123,7 @@ struct dynamic_reconfigure_traits<AutoConfig> {
     static void fromMessage(AutoConfig &config, dynamic_reconfigure::Config &message, const ServerType *server) { config.__fromMessage__(message, config); }
     static void clamp(AutoConfig &config, const ServerType *server) { config.__clamp__(server); }
 
-    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(AutoConfig &config, const ServerType *) {
+    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr getDataSource(AutoConfig &config, const ServerType *) {
         return RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr(new RTT::internal::ReferenceDataSource<RTT::PropertyBag>(config));
     }
 };
