@@ -145,7 +145,7 @@ template <> struct PropertyTypeInfo<unsigned int>
     static std::string getType() { return "int"; }
     static bool hasLimits() { return true; }
     static int getMin() { return 0; }
-    static int getMax() { return UINT_MAX; }
+    static int getMax() { return INT_MAX; }
 };
 
 template <> struct PropertyTypeInfo<std::string>
