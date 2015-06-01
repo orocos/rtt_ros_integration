@@ -9,16 +9,26 @@
   <arg name="OROCOS_TARGET" default="$(optenv OROCOS_TARGET)"/>
   <!-- Path to look for dynamically-loaded plugins and components (something like /lib/orocos) -->
   <arg name="RTT_COMPONENT_PATH" default="$(env RTT_COMPONENT_PATH)"/>
-
+  <!-- Lauch corba deployer -->
+  <arg name="CORBA" default="false"/>
   <!-- Set DEBUG to true to run in GDB (don't forget to build in Debug mode) -->
   <arg name="DEBUG" default="false"/>
   <arg if="$(arg DEBUG)" name="SUFFIX" value="-debug"/>
   <arg unless="$(arg DEBUG)" name="SUFFIX" value=""/>
 
   <!-- Launch deployer -->
-  <node 
+  <node unless="$(arg CORBA)"
     name="$(arg NAME)"
     pkg="rtt_ros" type="deployer$(arg SUFFIX)" 
+    args="-l $(arg LOG_LEVEL) $(arg DEPLOYER_ARGS) --"
+    output="screen">
+    <env name="OROCOS_TARGET" value="$(arg OROCOS_TARGET)"/>
+    <env name="RTT_COMPONENT_PATH" value="$(arg RTT_COMPONENT_PATH)"/>
+  </node>
+  <!-- launch corba deployer -->
+  <node if="$(arg CORBA)"
+    name="$(arg NAME)"
+    pkg="rtt_ros" type="deployer-corba$(arg SUFFIX)" 
     args="-l $(arg LOG_LEVEL) $(arg DEPLOYER_ARGS) --"
     output="screen">
     <env name="OROCOS_TARGET" value="$(arg OROCOS_TARGET)"/>
