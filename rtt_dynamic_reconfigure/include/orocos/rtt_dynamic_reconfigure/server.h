@@ -142,12 +142,12 @@ struct dynamic_reconfigure_traits {
     static void clamp(ConfigType &config, const ServerType *) { config.__clamp__(); }
 
     /**
-     * Create a new RTT::internal::ValueDataSource<RTT::PropertyBag> filled with properties from a ConfigType instance.
+     * Creates a new RTT::internal::AssignableDataSource<RTT::PropertyBag> filled with properties from a ConfigType instance.
      *
      * \param config referencte to the ConfigType instance to be read
      * \param server pointer to the rtt_dynamic_reconfigure server instance whose updater is going to be used
      */
-    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr toPropertyBag(ConfigType &config, const ServerType *server) {
+    static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr getDataSource(ConfigType &config, const ServerType *server) {
         RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr ds(new RTT::internal::ValueDataSource<RTT::PropertyBag>());
         if (!server->updater()->propertiesFromConfig(config, ~0, ds->set()))
             ds.reset();
@@ -439,9 +439,9 @@ public:
         this->properties()->remove(this->properties()->getProperty("min"));
         this->properties()->remove(this->properties()->getProperty("max"));
         this->properties()->remove(this->properties()->getProperty("default"));
-        this->properties()->ownProperty(new RTT::Property<RTT::PropertyBag>("min", "Minimum values as published to dynamic_reconfigure clients", traits::toPropertyBag(min_, this)));
-        this->properties()->ownProperty(new RTT::Property<RTT::PropertyBag>("max", "Maximum values as published to dynamic_reconfigure clients", traits::toPropertyBag(max_, this)));
-        this->properties()->ownProperty(new RTT::Property<RTT::PropertyBag>("default", "Default values as published to dynamic_reconfigure clients", traits::toPropertyBag(default_, this)));
+        this->properties()->ownProperty(new RTT::Property<RTT::PropertyBag>("min", "Minimum values as published to dynamic_reconfigure clients", traits::getDataSource(min_, this)));
+        this->properties()->ownProperty(new RTT::Property<RTT::PropertyBag>("max", "Maximum values as published to dynamic_reconfigure clients", traits::getDataSource(max_, this)));
+        this->properties()->ownProperty(new RTT::Property<RTT::PropertyBag>("default", "Default values as published to dynamic_reconfigure clients", traits::getDataSource(default_, this)));
 
         // Get initial values from current property settings
         config_ = ConfigType();

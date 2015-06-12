@@ -35,6 +35,7 @@
 #include <rtt_dynamic_reconfigure/auto_config.h>
 #include <rtt/Property.hpp>
 #include <rtt/internal/DataSources.hpp>
+#include <rtt/types/PropertyComposition.hpp>
 
 #include <climits>
 #include <cfloat>
@@ -104,8 +105,8 @@ AutoConfig::AutoConfig()
 }
 
 AutoConfig::AutoConfig(const RTT::PropertyBag &bag)
-    : RTT::PropertyBag(bag)
 {
+    this->fromProperties(bag);
 }
 
 AutoConfig::~AutoConfig()
@@ -145,7 +146,7 @@ template <> struct PropertyTypeInfo<unsigned int>
     static std::string getType() { return "int"; }
     static bool hasLimits() { return true; }
     static int getMin() { return 0; }
-    static int getMax() { return UINT_MAX; }
+    static int getMax() { return INT_MAX; }
 };
 
 template <> struct PropertyTypeInfo<std::string>
@@ -222,6 +223,23 @@ bool AutoConfig::__fromMessage__(AutoConfig &config, Config &msg, const AutoConf
         RTT::base::PropertyBase *pb = config.getProperty((*i)->getName());
         std::string param_name = config.prefix_ + (*i)->getName();
 
+        // For sub groups, add a sub config to *this and recurse...
+        const AutoConfig *sample_sub = getAutoConfigFromProperty(*i);
+        if (sample_sub) {
+            RTT::Property<RTT::PropertyBag> *sub = config.getPropertyType<RTT::PropertyBag>((*i)->getName());
+            AutoConfigDataSource *ds;
+            if (sub) {
+                ds = AutoConfigDataSource::narrow(sub->getDataSource().get());
+            } else {
+                ds = new AutoConfigDataSource();
+                sub = new RTT::Property<RTT::PropertyBag>((*i)->getName(), (*i)->getDescription(), AutoConfigDataSource::shared_ptr(ds));
+                config.ownProperty(sub);
+            }
+
+            if (ds && __fromMessage__(ds->set(), msg, *sample_sub))
+                continue;
+        }
+
         // search parameter in Config message
         bool param_found = false;
         for(Config::_bools_type::const_iterator n = msg.bools.begin(); n != msg.bools.end(); ++n) {
@@ -247,23 +265,6 @@ bool AutoConfig::__fromMessage__(AutoConfig &config, Config &msg, const AutoConf
             propertyFromMessage<double>(config, msg, *i, param_name) ||
             propertyFromMessage<float>(config, msg, *i, param_name)
            ) continue;
-
-        // For sub groups, add a sub config to *this and recurse...
-        const AutoConfig *sample_sub = getAutoConfigFromProperty(*i);
-        if (sample_sub) {
-            RTT::Property<RTT::PropertyBag> *sub = config.getPropertyType<RTT::PropertyBag>((*i)->getName());
-            AutoConfigDataSource *ds;
-            if (sub) {
-                ds = AutoConfigDataSource::narrow(sub->getDataSource().get());
-            } else {
-                ds = new AutoConfigDataSource();
-                sub = new RTT::Property<RTT::PropertyBag>((*i)->getName(), (*i)->getDescription(), AutoConfigDataSource::shared_ptr(ds));
-                config.ownProperty(sub);
-            }
-
-            if (ds && __fromMessage__(ds->set(), msg, *sample_sub))
-                continue;
-        }
 
         result = false;
     }
@@ -337,6 +338,39 @@ uint32_t AutoConfig::__level__(const AutoConfig &config) const
     return 0;
 }
 
+bool AutoConfig::updateProperties(RTT::PropertyBag &target) const
+{
+    RTT::PropertyBag composed;
+    if (!RTT::types::composePropertyBag(*this, composed)) return false;
+    return RTT::updateProperties(target, composed);
+}
+
+bool AutoConfig::fromProperties(const RTT::PropertyBag &source)
+{
+    RTT::PropertyBag decomposed;
+    if (!RTT::types::decomposePropertyBag(source, decomposed)) return false;
+
+    for(RTT::PropertyBag::const_iterator i = decomposed.begin(); i != decomposed.end(); ++i) {
+        RTT::base::PropertyBase *pb = this->getProperty((*i)->getName());
+        if (pb) {
+            pb->update(*i);
+            continue;
+        }
+
+        RTT::Property<RTT::PropertyBag> *sub = dynamic_cast<RTT::Property<RTT::PropertyBag> *>(*i);
+        if (sub) {
+            AutoConfigDataSource *ds = new AutoConfigDataSource(sub->rvalue());
+            ds->set().setType(sub->rvalue().getType());
+            this->ownProperty(new RTT::Property<RTT::PropertyBag>(sub->getName(), sub->getDescription(), ds));
+            continue;
+        } else {
+            this->ownProperty((*i)->clone());
+        }
+    }
+
+    return true;
+}
+
 template <typename T>
 static bool buildParamDescription(const RTT::base::PropertyBase *pb, const std::string &prefix, Group::_parameters_type& params, AutoConfig& dflt, AutoConfig& min, AutoConfig& max)
 {
@@ -371,7 +405,7 @@ static bool buildParamDescription(const RTT::base::PropertyBase *pb, const std::
     return true;
 }
 
-static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBag *bag, ConfigDescription& config_description, AutoConfig& dflt, AutoConfig& min, AutoConfig& max, const std::string &prefix, const std::string &name, const std::string &type, int32_t parent, int32_t id)
+static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBag &bag, ConfigDescription& config_description, AutoConfig& dflt, AutoConfig& min, AutoConfig& max, const std::string &prefix, const std::string &name, const std::string &type, int32_t parent, int32_t id)
 {
     std::size_t group_index = config_description.groups.size();
     config_description.groups.push_back(Group());
@@ -404,7 +438,7 @@ static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBa
     max.state = true;
 
     // for loop might invalidate group reference -> use index group_index instead
-    for(RTT::PropertyBag::const_iterator i = bag->begin(); i != bag->end(); ++i) {
+    for(RTT::PropertyBag::const_iterator i = bag.begin(); i != bag.end(); ++i) {
         if (buildParamDescription<bool>(*i, prefix, config_description.groups[group_index].parameters, dflt, min, max) ||
             buildParamDescription<int>(*i, prefix, config_description.groups[group_index].parameters, dflt, min, max) ||
             buildParamDescription<unsigned int>(*i, prefix, config_description.groups[group_index].parameters, dflt, min, max) ||
@@ -419,6 +453,7 @@ static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBa
             if (!sub_dflt) {
                 AutoConfigDataSource *ds = new AutoConfigDataSource();
                 sub_dflt = &(ds->set());
+                sub_dflt->setType(sub->rvalue().getType());
                 dflt.ownProperty(new RTT::Property<RTT::PropertyBag>(sub->getName(), sub->getDescription(), ds));
             }
 
@@ -426,6 +461,7 @@ static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBa
             if (!sub_min) {
                 AutoConfigDataSource *ds = new AutoConfigDataSource();
                 sub_min = &(ds->set());
+                sub_min->setType(sub->rvalue().getType());
                 min.ownProperty(new RTT::Property<RTT::PropertyBag>(sub->getName(), sub->getDescription(), ds));
             }
 
@@ -433,10 +469,11 @@ static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBa
             if (!sub_max) {
                 AutoConfigDataSource *ds = new AutoConfigDataSource();
                 sub_max = &(ds->set());
+                sub_max->setType(sub->rvalue().getType());
                 max.ownProperty(new RTT::Property<RTT::PropertyBag>(sub->getName(), sub->getDescription(), ds));
             }
 
-            buildGroupDescription(owner, &(sub->rvalue()), config_description, *sub_dflt, *sub_min, *sub_max, prefix + sub->getName() + "__", prefix + sub->getName(), "", config_description.groups[group_index].id, ++id);
+            buildGroupDescription(owner, sub->rvalue(), config_description, *sub_dflt, *sub_min, *sub_max, prefix + sub->getName() + "__", prefix + sub->getName(), "", config_description.groups[group_index].id, ++id);
         }
     }
 }
@@ -446,6 +483,12 @@ boost::shared_mutex AutoConfig::cache_mutex_;
 
 void AutoConfig::buildCache(const ServerType *server, RTT::TaskContext *owner)
 {
+    RTT::PropertyBag decomposed;
+    if (!RTT::types::decomposePropertyBag(*(owner->properties()), decomposed)) {
+        RTT::log(RTT::Error) << "Failed to decompose properties of '" << owner->getName() << "' for dynamic_reconfigure. Properties with custom types will not be available for reconfiguration." << RTT::endlog();
+        decomposed = *(owner->properties());
+    }
+
     boost::upgrade_lock<boost::shared_mutex> upgrade_lock(cache_mutex_);
     if (upgrade_lock.owns_lock())
     {
@@ -453,7 +496,7 @@ void AutoConfig::buildCache(const ServerType *server, RTT::TaskContext *owner)
         CachePtr& cache = cache_[server];
         if (!cache) cache.reset(new Cache());
         cache->description_message_.reset(new ConfigDescription);
-        buildGroupDescription(owner, owner->properties(), *(cache->description_message_), cache->default_, cache->min_, cache->max_, "", "", "", 0, 0);
+        buildGroupDescription(owner, decomposed, *(cache->description_message_), cache->default_, cache->min_, cache->max_, "", "", "", 0, 0);
     }
 }
 
