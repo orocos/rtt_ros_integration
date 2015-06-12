@@ -14,7 +14,6 @@
 #include <rtt/plugin/PluginLoader.hpp>
 #include <rtt/Logger.hpp>
 
-#include <rtt/TaskContext.hpp>
 #include <rtt/deployment/ComponentLoader.hpp>
 #include <rtt/os/main.h>
 
@@ -25,6 +24,7 @@
 #include <dynamic_reconfigure/config_tools.h>
 
 #include <rtt_dynamic_reconfigure_tests/TestConfig.h>
+#include "test_component.hpp"
 
 using namespace rtt_dynamic_reconfigure;
 using namespace rtt_dynamic_reconfigure_tests;
@@ -32,53 +32,7 @@ using namespace rtt_dynamic_reconfigure_tests;
 class DynamicReconfigureTest : public ::testing::Test
 {
 public:
-    struct Properties {
-        Properties()
-        : int_param()
-        , double_param()
-        , str_param()
-        , bool_param()
-        , float_param()
-        , uint_param()
-        , bag_param()
-        , str_param_in_bag()
-        {}
-
-        int int_param;
-        double double_param;
-        std::string str_param;
-        bool bool_param;
-
-        // other property types
-        float float_param;
-        unsigned int uint_param;
-
-        // PropertyBag properties
-        RTT::PropertyBag bag_param;
-        std::string str_param_in_bag;
-    };
-
-    class Component : public RTT::TaskContext
-    {
-    public:
-        Properties props;
-
-        // types directly supported by dynamic_reconfigure
-        Component()
-            : RTT::TaskContext("component")
-        {
-            this->addProperty("int_param", props.int_param);
-            this->addProperty("double_param", props.double_param);
-            this->addProperty("str_param", props.str_param);
-            this->addProperty("bool_param", props.bool_param);
-
-            this->addProperty("float_param", props.float_param);
-            this->addProperty("uint_param", props.uint_param);
-
-            props.bag_param.addProperty("str_param", props.str_param_in_bag);
-            this->addProperty("bag", props.bag_param);
-        }
-    } tc;
+    DynamicReconfigureTestComponent tc;
 
     // virtual void SetUp() {}
     // virtual void TearDown() {}
@@ -211,6 +165,9 @@ TEST_F(DynamicReconfigureTest, AutoConfig)
     EXPECT_EQ(0,     tc.props.uint_param);
     EXPECT_TRUE(tc.props.bag_param.size() == 1);
     EXPECT_EQ("",    tc.props.str_param_in_bag);
+    EXPECT_EQ(1.0,   tc.props.vector3_param.x);
+    EXPECT_EQ(2.0,   tc.props.vector3_param.y);
+    EXPECT_EQ(3.0,   tc.props.vector3_param.z);
 
     // default value properties should exists with the initial value of the properties
     const RTT::PropertyBag &dflt = tc.provides("reconfigure")->properties()->getPropertyType<RTT::PropertyBag>("default")->rvalue();
@@ -227,25 +184,40 @@ TEST_F(DynamicReconfigureTest, AutoConfig)
     ASSERT_TRUE(dflt.getPropertyType<unsigned int>("uint_param"));
     EXPECT_EQ(tc.props.uint_param,   *(dflt.getPropertyType<unsigned int>("uint_param")));
 
-    ASSERT_TRUE(dflt.getPropertyType<RTT::PropertyBag>("bag"));
-    const RTT::PropertyBag &dflt_bag = *(dflt.getPropertyType<RTT::PropertyBag>("bag"));
+    ASSERT_TRUE(dflt.getPropertyType<RTT::PropertyBag>("bag_param"));
+    const RTT::PropertyBag &dflt_bag = *(dflt.getPropertyType<RTT::PropertyBag>("bag_param"));
     EXPECT_TRUE(dflt_bag.size() == 1);
     ASSERT_TRUE(dflt_bag.getPropertyType<std::string>("str_param"));
     EXPECT_EQ(tc.props.str_param_in_bag, dflt_bag.getPropertyType<std::string>("str_param")->rvalue());
 
+    ASSERT_TRUE(dflt.getPropertyType<RTT::PropertyBag>("vector3_param"));
+    const RTT::PropertyBag &dflt_vector3_bag = *(dflt.getPropertyType<RTT::PropertyBag>("vector3_param"));
+    EXPECT_TRUE(dflt_vector3_bag.size() == 3);
+    ASSERT_TRUE(dflt_vector3_bag.getPropertyType<double>("x"));
+    ASSERT_TRUE(dflt_vector3_bag.getPropertyType<double>("y"));
+    ASSERT_TRUE(dflt_vector3_bag.getPropertyType<double>("z"));
+    EXPECT_EQ(tc.props.vector3_param.x, dflt_vector3_bag.getPropertyType<double>("x")->rvalue());
+    EXPECT_EQ(tc.props.vector3_param.y, dflt_vector3_bag.getPropertyType<double>("y")->rvalue());
+    EXPECT_EQ(tc.props.vector3_param.z, dflt_vector3_bag.getPropertyType<double>("z")->rvalue());
+
     // check ConfigDescription
     dynamic_reconfigure::ConfigDescriptionPtr description = server->getDescriptionMessage();
-    ASSERT_TRUE(description->groups.size() == 2);
+    ASSERT_TRUE(description->groups.size() == 3);
     EXPECT_EQ("Default", description->groups[0].name);
     EXPECT_EQ("", description->groups[0].type);
     EXPECT_EQ(6, description->groups[0].parameters.size());
     EXPECT_EQ(0, description->groups[0].parent);
     EXPECT_EQ(0, description->groups[0].id);
-    EXPECT_EQ("bag", description->groups[1].name);
+    EXPECT_EQ("bag_param", description->groups[1].name);
     EXPECT_EQ("", description->groups[1].type);
     EXPECT_EQ(1, description->groups[1].parameters.size());
     EXPECT_EQ(0, description->groups[1].parent);
     EXPECT_EQ(1, description->groups[1].id);
+    EXPECT_EQ("vector3_param", description->groups[2].name);
+    EXPECT_EQ("", description->groups[2].type);
+    EXPECT_EQ(3, description->groups[2].parameters.size());
+    EXPECT_EQ(0, description->groups[2].parent);
+    EXPECT_EQ(2, description->groups[2].id);
 
     // check default/minimum/maximum values in description message
     struct {
@@ -256,6 +228,7 @@ TEST_F(DynamicReconfigureTest, AutoConfig)
         double float_param;
         int uint_param;
         std::string str_param_in_bag;
+        geometry_msgs::Vector3 vector3_param;
     } temp;
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "int_param", temp.int_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "double_param", temp.double_param));
@@ -263,21 +236,30 @@ TEST_F(DynamicReconfigureTest, AutoConfig)
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "bool_param", temp.bool_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "float_param", temp.float_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "uint_param", temp.uint_param));
-    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "bag__str_param", temp.str_param_in_bag));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "bag_param__str_param", temp.str_param_in_bag));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "vector3_param__x", temp.vector3_param.x));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "vector3_param__y", temp.vector3_param.y));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->dflt, "vector3_param__z", temp.vector3_param.z));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "int_param", temp.int_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "double_param", temp.double_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "str_param", temp.str_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "bool_param", temp.bool_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "float_param", temp.float_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "uint_param", temp.uint_param));
-    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "bag__str_param", temp.str_param_in_bag));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "bag_param__str_param", temp.str_param_in_bag));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "vector3_param__x", temp.vector3_param.x));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "vector3_param__y", temp.vector3_param.y));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->min, "vector3_param__z", temp.vector3_param.z));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "int_param", temp.int_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "double_param", temp.double_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "str_param", temp.str_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "bool_param", temp.bool_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "float_param", temp.float_param));
     EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "uint_param", temp.uint_param));
-    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "bag__str_param", temp.str_param_in_bag));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "bag_param__str_param", temp.str_param_in_bag));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "vector3_param__x", temp.vector3_param.x));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "vector3_param__y", temp.vector3_param.y));
+    EXPECT_TRUE(dynamic_reconfigure::ConfigTools::getParameter(description->max, "vector3_param__z", temp.vector3_param.z));
 }
 
 TEST_F(DynamicReconfigureTest, AutoConfigAddPropertiesAndRefresh)
