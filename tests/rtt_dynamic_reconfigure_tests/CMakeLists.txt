@@ -12,17 +12,13 @@ if(CATKIN_ENABLE_TESTING)
   orocos_plugin(rtt_dynamic_reconfigure_tests_service test/service.cpp)
   add_dependencies(rtt_dynamic_reconfigure_tests_service ${PROJECT_NAME}_gencfg)
 
-  orocos_component(rtt_dynamic_reconfigure_tests_component test/test_component.cpp)
-
   catkin_add_gtest(rtt_dynamic_reconfigure_tests test/rtt_dynamic_reconfigure_tests.cpp)
   add_dependencies(rtt_dynamic_reconfigure_tests rtt_dynamic_reconfigure_tests_service)
   target_link_libraries(rtt_dynamic_reconfigure_tests
     ${catkin_LIBRARIES}
     ${USE_OROCOS_LIBRARIES}
     ${OROCOS-RTT_LIBRARIES}
-    ${OROCOS-RTT_RTT-SCRIPTING_LIBRARY}
-    rtt_dynamic_reconfigure_tests_component
-  )
+    ${OROCOS-RTT_RTT-SCRIPTING_LIBRARY} )
 
   orocos_generate_package()
 
