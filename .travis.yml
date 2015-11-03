@@ -8,7 +8,7 @@ before_install:
   - export ROS_DISTRO=indigo
   - export CI_SOURCE_PATH=$(pwd)
   # Bootstrap a minimal ROS installation
-  - git clone https://github.com/jhu-lcsr/ros_ci_tools /tmp/ros_ci_tools && export PATH=/tmp/ros_ci_tools:$PATH
+  - git clone https://github.com/orocos/ros_ci_tools /tmp/ros_ci_tools && export PATH=/tmp/ros_ci_tools:$PATH
   - ros_ci_bootstrap
   - source /opt/ros/$ROS_DISTRO/setup.bash
   # Create non-isolated workspace
