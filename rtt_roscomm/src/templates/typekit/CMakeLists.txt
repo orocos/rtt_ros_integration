@@ -205,7 +205,9 @@ include_directories(
   ${${_package}_INCLUDE_DIRS})
 
 # Targets
-set(CMAKE_BUILD_TYPE MinSizeRel)
+if(NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CMAKE_BUILD_TYPE MinSizeRel)
+endif()
 orocos_typekit(rtt-${_package}-typekit ${rtt-${_package}-typekit_SOURCES})
 target_link_libraries(rtt-${_package}-typekit ${catkin_LIBRARIES} ${${_package}_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 orocos_typekit(rtt-${_package}-ros-transport ${rtt-${_package}-ros-transport_SOURCES})
