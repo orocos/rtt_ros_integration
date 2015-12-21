@@ -173,8 +173,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS})
 
 # Targets
-set(CMAKE_BUILD_TYPE Debug)
-  #MinSizeRel)
+set(CMAKE_BUILD_TYPE MinSizeRel)
 orocos_typekit(         rtt-${_package}-typekit ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
 orocos_typekit(         rtt-${_package}-ros-transport ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp )
 
