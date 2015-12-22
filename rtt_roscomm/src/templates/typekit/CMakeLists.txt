@@ -1,4 +1,4 @@
-find_package(OROCOS-RTT 2.0.0 QUIET COMPONENTS rtt-scripting rtt-marshalling)
+find_package(OROCOS-RTT 2.0.0  COMPONENTS rtt-scripting rtt-marshalling rtt-transport-mqueue)
 if (NOT OROCOS-RTT_FOUND)
   message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
 else()
@@ -7,6 +7,12 @@ else()
 endif()
 
 include(AddFileDependencies)
+
+if (OROCOS-RTT_MQUEUE_FOUND)
+  message(STATUS "Building MQueue transport for ROS messages.")
+else()
+  message(WARNING "Not building MQueue transport for ROS messages.")
+endif()
 
 # Configure source and destination paths of generated files
 rtt_roscomm_destinations()
@@ -94,7 +100,9 @@ foreach( FILE ${MSG_FILES} )
            RTT::types::Types()->addType( new types::CArrayTypeInfo<RTT::types::carray<${ROSMSGTYPE}> >(\"${ROSMSGCTYPENAME}[]\") );
       }\n")
   # ros_msg_transport_package.cpp.in
-  set(ROSMSGTRANSPORTS   "${ROSMSGTRANSPORTS}         if(name == \"${ROSMSGTYPENAME}\") { return ti->addProtocol(ORO_ROS_PROTOCOL_ID,new RosMsgTransporter<${ROSMSGTYPE}>()); } else\n")
+  set(ROSMSGTRANSPORTS   "${ROSMSGTRANSPORTS}       if(name == \"${ROSMSGTYPENAME}\") { return ti->addProtocol(ORO_ROS_PROTOCOL_ID,new RosMsgTransporter<${ROSMSGTYPE}>());} else\n")
+  # ros_msg_mqueue_transport_package.cpp.in
+  set(MQMSGTRANSPORTS   "${MQMSGTRANSPORTS}         if(name == \"${ROSMSGTYPENAME}\") { return ti->addProtocol(ORO_MQUEUE_PROTOCOL_ID, new RTT::mqueue::MQTemplateProtocol<${ROSMSGTYPE}>());} else\n")
   # Types.hpp.in
   set(ROSMSGTYPESHEADERS "${ROSMSGTYPESHEADERS}#include \"${ROSMSGNAME}.h\"\n")
 
@@ -120,6 +128,11 @@ foreach( FILE ${MSG_FILES} )
     ros_msg_transport_plugin.cpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_plugin.cpp @ONLY )
 
+  # Transport for MQ-ROS
+  configure_file(
+    ros_msg_transport_mqueue_plugin.cpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_mqueue_plugin.cpp @ONLY )
+
   # Types.hpp helper for extern templates
   configure_file(
     msg_Types.hpp.in
@@ -127,6 +140,7 @@ foreach( FILE ${MSG_FILES} )
 
   list(APPEND ROSMSG_TYPEKIT_PLUGINS ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_typekit_plugin.cpp )
   list(APPEND ROSMSG_TRANSPORT_PLUGIN ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_plugin.cpp )
+  list(APPEND ROSMSG_TRANSPORT_MQUEUE_PLUGIN ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_mqueue_plugin.cpp )
 
   add_file_dependencies( ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp ${FILE})
 endforeach( FILE ${MSG_FILES} )
@@ -138,6 +152,10 @@ configure_file(
 configure_file(
   ros_msg_transport_package.cpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp @ONLY )
+
+configure_file(
+  ros_msg_transport_mqueue_package.cpp.in
+  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_mqueue.cpp @ONLY )
 
 # Both are equivalent
 configure_file(
@@ -158,6 +176,13 @@ include_directories(
 set(CMAKE_BUILD_TYPE MinSizeRel)
 orocos_typekit(         rtt-${_package}-typekit ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
 orocos_typekit(         rtt-${_package}-ros-transport ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp )
+
+# Build mqueue typekit
+if (OROCOS-RTT_MQUEUE_FOUND)
+  orocos_typekit(         rtt-${_package}-ros-transport-mqueue ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_mqueue.cpp )
+  target_link_libraries(  rtt-${_package}-ros-transport-mqueue ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES} ${OROCOS-RTT_MQUEUE_LIBRARIES})
+endif()
+
 target_link_libraries(  rtt-${_package}-typekit ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 target_link_libraries(  rtt-${_package}-ros-transport ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 
@@ -167,6 +192,9 @@ if(${_package}_EXPORTED_TARGETS)
   if(NOT ${_package} STREQUAL ${PROJECT_NAME})
     add_dependencies(rtt-${_package}-typekit ${${_package}_EXPORTED_TARGETS})
     add_dependencies(rtt-${_package}-ros-transport ${${_package}_EXPORTED_TARGETS})
+    if (OROCOS-RTT_MQUEUE_FOUND)
+      add_dependencies(rtt-${_package}-ros-transport-mqueue ${${_package}_EXPORTED_TARGETS})
+    endif()
   endif()
 endif()
 
@@ -178,8 +206,12 @@ LIST(APPEND ${PROJECT_NAME}_EXPORTED_INCLUDE_DIRS "${rtt_roscomm_GENERATED_HEADE
 add_file_dependencies(  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
 add_file_dependencies(  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
 
+if (OROCOS-RTT_MQUEUE_FOUND)
+  add_file_dependencies(  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_mqueue.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
+endif()
+
 get_directory_property(_additional_make_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
-list(APPEND _additional_make_clean_files "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp;${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp;${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${_package}")
+list(APPEND _additional_make_clean_files "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${ROSMSG_TRANSPORT_MQUEUE_PLUGIN};${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp;${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp;${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${_package}")
 set_directory_properties(PROPERTIES
   ADDITIONAL_MAKE_CLEAN_FILES "${_additional_make_clean_files}")
 

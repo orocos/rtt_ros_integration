@@ -1,0 +1,31 @@
+#include <@ROSMSGBOOSTHEADER@>
+#include <rtt_roscomm/rtt_rostopic_ros_msg_transporter.hpp>
+#include <rtt_roscomm/rtt_rostopic.h>
+#include <rtt/types/TransportPlugin.hpp>
+#include <rtt/types/TypekitPlugin.hpp>
+#include <rtt/transports/mqueue/MQTemplateProtocol.hpp>
+#include <rtt/transports/mqueue/MQSerializationProtocol.hpp>
+
+namespace RTT {
+    namespace mqueue {
+        bool MQROS@ROSMSGNAME@Plugin::registerTransport(std::string name, TypeInfo* ti)
+        {
+            if ( name == "/@ROSPACKAGE@/@ROSMSGNAME@" )
+                return ti->addProtocol(ORO_MQUEUE_PROTOCOL_ID, new MQSerializationProtocol<@ROSMSGTYPE@>() );
+            return false;
+        }
+
+        std::string MQROS@ROSMSGNAME@Plugin::getTransportName() const {
+            return "mqueue";
+        }
+
+        std::string MQROS@ROSMSGNAME@Plugin::getTypekitName() const {
+            return std::string("ros-")+"@ROSMSGNAME@";
+        }
+        std::string MQROS@ROSMSGNAME@Plugin::getName() const {
+            return std::string("rtt-ros-") + "@ROSMSGNAME@" + "-transport-mqueue";
+        }
+    }
+}
+
+ORO_TYPEKIT_PLUGIN( RTT::mqueue::MQROS@ROSMSGNAME@Plugin )

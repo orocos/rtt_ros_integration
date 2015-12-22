@@ -53,6 +53,8 @@ def write_boost_serialization(s, spec, cpp_name_prefix, file):
     s.write('#define %s_BOOST_SERIALIZATION_%s_H\n\n'%(spec.package.upper(), spec.short_name.upper()))
     s.write('#include <boost/serialization/serialization.hpp>\n')
     s.write('#include <boost/serialization/nvp.hpp>\n')
+    s.write('#include <boost/serialization/vector.hpp>\n')
+    s.write('#include <boost/serialization/string.hpp>\n')
     s.write('#include <%s/%s.h>\n'%(spec.package,spec.short_name))
     write_boost_includes(s, spec)
     s.write('namespace boost\n{\n')
