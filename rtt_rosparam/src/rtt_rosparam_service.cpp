@@ -31,10 +31,10 @@ public:
   {
     this->doc("RTT Service for synchronizing ROS parameters with the properties of a corresponding RTT component");
 
-    this->addConstant("RELATIVE",RELATIVE);
-    this->addConstant("ABSOLUTE",ABSOLUTE);
-    this->addConstant("PRIVATE",PRIVATE);
-    this->addConstant("COMPONENT",COMPONENT);
+    this->addConstant("RELATIVE",static_cast<int>(RELATIVE));
+    this->addConstant("ABSOLUTE",static_cast<int>(ABSOLUTE));
+    this->addConstant("PRIVATE",static_cast<int>(PRIVATE));
+    this->addConstant("COMPONENT",static_cast<int>(COMPONENT));
 
     this->addOperation("getAllRelative", &ROSParamService::getParamsRelative, this)
       .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the relative namespace.");
