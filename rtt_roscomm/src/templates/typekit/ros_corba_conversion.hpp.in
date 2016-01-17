@@ -62,7 +62,7 @@ namespace RTT
         cb.length(ser_length);
 
         for(size_t i = 0; i < ser_length; i++)
-          cb[static_cast<CORBA::ULong>(i)] = reinterpret_cast<CORBA::Octet>(m.buf[i + offset]);
+          cb[static_cast<CORBA::ULong>(i)] = static_cast<CORBA::Octet>(m.buf[i + offset]);
 
         return true;
       }
