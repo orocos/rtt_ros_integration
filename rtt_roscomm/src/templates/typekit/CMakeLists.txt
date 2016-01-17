@@ -201,8 +201,8 @@ include_directories(
     set(CORBA_GEN_CPP "") 
     set(CORBA_GEN_HPP "")
     ORO_ADD_CORBA_SERVERS(CORBA_GEN_CPP HPP ${IDLS} )
-    ADD_CUSTOM_TARGET( idl-ros DEPENDS ${CORBA_GEN_CPP} ${CORBA_GEN_HPP} COMMENT "Generating sources from .idl files")
-    MESSAGE(STATUS "ROS Corba HPPS: ${CORBA_GEN_CPP} ${CORBA_GEN_HPP}")
+    ADD_CUSTOM_TARGET( idl-ros-${_package} DEPENDS ${CORBA_GEN_CPP} ${CORBA_GEN_HPP} COMMENT "Generating sources from .idl files")
+    MESSAGE(STATUS "ROS ${_package} Corba HPPS: ${CORBA_GEN_CPP} ${CORBA_GEN_HPP}")
     INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
   endif()
 
