@@ -201,7 +201,7 @@ public:
     Server(const std::string &name, RTT::TaskContext *owner)
         : RTT::Service(name, owner)
         , node_handle_(0)
-        , update_callback_default_impl_("updateProperties", &Server<ConfigType>::updatePropertiesDefaultImpl, this, RTT::OwnThread)
+        , update_callback_default_impl_("updateProperties", &Server<ConfigType>::updatePropertiesDefaultImpl, this, RTT::OwnThread, owner->engine())
     {
         construct();
     }
@@ -214,7 +214,7 @@ public:
     Server(RTT::TaskContext *owner)
         : RTT::Service("reconfigure", owner)
         , node_handle_(0)
-        , update_callback_default_impl_("updateProperties", &Server<ConfigType>::updatePropertiesDefaultImpl, this, RTT::OwnThread)
+        , update_callback_default_impl_("updateProperties", &Server<ConfigType>::updatePropertiesDefaultImpl, this, RTT::OwnThread, owner->engine())
     {
         construct();
     }
