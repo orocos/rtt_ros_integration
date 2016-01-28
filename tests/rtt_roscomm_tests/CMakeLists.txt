@@ -7,6 +7,7 @@ if(CATKIN_ENABLE_TESTING)
 
   orocos_use_package(ocl-logging)
   orocos_use_package(ocl-deployment)
+  orocos_use_package(rtt_std_msgs)
 
   catkin_add_gtest(rtt_roscomm_api_tests test/api_tests.cpp)
   target_link_libraries(rtt_roscomm_api_tests
