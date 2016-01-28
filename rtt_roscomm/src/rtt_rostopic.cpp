@@ -9,6 +9,15 @@ RTT::ConnPolicy rtt_roscomm::topic(const std::string& name) {
   return cp;
 }
 
+RTT::ConnPolicy rtt_roscomm::topicLatched(const std::string& name) {
+  RTT::ConnPolicy cp = RTT::ConnPolicy::data();
+  cp.transport = protocol_id;
+  cp.name_id = name;
+  cp.init = true;
+  cp.pull = false;
+  return cp;
+}
+
 /**
  * Returns a ConnPolicy object for streaming to or from 
  * the given ROS topic. Also specifies the buffer size of
