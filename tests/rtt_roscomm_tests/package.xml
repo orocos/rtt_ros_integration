@@ -15,13 +15,4 @@
   <build_depend>rtt_std_msgs</build_depend>
   <build_depend>ocl</build_depend>
 
-
-  <!-- The export tag contains other, unspecified, tags -->
-  <export>
-    <!-- You can specify that this package is a metapackage here: -->
-    <!-- <metapackage/> -->
-
-    <!-- Other tools can request additional information be placed here -->
-
-  </export>
 </package>

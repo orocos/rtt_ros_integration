@@ -15,10 +15,6 @@
   <build_depend>rtt_dynamic_reconfigure</build_depend>
   <build_depend>rtt_geometry_msgs</build_depend>
 
-  <run_depend>rtt_ros</run_depend>
-  <run_depend>rtt_dynamic_reconfigure</run_depend>
-  <run_depend>rtt_geometry_msgs</run_depend>
-
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <rtt_ros>
