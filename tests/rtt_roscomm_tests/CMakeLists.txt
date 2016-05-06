@@ -15,9 +15,19 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(api_tests test/api_tests.cpp)
   target_link_libraries(api_tests
-    ${catkin_LIBRARIES} 
+    ${catkin_LIBRARIES}
     ${USE_OROCOS_LIBRARIES}
     ${OROCOS-RTT_LIBRARIES}
     ${OROCOS-RTT_RTT-SCRIPTING_LIBRARY} )
+
+  find_package(rostest REQUIRED)
+  add_rostest_gtest(transport_tests test/transport_tests.test test/transport_tests.cpp)
+  target_link_libraries(transport_tests
+    ${catkin_LIBRARIES}
+    ${USE_OROCOS_LIBRARIES}
+    ${OROCOS-RTT_LIBRARIES})
+
+  add_custom_target(test_create_rtt_msgs ${CMAKE_CURRENT_SOURCE_DIR}/test/create_rtt_msgs/test_create_rtt_msgs.sh)
+  add_dependencies(_run_tests_${PROJECT_NAME} test_create_rtt_msgs)
 
 endif()
