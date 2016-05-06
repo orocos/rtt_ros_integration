@@ -34,11 +34,9 @@ if(CATKIN_ENABLE_TESTING)
   add_subdirectory(typekit)
 
   find_package(rtt_ros REQUIRED)
-  include_directories(include/orocos)
+  include_directories(${USE_OROCOS_INCLUDE_DIRS})
 
   orocos_component(rtt_rosbuild_component src/component.cpp)
   target_link_libraries(rtt_rosbuild_component rtt-${PROJECT_NAME}-typekit)
-
-  orocos_generate_package()
 
 endif()
