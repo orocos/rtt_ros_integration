@@ -15,9 +15,6 @@
   <build_depend>rtt_rospack</build_depend>
   <build_depend>ocl</build_depend>
 
-  <run_depend>rtt_rospack</run_depend>
-
-
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <rtt_ros>
