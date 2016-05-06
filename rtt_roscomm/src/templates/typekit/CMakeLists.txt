@@ -208,7 +208,9 @@ endif()
 
 
 # Targets
-set(CMAKE_BUILD_TYPE MinSizeRel)
+if(NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CMAKE_BUILD_TYPE MinSizeRel)
+endif()
 orocos_typekit(         rtt-${_package}-typekit ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
 orocos_typekit(         rtt-${_package}-ros-transport ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp )
 

@@ -49,6 +49,7 @@
 #ifndef __RTT_ROSCOMM_ROS_MSG_TRANSPORTER_HPP_
 #define __RTT_ROSCOMM_ROS_MSG_TRANSPORTER_HPP_
 
+#include <rtt/rtt-config.h>
 #include <rtt/types/TypeTransporter.hpp>
 #include <rtt/Port.hpp>
 #include <rtt/TaskContext.hpp>
@@ -56,6 +57,13 @@
 #include <ros/ros.h>
 
 #include <rtt_roscomm/rtt_rostopic_ros_publish_activity.hpp>
+
+#ifndef RTT_VERSION_GTE
+  #define RTT_VERSION_GTE(major,minor,patch) \
+      ((RTT_VERSION_MAJOR > major) || (RTT_VERSION_MAJOR == major && \
+       (RTT_VERSION_MINOR > minor) || (RTT_VERSION_MINOR == minor && \
+       (RTT_VERSION_PATCH >= patch))))
+#endif
 
 namespace rtt_roscomm {
 
@@ -143,13 +151,21 @@ namespace rtt_roscomm {
      * 
      * @param sample 
      * 
-     * @return always true
+     * @return always true/WriteSuccess
      */
+#if RTT_VERSION_GTE(2,8,99)
+    virtual WriteStatus data_sample(typename base::ChannelElement<T>::param_t sample)
+    {
+      this->sample = sample;
+      return WriteSuccess;
+    }
+#else
     virtual bool data_sample(typename base::ChannelElement<T>::param_t sample)
     {
       this->sample = sample;
       return true;
     }
+#endif
 
     /** 
      * signal from the port that new data is availabe to publish
@@ -169,10 +185,18 @@ namespace rtt_roscomm {
         write(sample);
     }
 
+#if RTT_VERSION_GTE(2,8,99)
+    WriteStatus write(typename base::ChannelElement<T>::param_t sample)
+#else
     bool write(typename base::ChannelElement<T>::param_t sample)
+#endif
     {
       ros_pub.publish(sample);
+#if RTT_VERSION_GTE(2,8,99)
+      return WriteSuccess;
+#else
       return true;
+#endif
     }
     
   };
@@ -225,7 +249,8 @@ namespace rtt_roscomm {
     virtual bool inputReady() {
       return true;
     }
-    /** 
+
+    /**
      * Callback function for the ROS subscriber, it will trigger the ChannelElement's signal function
      * 
      * @param msg The received message
@@ -241,24 +266,48 @@ namespace rtt_roscomm {
   class RosMsgTransporter : public RTT::types::TypeTransporter
   {
     virtual base::ChannelElementBase::shared_ptr createStream (base::PortInterface *port, const ConnPolicy &policy, bool is_sender) const{
-      base::ChannelElementBase::shared_ptr buf = internal::ConnFactory::buildDataStorage<T>(policy);
-      base::ChannelElementBase::shared_ptr tmp;
-      if(is_sender){
-        tmp = base::ChannelElementBase::shared_ptr(new RosPubChannelElement<T>(port,policy));
+      base::ChannelElementBase::shared_ptr channel;
+
+      // Pull semantics are not supported by the ROS message transport.
+      if (policy.pull) {
+          RTT::log(RTT::Error) << "Pull connections are not supported by the ROS message transport." << endlog();
+          return base::ChannelElementBase::shared_ptr();
+      }
+
+      // Check if this node is initialized
+      if (!ros::ok()) {
+          RTT::log(RTT::Error) << "Cannot create ROS message transport because the node is not initialized or already shutting down. Did you import package rtt_rosnode before?" << endlog();
+          return base::ChannelElementBase::shared_ptr();
+      }
+
+      if (is_sender){
+        channel = new RosPubChannelElement<T>(port, policy);
+
         if (policy.type == RTT::ConnPolicy::UNBUFFERED){
           log(Debug) << "Creating unbuffered publisher connection for port " << port->getName() << ". This may not be real-time safe!" << endlog();
-          return tmp;
+          return channel;
         }
+
+        base::ChannelElementBase::shared_ptr buf = internal::ConnFactory::buildDataStorage<T>(policy);
         if (!buf) return base::ChannelElementBase::shared_ptr();
-        buf->setOutput(tmp);
+#if RTT_VERSION_GTE(2,8,99)
+        buf->connectTo(channel);
+#else
+        buf->setOutput(channel);
+#endif
         return buf;
-      }
-      else {
+
+      } else {
+        channel = new RosSubChannelElement<T>(port, policy);
+
+#if !RTT_VERSION_GTE(2,8,99)
+        base::ChannelElementBase::shared_ptr buf = internal::ConnFactory::buildDataStorage<T>(policy);
         if (!buf) return base::ChannelElementBase::shared_ptr();
-        tmp = new RosSubChannelElement<T>(port,policy);
-        tmp->setOutput(buf);
-        return tmp;
+        channel->setOutput(buf);
+#endif
       }
+
+      return channel;
     }
   };
 } 
