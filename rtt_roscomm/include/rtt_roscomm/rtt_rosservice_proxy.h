@@ -67,6 +67,12 @@ public:
         this);
   }
 
+  ~ROSServiceServerProxy()
+  {
+    // Clean-up advertized ROS services
+    server_.shutdown();     
+  }
+
 private:
   
   //! The callback called by the ROS service server when this service is invoked
