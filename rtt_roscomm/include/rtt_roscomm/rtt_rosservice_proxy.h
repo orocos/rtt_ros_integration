@@ -11,6 +11,7 @@ class ROSServiceProxyBase
 {
 public:
   ROSServiceProxyBase(const std::string &service_name) : service_name_(service_name) { }
+  virtual ~ROSServiceProxyBase() { }
   //! Get the name of the ROS service
   const std::string& getServiceName() const { return service_name_; }
 private:
