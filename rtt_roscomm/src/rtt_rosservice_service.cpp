@@ -38,6 +38,22 @@ public:
     get_service_factory = rosservice_registry_->getOperation("getServiceFactory");
   }
 
+  ~ROSServiceService()
+  {
+    // Cleanup registered ROS services and clients
+    std::map<std::string, ROSServiceServerProxyBase*>::iterator iter_s;
+    for(iter_s=server_proxies_.begin(); iter_s != server_proxies_.end(); iter_s++)
+    {
+      delete iter_s->second;
+    }
+
+    std::map<std::string, ROSServiceClientProxyBase*>::iterator iter_c;
+    for(iter_c=client_proxies_.begin(); iter_c != client_proxies_.end(); iter_c++)
+    {
+      delete iter_c->second;
+    }
+  }
+
   //! Get an RTT operation caller from a string identifier
   RTT::base::OperationCallerBaseInvoker* get_owner_operation_caller(const std::string rtt_uri)
   {
