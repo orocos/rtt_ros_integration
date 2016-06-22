@@ -1,0 +1,16 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package rtt_ros
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Forthcoming
+-----------
+
+2.8.2 (2015-06-12)
+------------------
+
+2.8.1 (2015-03-16)
+------------------
+
+2.7.2 (2015-07-21)
+------------------
+* see `rtt_ros_integratoin/CHANGELOG.rst <../rtt_ros_integration/CHANGELOG.rst>`_
