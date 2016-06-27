@@ -1,14 +1,7 @@
 @ROSMSGCORBAHEADERS@
-#include <rtt_roscomm/rtt_rostopic_ros_msg_transporter.hpp>
-#include <rtt_roscomm/rtt_rostopic.h>
 #include <rtt/types/TransportPlugin.hpp>
 #include <rtt/types/TypekitPlugin.hpp>
-//#include <rtt/transports/corba/TransportPlugin.hpp>
 #include <rtt/transports/corba/CorbaTemplateProtocol.hpp>
-
-using namespace RTT;
-using namespace RTT::types;
-using namespace RTT::corba;
 
 namespace RTT {
     namespace corba {
