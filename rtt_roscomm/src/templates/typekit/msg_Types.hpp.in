@@ -8,7 +8,6 @@
 
 // All these classes were generated in the typekit library:
 #ifdef CORELIB_DATASOURCE_HPP
-    extern template class RTT::internal::DataSourceTypeInfo< @ROSMSGTYPE@ >;
     extern template class RTT::internal::DataSource< @ROSMSGTYPE@ >;
     extern template class RTT::internal::AssignableDataSource< @ROSMSGTYPE@ >;
     extern template class RTT::internal::AssignCommand< @ROSMSGTYPE@ >;
