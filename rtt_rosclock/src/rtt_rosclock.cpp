@@ -55,13 +55,17 @@ const ros::Time rtt_rosclock::rtt_now()
   const uint64_t one_E9 = 1000000000ULL;
   // NOTE: getNSecs returns wall time, getTicks returns offset time
 #ifdef __XENO__
-  uint64_t nsec64 = RTT::os::TimeService::Instance()->getNSecs(); //RTT::os::TimeService::Instance()->getNSecs();
+  uint64_t nsec64;
+  if(SimClockThread::GetInstance() && SimClockThread::GetInstance()->simTimeEnabled())
+      nsec64 = RTT::os::TimeService::ticks2nsecs(RTT::os::TimeService::Instance()->getTicks());
+  else
+      nsec64 = RTT::os::TimeService::Instance()->getNSecs();
 #else
   uint64_t nsec64 = RTT::os::TimeService::ticks2nsecs(RTT::os::TimeService::Instance()->getTicks()); //RTT::os::TimeService::Instance()->getNSecs();
 #endif
   uint32_t sec32_part = nsec64 / one_E9;
   uint32_t nsec32_part = nsec64 % one_E9;
-  //RTT::log(RTT::Error) << "sec: " << sec32 << " nsec: " << nsec32 << RTT::endlog();
+  //RTT::log(RTT::Error) << "sec: " << sec32_part << " nsec: " << nsec32_part << RTT::endlog();
   return ros::Time(sec32_part, nsec32_part);
 }
 
