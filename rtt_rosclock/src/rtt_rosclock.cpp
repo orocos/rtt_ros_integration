@@ -13,7 +13,7 @@ namespace rtt_rosclock {
 const ros::Time rtt_rosclock::host_now()
 {
   if(SimClockThread::GetInstance() && SimClockThread::GetInstance()->simTimeEnabled()) {
-    return rtt_now();   
+    return rtt_now();
   }
 
   #ifdef __XENO__
@@ -26,12 +26,12 @@ const ros::Time rtt_rosclock::host_now()
     }
 
     return ros::Time(ts.tv_sec, ts.tv_nsec);
-  #else 
+  #else
     return ros::Time::now();
   #endif
 }
 
-const ros::Time rtt_rosclock::host_wall_now() 
+const ros::Time rtt_rosclock::host_wall_now()
 {
   #ifdef __XENO__
     // Use Xenomai 2.6 feature to get the NTP-synched real-time clock
@@ -43,25 +43,21 @@ const ros::Time rtt_rosclock::host_wall_now()
     }
 
     return ros::Time(ts.tv_sec, ts.tv_nsec);
-  #else 
+  #else
     ros::WallTime now(ros::WallTime::now());
     return ros::Time(now.sec, now.nsec);
   #endif
 }
 
-const ros::Time rtt_rosclock::rtt_now() 
+const ros::Time rtt_rosclock::rtt_now()
 {
   // count the zeros...   -987654321--
   const uint64_t one_E9 = 1000000000ULL;
   // NOTE: getNSecs returns wall time, getTicks returns offset time
-#ifdef __XENO__
-  uint64_t nsec64 = RTT::os::TimeService::Instance()->getNSecs(); //RTT::os::TimeService::Instance()->getNSecs();
-#else
-  uint64_t nsec64 = RTT::os::TimeService::ticks2nsecs(RTT::os::TimeService::Instance()->getTicks()); //RTT::os::TimeService::Instance()->getNSecs();
-#endif
+  uint64_t nsec64 = RTT::os::TimeService::ticks2nsecs(RTT::os::TimeService::Instance()->getTicks());
   uint32_t sec32_part = nsec64 / one_E9;
   uint32_t nsec32_part = nsec64 % one_E9;
-  //RTT::log(RTT::Error) << "sec: " << sec32 << " nsec: " << nsec32 << RTT::endlog();
+  //RTT::log(RTT::Error) << "sec: " << sec32_part << " nsec: " << nsec32_part << RTT::endlog();
   return ros::Time(sec32_part, nsec32_part);
 }
 
@@ -76,7 +72,7 @@ const ros::Time rtt_rosclock::rtt_wall_now()
   return ros::Time(sec64_part, nsec64_part);
 }
 
-const RTT::Seconds rtt_rosclock::host_offset_from_rtt() 
+const RTT::Seconds rtt_rosclock::host_offset_from_rtt()
 {
   return (rtt_rosclock::host_wall_now() - rtt_rosclock::rtt_wall_now()).toSec();
 }
@@ -102,7 +98,7 @@ const bool rtt_rosclock::enable_sim()
   return SimClockThread::Instance()->start();
 }
 
-const bool rtt_rosclock::disable_sim() 
+const bool rtt_rosclock::disable_sim()
 {
   return SimClockThread::Instance()->stop();
 }
