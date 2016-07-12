@@ -1,4 +1,4 @@
-find_package(OROCOS-RTT 2.0.0  COMPONENTS rtt-scripting rtt-marshalling rtt-transport-mqueue rtt-transport-corba)
+find_package(OROCOS-RTT 2.0.0 COMPONENTS rtt-scripting rtt-marshalling rtt-transport-mqueue rtt-transport-corba)
 if (NOT OROCOS-RTT_FOUND)
   message(FATAL_ERROR "\n   RTT not found. Is the version correct? Use the CMAKE_PREFIX_PATH cmake or environment variable to point to the installation directory of RTT.")
 else()
@@ -8,17 +8,27 @@ endif()
 
 include(AddFileDependencies)
 
-if (OROCOS-RTT_MQUEUE_FOUND)
-  message(STATUS "Building MQueue transport for ROS messages with ${OROCOS-RTT_MQUEUE_LIBRARIES}")
-else()
-  message(WARNING "Not building MQueue transport for ROS messages")
+# mqueue transport
+OPTION(ENABLE_MQ "Build posix message queue transport plugin for ${_package}" OFF)
+if(ENABLE_MQ)
+  if (OROCOS-RTT_MQUEUE_FOUND)
+    message(STATUS "Building MQueue transport plugin for ROS messages in package ${_package} with ${OROCOS-RTT_MQUEUE_LIBRARIES}")
+  else()
+    message(WARNING "Disabled built of posix message queue transport plugin for ${_package} because the RTT mqueue plugin could not be found.")
+    set(ENABLE_MQ OFF CACHE BOOL "Build posix message queue transport plugin for ${_package} (forced to OFF)" FORCE)
+  endif()
 endif()
 
-if ( OROCOS-RTT_CORBA_FOUND )
-  message(STATUS "Building CORBA transport for ROS messages with ${OROCOS-RTT_CORBA_LIBRARIES}")
-else( OROCOS-RTT_CORBA_FOUND )
-  message(WARNING "Not building CORBA transport for ROS messages")
-endif( OROCOS-RTT_CORBA_FOUND )
+# corba transport
+OPTION(ENABLE_CORBA "Build CORBA transport plugin for ${_package}" OFF)
+if(ENABLE_CORBA)
+  if(OROCOS-RTT_CORBA_FOUND)
+    message(STATUS "Building CORBA transport plugin for ROS messages in package ${_package} with ${OROCOS-RTT_CORBA_LIBRARIES}")
+  else()
+    message(WARNING "Disabled built of CORBA transport plugin for ${_package} because the RTT CORBA plugin could not be found.")
+    set(ENABLE_CORBA OFF CACHE BOOL "Build CORBA transport plugin for ${_package} (forced to OFF)" FORCE)
+  endif()
+endif()
 
 # Configure source and destination paths of generated files
 rtt_roscomm_destinations()
@@ -92,7 +102,7 @@ foreach( FILE ${MSG_FILES} )
   set(ROSMSGBOOSTHEADER  "${_package}/boost/${ROSMSGNAME}.h")
   # ros_msg_typekit_plugin.cpp.in, ros_msg_typekit_package.cpp.in
   set(ROSMSGBOOSTHEADERS "${ROSMSGBOOSTHEADERS}#include <orocos/${ROSMSGBOOSTHEADER}>\n")
-  # ros_corba_conversion.hpp.in
+  # ros_msg_corba_conversion.hpp.in
   set(ROSMSGCORBABOOSTHEADER "#include <orocos/${ROSMSGBOOSTHEADER}>\n")
   # ros_msg_transport_corba_package.cpp.in
   set(ROSMSGCORBAHEADERS "${ROSMSGCORBAHEADERS}#include \"ros_${ROSMSGNAME}_corba_conversion.hpp\"\n")
@@ -130,53 +140,51 @@ foreach( FILE ${MSG_FILES} )
 
   #set_source_files_properties(${ROSMSGS_GENERATED_BOOST_HEADERS} PROPERTIES GENERATED TRUE)
 
+  # Message-specific typekit module
   configure_file(
     ros_msg_typekit_plugin.cpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_typekit_plugin.cpp @ONLY )
+  list(APPEND rtt-${_package}-typekit_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_typekit_plugin.cpp )
+  add_file_dependencies( ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_typekit.cpp ${FILE})
 
-  # Transport for ROS
-  configure_file(
-    ros_msg_transport_plugin.cpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_plugin.cpp @ONLY )
-
-  # Transport for MQ-ROS
-  configure_file(
-    ros_msg_transport_mqueue_plugin.cpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_mqueue_plugin.cpp @ONLY )
-
-  # Transport for CORBA
-  configure_file(
-    ros_corba_conversion.hpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_corba_conversion.hpp @ONLY )
+  # Conversion header for CORBA
+  if(ENABLE_CORBA)
+    configure_file(
+      ros_msg_corba_conversion.hpp.in
+      ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_corba_conversion.hpp @ONLY )
+    list(APPEND rtt-${_package}-ros-transport-corba_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_corba_conversion.hpp )
+    add_file_dependencies( ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_corba_conversion.hpp ${FILE})
+  endif()
 
   # Types.hpp helper for extern templates
   configure_file(
     msg_Types.hpp.in
     ${_template_typekit_dst_dir}/${ROSMSGNAME}.h @ONLY )
-
-  list(APPEND ROSMSG_TYPEKIT_PLUGINS ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_typekit_plugin.cpp )
-  list(APPEND ROSMSG_TRANSPORT_PLUGIN ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_plugin.cpp )
-  list(APPEND ROSMSG_TRANSPORT_MQUEUE_PLUGIN ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_transport_mqueue_plugin.cpp )
-  list(APPEND ROSMSG_TRANSPORT_CORBA_PLUGIN ${CMAKE_CURRENT_BINARY_DIR}/ros_${ROSMSGNAME}_corba_conversion.hpp )
-
-  add_file_dependencies( ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp ${FILE})
 endforeach( FILE ${MSG_FILES} )
 
 configure_file(
-  ros_msg_typekit_package.cpp.in
+  ros_package_typekit.cpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp @ONLY )
+list(APPEND rtt-${_package}-typekit_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp )
 
 configure_file(
-  ros_msg_transport_package.cpp.in
+  ros_package_transport.cpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp @ONLY )
+list(APPEND rtt-${_package}-ros-transport_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp )
 
-configure_file(
-  ros_msg_transport_mqueue_package.cpp.in
-  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_mqueue.cpp @ONLY )
+if(ENABLE_MQ)
+  configure_file(
+    ros_package_transport_mqueue.cpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_mqueue.cpp @ONLY )
+  list(APPEND rtt-${_package}-ros-transport-mqueue_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_mqueue.cpp )
+endif()
 
-configure_file(
-  ros_msg_transport_corba_package.cpp.in
-  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_corba.cpp @ONLY )
+if(ENABLE_CORBA)
+  configure_file(
+    ros_package_transport_corba.cpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_corba.cpp @ONLY )
+  list(APPEND rtt-${_package}-ros-transport-corba_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_corba.cpp )
+endif()
 
 # Both are equivalent
 configure_file(
@@ -193,7 +201,7 @@ include_directories(
   ${USE_OROCOS_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS})
 
-if ( OROCOS-RTT_CORBA_FOUND )
+if(ENABLE_CORBA)
   list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/config)
   set(ENABLE_CORBA TRUE)
   find_package(Corba REQUIRED)
@@ -204,6 +212,7 @@ if ( OROCOS-RTT_CORBA_FOUND )
   ADD_CUSTOM_TARGET( idl-ros-${_package} DEPENDS ${CORBA_GEN_CPP} ${CORBA_GEN_HPP} COMMENT "Generating sources from .idl files")
   MESSAGE(STATUS "ROS ${_package} Corba HPPS: ${CORBA_GEN_CPP} ${CORBA_GEN_HPP}")
   INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
+  list(APPEND rtt-${_package}-ros-transport-corba_SOURCES ${CORBA_GEN_CPP} ${CORBA_GEN_HPP})
 endif()
 
 
@@ -211,23 +220,22 @@ endif()
 if(NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CMAKE_BUILD_TYPE MinSizeRel)
 endif()
-orocos_typekit(         rtt-${_package}-typekit ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
-orocos_typekit(         rtt-${_package}-ros-transport ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp )
+orocos_typekit(rtt-${_package}-typekit ${rtt-${_package}-typekit_SOURCES})
+target_link_libraries(rtt-${_package}-typekit ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
+orocos_typekit(rtt-${_package}-ros-transport ${rtt-${_package}-ros-transport_SOURCES})
+target_link_libraries(rtt-${_package}-ros-transport ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 
-# Build mqueue typekit
-if (OROCOS-RTT_MQUEUE_FOUND)
-  orocos_typekit(         rtt-${_package}-ros-transport-mqueue ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_mqueue.cpp )
-  target_link_libraries(  rtt-${_package}-ros-transport-mqueue ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES} ${OROCOS-RTT_MQUEUE_LIBRARIES})
+# Build mqueue transport plugin
+if(ENABLE_MQ)
+  orocos_typekit(rtt-${_package}-ros-transport-mqueue ${rtt-${_package}-ros-transport-mqueue_SOURCES})
+  target_link_libraries(rtt-${_package}-ros-transport-mqueue ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES} ${OROCOS-RTT_MQUEUE_LIBRARIES})
 endif()
 
-# Build corba typekit
-if (OROCOS-RTT_CORBA_FOUND)
-  orocos_typekit(         rtt-${_package}-ros-transport-corba ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_corba.cpp ${CORBA_GEN_CPP})
-  target_link_libraries(  rtt-${_package}-ros-transport-corba ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES} ${OROCOS-RTT_CORBA_LIBRARIES})
+# Build corba transport plugin
+if(ENABLE_CORBA)
+  orocos_typekit(rtt-${_package}-ros-transport-corba ${rtt-${_package}-ros-transport-corba_SOURCES})
+  target_link_libraries(rtt-${_package}-ros-transport-corba ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES} ${OROCOS-RTT_CORBA_LIBRARIES})
 endif()
-
-target_link_libraries(  rtt-${_package}-typekit ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
-target_link_libraries(  rtt-${_package}-ros-transport ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 
 # Add an explicit dependency between the typekits and message files
 # TODO: Add deps for all msg dependencies
@@ -235,10 +243,10 @@ if(${_package}_EXPORTED_TARGETS)
   if(NOT ${_package} STREQUAL ${PROJECT_NAME})
     add_dependencies(rtt-${_package}-typekit ${${_package}_EXPORTED_TARGETS})
     add_dependencies(rtt-${_package}-ros-transport ${${_package}_EXPORTED_TARGETS})
-    if (OROCOS-RTT_MQUEUE_FOUND)
+    if(TARGET rtt-${_package}-ros-transport-mqueue)
       add_dependencies(rtt-${_package}-ros-transport-mqueue ${${_package}_EXPORTED_TARGETS})
     endif()
-    if (OROCOS-RTT_CORBA_FOUND)
+    if(TARGET rtt-${_package}-ros-transport-corba)
       add_dependencies(rtt-${_package}-ros-transport-corba ${${_package}_EXPORTED_TARGETS})
     endif()
   endif()
@@ -249,19 +257,19 @@ endif()
 #    LIST(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS "rtt-${_package}-ros-transport")  # <-- This is already done in orocos_typekit().
 LIST(APPEND ${PROJECT_NAME}_EXPORTED_INCLUDE_DIRS "${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos" ${${_package}_INCLUDE_DIRS})
 
-add_file_dependencies(  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
-add_file_dependencies(  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
+add_file_dependencies(${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp ${CMAKE_CURRENT_LIST_FILE} ${ROSMSGS_GENERATED_BOOST_HEADERS})
+add_file_dependencies(${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp ${CMAKE_CURRENT_LIST_FILE} ${ROSMSGS_GENERATED_BOOST_HEADERS})
 
-if (OROCOS-RTT_MQUEUE_FOUND)
-  add_file_dependencies(  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_mqueue.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
+if(ENABLE_MQ)
+  add_file_dependencies(${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_mqueue.cpp ${CMAKE_CURRENT_LIST_FILE} ${ROSMSGS_GENERATED_BOOST_HEADERS})
 endif()
 
-if (OROCOS-RTT_CORBA_FOUND)
-  add_file_dependencies(  ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_corba.cpp "${CMAKE_CURRENT_LIST_FILE}" ${ROSMSGS_GENERATED_BOOST_HEADERS} )
+if(ENABLE_CORBA)
+  add_file_dependencies(${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport_corba.cpp ${CMAKE_CURRENT_LIST_FILE} ${ROSMSGS_GENERATED_BOOST_HEADERS})
 endif()
 
 get_directory_property(_additional_make_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
-list(APPEND _additional_make_clean_files "${ROSMSG_TYPEKIT_PLUGINS};${ROSMSG_TRANSPORT_PLUGIN};${ROSMSG_TRANSPORT_CORBA_PLUGIN};${ROSMSG_TRANSPORT_MQUEUE_PLUGIN};${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp;${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp;${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${_package}")
+list(APPEND _additional_make_clean_files "${rtt-${_package}-typekit_SOURCES};${rtt-${_package}-ros-transport_SOURCES};${rtt-${_package}-ros-transport-corba_SOURCES};${rtt-${_package}-ros-transport-mqueue_SOURCES};${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos/${_package}")
 set_directory_properties(PROPERTIES
   ADDITIONAL_MAKE_CLEAN_FILES "${_additional_make_clean_files}")
 
