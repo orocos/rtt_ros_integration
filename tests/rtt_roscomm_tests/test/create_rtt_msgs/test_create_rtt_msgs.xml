@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "cpf.dtd">
+<properties>
+  <simple name="Import" type="string"><value>rtt_my_msgs</value></simple>
+
+  <!-- We need to load at least one component to make the deployer happy. -->
+  <struct name="Foo" type="TaskContext" />
+
+</properties>

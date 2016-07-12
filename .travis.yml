@@ -28,7 +28,6 @@ install:
 script:
   # Run tests
   - source devel/setup.bash
-  - rosrun rtt_roscomm_tests test_message_package.bash
   - catkin_make run_tests
   - catkin_test_results
   #- catkin_make install
