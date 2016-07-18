@@ -1,7 +1,8 @@
 #ifndef __ROS_@ROSPACKAGE@_@ROSMSGNAME@_CORBA_CONVERSION__
 #define __ROS_@ROSPACKAGE@_@ROSMSGNAME@_CORBA_CONVERSION__
 
-#include <@ROSPACKAGE@/@ROSMSGNAME@.h>
+#include <@ROSMSGHEADER@>
+
 #include <rtt_roscomm/rtt_rostopic_ros_msg_transporter.hpp>
 #include <rtt_roscomm/rtt_rostopic.h>
 #include <rtt/Logger.hpp>
@@ -18,11 +19,11 @@ namespace RTT
   namespace corba{
 
     template<>
-    struct AnyConversion< @ROSPACKAGE@::@ROSMSGNAME@ >
+    struct AnyConversion< @ROSMSGTYPE@ >
     {
       //typedef CORBA::OctetSeq CorbaType;
       typedef ros::corba::OctetSequence CorbaType;
-      typedef @ROSPACKAGE@::@ROSMSGNAME@ StdType;
+      typedef @ROSMSGTYPE@ StdType;
 
       static CorbaType* toAny(const StdType& tp) {
         CorbaType* cb = new CorbaType();
