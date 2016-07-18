@@ -238,7 +238,6 @@ namespace rtt_roscomm {
       } else {
         ros_sub = ros_node.subscribe(policy.name_id,policy.size,&RosSubChannelElement::newData,this);
       }
-      this->ref();
     }
 
     ~RosSubChannelElement() {
