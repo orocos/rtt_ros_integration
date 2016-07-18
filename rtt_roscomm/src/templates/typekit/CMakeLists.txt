@@ -98,8 +98,10 @@ foreach( FILE ${MSG_FILES} )
   set(ROSMSGTYPENAME     "/${_package}/${ROSMSGNAME}")
   set(ROSMSGCTYPENAME    "/${_package}/c${ROSMSGNAME}")
 
-  # msg_Types.hpp.in, ros_msg_typekit_plugin.cpp.in, ros_msg_typekit_package.cpp.in
-  set(ROSMSGBOOSTHEADER  "${_package}/boost/${ROSMSGNAME}.h")
+  # msg_Types.hpp.in, ros_msg_corba_conversion.hpp.in
+  set(ROSMSGHEADER "${_package}/${ROSMSGNAME}.h")
+  # ros_msg_typekit_plugin.cpp.in, ros_msg_typekit_package.cpp.in
+  set(ROSMSGBOOSTHEADER "${_package}/boost/${ROSMSGNAME}.h")
   # ros_msg_typekit_plugin.cpp.in, ros_msg_typekit_package.cpp.in
   set(ROSMSGBOOSTHEADERS "${ROSMSGBOOSTHEADERS}#include <orocos/${ROSMSGBOOSTHEADER}>\n")
   # ros_corba_conversion.hpp.in
