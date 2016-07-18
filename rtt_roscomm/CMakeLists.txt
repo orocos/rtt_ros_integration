@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_roscomm)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros)
+find_package(catkin REQUIRED COMPONENTS rtt_ros roscpp)
 
 catkin_package(
-  CATKIN_DEPENDS rtt_ros
+  CATKIN_DEPENDS rtt_ros roscpp
   CFG_EXTRAS GenerateRTTROSCommPackage.cmake
 )
 
