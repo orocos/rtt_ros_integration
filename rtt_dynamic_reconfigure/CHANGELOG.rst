@@ -4,6 +4,10 @@ Changelog for package rtt_dynamic_reconfigure
 
 Forthcoming
 -----------
+
+2.8.3 (2016-07-20)
+------------------
+* rtt_dynamic_reconfigure: fixed potential deadlock in refresh() for RTT prior to 2.9
 * rtt_dynamic_reconfigure: set owner of default updateCallback implementation
 * Contributors: Johannes Meyer
 

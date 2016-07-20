@@ -4,6 +4,9 @@ Orocos RTT/ROS Integration Changelog
 
 Forthcoming
 -----------
+
+2.8.3 (2016-07-20)
+------------------
 * Please check the changelogs of the individual packages, e.g.:
 
   - `rtt_roscomm <../rtt_roscomm/CHANGELOG.rst>`_

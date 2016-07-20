@@ -5,6 +5,9 @@ Changelog for package rtt_rospack_tests
 Forthcoming
 -----------
 * tests: add USE_OROCOS_INCLUDE_DIRS explicitly and remove orocos_generate_package() calls for tests
+
+2.8.3 (2016-07-20)
+------------------
 * tests: removed all run dependencies or replaced them by test dependencies
 * Contributors: Johannes Meyer
 
