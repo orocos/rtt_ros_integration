@@ -2,6 +2,12 @@
 Changelog for package rtt_dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.3 (2016-07-20)
+------------------
+* rtt_dynamic_reconfigure: fixed potential deadlock in refresh() for RTT prior to 2.9
+* rtt_dynamic_reconfigure: set owner of default updateCallback implementation
+* Contributors: Johannes Meyer
+
 2.8.2 (2015-06-12)
 ------------------
 * rtt_dynamic_reconfigure: added support for Property composition and decomposition and fixed reconfiguration of nested properties
