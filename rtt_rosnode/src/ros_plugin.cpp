@@ -34,22 +34,31 @@
 #include <ros/ros.h>
 
 using namespace RTT;
+
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
 
     // Initialize ROS if necessary
-    if(!ros::isInitialized()){
-      log(Info)<<"Initializing ROS node in Orocos plugin..."<<endlog();
+    if (!ros::isInitialized()) {
+      log(Info) << "Initializing ROS node in Orocos plugin..." << endlog();
 
       int argc = __os_main_argc();
       char ** argv = __os_main_argv();
 
-      ros::init(argc,argv,"rtt",ros::init_options::AnonymousName);
+      // copy the argv array of C strings into a std::vector<char *>
+      // Rationale: ros::init(int &argc, char **argv) removes some of the
+      // command line arguments and rearranges the remaining ones in the argv
+      // vector.
+      // See https://github.com/orocos/rtt_ros_integration/issues/54
+      std::vector<char *> argvv(argv, argv + argc);
+      assert(argvv.size() == argc);
+      ros::init(argc, argvv.data(), "rtt", ros::init_options::AnonymousName);
+      argvv.resize(argc);
 
-      if(ros::master::check())
+      if (ros::master::check()) {
         ros::start();
-      else{
-        log(Warning)<<"'roscore' is not running: no ROS functions will be available."<<endlog();
+      } else {
+        log(Warning) << "'roscore' is not running: no ROS functions will be available." << endlog();
         ros::shutdown();
         return true;
       }
@@ -64,14 +73,16 @@ extern "C" {
 
     // TODO: Check spinner.canStart() to suppress errors / warnings once it's incorporated into ROS
     spinner.start();
-    log(Info)<<"ROS node spinner started (" << thread_count << " " << (thread_count > 1 ? "threads" : "thread") << ")."<<endlog();
+    log(Info) << "ROS node spinner started (" << thread_count << " " << (thread_count > 1 ? "threads" : "thread") << ")." << endlog();
 
     return true;
   }
-  std::string getRTTPluginName (){
+
+  std::string getRTTPluginName () {
     return "rosnode";
   }
-  std::string getRTTTargetName (){
+
+  std::string getRTTTargetName () {
     return OROCOS_TARGET_NAME;
   }
 }
