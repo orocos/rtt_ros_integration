@@ -234,9 +234,9 @@ namespace rtt_roscomm {
         log(Debug)<<"Creating ROS subscriber for port "<<port->getName()<<" on topic "<<policy.name_id<<endlog();
       }
       if(topicname.length() > 1 && topicname.at(0) == '~') {
-        ros_sub = ros_node_private.subscribe(policy.name_id.substr(1),policy.size,&RosSubChannelElement::newData,this);
+        ros_sub = ros_node_private.subscribe(policy.name_id.substr(1), policy.size > 0 ? policy.size : 1, &RosSubChannelElement::newData, this); // minimum queue_size 1
       } else {
-        ros_sub = ros_node.subscribe(policy.name_id,policy.size,&RosSubChannelElement::newData,this);
+        ros_sub = ros_node.subscribe(policy.name_id, policy.size > 0 ? policy.size : 1, &RosSubChannelElement::newData, this); // minimum queue_size 1
       }
     }
 

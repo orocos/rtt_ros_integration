@@ -52,9 +52,19 @@
 #include <dynamic_reconfigure/Config.h>
 #include <dynamic_reconfigure/ConfigDescription.h>
 
+#include <rtt/rtt-config.h>
+#if !defined(RTT_VERSION_GTE)
+    #define RTT_VERSION_GTE(major,minor,patch) \
+        ((RTT_VERSION_MAJOR > major) || (RTT_VERSION_MAJOR == major && \
+         (RTT_VERSION_MINOR > minor) || (RTT_VERSION_MINOR == minor && \
+         (RTT_VERSION_PATCH >= patch))))
+#endif
+
 namespace rtt_dynamic_reconfigure {
 
 template <class ConfigType> class Server;
+typedef bool (UpdateCallbackSignature)(const RTT::PropertyBag &source, uint32_t level);
+typedef void (NotifyCallbackSignature)(uint32_t level);
 
 /**
  * This class converts between a dynamic_reconfigure Config class and an RTT::PropertyBag.
@@ -187,9 +197,9 @@ private:
     mutable boost::shared_ptr<UpdaterType> updater_;
     bool initialized_;
 
-    RTT::OperationCaller<bool(const RTT::PropertyBag &source, uint32_t level)> update_callback_;
-    RTT::OperationCaller<void(uint32_t level)> notify_callback_;
-    RTT::Operation<bool(const RTT::PropertyBag &source, uint32_t level)> update_callback_default_impl_;
+    RTT::OperationCaller<UpdateCallbackSignature> update_callback_;
+    RTT::OperationCaller<NotifyCallbackSignature> notify_callback_;
+    RTT::Operation<UpdateCallbackSignature> update_callback_default_impl_;
 
 public:
     /**
@@ -454,8 +464,47 @@ public:
         // At startup we need to load the configuration with all level bits set (everything has changed).
         RTT::PropertyBag init_config;
         updater()->propertiesFromConfig(config_, ~0, init_config);
+
+        // Invoke update and notification callback
+#if !RTT_VERSION_GTE(2,8,99)
+        // Additional check for RTT < 2.9:
+        // ===============================
+        // We do not know for sure which thread is calling this method/operation, but we can check if the current
+        // thread is the same as the thread that will process the update/notify operation. If yes, we clone the
+        // underlying OperationCaller implementation and set the caller to the processing engine. In this case
+        // RTT < 2.9 should always call the operation directly as if it would be a ClientThread operation:
+        // https://github.com/orocos-toolchain/rtt/blob/toolchain-2.8/rtt/base/OperationCallerInterface.hpp#L79
+        //
+        // RTT 2.9 and above already checks the caller thread internally and therefore does not require this hack.
+        //
+        RTT::base::OperationCallerBase<UpdateCallbackSignature>::shared_ptr update_callback_impl = update_callback_.getOperationCallerImpl();
+        if (update_callback_impl && update_callback_impl->isSend()) {
+            RTT::ExecutionEngine *engine = update_callback_impl->getMessageProcessor();
+            if (engine && engine->getThread() && engine->getThread()->isSelf()) {
+                RTT::Logger::In in(this->getOwner()->getName() + "." + this->getName());
+                RTT::log(RTT::Debug) << "calling my own updateProperties operation from refresh()" << RTT::endlog();
+                update_callback_impl.reset(update_callback_impl->cloneI(engine));
+                update_callback_impl->call(init_config, ~0);
+            } else {
+                update_callback_(init_config, ~0);
+            }
+        }
+        RTT::base::OperationCallerBase<NotifyCallbackSignature>::shared_ptr notify_callback_impl = notify_callback_.getOperationCallerImpl();
+        if (notify_callback_impl && notify_callback_impl->isSend()) {
+            RTT::ExecutionEngine *engine = notify_callback_impl->getMessageProcessor();
+            if (engine && engine->getThread() && engine->getThread()->isSelf()) {
+                RTT::Logger::In in(this->getOwner()->getName() + "." + this->getName());
+                RTT::log(RTT::Debug) << "calling my own notifyPropertiesUpdate operation from refresh()" << RTT::endlog();
+                notify_callback_impl.reset(notify_callback_impl->cloneI(engine));
+                notify_callback_impl->call(~0);
+            } else {
+                notify_callback_(~0);
+            }
+        }
+#else
         update_callback_(init_config, ~0);
         if (notify_callback_.ready()) notify_callback_(~0);
+#endif
 
         updateConfigInternal(config_);
     }
