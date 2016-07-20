@@ -214,7 +214,6 @@ namespace rtt_roscomm {
       } else {
         ros_sub = ros_node.subscribe(policy.name_id, policy.size > 0 ? policy.size : 1, &RosSubChannelElement::newData, this); // minimum queue_size 1
       }
-      this->ref();
     }
 
     ~RosSubChannelElement() {
