@@ -607,6 +607,7 @@ private:
         if (!updater()->propertiesFromConfig(new_config, level, bag)) return false;
         if (!update_callback_.ready() || !update_callback_(bag, level)) return false;
         if (notify_callback_.ready()) notify_callback_(level);
+        updater()->configFromProperties(new_config, *(getOwner()->properties()));
 
         updateConfigInternal(new_config);
         new_config.__toMessage__(rsp.config);
