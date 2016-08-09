@@ -63,7 +63,7 @@
 namespace rtt_dynamic_reconfigure {
 
 template <class ConfigType> class Server;
-typedef bool (UpdateCallbackSignature)(const RTT::PropertyBag &source, uint32_t level);
+typedef bool (UpdateCallbackSignature)(RTT::PropertyBag &bag, uint32_t level);
 typedef void (NotifyCallbackSignature)(uint32_t level);
 
 /**
@@ -607,7 +607,7 @@ private:
         if (!updater()->propertiesFromConfig(new_config, level, bag)) return false;
         if (!update_callback_.ready() || !update_callback_(bag, level)) return false;
         if (notify_callback_.ready()) notify_callback_(level);
-        updater()->configFromProperties(new_config, *(getOwner()->properties()));
+        updater()->configFromProperties(new_config, bag);
 
         updateConfigInternal(new_config);
         new_config.__toMessage__(rsp.config);
@@ -627,9 +627,9 @@ private:
             update_pub_.publish(msg);
     }
 
-    bool updatePropertiesDefaultImpl(const RTT::PropertyBag &source, uint32_t)
+    bool updatePropertiesDefaultImpl(RTT::PropertyBag &bag, uint32_t)
     {
-        return RTT::updateProperties(*(getOwner()->properties()), source);
+        return RTT::updateProperties(*(getOwner()->properties()), bag);
     }
 };
 
