@@ -152,14 +152,15 @@ include_directories(
   ${rtt_roscomm_GENERATED_HEADERS_OUTPUT_DIRECTORY}/orocos
   ${rtt_roscomm_GENERATED_HEADERS_INSTALL_DESTINATION}/orocos
   ${USE_OROCOS_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS})
+  ${catkin_INCLUDE_DIRS}
+  ${${_package}_INCLUDE_DIRS})
 
 # Targets
 set(CMAKE_BUILD_TYPE MinSizeRel)
 orocos_typekit(         rtt-${_package}-typekit ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
 orocos_typekit(         rtt-${_package}-ros-transport ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp )
-target_link_libraries(  rtt-${_package}-typekit ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
-target_link_libraries(  rtt-${_package}-ros-transport ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
+target_link_libraries(  rtt-${_package}-typekit ${catkin_LIBRARIES} ${${_package}_LIBRARIES} ${USE_OROCOS_LIBRARIES})
+target_link_libraries(  rtt-${_package}-ros-transport ${catkin_LIBRARIES} ${${_package}_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 
 # Add an explicit dependency between the typekits and message files
 # TODO: Add deps for all msg dependencies
