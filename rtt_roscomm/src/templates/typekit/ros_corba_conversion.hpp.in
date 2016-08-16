@@ -4,6 +4,7 @@
 #include <@ROSPACKAGE@/@ROSMSGNAME@.h>
 #include <rtt_roscomm/rtt_rostopic_ros_msg_transporter.hpp>
 #include <rtt_roscomm/rtt_rostopic.h>
+#include <rtt/Logger.hpp>
 #include <rtt/types/TransportPlugin.hpp>
 #include <rtt/types/TypekitPlugin.hpp>
 #include <rtt/transports/corba/RTTCorbaConversion.hpp>
@@ -30,39 +31,34 @@ namespace RTT
       }
 
       static bool update(const CORBA::Any& any, StdType& _value) {
-        //log(Debug)<< "@ROSPACKAGE@::@ROSMSGNAME@ update(const CORBA::Any& any, StdType& _value) "<<endlog();
         CorbaType* result;
         if ( any >>= result ) {
           return toStdType(_value, *result);
         }
-        //log(Debug)<< "ERROR "<<endlog();
         return false;
       }
 
       static CORBA::Any_ptr createAny( const StdType& t ) {
-        //log(Debug)<< "@ROSPACKAGE@::@ROSMSGNAME@ createAny( const StdType& t ) "<<endlog();
         CORBA::Any_ptr ret = new CORBA::Any();
         *ret <<= toAny( t );
         return ret;
       }
 
       static bool updateAny( StdType const& t, CORBA::Any& any ) {
-        //log(Debug)<< "@ROSPACKAGE@::@ROSMSGNAME@ updateAny( StdType const& t, CORBA::Any& any ) "<<endlog();
         any <<= toAny( t );
         return true;
       }
 
       static bool toCorbaType(CorbaType& cb, const StdType& tp){
-        //log(Debug)<< "@ROSPACKAGE@::@ROSMSGNAME@ toCorbaType(const StdType& tp) "<<endlog();
-        
-        ros::SerializedMessage m(ros::serialization::serializeMessage(tp));
-        size_t offset = (m.message_start - m.buf.get());
-        size_t ser_length = m.num_bytes - offset;
-
-        cb.length(ser_length);
-
-        for(size_t i = 0; i < ser_length; i++)
-          cb[static_cast<CORBA::ULong>(i)] = static_cast<CORBA::Octet>(m.buf[i + offset]);
+        try {
+          cb.length(ros::serialization::serializationLength(tp));
+          ros::serialization::OStream s(static_cast<uint8_t *>(cb.get_buffer()), static_cast<uint32_t>(cb.length()));
+          ros::serialization::serialize(s, tp);
+        } catch(ros::serialization::StreamOverrunException& e) {
+          RTT::log(RTT::Error) << "StreamOverrunException during serialization of " << ros::message_traits::datatype(tp) << ": "
+                               << e.what() << RTT::endlog();
+          return false;
+        }
 
         return true;
       }
@@ -72,13 +68,15 @@ namespace RTT
           return false;
         }
 
-        //log(Debug)<< "Converting type sequence<std::string> to '@ROSPACKAGE@::@ROSMSGNAME@' cb.length() = "<<cb.length()<<endlog();
+        try {
+          ros::serialization::IStream s(const_cast<uint8_t*>(cb.get_buffer()), static_cast<uint32_t>(cb.length()));
+          ros::serialization::deserialize(s, tp);
+        } catch(ros::serialization::StreamOverrunException& e) {
+          RTT::log(RTT::Error) << "StreamOverrunException during deserialization of " << ros::message_traits::datatype(tp) << ": "
+                               << e.what() << RTT::endlog();
+          return false;
+        }
 
-        ros::serialization::IStream s(const_cast<uint8_t*>(cb.get_buffer()), static_cast<size_t>(cb.length()));
-        ros::serialization::deserialize(s, tp);
-
-
-        //log(Debug)<< "Ros message : " << tp<<endlog();
         return true;
       }
 
