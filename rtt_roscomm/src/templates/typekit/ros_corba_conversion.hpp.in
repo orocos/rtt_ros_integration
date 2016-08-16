@@ -12,8 +12,6 @@
 #include <sstream>
 #include <ros/serialization.h>
 
-#include <ROSTypesC.h>
-
 namespace RTT
 {
   namespace corba{
@@ -21,8 +19,7 @@ namespace RTT
     template<>
     struct AnyConversion< @ROSMSGTYPE@ >
     {
-      //typedef CORBA::OctetSeq CorbaType;
-      typedef ros::corba::OctetSequence CorbaType;
+      typedef CORBA::OctetSeq CorbaType;
       typedef @ROSMSGTYPE@ StdType;
 
       static CorbaType* toAny(const StdType& tp) {

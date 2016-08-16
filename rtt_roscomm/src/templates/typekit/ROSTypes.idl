@@ -1,5 +1,0 @@
-module ros {
-module corba {
-	typedef sequence<octet> OctetSequence;
-};
-};

@@ -217,20 +217,6 @@ include_directories(
   ${USE_OROCOS_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS})
 
-if(ENABLE_CORBA)
-  list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/config)
-  set(ENABLE_CORBA TRUE)
-  find_package(Corba REQUIRED)
-  FILE( GLOB IDLS [^.]*.idl )
-  set(CORBA_GEN_CPP "") 
-  set(CORBA_GEN_HPP "")
-  ORO_ADD_CORBA_SERVERS(CORBA_GEN_CPP HPP ${IDLS} )
-  ADD_CUSTOM_TARGET( idl-ros-${_package} DEPENDS ${CORBA_GEN_CPP} ${CORBA_GEN_HPP} COMMENT "Generating sources from .idl files")
-  MESSAGE(STATUS "ROS ${_package} Corba HPPS: ${CORBA_GEN_CPP} ${CORBA_GEN_HPP}")
-  INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
-endif()
-
-
 # Targets
 set(CMAKE_BUILD_TYPE MinSizeRel)
 orocos_typekit(rtt-${_package}-typekit ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
