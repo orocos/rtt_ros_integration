@@ -254,7 +254,7 @@ namespace rtt_roscomm {
       }
       else {
         if (!buf) return base::ChannelElementBase::shared_ptr();
-        tmp = new RosSubChannelElement<T>(port,policy);
+        tmp = base::ChannelElementBase::shared_ptr(new RosSubChannelElement<T>(port,policy));
         tmp->setOutput(buf);
         return tmp;
       }
