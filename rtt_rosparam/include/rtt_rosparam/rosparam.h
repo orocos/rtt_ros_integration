@@ -36,7 +36,7 @@ namespace rtt_rosparam {
       setRelative("setRelative"),
       setAbsolute("setAbsolute"),
       setPrivate("setPrivate"),
-      setComponentPrivate("setComponentPrivate")
+      setComponentPrivate("setComponentPrivate"),
       setComponentRelative("setComponentRelative")
     {
       this->addOperationCaller(getAllRelative);
