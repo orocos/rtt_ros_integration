@@ -131,28 +131,26 @@ public:
 
     DECLARE_ROSPARAM_OPERATION(String)
     DECLARE_ROSPARAM_OPERATION(Double)
+    DECLARE_ROSPARAM_OPERATION(Float)
     DECLARE_ROSPARAM_OPERATION(Int)
     DECLARE_ROSPARAM_OPERATION(Bool)
 
     // Vector parameters
     DECLARE_ROSPARAM_OPERATION(VectorOfString)
     DECLARE_ROSPARAM_OPERATION(VectorOfDouble)
-    DECLARE_ROSPARAM_OPERATION(VectorOfInt)
-    DECLARE_ROSPARAM_OPERATION(VectorOfBool)
 
   }
 private:
 
   DECLARE_ROSPARAM_GETTER_SETTER(String,std::string)
   DECLARE_ROSPARAM_GETTER_SETTER(Double,double)
+  DECLARE_ROSPARAM_GETTER_SETTER(Float,float)
   DECLARE_ROSPARAM_GETTER_SETTER(Int,int)
   DECLARE_ROSPARAM_GETTER_SETTER(Bool,bool)
 
     // Vector parameters
   DECLARE_ROSPARAM_GETTER_SETTER(VectorOfString,std::vector<std::string>)
   DECLARE_ROSPARAM_GETTER_SETTER(VectorOfDouble,std::vector<double>)
-  DECLARE_ROSPARAM_GETTER_SETTER(VectorOfInt,std::vector<int>)
-  DECLARE_ROSPARAM_GETTER_SETTER(VectorOfBool,std::vector<bool>)
 
   //! Resolve a parameter name based on the given \ref ResolutionPolicy
   const std::string resolvedName(
