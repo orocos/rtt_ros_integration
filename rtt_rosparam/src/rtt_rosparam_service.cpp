@@ -12,6 +12,29 @@
 
 #include <ros/ros.h>
 
+#ifndef DECLARE_ROSPARAM_GETTER_SETTER
+#define DECLARE_ROSPARAM_GETTER_SETTER(function_name,return_type) \
+bool get##function_name(const std::string& ros_param_name,return_type& ret) \
+{ \
+    if(!ros::param::get(ros_param_name,ret)){ \
+        RTT::log(RTT::Debug) << "ROS Parameter \"" << ros_param_name << "\" not found on the parameter server!" << RTT::endlog(); \
+        return false; \
+    } \
+    return true; \
+} \
+void set##function_name(const std::string& ros_param_name,const return_type& ret) \
+{ \
+    ros::param::set(ros_param_name,ret); \
+}
+#endif
+
+#ifndef DECLARE_ROSPARAM_OPERATION
+#define DECLARE_ROSPARAM_OPERATION(function_name) \
+this->addOperation("get"#function_name,&ROSParamService::get##function_name,this).doc("Get a "#function_name" from ros parameter server");\
+this->addOperation("set"#function_name,&ROSParamService::set##function_name,this).doc("Set a "#function_name" in the ros parameter server");
+#endif
+
+
 using namespace RTT;
 using namespace std;
 
@@ -106,8 +129,30 @@ public:
       .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the component's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
 
+    DECLARE_ROSPARAM_OPERATION(String)
+    DECLARE_ROSPARAM_OPERATION(Double)
+    DECLARE_ROSPARAM_OPERATION(Int)
+    DECLARE_ROSPARAM_OPERATION(Bool)
+
+    // Vector parameters
+    DECLARE_ROSPARAM_OPERATION(VectorOfString)
+    DECLARE_ROSPARAM_OPERATION(VectorOfDouble)
+    DECLARE_ROSPARAM_OPERATION(VectorOfInt)
+    DECLARE_ROSPARAM_OPERATION(VectorOfBool)
+
   }
 private:
+
+  DECLARE_ROSPARAM_GETTER_SETTER(String,std::string)
+  DECLARE_ROSPARAM_GETTER_SETTER(Double,double)
+  DECLARE_ROSPARAM_GETTER_SETTER(Int,int)
+  DECLARE_ROSPARAM_GETTER_SETTER(Bool,bool)
+
+    // Vector parameters
+  DECLARE_ROSPARAM_GETTER_SETTER(VectorOfString,std::vector<std::string>)
+  DECLARE_ROSPARAM_GETTER_SETTER(VectorOfDouble,std::vector<double>)
+  DECLARE_ROSPARAM_GETTER_SETTER(VectorOfInt,std::vector<int>)
+  DECLARE_ROSPARAM_GETTER_SETTER(VectorOfBool,std::vector<bool>)
 
   //! Resolve a parameter name based on the given \ref ResolutionPolicy
   const std::string resolvedName(
