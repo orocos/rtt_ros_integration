@@ -37,7 +37,19 @@ namespace rtt_rosparam {
       setAbsolute("setAbsolute"),
       setPrivate("setPrivate"),
       setComponentPrivate("setComponentPrivate"),
-      setComponentRelative("setComponentRelative")
+      setComponentRelative("setComponentRelative"),
+      getBool("getBool"),
+      getInt("getInt"),
+      getFloat("getFloat"),
+      getDouble("getDouble"),
+      getVectorOfDouble("getVectorOfDouble"),
+      getVectorOfString("getVectorOfString"),
+      setBool("setBool"),
+      setInt("setInt"),
+      setFloat("setFloat"),
+      setDouble("setDouble"),
+      setVectorOfDouble("setVectorOfDouble"),
+      setVectorOfString("setVectorOfString")
     {
       this->addOperationCaller(getAllRelative);
       this->addOperationCaller(getAllAbsolute);
@@ -68,6 +80,20 @@ namespace rtt_rosparam {
       this->addOperationCaller(setPrivate);
       this->addOperationCaller(setComponentPrivate);
       this->addOperationCaller(setComponentRelative);
+
+      this->addOperationCaller(getBool);
+      this->addOperationCaller(getInt);
+      this->addOperationCaller(getFloat);
+      this->addOperationCaller(getDouble);
+      this->addOperationCaller(getVectorOfDouble);
+      this->addOperationCaller(getVectorOfString);
+
+      this->addOperationCaller(setBool);
+      this->addOperationCaller(setInt);
+      this->addOperationCaller(setFloat);
+      this->addOperationCaller(setDouble);
+      this->addOperationCaller(setVectorOfDouble);
+      this->addOperationCaller(setVectorOfString);
     }
 
     typedef enum  {
@@ -75,7 +101,8 @@ namespace rtt_rosparam {
       ABSOLUTE, //! Absolute resolution:  "name" -> "/name"
       PRIVATE,  //! Private resolution:   "name" -> "~name"
       COMPONENT_PRIVATE, //! Component resolution: "name" -> "~COMPONENT_NAME/name"
-      COMPONENT_RELATIVE //! Component resolution: "name" -> "COMPONENT_NAME/name"
+      COMPONENT_RELATIVE, //! Component resolution: "name" -> "COMPONENT_NAME/name"
+      COMPONENT = COMPONENT_PRIVATE //! For backwards compatibility, component resolution: COMPONENT_PRIVATE
     }ResolutionPolicy;
 
     RTT::OperationCaller<bool(void)> getAllRelative;
@@ -106,6 +133,20 @@ namespace rtt_rosparam {
     RTT::OperationCaller<bool(const std::string &)> setPrivate;
     RTT::OperationCaller<bool(const std::string &)> setComponentPrivate;
     RTT::OperationCaller<bool(const std::string &)> setComponentRelative;
+
+    RTT::OperationCaller<bool(const std::string &, bool &)> getBool;
+    RTT::OperationCaller<bool(const std::string &, int &)> getInt;
+    RTT::OperationCaller<bool(const std::string &, float &)> getFloat;
+    RTT::OperationCaller<bool(const std::string &, double &)> getDouble;
+    RTT::OperationCaller<bool(const std::string &, std::vector<double> &)> getVectorOfDouble;
+    RTT::OperationCaller<bool(const std::string &, std::vector<std::string> &)> getVectorOfString;
+
+    RTT::OperationCaller<void(const bool&)> setBool;
+    RTT::OperationCaller<void(const int&)> setInt;
+    RTT::OperationCaller<void(const float&)> setFloat;
+    RTT::OperationCaller<void(const double&)> setDouble;
+    RTT::OperationCaller<void(const std::vector<double> &)> setVectorOfDouble;
+    RTT::OperationCaller<void(const std::vector<std::string> &)> setVectorOfString;
   };
 }
 

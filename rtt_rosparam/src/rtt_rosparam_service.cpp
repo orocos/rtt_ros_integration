@@ -12,26 +12,10 @@
 
 #include <ros/ros.h>
 
-#ifndef DECLARE_ROSPARAM_GETTER_SETTER
-#define DECLARE_ROSPARAM_GETTER_SETTER(function_name,return_type) \
-bool get##function_name(const std::string& ros_param_name,return_type& ret) \
-{ \
-    if(!ros::param::get(ros_param_name,ret)){ \
-        RTT::log(RTT::Debug) << "ROS Parameter \"" << ros_param_name << "\" not found on the parameter server!" << RTT::endlog(); \
-        return false; \
-    } \
-    return true; \
-} \
-void set##function_name(const std::string& ros_param_name,const return_type& ret) \
-{ \
-    ros::param::set(ros_param_name,ret); \
-}
-#endif
-
-#ifndef DECLARE_ROSPARAM_OPERATION
-#define DECLARE_ROSPARAM_OPERATION(function_name) \
-this->addOperation("get"#function_name,&ROSParamService::get##function_name,this).doc("Get a "#function_name" from ros parameter server");\
-this->addOperation("set"#function_name,&ROSParamService::set##function_name,this).doc("Set a "#function_name" in the ros parameter server");
+#ifndef ADD_ROSPARAM_OPERATION
+#define ADD_ROSPARAM_OPERATION(function_name, return_type) \
+  this->addOperation("get"#function_name, &ROSParamService::getParamImpl< return_type >, this).doc("Get a " #return_type " from ROS parameter server"); \
+  this->addOperation("set"#function_name, &ROSParamService::setParamImpl< return_type >, this).doc("Set a " #return_type " in the ROS parameter server");
 #endif
 
 
@@ -46,8 +30,9 @@ public:
     RELATIVE, //! Relative resolution:  "name" -> "name"
     ABSOLUTE, //! Absolute resolution:  "name" -> "/name"
     PRIVATE,  //! Private resolution:   "name" -> "~name"
-    COMPONENT_PRIVATE, //! Component resolution: "name" -> "~COMPONENT_PRIVATE_NAME/name"
-    COMPONENT_RELATIVE //! Component resolution: "name" -> "COMPONENT_RELATIVE_NAME/name"
+    COMPONENT_PRIVATE, //! Component resolution: "name" -> "~COMPONENT_NAME/name"
+    COMPONENT_RELATIVE, //! Component resolution: "name" -> "COMPONENT_NAME/name"
+    COMPONENT = COMPONENT_PRIVATE //! For backwards compatibility, component resolution: COMPONENT_PRIVATE
   }ResolutionPolicy;
 
   ROSParamService(TaskContext* owner) :
@@ -58,6 +43,7 @@ public:
     this->addConstant("RELATIVE",static_cast<int>(RELATIVE));
     this->addConstant("ABSOLUTE",static_cast<int>(ABSOLUTE));
     this->addConstant("PRIVATE",static_cast<int>(PRIVATE));
+    this->addConstant("COMPONENT",static_cast<int>(COMPONENT));
     this->addConstant("COMPONENT_PRIVATE",static_cast<int>(COMPONENT_PRIVATE));
     this->addConstant("COMPONENT_RELATIVE",static_cast<int>(COMPONENT_RELATIVE));
 
@@ -129,28 +115,32 @@ public:
       .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the component's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
 
-    DECLARE_ROSPARAM_OPERATION(String)
-    DECLARE_ROSPARAM_OPERATION(Double)
-    DECLARE_ROSPARAM_OPERATION(Float)
-    DECLARE_ROSPARAM_OPERATION(Int)
-    DECLARE_ROSPARAM_OPERATION(Bool)
+    ADD_ROSPARAM_OPERATION(String, std::string)
+    ADD_ROSPARAM_OPERATION(Double, double)
+    ADD_ROSPARAM_OPERATION(Float, float)
+    ADD_ROSPARAM_OPERATION(Int, int)
+    ADD_ROSPARAM_OPERATION(Bool, bool)
 
     // Vector parameters
-    DECLARE_ROSPARAM_OPERATION(VectorOfString)
-    DECLARE_ROSPARAM_OPERATION(VectorOfDouble)
+    ADD_ROSPARAM_OPERATION(VectorOfString, std::vector<std::string>)
+    ADD_ROSPARAM_OPERATION(VectorOfDouble, std::vector<double>)
 
   }
 private:
 
-  DECLARE_ROSPARAM_GETTER_SETTER(String,std::string)
-  DECLARE_ROSPARAM_GETTER_SETTER(Double,double)
-  DECLARE_ROSPARAM_GETTER_SETTER(Float,float)
-  DECLARE_ROSPARAM_GETTER_SETTER(Int,int)
-  DECLARE_ROSPARAM_GETTER_SETTER(Bool,bool)
+  template <typename T> bool getParamImpl(const std::string& ros_param_name, T& value)
+  {
+    if (!ros::param::get(ros_param_name, value)) {
+      RTT::log(RTT::Debug) << "ROS Parameter \"" << ros_param_name << "\" not found on the parameter server!" << RTT::endlog();
+      return false;
+    }
+    return true;
+  }
 
-    // Vector parameters
-  DECLARE_ROSPARAM_GETTER_SETTER(VectorOfString,std::vector<std::string>)
-  DECLARE_ROSPARAM_GETTER_SETTER(VectorOfDouble,std::vector<double>)
+  template <typename T> void setParamImpl(const std::string& ros_param_name, const T& value)
+  {
+    ros::param::set(ros_param_name, value);
+  }
 
   //! Resolve a parameter name based on the given \ref ResolutionPolicy
   const std::string resolvedName(
