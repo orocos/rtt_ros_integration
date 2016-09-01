@@ -13,21 +13,21 @@
 #include <ros/ros.h>
 
 #ifndef ADD_ROSPARAM_OPERATION
-#define ADD_ROSPARAM_OPERATION(return_type_str, return_type) \
-  this->addOperation("get"#return_type_str, &ROSParamService::getParamImpl< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam"); \
-  this->addOperation("set"#return_type_str, &ROSParamService::setParamImpl< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam"); \
-  this->addOperation("get"#return_type_str"Relative", &ROSParamService::getParamImpl< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam using the relative resolution policy : `relative/param`"); \
-  this->addOperation("set"#return_type_str"Relative", &ROSParamService::setParamImpl< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam using the relative resolution policy : `relative/param`"); \
-  this->addOperation("get"#return_type_str"Absolute", &ROSParamService::getParamImpl< return_type , ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the absolute resolution policy : `/global/param`"); \
-  this->addOperation("set"#return_type_str"Absolute", &ROSParamService::setParamImpl< return_type , ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the absolute resolution policy : `/global/param`"); \
-  this->addOperation("get"#return_type_str"Private", &ROSParamService::getParamImpl< return_type , PRIVATE >, this).doc("Get a " #return_type " from rosparam using the private resolution policy : `~private/param`"); \
-  this->addOperation("set"#return_type_str"Private", &ROSParamService::setParamImpl< return_type , PRIVATE >, this).doc("Set a " #return_type " in rosparam using the private resolution policy : `~private/param`"); \
-  this->addOperation("get"#return_type_str"ComponentPrivate", &ROSParamService::getParamImpl< return_type , COMPONENT_PRIVATE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `~component_name/param`"); \
-  this->addOperation("set"#return_type_str"ComponentPrivate", &ROSParamService::setParamImpl< return_type , COMPONENT_PRIVATE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `~component_name/param`"); \
-  this->addOperation("get"#return_type_str"ComponentRelative", &ROSParamService::getParamImpl< return_type , COMPONENT_RELATIVE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `component_name/param`"); \
-  this->addOperation("set"#return_type_str"ComponentRelative", &ROSParamService::setParamImpl< return_type , COMPONENT_RELATIVE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `component_name/param`"); \
-  this->addOperation("get"#return_type_str"ComponentAbsolute", &ROSParamService::getParamImpl< return_type , COMPONENT_ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `/component_name/param`"); \
-  this->addOperation("set"#return_type_str"ComponentAbsolute", &ROSParamService::setParamImpl< return_type , COMPONENT_ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `/component_name/param`");
+#define ADD_ROSPARAM_OPERATION(return_type_str, return_type, func) \
+  this->addOperation("get"#return_type_str, &ROSParamService::get##func< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam"); \
+  this->addOperation("set"#return_type_str, &ROSParamService::set##func< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam"); \
+  this->addOperation("get"#return_type_str"Relative", &ROSParamService::get##func< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam using the relative resolution policy : `relative/param`"); \
+  this->addOperation("set"#return_type_str"Relative", &ROSParamService::set##func< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam using the relative resolution policy : `relative/param`"); \
+  this->addOperation("get"#return_type_str"Absolute", &ROSParamService::get##func< return_type , ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the absolute resolution policy : `/global/param`"); \
+  this->addOperation("set"#return_type_str"Absolute", &ROSParamService::set##func< return_type , ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the absolute resolution policy : `/global/param`"); \
+  this->addOperation("get"#return_type_str"Private", &ROSParamService::get##func< return_type , PRIVATE >, this).doc("Get a " #return_type " from rosparam using the private resolution policy : `~private/param`"); \
+  this->addOperation("set"#return_type_str"Private", &ROSParamService::set##func< return_type , PRIVATE >, this).doc("Set a " #return_type " in rosparam using the private resolution policy : `~private/param`"); \
+  this->addOperation("get"#return_type_str"ComponentPrivate", &ROSParamService::get##func< return_type , COMPONENT_PRIVATE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `~component_name/param`"); \
+  this->addOperation("set"#return_type_str"ComponentPrivate", &ROSParamService::set##func< return_type , COMPONENT_PRIVATE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `~component_name/param`"); \
+  this->addOperation("get"#return_type_str"ComponentRelative", &ROSParamService::get##func< return_type , COMPONENT_RELATIVE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `component_name/param`"); \
+  this->addOperation("set"#return_type_str"ComponentRelative", &ROSParamService::set##func< return_type , COMPONENT_RELATIVE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `component_name/param`"); \
+  this->addOperation("get"#return_type_str"ComponentAbsolute", &ROSParamService::get##func< return_type , COMPONENT_ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `/component_name/param`"); \
+  this->addOperation("set"#return_type_str"ComponentAbsolute", &ROSParamService::set##func< return_type , COMPONENT_ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `/component_name/param`");
 #endif
 
 
@@ -129,15 +129,18 @@ public:
       .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the component's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
 
-    ADD_ROSPARAM_OPERATION(String, std::string)
-    ADD_ROSPARAM_OPERATION(Double, double)
-    ADD_ROSPARAM_OPERATION(Float, float)
-    ADD_ROSPARAM_OPERATION(Int, int)
-    ADD_ROSPARAM_OPERATION(Bool, bool)
+    ADD_ROSPARAM_OPERATION(String, std::string, ParamImpl)
+    ADD_ROSPARAM_OPERATION(Double, double, ParamImpl)
+    ADD_ROSPARAM_OPERATION(Float, float, ParamImpl)
+    ADD_ROSPARAM_OPERATION(Int, int, ParamImpl)
+    ADD_ROSPARAM_OPERATION(Bool, bool, ParamImpl)
 
     // Vector parameters
-    ADD_ROSPARAM_OPERATION(VectorOfString, std::vector<std::string>)
-    ADD_ROSPARAM_OPERATION(VectorOfDouble, std::vector<double>)
+    ADD_ROSPARAM_OPERATION(VectorOfString, std::vector<std::string>, ParamImpl)
+    ADD_ROSPARAM_OPERATION(VectorOfDouble, std::vector<double>, ParamImpl)
+
+    ADD_ROSPARAM_OPERATION(EigenVectorXd, double, EigenVectorParamImpl)
+    ADD_ROSPARAM_OPERATION(EigenVectorXf, float, EigenVectorParamImpl)
 
   }
 private:
@@ -154,6 +157,22 @@ private:
   template <typename T, ROSParamService::ResolutionPolicy P> void setParamImpl(const std::string& ros_param_name, const T& value)
   {
     ros::param::set(resolvedName(ros_param_name,P), value);
+  }
+
+  template <typename T, ROSParamService::ResolutionPolicy P> bool getEigenVectorParamImpl(const std::string& ros_param_name, Eigen::Matrix<T,Eigen::Dynamic,1>& eigen_vector)
+  {
+    std::vector<T> value;
+    if (!getParamImpl< std::vector<T> , P >(ros_param_name,value)) {
+      return false;
+    }
+    eigen_vector = Eigen::Matrix<T,Eigen::Dynamic,1>::Map(value.data(),value.size());
+    return true;
+  }
+
+  template <typename T, ROSParamService::ResolutionPolicy P> void setEigenVectorParamImpl(const std::string& ros_param_name, const Eigen::Matrix<T,Eigen::Dynamic,1>& eigen_vector)
+  {
+    std::vector<T> value(eigen_vector.data(),eigen_vector.data() + eigen_vector.size() );
+    setParamImpl< std::vector<T> , P >(ros_param_name,value);
   }
 
   //! Resolve a parameter name based on the given \ref ResolutionPolicy
