@@ -15,7 +15,7 @@
 
   <arg name="SCREEN" default="false"/>
   <arg if="$(arg SCREEN)" name="SUFFIX2" value="-screen"/>
-  <arg unless="$(arg SCREEN)" name="SUFFIX2" value="$(arg SUFFIX2)"/>
+  <arg unless="$(arg SCREEN)" name="SUFFIX2" value="$(arg SUFFIX)"/>
 
   <arg name="INTERACTIVE" default="true"/>
   <arg if="$(arg INTERACTIVE)" name="INTERACTIVE_ARG" value="-i"/>
