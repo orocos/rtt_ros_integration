@@ -13,9 +13,21 @@
 #include <ros/ros.h>
 
 #ifndef ADD_ROSPARAM_OPERATION
-#define ADD_ROSPARAM_OPERATION(function_name, return_type) \
-  this->addOperation("get"#function_name, &ROSParamService::getParamImpl< return_type >, this).doc("Get a " #return_type " from ROS parameter server"); \
-  this->addOperation("set"#function_name, &ROSParamService::setParamImpl< return_type >, this).doc("Set a " #return_type " in the ROS parameter server");
+#define ADD_ROSPARAM_OPERATION(return_type_str, return_type) \
+  this->addOperation("get"#return_type_str, &ROSParamService::getParamImpl< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam"); \
+  this->addOperation("set"#return_type_str, &ROSParamService::setParamImpl< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam"); \
+  this->addOperation("get"#return_type_str"Relative", &ROSParamService::getParamImpl< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam using the relative resolution policy : `relative/param`"); \
+  this->addOperation("set"#return_type_str"Relative", &ROSParamService::setParamImpl< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam using the relative resolution policy : `relative/param`"); \
+  this->addOperation("get"#return_type_str"Absolute", &ROSParamService::getParamImpl< return_type , ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the absolute resolution policy : `/global/param`"); \
+  this->addOperation("set"#return_type_str"Absolute", &ROSParamService::setParamImpl< return_type , ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the absolute resolution policy : `/global/param`"); \
+  this->addOperation("get"#return_type_str"Private", &ROSParamService::getParamImpl< return_type , PRIVATE >, this).doc("Get a " #return_type " from rosparam using the private resolution policy : `~private/param`"); \
+  this->addOperation("set"#return_type_str"Private", &ROSParamService::setParamImpl< return_type , PRIVATE >, this).doc("Set a " #return_type " in rosparam using the private resolution policy : `~private/param`"); \
+  this->addOperation("get"#return_type_str"ComponentPrivate", &ROSParamService::getParamImpl< return_type , COMPONENT_PRIVATE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `~component_name/param`"); \
+  this->addOperation("set"#return_type_str"ComponentPrivate", &ROSParamService::setParamImpl< return_type , COMPONENT_PRIVATE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `~component_name/param`"); \
+  this->addOperation("get"#return_type_str"ComponentRelative", &ROSParamService::getParamImpl< return_type , COMPONENT_RELATIVE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `component_name/param`"); \
+  this->addOperation("set"#return_type_str"ComponentRelative", &ROSParamService::setParamImpl< return_type , COMPONENT_RELATIVE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `component_name/param`"); \
+  this->addOperation("get"#return_type_str"ComponentAbsolute", &ROSParamService::getParamImpl< return_type , COMPONENT_ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `/component_name/param`"); \
+  this->addOperation("set"#return_type_str"ComponentAbsolute", &ROSParamService::setParamImpl< return_type , COMPONENT_ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `/component_name/param`");
 #endif
 
 
@@ -32,6 +44,7 @@ public:
     PRIVATE,  //! Private resolution:   "name" -> "~name"
     COMPONENT_PRIVATE, //! Component resolution: "name" -> "~COMPONENT_NAME/name"
     COMPONENT_RELATIVE, //! Component resolution: "name" -> "COMPONENT_NAME/name"
+    COMPONENT_ABSOLUTE, //! Component resolution: "name" -> "/COMPONENT_NAME/name"
     COMPONENT = COMPONENT_PRIVATE //! For backwards compatibility, component resolution: COMPONENT_PRIVATE
   }ResolutionPolicy;
 
@@ -46,6 +59,7 @@ public:
     this->addConstant("COMPONENT",static_cast<int>(COMPONENT));
     this->addConstant("COMPONENT_PRIVATE",static_cast<int>(COMPONENT_PRIVATE));
     this->addConstant("COMPONENT_RELATIVE",static_cast<int>(COMPONENT_RELATIVE));
+    this->addConstant("COMPONENT_ABSOLUTE",static_cast<int>(COMPONENT_ABSOLUTE));
 
     this->addOperation("getAllRelative", &ROSParamService::getParamsRelative, this)
       .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the relative namespace.");
@@ -128,18 +142,18 @@ public:
   }
 private:
 
-  template <typename T> bool getParamImpl(const std::string& ros_param_name, T& value)
+  template <typename T, ROSParamService::ResolutionPolicy P> bool getParamImpl(const std::string& ros_param_name, T& value)
   {
-    if (!ros::param::get(ros_param_name, value)) {
+    if (!ros::param::get(resolvedName(ros_param_name,P), value)) {
       RTT::log(RTT::Debug) << "ROS Parameter \"" << ros_param_name << "\" not found on the parameter server!" << RTT::endlog();
       return false;
     }
     return true;
   }
 
-  template <typename T> void setParamImpl(const std::string& ros_param_name, const T& value)
+  template <typename T, ROSParamService::ResolutionPolicy P> void setParamImpl(const std::string& ros_param_name, const T& value)
   {
-    ros::param::set(ros_param_name, value);
+    ros::param::set(resolvedName(ros_param_name,P), value);
   }
 
   //! Resolve a parameter name based on the given \ref ResolutionPolicy
@@ -154,6 +168,7 @@ private:
   bool getParamsPrivate() { return getParams(PRIVATE); }
   bool getParamsComponentPrivate() { return getParams(COMPONENT_PRIVATE); }
   bool getParamsComponentRelative() { return getParams(COMPONENT_RELATIVE); }
+  bool getParamsComponentAbsolute() { return getParams(COMPONENT_ABSOLUTE); }
 
   bool get(
     const std::string &param_name,
@@ -166,6 +181,7 @@ private:
   bool getParamPrivate(const std::string &name) { return get(name, PRIVATE); }
   bool getParamComponentPrivate(const std::string &name) { return get(name, COMPONENT_PRIVATE); }
   bool getParamComponentRelative(const std::string &name) { return get(name, COMPONENT_RELATIVE); }
+  bool getParamComponentAbsolute(const std::string &name) { return get(name, COMPONENT_ABSOLUTE); }
 
   bool setParams(RTT::Service::shared_ptr service, const std::string& ns);
   bool setParams(const ROSParamService::ResolutionPolicy policy);
@@ -174,6 +190,7 @@ private:
   bool setParamsPrivate() { return setParams(PRIVATE); }
   bool setParamsComponentPrivate() { return setParams(COMPONENT_PRIVATE); }
   bool setParamsComponentRelative() { return setParams(COMPONENT_RELATIVE); }
+  bool setParamsComponentAbsolute() { return setParams(COMPONENT_ABSOLUTE); }
 
   bool set(
     const std::string &param_name,
@@ -186,6 +203,7 @@ private:
   bool setParamPrivate(const std::string &name) { return set(name, PRIVATE); }
   bool setParamComponentPrivate(const std::string &name) { return set(name, COMPONENT_PRIVATE); }
   bool setParamComponentRelative(const std::string &name) { return set(name, COMPONENT_RELATIVE); }
+  bool setParamComponentAbsolute(const std::string &name) { return set(name, COMPONENT_ABSOLUTE); }
 };
 
 const std::string ROSParamService::resolvedName(
@@ -214,6 +232,9 @@ const std::string ROSParamService::resolvedName(
       break;
     case ROSParamService::COMPONENT_RELATIVE:
       resolved_name = ros::names::append(this->getOwner()->getName(),param_name);
+      break;
+    case ROSParamService::COMPONENT_ABSOLUTE:
+      resolved_name = std::string("/") +ros::names::append(this->getOwner()->getName(),param_name);
       break;
   };
 
