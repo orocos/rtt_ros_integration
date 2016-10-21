@@ -4,6 +4,64 @@
 #include <rtt/RTT.hpp>
 #include <rtt/Property.hpp>
 
+// #include <Eigen/Dense>
+// #define eigen_matrix_xd Eigen::Matrix<double,Eigen::Dynamic,1>
+// #define eigen_matrix_xf Eigen::Matrix<float,Eigen::Dynamic,1>
+
+#ifndef ADD_ROSPARAM_SERVICE_CONSTRUCTOR
+#define ADD_ROSPARAM_SERVICE_CONSTRUCTOR(return_type_str) \
+  ,get##return_type_str("get"#return_type_str) \
+  ,set##return_type_str("set"#return_type_str) \
+  ,get##return_type_str##Relative ("get"#return_type_str"Relative") \
+  ,set##return_type_str##Relative ("set"#return_type_str"Relative") \
+  ,get##return_type_str##Absolute ("get"#return_type_str"Absolute") \
+  ,set##return_type_str##Absolute ("set"#return_type_str"Absolute") \
+  ,get##return_type_str##Private ("get"#return_type_str"Private") \
+  ,set##return_type_str##Private ("set"#return_type_str"Private") \
+  ,get##return_type_str##ComponentPrivate ("get"#return_type_str"ComponentPrivate") \
+  ,set##return_type_str##ComponentPrivate ("set"#return_type_str"ComponentPrivate") \
+  ,get##return_type_str##ComponentRelative ("get"#return_type_str"ComponentRelative") \
+  ,set##return_type_str##ComponentRelative ("set"#return_type_str"ComponentRelative") \
+  ,get##return_type_str##ComponentAbsolute ("get"#return_type_str"ComponentAbsolute") \
+  ,set##return_type_str##ComponentAbsolute ("set"#return_type_str"ComponentAbsolute")
+#endif
+
+#ifndef ADD_ROSPARAM_OPERATION_CALLER
+#define ADD_ROSPARAM_OPERATION_CALLER(return_type_str) \
+  this->addOperationCaller(get##return_type_str); \
+  this->addOperationCaller(set##return_type_str); \
+  this->addOperationCaller(get##return_type_str##Relative); \
+  this->addOperationCaller(set##return_type_str##Relative); \
+  this->addOperationCaller(get##return_type_str##Absolute); \
+  this->addOperationCaller(set##return_type_str##Absolute); \
+  this->addOperationCaller(get##return_type_str##Private); \
+  this->addOperationCaller(set##return_type_str##Private); \
+  this->addOperationCaller(get##return_type_str##ComponentPrivate); \
+  this->addOperationCaller(set##return_type_str##ComponentPrivate); \
+  this->addOperationCaller(get##return_type_str##ComponentRelative); \
+  this->addOperationCaller(set##return_type_str##ComponentRelative); \
+  this->addOperationCaller(get##return_type_str##ComponentAbsolute); \
+  this->addOperationCaller(set##return_type_str##ComponentAbsolute);
+#endif
+
+#ifndef DECLARE_ROSPARAM_OPERATION_CALLER
+#define DECLARE_ROSPARAM_OPERATION_CALLER(return_type_str, return_type) \
+  RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str; \
+  RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str; \
+  RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str##Relative; \
+  RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str##Relative; \
+  RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str##Absolute; \
+  RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str##Absolute; \
+  RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str##Private; \
+  RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str##Private; \
+  RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str##ComponentPrivate; \
+  RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str##ComponentPrivate; \
+  RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str##ComponentRelative; \
+  RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str##ComponentRelative; \
+  RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str##ComponentAbsolute; \
+  RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str##ComponentAbsolute;
+#endif
+
 namespace rtt_rosparam {
 
   class ROSParam : public RTT::ServiceRequester
@@ -37,19 +95,18 @@ namespace rtt_rosparam {
       setAbsolute("setAbsolute"),
       setPrivate("setPrivate"),
       setComponentPrivate("setComponentPrivate"),
-      setComponentRelative("setComponentRelative"),
-      getBool("getBool"),
-      getInt("getInt"),
-      getFloat("getFloat"),
-      getDouble("getDouble"),
-      getVectorOfDouble("getVectorOfDouble"),
-      getVectorOfString("getVectorOfString"),
-      setBool("setBool"),
-      setInt("setInt"),
-      setFloat("setFloat"),
-      setDouble("setDouble"),
-      setVectorOfDouble("setVectorOfDouble"),
-      setVectorOfString("setVectorOfString")
+      setComponentRelative("setComponentRelative")
+      
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(String)
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(Double)
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(Float)
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(Int)
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(Bool)
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(VectorOfString)
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(VectorOfDouble)
+    //   ADD_ROSPARAM_SERVICE_CONSTRUCTOR(EigenVectorXd)
+    //   ADD_ROSPARAM_SERVICE_CONSTRUCTOR(EigenVectorXf)
+      
     {
       this->addOperationCaller(getAllRelative);
       this->addOperationCaller(getAllAbsolute);
@@ -81,19 +138,15 @@ namespace rtt_rosparam {
       this->addOperationCaller(setComponentPrivate);
       this->addOperationCaller(setComponentRelative);
 
-      this->addOperationCaller(getBool);
-      this->addOperationCaller(getInt);
-      this->addOperationCaller(getFloat);
-      this->addOperationCaller(getDouble);
-      this->addOperationCaller(getVectorOfDouble);
-      this->addOperationCaller(getVectorOfString);
-
-      this->addOperationCaller(setBool);
-      this->addOperationCaller(setInt);
-      this->addOperationCaller(setFloat);
-      this->addOperationCaller(setDouble);
-      this->addOperationCaller(setVectorOfDouble);
-      this->addOperationCaller(setVectorOfString);
+      ADD_ROSPARAM_OPERATION_CALLER(String)
+      ADD_ROSPARAM_OPERATION_CALLER(Double)
+      ADD_ROSPARAM_OPERATION_CALLER(Float)
+      ADD_ROSPARAM_OPERATION_CALLER(Int)
+      ADD_ROSPARAM_OPERATION_CALLER(Bool)
+      ADD_ROSPARAM_OPERATION_CALLER(VectorOfString)
+      ADD_ROSPARAM_OPERATION_CALLER(VectorOfDouble)
+    //   ADD_ROSPARAM_OPERATION_CALLER(EigenVectorXd)
+    //   ADD_ROSPARAM_OPERATION_CALLER(EigenVectorXf)
     }
 
     typedef enum  {
@@ -133,20 +186,17 @@ namespace rtt_rosparam {
     RTT::OperationCaller<bool(const std::string &)> setPrivate;
     RTT::OperationCaller<bool(const std::string &)> setComponentPrivate;
     RTT::OperationCaller<bool(const std::string &)> setComponentRelative;
-
-    RTT::OperationCaller<bool(const std::string &, bool &)> getBool;
-    RTT::OperationCaller<bool(const std::string &, int &)> getInt;
-    RTT::OperationCaller<bool(const std::string &, float &)> getFloat;
-    RTT::OperationCaller<bool(const std::string &, double &)> getDouble;
-    RTT::OperationCaller<bool(const std::string &, std::vector<double> &)> getVectorOfDouble;
-    RTT::OperationCaller<bool(const std::string &, std::vector<std::string> &)> getVectorOfString;
-
-    RTT::OperationCaller<void(const bool&)> setBool;
-    RTT::OperationCaller<void(const int&)> setInt;
-    RTT::OperationCaller<void(const float&)> setFloat;
-    RTT::OperationCaller<void(const double&)> setDouble;
-    RTT::OperationCaller<void(const std::vector<double> &)> setVectorOfDouble;
-    RTT::OperationCaller<void(const std::vector<std::string> &)> setVectorOfString;
+    
+    DECLARE_ROSPARAM_OPERATION_CALLER(String, std::string)
+    DECLARE_ROSPARAM_OPERATION_CALLER(Double, double)
+    DECLARE_ROSPARAM_OPERATION_CALLER(Float, float)
+    DECLARE_ROSPARAM_OPERATION_CALLER(Int, int)
+    DECLARE_ROSPARAM_OPERATION_CALLER(Bool, bool)
+    DECLARE_ROSPARAM_OPERATION_CALLER(VectorOfString, std::vector<std::string>)
+    DECLARE_ROSPARAM_OPERATION_CALLER(VectorOfDouble, std::vector<double>)
+    // DECLARE_ROSPARAM_OPERATION_CALLER(EigenVectorXd, eigen_matrix_xd)
+    // DECLARE_ROSPARAM_OPERATION_CALLER(EigenVectorXf, eigen_matrix_xf)
+    
   };
 }
 
