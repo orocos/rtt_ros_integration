@@ -4,7 +4,7 @@
 #include <rtt/RTT.hpp>
 #include <rtt/Property.hpp>
 
-namespace rtt_rosservice {
+namespace rtt_roscomm {
 
   class ROSService : public RTT::ServiceRequester
   {
@@ -18,6 +18,10 @@ namespace rtt_rosservice {
 
     RTT::OperationCaller<bool(const std::string &, const std::string &, const std::string &)> connect;
   };
+}
+
+namespace rtt_rosservice {
+    using rtt_roscomm::ROSService; // deprecated
 }
 
 #endif // ifndef __RTT_ROSSERVICE_ROSSERVICE_H

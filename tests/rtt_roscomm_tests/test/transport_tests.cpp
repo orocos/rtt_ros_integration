@@ -7,7 +7,7 @@
 #include <rtt/Logger.hpp>
 #include <rtt/deployment/ComponentLoader.hpp>
 
-#include <rtt_roscomm/rtt_rostopic.h>
+#include <rtt_roscomm/rostopic.h>
 #include <std_msgs/typekit/String.h>
 
 #include <ros/names.h>
