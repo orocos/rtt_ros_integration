@@ -4,9 +4,12 @@
 #include <rtt/RTT.hpp>
 #include <rtt/Property.hpp>
 
-// #include <Eigen/Dense>
-// #define eigen_matrix_xd Eigen::Matrix<double,Eigen::Dynamic,1>
-// #define eigen_matrix_xf Eigen::Matrix<float,Eigen::Dynamic,1>
+#define RTT_ROSPARAM_EIGEN_SUPPORT
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
+  #include <Eigen/Dense>
+  #define eigen_matrix_xd Eigen::Matrix<double,Eigen::Dynamic,1>
+  #define eigen_matrix_xf Eigen::Matrix<float,Eigen::Dynamic,1>
+#endif
 
 #ifndef ADD_ROSPARAM_SERVICE_CONSTRUCTOR
 #define ADD_ROSPARAM_SERVICE_CONSTRUCTOR(return_type_str) \
@@ -96,7 +99,7 @@ namespace rtt_rosparam {
       setPrivate("setPrivate"),
       setComponentPrivate("setComponentPrivate"),
       setComponentRelative("setComponentRelative")
-      
+
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(String)
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(Double)
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(Float)
@@ -104,9 +107,12 @@ namespace rtt_rosparam {
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(Bool)
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(VectorOfString)
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(VectorOfDouble)
-    //   ADD_ROSPARAM_SERVICE_CONSTRUCTOR(EigenVectorXd)
-    //   ADD_ROSPARAM_SERVICE_CONSTRUCTOR(EigenVectorXf)
-      
+
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(EigenVectorXd)
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(EigenVectorXf)
+#endif
+
     {
       this->addOperationCaller(getAllRelative);
       this->addOperationCaller(getAllAbsolute);
@@ -145,8 +151,11 @@ namespace rtt_rosparam {
       ADD_ROSPARAM_OPERATION_CALLER(Bool)
       ADD_ROSPARAM_OPERATION_CALLER(VectorOfString)
       ADD_ROSPARAM_OPERATION_CALLER(VectorOfDouble)
-    //   ADD_ROSPARAM_OPERATION_CALLER(EigenVectorXd)
-    //   ADD_ROSPARAM_OPERATION_CALLER(EigenVectorXf)
+
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
+      ADD_ROSPARAM_OPERATION_CALLER(EigenVectorXd)
+      ADD_ROSPARAM_OPERATION_CALLER(EigenVectorXf)
+#endif
     }
 
     typedef enum  {
@@ -156,7 +165,7 @@ namespace rtt_rosparam {
       COMPONENT_PRIVATE, //! Component resolution: "name" -> "~COMPONENT_NAME/name"
       COMPONENT_RELATIVE, //! Component resolution: "name" -> "COMPONENT_NAME/name"
       COMPONENT = COMPONENT_PRIVATE //! For backwards compatibility, component resolution: COMPONENT_PRIVATE
-    }ResolutionPolicy;
+    } ResolutionPolicy;
 
     RTT::OperationCaller<bool(void)> getAllRelative;
     RTT::OperationCaller<bool(void)> getAllAbsolute;
@@ -186,7 +195,7 @@ namespace rtt_rosparam {
     RTT::OperationCaller<bool(const std::string &)> setPrivate;
     RTT::OperationCaller<bool(const std::string &)> setComponentPrivate;
     RTT::OperationCaller<bool(const std::string &)> setComponentRelative;
-    
+
     DECLARE_ROSPARAM_OPERATION_CALLER(String, std::string)
     DECLARE_ROSPARAM_OPERATION_CALLER(Double, double)
     DECLARE_ROSPARAM_OPERATION_CALLER(Float, float)
@@ -194,9 +203,12 @@ namespace rtt_rosparam {
     DECLARE_ROSPARAM_OPERATION_CALLER(Bool, bool)
     DECLARE_ROSPARAM_OPERATION_CALLER(VectorOfString, std::vector<std::string>)
     DECLARE_ROSPARAM_OPERATION_CALLER(VectorOfDouble, std::vector<double>)
-    // DECLARE_ROSPARAM_OPERATION_CALLER(EigenVectorXd, eigen_matrix_xd)
-    // DECLARE_ROSPARAM_OPERATION_CALLER(EigenVectorXf, eigen_matrix_xf)
-    
+
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
+    DECLARE_ROSPARAM_OPERATION_CALLER(EigenVectorXd, eigen_matrix_xd)
+    DECLARE_ROSPARAM_OPERATION_CALLER(EigenVectorXf, eigen_matrix_xf)
+#endif
+
   };
 }
 

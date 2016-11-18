@@ -46,7 +46,7 @@ public:
     COMPONENT_RELATIVE, //! Component resolution: "name" -> "COMPONENT_NAME/name"
     COMPONENT_ABSOLUTE, //! Component resolution: "name" -> "/COMPONENT_NAME/name"
     COMPONENT = COMPONENT_PRIVATE //! For backwards compatibility, component resolution: COMPONENT_PRIVATE
-  }ResolutionPolicy;
+  } ResolutionPolicy;
 
   ROSParamService(TaskContext* owner) :
     Service("rosparam", owner)
@@ -143,6 +143,7 @@ public:
     ADD_ROSPARAM_OPERATION(EigenVectorXf, float, EigenVectorParamImpl)
 
   }
+
 private:
 
   template <typename T, ROSParamService::ResolutionPolicy P> bool getParamImpl(const std::string& ros_param_name, T& value)
@@ -385,14 +386,14 @@ XmlRpc::XmlRpcValue rttPropertyToXmlParam(const Eigen::VectorXf &vec)
 XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(RTT::base::PropertyBase *prop)
 {
   // Primitive parameters
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(std::string,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(double,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(float,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(int,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(unsigned int,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(char,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(unsigned char,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(bool,prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(std::string, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(double, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(float, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(int, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(unsigned int, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(char, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(unsigned char, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(bool, prop);
 
   // Vector parameters
   RETURN_RTT_PROPERTY_CONTAINER_TO_XML_PARAM(std::vector<std::string>, std::string, prop);
@@ -408,7 +409,7 @@ XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(RTT::base::PropertyBase *prop)
   RETURN_RTT_PROPERTY_TO_XML_PARAM(Eigen::VectorXf, prop);
 
   // Struct parameters
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(RTT::PropertyBag,prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(RTT::PropertyBag, prop);
 
   // Try to decompose property into a property bag
   RTT::PropertyBag bag;

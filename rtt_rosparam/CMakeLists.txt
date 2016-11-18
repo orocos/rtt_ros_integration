@@ -20,5 +20,5 @@ target_link_libraries(rtt_rosparam
 orocos_install_headers(include/rtt_rosparam/rosparam.h)
 orocos_generate_package(
   INCLUDE_DIRS include
-  DEPENDS roscpp
+  DEPENDS roscpp eigen3
 )
