@@ -8,10 +8,15 @@
 #include <rtt/deployment/ComponentLoader.hpp>
 
 #include <rtt_roscomm/rtt_rostopic.h>
+#include <rtt_roscomm/rosservice.h>
 #include <std_msgs/typekit/String.h>
+#include <std_srvs/Empty.h>
 
 #include <ros/names.h>
+#include <ros/service_manager.h>
 #include <ros/this_node.h>
+
+#include <boost/weak_ptr.hpp>
 
 #include <gtest/gtest.h>
 
@@ -22,8 +27,9 @@ TEST(TransportTest, OutOfBandTest)
   ros::V_string advertised_topics, subscribed_topics;
 
   // Import plugins
-  EXPECT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_std_msgs", "" ));
-  EXPECT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_rosnode", "" ));
+  ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_rosnode", "" ));
+  ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_roscomm", "" ));
+  ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_std_msgs", "" ));
 
   RTT::OutputPort<std_msgs::String> out("out");
   RTT::InputPort<std_msgs::String> in("in");
@@ -66,6 +72,63 @@ TEST(TransportTest, OutOfBandTest)
   ros::this_node::getSubscribedTopics(subscribed_topics);
   EXPECT_FALSE(std::find(subscribed_topics.begin(), subscribed_topics.end(),
                         topic) != subscribed_topics.end());
+}
+
+static int callback_called = 0;
+bool callback(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
+{
+  ++callback_called;
+  return true;
+}
+
+TEST(TransportTest, ServiceServerTest)
+{
+  std::string service = ros::names::resolve("~empty");
+
+  // Import plugins
+  ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_rosnode", "" ));
+  ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_roscomm", "" ));
+  ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_std_srvs", "" ));
+
+  // Create a TaskContext
+  RTT::TaskContext *tc = new RTT::TaskContext("TaskContext");
+  tc->addOperation("empty", &callback);
+
+  // Load the rosservice service
+  boost::weak_ptr<rtt_rosservice::ROSService> rosservice;
+  rosservice = tc->getProvider<rtt_rosservice::ROSService>("rosservice");
+  ASSERT_FALSE(rosservice.expired());
+
+  // Create a service server
+  EXPECT_TRUE(rosservice.lock()->connect("empty", service, "std_srvs/Empty"));
+
+  // Check that the service server has been successfully registered:
+  EXPECT_TRUE(ros::ServiceManager::instance()->lookupServicePublication(service));
+
+  // Create a service client
+  RTT::OperationCaller<bool(std_srvs::Empty::Request&, std_srvs::Empty::Response&)> service_caller("empty");
+  tc->requires()->addOperationCaller(service_caller);
+  EXPECT_TRUE(rosservice.lock()->connect("empty", service, "std_srvs/Empty"));
+  EXPECT_TRUE(service_caller.ready());
+
+  // Call the service
+  EXPECT_EQ(0, callback_called);
+  std_srvs::Empty empty;
+  EXPECT_TRUE(service_caller(empty.request, empty.response));
+  EXPECT_EQ(1, callback_called);
+
+  // Disconnect the service
+  EXPECT_TRUE(rosservice.lock()->disconnect(service));
+
+  // Check that the service server has been destroyed
+  EXPECT_FALSE(ros::ServiceManager::instance()->lookupServicePublication(service));
+
+  // Destroy the TaskContext
+  delete tc;
+  EXPECT_TRUE(rosservice.expired());
+
+  // Check that the service server has been destroyed (again)
+  EXPECT_FALSE(ros::ServiceManager::instance()->lookupServicePublication(service));
 }
 
 int main(int argc, char** argv) {
