@@ -697,8 +697,10 @@ bool xmlParamToProp<RTT::PropertyBag>(
       ++it)
   {
     RTT::base::PropertyBase *sub_prop_base = prop->value().getProperty(it->first);
-    if(sub_prop_base) {
+    if (sub_prop_base) {
       success &= xmlParamToProp(it->second, sub_prop_base);
+    } else {
+      // create property based on XmlRpc type?
     }
   }
 
@@ -709,17 +711,17 @@ bool xmlParamToProp(
     const XmlRpc::XmlRpcValue &xml_value,
     RTT::base::PropertyBase* prop_base)
 {
-  bool array_ret = false;
-
   // Switch based on the type of XmlRpcValue
   switch(xml_value.getType()) {
     case XmlRpc::XmlRpcValue::TypeString:
       return
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::string>*>(prop_base));
+
     case XmlRpc::XmlRpcValue::TypeDouble:
       return
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<double>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<float>*>(prop_base));
+
     case XmlRpc::XmlRpcValue::TypeInt:
       return
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<double>*>(prop_base)) ||
@@ -728,11 +730,13 @@ bool xmlParamToProp(
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<unsigned int>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<char>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<unsigned char>*>(prop_base));
+
     case XmlRpc::XmlRpcValue::TypeBoolean:
       return
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<bool>*>(prop_base));
+
     case XmlRpc::XmlRpcValue::TypeArray:
-      array_ret =
+      if (
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<std::string> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<double> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<float> >*>(prop_base)) ||
@@ -741,30 +745,36 @@ bool xmlParamToProp(
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<char> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<unsigned char> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<bool> >*>(prop_base)) ||
-        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<Eigen::VectorXd >*>(prop_base));
-      // Return true if it gets parsed into an array structure, otherwise, try property bag decomposition
-      if(array_ret) {
-        return true;
-      }
-    case XmlRpc::XmlRpcValue::TypeStruct:
-      // Try to decompose the property in a property bag:
-      if(xmlParamToProp(xml_value, dynamic_cast<RTT::Property<RTT::PropertyBag>*>(prop_base))) {
-        return true;
-      }
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<Eigen::VectorXd >*>(prop_base)) ||
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<Eigen::VectorXf >*>(prop_base)) )
       {
-        RTT::Property<RTT::PropertyBag> bag(prop_base->getName());
-        if(RTT::types::propertyDecomposition(prop_base, bag.set()) && xmlParamToProp(xml_value, &bag)) {
-          return true;
-        } else {
-          RTT::log(RTT::Debug) << "Could not decompose property bag for property type \"" << prop_base->getName() << "\"" << RTT::endlog();
-          return false;
-        }
-
+        // Return true if it gets parsed into an array structure
+        return true;
       }
+      break;
+
+    case XmlRpc::XmlRpcValue::TypeStruct:
+      if (
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<RTT::PropertyBag>*>(prop_base)) )
+      {
+        // Return true if it gets parsed into a PropertyBag structure
+        return true;
+      }
+      break;
   };
 
-  RTT::log(RTT::Debug) << "No appropriate conversion for property \"" << prop_base->getName() << "\"" << RTT::endlog();
+  // try property bag decomposition
+  {
+    RTT::Property<RTT::PropertyBag> bag(prop_base->getName());
+    if (RTT::types::propertyDecomposition(prop_base, bag.set()) && xmlParamToProp(xml_value, &bag)) {
+      return true;
+    } else {
+      RTT::log(RTT::Debug) << "Could not decompose property bag for property type \"" << prop_base->getName() << "\"" << RTT::endlog();
+      return false;
+    }
+  }
 
+  RTT::log(RTT::Debug) << "No appropriate conversion for property \"" << prop_base->getName() << "\"" << RTT::endlog();
   return false;
 }
 
