@@ -98,8 +98,10 @@ foreach( FILE ${MSG_FILES} )
   set(ROSMSGTYPENAME     "/${_package}/${ROSMSGNAME}")
   set(ROSMSGCTYPENAME    "/${_package}/c${ROSMSGNAME}")
 
-  # msg_Types.hpp.in, ros_msg_typekit_plugin.cpp.in, ros_msg_typekit_package.cpp.in
-  set(ROSMSGBOOSTHEADER  "${_package}/boost/${ROSMSGNAME}.h")
+  # msg_Types.hpp.in, ros_msg_corba_conversion.hpp.in
+  set(ROSMSGHEADER "${_package}/${ROSMSGNAME}.h")
+  # ros_msg_typekit_plugin.cpp.in, ros_msg_typekit_package.cpp.in
+  set(ROSMSGBOOSTHEADER "${_package}/boost/${ROSMSGNAME}.h")
   # ros_msg_typekit_plugin.cpp.in, ros_msg_typekit_package.cpp.in
   set(ROSMSGBOOSTHEADERS "${ROSMSGBOOSTHEADERS}#include <orocos/${ROSMSGBOOSTHEADER}>\n")
   # ros_msg_corba_conversion.hpp.in
@@ -201,21 +203,6 @@ include_directories(
   ${USE_OROCOS_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
   ${${_package}_INCLUDE_DIRS})
-
-if(ENABLE_CORBA)
-  list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/config)
-  set(ENABLE_CORBA TRUE)
-  find_package(Corba REQUIRED)
-  FILE( GLOB IDLS [^.]*.idl )
-  set(CORBA_GEN_CPP "") 
-  set(CORBA_GEN_HPP "")
-  ORO_ADD_CORBA_SERVERS(CORBA_GEN_CPP HPP ${IDLS} )
-  ADD_CUSTOM_TARGET( idl-ros-${_package} DEPENDS ${CORBA_GEN_CPP} ${CORBA_GEN_HPP} COMMENT "Generating sources from .idl files")
-  MESSAGE(STATUS "ROS ${_package} Corba HPPS: ${CORBA_GEN_CPP} ${CORBA_GEN_HPP}")
-  INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} )
-  list(APPEND rtt-${_package}-ros-transport-corba_SOURCES ${CORBA_GEN_CPP} ${CORBA_GEN_HPP})
-endif()
-
 
 # Targets
 set(CMAKE_BUILD_TYPE MinSizeRel)
