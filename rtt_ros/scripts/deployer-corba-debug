@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Wrapper script for the orocos deployer debug
+
+# Use gnulinux if orocos target isn't set
+OROCOS_TARGET=${OROCOS_TARGET:-gnulinux}
+
+# Run with gdb
+gdb -ex run --args deployer-corba-$OROCOS_TARGET "$@"
