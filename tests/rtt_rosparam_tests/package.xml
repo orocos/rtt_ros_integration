@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>rtt_rosparam_tests</name>
+  <version>2.9.0</version>
+  <description>The rtt_rosparam_tests package</description>
+  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/rtt_ros_integration</url>
+  <url type="bugtracker">https://github.com/orocos/rtt_ros_integration/issues</url>
+  
+  <author>Johannes Meyer</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rtt_rosparam</build_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>rtt_geometry_msgs</test_depend>
+
+</package>
