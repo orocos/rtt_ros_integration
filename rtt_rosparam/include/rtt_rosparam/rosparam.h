@@ -67,10 +67,28 @@
 
 namespace rtt_rosparam {
 
+  typedef enum  {
+    RELATIVE, //! Relative resolution:  "name" -> "name"
+    ABSOLUTE, //! Absolute resolution:  "name" -> "/name"
+    PRIVATE,  //! Private resolution:   "name" -> "~name"
+    COMPONENT_PRIVATE, //! Component resolution: "name" -> "~COMPONENT_NAME/name"
+    COMPONENT_RELATIVE, //! Component resolution: "name" -> "COMPONENT_NAME/name"
+    COMPONENT_ABSOLUTE, //! Component resolution: "name" -> "/COMPONENT_NAME/name"
+    COMPONENT = COMPONENT_PRIVATE //! For backwards compatibility, component resolution: COMPONENT_PRIVATE
+  } ResolutionPolicy;
+
   class ROSParam : public RTT::ServiceRequester
   {
 
   public:
+    static const int RELATIVE           = rtt_rosparam::RELATIVE; //! For backwards compatibility
+    static const int ABSOLUTE           = rtt_rosparam::ABSOLUTE; //! For backwards compatibility
+    static const int PRIVATE            = rtt_rosparam::PRIVATE; //! For backwards compatibility
+    static const int COMPONENT_PRIVATE  = rtt_rosparam::COMPONENT_PRIVATE; //! For backwards compatibility
+    static const int COMPONENT_RELATIVE = rtt_rosparam::COMPONENT_RELATIVE; //! For backwards compatibility
+    static const int COMPONENT_ABSOLUTE = rtt_rosparam::COMPONENT_ABSOLUTE; //! For backwards compatibility
+    static const int COMPONENT          = rtt_rosparam::COMPONENT_PRIVATE; //! For backwards compatibility, component resolution: COMPONENT_PRIVATE
+
     ROSParam(RTT::TaskContext *owner) :
       RTT::ServiceRequester("rosparam",owner),
       getAllRelative("getAllRelative"),
@@ -157,15 +175,6 @@ namespace rtt_rosparam {
       ADD_ROSPARAM_OPERATION_CALLER(EigenVectorXf)
 #endif
     }
-
-    typedef enum  {
-      RELATIVE, //! Relative resolution:  "name" -> "name"
-      ABSOLUTE, //! Absolute resolution:  "name" -> "/name"
-      PRIVATE,  //! Private resolution:   "name" -> "~name"
-      COMPONENT_PRIVATE, //! Component resolution: "name" -> "~COMPONENT_NAME/name"
-      COMPONENT_RELATIVE, //! Component resolution: "name" -> "COMPONENT_NAME/name"
-      COMPONENT = COMPONENT_PRIVATE //! For backwards compatibility, component resolution: COMPONENT_PRIVATE
-    } ResolutionPolicy;
 
     RTT::OperationCaller<bool(void)> getAllRelative;
     RTT::OperationCaller<bool(void)> getAllAbsolute;

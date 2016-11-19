@@ -12,6 +12,8 @@
 
 #include <ros/ros.h>
 
+#include <rtt_rosparam/rosparam.h>
+
 #ifndef ADD_ROSPARAM_OPERATION
 #define ADD_ROSPARAM_OPERATION(return_type_str, return_type, func) \
   this->addOperation("get"#return_type_str, &ROSParamService::get##func< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam"); \
@@ -34,32 +36,24 @@
 using namespace RTT;
 using namespace std;
 
+using namespace rtt_rosparam;
+
 class ROSParamService: public RTT::Service
 {
 public:
-
-  typedef enum  {
-    RELATIVE, //! Relative resolution:  "name" -> "name"
-    ABSOLUTE, //! Absolute resolution:  "name" -> "/name"
-    PRIVATE,  //! Private resolution:   "name" -> "~name"
-    COMPONENT_PRIVATE, //! Component resolution: "name" -> "~COMPONENT_NAME/name"
-    COMPONENT_RELATIVE, //! Component resolution: "name" -> "COMPONENT_NAME/name"
-    COMPONENT_ABSOLUTE, //! Component resolution: "name" -> "/COMPONENT_NAME/name"
-    COMPONENT = COMPONENT_PRIVATE //! For backwards compatibility, component resolution: COMPONENT_PRIVATE
-  } ResolutionPolicy;
 
   ROSParamService(TaskContext* owner) :
     Service("rosparam", owner)
   {
     this->doc("RTT Service for synchronizing ROS parameters with the properties of a corresponding RTT component");
 
-    this->addConstant("RELATIVE",static_cast<int>(RELATIVE));
-    this->addConstant("ABSOLUTE",static_cast<int>(ABSOLUTE));
-    this->addConstant("PRIVATE",static_cast<int>(PRIVATE));
-    this->addConstant("COMPONENT",static_cast<int>(COMPONENT));
-    this->addConstant("COMPONENT_PRIVATE",static_cast<int>(COMPONENT_PRIVATE));
-    this->addConstant("COMPONENT_RELATIVE",static_cast<int>(COMPONENT_RELATIVE));
-    this->addConstant("COMPONENT_ABSOLUTE",static_cast<int>(COMPONENT_ABSOLUTE));
+    this->setValue(new Constant<int>("RELATIVE", static_cast<int>(RELATIVE)));
+    this->setValue(new Constant<int>("ABSOLUTE", static_cast<int>(ABSOLUTE)));
+    this->setValue(new Constant<int>("PRIVATE", static_cast<int>(PRIVATE)));
+    this->setValue(new Constant<int>("COMPONENT", static_cast<int>(COMPONENT)));
+    this->setValue(new Constant<int>("COMPONENT_PRIVATE", static_cast<int>(COMPONENT_PRIVATE)));
+    this->setValue(new Constant<int>("COMPONENT_RELATIVE", static_cast<int>(COMPONENT_RELATIVE)));
+    this->setValue(new Constant<int>("COMPONENT_ABSOLUTE", static_cast<int>(COMPONENT_ABSOLUTE)));
 
     this->addOperation("getAllRelative", &ROSParamService::getParamsRelative, this)
       .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the relative namespace.");
@@ -146,7 +140,7 @@ public:
 
 private:
 
-  template <typename T, ROSParamService::ResolutionPolicy P> bool getParamImpl(const std::string& ros_param_name, T& value)
+  template <typename T, ResolutionPolicy P> bool getParamImpl(const std::string& ros_param_name, T& value)
   {
     if (!ros::param::get(resolvedName(ros_param_name,P), value)) {
       RTT::log(RTT::Debug) << "ROS Parameter \"" << ros_param_name << "\" not found on the parameter server!" << RTT::endlog();
@@ -155,12 +149,12 @@ private:
     return true;
   }
 
-  template <typename T, ROSParamService::ResolutionPolicy P> void setParamImpl(const std::string& ros_param_name, const T& value)
+  template <typename T, ResolutionPolicy P> void setParamImpl(const std::string& ros_param_name, const T& value)
   {
     ros::param::set(resolvedName(ros_param_name,P), value);
   }
 
-  template <typename T, ROSParamService::ResolutionPolicy P> bool getEigenVectorParamImpl(const std::string& ros_param_name, Eigen::Matrix<T,Eigen::Dynamic,1>& eigen_vector)
+  template <typename T, ResolutionPolicy P> bool getEigenVectorParamImpl(const std::string& ros_param_name, Eigen::Matrix<T,Eigen::Dynamic,1>& eigen_vector)
   {
     std::vector<T> value;
     if (!getParamImpl< std::vector<T> , P >(ros_param_name,value)) {
@@ -170,7 +164,7 @@ private:
     return true;
   }
 
-  template <typename T, ROSParamService::ResolutionPolicy P> void setEigenVectorParamImpl(const std::string& ros_param_name, const Eigen::Matrix<T,Eigen::Dynamic,1>& eigen_vector)
+  template <typename T, ResolutionPolicy P> void setEigenVectorParamImpl(const std::string& ros_param_name, const Eigen::Matrix<T,Eigen::Dynamic,1>& eigen_vector)
   {
     std::vector<T> value(eigen_vector.data(),eigen_vector.data() + eigen_vector.size() );
     setParamImpl< std::vector<T> , P >(ros_param_name,value);
@@ -179,10 +173,10 @@ private:
   //! Resolve a parameter name based on the given \ref ResolutionPolicy
   const std::string resolvedName(
     const std::string &param_name,
-    const ROSParamService::ResolutionPolicy policy);
+    const ResolutionPolicy policy);
 
   bool getParams(RTT::Service::shared_ptr service, const std::string& ns);
-  bool getParams(const ROSParamService::ResolutionPolicy policy);
+  bool getParams(const ResolutionPolicy policy);
   bool getParamsRelative() { return getParams(RELATIVE); }
   bool getParamsAbsolute() { return getParams(ABSOLUTE); }
   bool getParamsPrivate() { return getParams(PRIVATE); }
@@ -192,7 +186,7 @@ private:
 
   bool get(
     const std::string &param_name,
-    const unsigned int policy = (unsigned int)ROSParamService::COMPONENT_PRIVATE);
+    const unsigned int policy = (unsigned int) COMPONENT_PRIVATE);
   bool getParam(
     const std::string &ros_name,
     const std::string &rtt_name);
@@ -204,7 +198,7 @@ private:
   bool getParamComponentAbsolute(const std::string &name) { return get(name, COMPONENT_ABSOLUTE); }
 
   bool setParams(RTT::Service::shared_ptr service, const std::string& ns);
-  bool setParams(const ROSParamService::ResolutionPolicy policy);
+  bool setParams(const ResolutionPolicy policy);
   bool setParamsRelative() { return setParams(RELATIVE); }
   bool setParamsAbsolute() { return setParams(ABSOLUTE); }
   bool setParamsPrivate() { return setParams(PRIVATE); }
@@ -214,7 +208,7 @@ private:
 
   bool set(
     const std::string &param_name,
-    const unsigned int policy = (unsigned int)ROSParamService::COMPONENT_PRIVATE);
+    const unsigned int policy = (unsigned int) COMPONENT_PRIVATE);
   bool setParam(
     const std::string &ros_name,
     const std::string &rtt_name);
@@ -228,7 +222,7 @@ private:
 
 const std::string ROSParamService::resolvedName(
     const std::string &param_name,
-    const ROSParamService::ResolutionPolicy policy)
+    const ResolutionPolicy policy)
 {
   std::string leader = "";
   std::string resolved_name = "";
@@ -238,22 +232,22 @@ const std::string ROSParamService::resolvedName(
   }
 
   switch(policy) {
-    case ROSParamService::RELATIVE:
+    case RELATIVE:
       resolved_name = param_name;
       break;
-    case ROSParamService::ABSOLUTE:
+    case ABSOLUTE:
       resolved_name = (leader == "/") ? param_name : std::string("/") + param_name;
       break;
-    case ROSParamService::PRIVATE:
+    case PRIVATE:
       resolved_name = (leader == "~") ? param_name : std::string("~") + param_name;
       break;
-    case ROSParamService::COMPONENT_PRIVATE:
+    case COMPONENT_PRIVATE:
       resolved_name = std::string("~") + ros::names::append(this->getOwner()->getName(),param_name);
       break;
-    case ROSParamService::COMPONENT_RELATIVE:
+    case COMPONENT_RELATIVE:
       resolved_name = ros::names::append(this->getOwner()->getName(),param_name);
       break;
-    case ROSParamService::COMPONENT_ABSOLUTE:
+    case COMPONENT_ABSOLUTE:
       resolved_name = std::string("/") +ros::names::append(this->getOwner()->getName(),param_name);
       break;
   };
@@ -459,7 +453,7 @@ bool ROSParamService::setParam(
   return false;
 }
 
-bool ROSParamService::setParams(const ROSParamService::ResolutionPolicy policy)
+bool ROSParamService::setParams(const ResolutionPolicy policy)
 {
   return setParams(this->getOwner()->provides(), resolvedName(std::string(), policy));
 }
@@ -809,7 +803,7 @@ bool ROSParamService::getParam(
 }
 
 
-bool ROSParamService::getParams(const ROSParamService::ResolutionPolicy policy)
+bool ROSParamService::getParams(const ResolutionPolicy policy)
 {
   return getParams(this->getOwner()->provides(), resolvedName(std::string(), policy));
 }
