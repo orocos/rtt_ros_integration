@@ -96,12 +96,14 @@ namespace rtt_rosparam {
       getAllPrivate("getAllPrivate"),
       getAllComponentPrivate("getAllComponentPrivate"),
       getAllComponentRelative("getAllComponentRelative"),
+      getAllComponentAbsolute("getAllComponentAbsolute"),
       getAll("getAll"),
       setAllRelative("setAllRelative"),
       setAllAbsolute("setAllAbsolute"),
       setAllPrivate("setAllPrivate"),
       setAllComponentPrivate("setAllComponentPrivate"),
       setAllComponentRelative("setAllComponentRelative"),
+      setAllComponentAbsolute("setAllComponentAbsolute"),
       setAll("setAll"),
       get("get"),
       getParam("getParam"),
@@ -110,13 +112,15 @@ namespace rtt_rosparam {
       getPrivate("getPrivate"),
       getComponentPrivate("getComponentPrivate"),
       getComponentRelative("getComponentRelative"),
+      getComponentAbsolute("getComponentAbsolute"),
       set("set"),
       setParam("setParam"),
       setRelative("setRelative"),
       setAbsolute("setAbsolute"),
       setPrivate("setPrivate"),
       setComponentPrivate("setComponentPrivate"),
-      setComponentRelative("setComponentRelative")
+      setComponentRelative("setComponentRelative"),
+      setComponentAbsolute("setComponentAbsolute")
 
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(String)
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(Double)
@@ -125,6 +129,9 @@ namespace rtt_rosparam {
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(Bool)
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(VectorOfString)
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(VectorOfDouble)
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(VectorOfFloat)
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(VectorOfInt)
+      ADD_ROSPARAM_SERVICE_CONSTRUCTOR(VectorOfBool)
 
 #ifdef RTT_ROSPARAM_EIGEN_SUPPORT
       ADD_ROSPARAM_SERVICE_CONSTRUCTOR(EigenVectorXd)
@@ -137,6 +144,7 @@ namespace rtt_rosparam {
       this->addOperationCaller(getAllPrivate);
       this->addOperationCaller(getAllComponentPrivate);
       this->addOperationCaller(getAllComponentRelative);
+      this->addOperationCaller(getAllComponentAbsolute);
       this->addOperationCaller(getAll);
 
       this->addOperationCaller(setAllRelative);
@@ -144,6 +152,7 @@ namespace rtt_rosparam {
       this->addOperationCaller(setAllPrivate);
       this->addOperationCaller(setAllComponentPrivate);
       this->addOperationCaller(setAllComponentRelative);
+      this->addOperationCaller(setAllComponentAbsolute);
       this->addOperationCaller(setAll);
 
       this->addOperationCaller(get);
@@ -153,6 +162,7 @@ namespace rtt_rosparam {
       this->addOperationCaller(getPrivate);
       this->addOperationCaller(getComponentPrivate);
       this->addOperationCaller(getComponentRelative);
+      this->addOperationCaller(getComponentAbsolute);
 
       this->addOperationCaller(set);
       this->addOperationCaller(setParam);
@@ -161,6 +171,7 @@ namespace rtt_rosparam {
       this->addOperationCaller(setPrivate);
       this->addOperationCaller(setComponentPrivate);
       this->addOperationCaller(setComponentRelative);
+      this->addOperationCaller(setComponentAbsolute);
 
       ADD_ROSPARAM_OPERATION_CALLER(String)
       ADD_ROSPARAM_OPERATION_CALLER(Double)
@@ -169,6 +180,9 @@ namespace rtt_rosparam {
       ADD_ROSPARAM_OPERATION_CALLER(Bool)
       ADD_ROSPARAM_OPERATION_CALLER(VectorOfString)
       ADD_ROSPARAM_OPERATION_CALLER(VectorOfDouble)
+      ADD_ROSPARAM_OPERATION_CALLER(VectorOfFloat)
+      ADD_ROSPARAM_OPERATION_CALLER(VectorOfInt)
+      ADD_ROSPARAM_OPERATION_CALLER(VectorOfBool)
 
 #ifdef RTT_ROSPARAM_EIGEN_SUPPORT
       ADD_ROSPARAM_OPERATION_CALLER(EigenVectorXd)
@@ -181,12 +195,14 @@ namespace rtt_rosparam {
     RTT::OperationCaller<bool(void)> getAllPrivate;
     RTT::OperationCaller<bool(void)> getAllComponentPrivate;
     RTT::OperationCaller<bool(void)> getAllComponentRelative;
+    RTT::OperationCaller<bool(void)> getAllComponentAbsolute;
     RTT::OperationCaller<bool(void)> getAll;
     RTT::OperationCaller<bool(void)> setAllRelative;
     RTT::OperationCaller<bool(void)> setAllAbsolute;
     RTT::OperationCaller<bool(void)> setAllPrivate;
     RTT::OperationCaller<bool(void)> setAllComponentPrivate;
     RTT::OperationCaller<bool(void)> setAllComponentRelative;
+    RTT::OperationCaller<bool(void)> setAllComponentAbsolute;
     RTT::OperationCaller<bool(void)> setAll;
 
     RTT::OperationCaller<bool(const std::string &, const unsigned int)> get;
@@ -196,6 +212,7 @@ namespace rtt_rosparam {
     RTT::OperationCaller<bool(const std::string &)> getPrivate;
     RTT::OperationCaller<bool(const std::string &)> getComponentPrivate;
     RTT::OperationCaller<bool(const std::string &)> getComponentRelative;
+    RTT::OperationCaller<bool(const std::string &)> getComponentAbsolute;
 
     RTT::OperationCaller<bool(const std::string &, const unsigned int)> set;
     RTT::OperationCaller<bool(const std::string &, const std::string &)> setParam;
@@ -204,6 +221,7 @@ namespace rtt_rosparam {
     RTT::OperationCaller<bool(const std::string &)> setPrivate;
     RTT::OperationCaller<bool(const std::string &)> setComponentPrivate;
     RTT::OperationCaller<bool(const std::string &)> setComponentRelative;
+    RTT::OperationCaller<bool(const std::string &)> setComponentAbsolute;
 
     DECLARE_ROSPARAM_OPERATION_CALLER(String, std::string)
     DECLARE_ROSPARAM_OPERATION_CALLER(Double, double)
@@ -212,6 +230,9 @@ namespace rtt_rosparam {
     DECLARE_ROSPARAM_OPERATION_CALLER(Bool, bool)
     DECLARE_ROSPARAM_OPERATION_CALLER(VectorOfString, std::vector<std::string>)
     DECLARE_ROSPARAM_OPERATION_CALLER(VectorOfDouble, std::vector<double>)
+    DECLARE_ROSPARAM_OPERATION_CALLER(VectorOfFloat, std::vector<float>)
+    DECLARE_ROSPARAM_OPERATION_CALLER(VectorOfInt, std::vector<int>)
+    DECLARE_ROSPARAM_OPERATION_CALLER(VectorOfBool, std::vector<bool>)
 
 #ifdef RTT_ROSPARAM_EIGEN_SUPPORT
     DECLARE_ROSPARAM_OPERATION_CALLER(EigenVectorXd, eigen_matrix_xd)
