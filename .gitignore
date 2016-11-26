@@ -1,0 +1,6 @@
+# Orocos-specific files that are commonly left in the current working directory:
+orocos.log
+.tb_history
+
+# QtCreator project settings file
+*.user

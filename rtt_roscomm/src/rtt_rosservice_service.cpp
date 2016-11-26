@@ -31,6 +31,11 @@ public:
       .arg( "operation_name", "The RTT operation name (like \"some_provided_service.another.operation\").")
       .arg( "service_name", "The ROS service name (like \"/my_robot/ns/some_service\").")
       .arg( "service_type", "The ROS service type (like \"std_srvs/Empty\").");
+    this->addOperation("disconnect", &ROSServiceService::disconnect, this)
+      .doc( "Disconnects an RTT operation or operation caller from an associated ROS service server or client.")
+      .arg( "service_name", "The ROS service name (like \"/my_robot/ns/some_service\").");
+    this->addOperation("disconnectAll", &ROSServiceService::disconnectAll, this)
+      .doc( "Disconnects all RTT operations and operation callers from associated ROS service servers or clients.");
 
     // Get the global ros service registry
     rosservice_registry_ = ROSServiceRegistryService::Instance();
@@ -40,18 +45,7 @@ public:
 
   ~ROSServiceService()
   {
-    // Cleanup registered ROS services and clients
-    std::map<std::string, ROSServiceServerProxyBase*>::iterator iter_s;
-    for(iter_s=server_proxies_.begin(); iter_s != server_proxies_.end(); iter_s++)
-    {
-      delete iter_s->second;
-    }
-
-    std::map<std::string, ROSServiceClientProxyBase*>::iterator iter_c;
-    for(iter_c=client_proxies_.begin(); iter_c != client_proxies_.end(); iter_c++)
-    {
-      delete iter_c->second;
-    }
+    disconnectAll();
   }
 
   //! Get an RTT operation caller from a string identifier
@@ -168,6 +162,49 @@ public:
 
     RTT::log(RTT::Error) << "No such Operation or OperationCaller '" << rtt_operation_name << "' in '" << getOwner()->getName() << "'" << RTT::endlog();
     return false;
+  }
+
+  bool disconnect(const std::string &ros_service_name)
+  {
+    bool found = false;
+
+    // Cleanup ROS service or client named ros_service_name
+    std::map<std::string, ROSServiceServerProxyBase*>::iterator iter_s
+        = server_proxies_.find(ros_service_name);
+    if (iter_s != server_proxies_.end()) {
+      delete iter_s->second;
+      server_proxies_.erase(iter_s);
+      found = true;
+    }
+
+    std::map<std::string, ROSServiceClientProxyBase*>::iterator iter_c
+        = client_proxies_.find(ros_service_name);
+    if (iter_c != client_proxies_.end())
+    {
+      delete iter_c->second;
+      client_proxies_.erase(iter_c);
+      found = true;
+    }
+
+    return found;
+  }
+
+  void disconnectAll()
+  {
+    // Cleanup registered ROS services and clients
+    std::map<std::string, ROSServiceServerProxyBase*>::iterator iter_s;
+    for(iter_s = server_proxies_.begin(); iter_s != server_proxies_.end(); iter_s = server_proxies_.begin())
+    {
+      delete iter_s->second;
+      server_proxies_.erase(iter_s);
+    }
+
+    std::map<std::string, ROSServiceClientProxyBase*>::iterator iter_c;
+    for(iter_c = client_proxies_.begin(); iter_c != client_proxies_.end(); iter_c = client_proxies_.begin())
+    {
+      delete iter_c->second;
+      client_proxies_.erase(iter_c);
+    }
   }
 
   RTT::Service::shared_ptr rosservice_registry_;
