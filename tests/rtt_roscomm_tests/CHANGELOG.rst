@@ -2,11 +2,8 @@
 Changelog for package rtt_roscomm_tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
-* tests: split off out-of-band ROS transport test using rostest and integrated create_rtt_msgs test with catkin
-* tests: add USE_OROCOS_INCLUDE_DIRS explicitly and remove orocos_generate_package() calls for tests
-* rtt_roscomm_tests: added an out-of-band test using the ROS transport
+2.8.4 (2016-11-26)
+------------------
 
 2.8.3 (2016-07-20)
 ------------------

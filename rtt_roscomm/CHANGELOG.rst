@@ -2,15 +2,14 @@
 Changelog for package rtt_roscomm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
-* Also add a virtual destructor to the base class of the ROS Service Proxy
-* Added an explicit destructor to shutdown services servers, and cleanup the registered proxies
-* added topicLatched() method to rtt_rostopic service
-* Corba / Mqueue support for ROS message typekits
-* added support for updated dataflow semantics (RTT version >= 2.8.99)
-* only set CMAKE_BUILD_TYPE to MinSizeRel if either not set or if it was Release before
-* Contributors: Antoine Hoarau, Guillaume Walck, Johannes Meyer
+2.8.4 (2016-11-26)
+------------------
+* Merge pull request `#79 <https://github.com/orocos/rtt_ros_integration/issues/79>`_ from meyerj/added-rtt-rosservice-operations
+  rtt_roscomm: added operations disconnect() and disconnectAll() to the rosservice service
+* Merge branch 'B`#59 <https://github.com/orocos/rtt_ros_integration/issues/59>`__cleaning_registered_services' of https://github.com/ubi-agni/rtt_ros_integration into indigo-devel
+* rtt_roscomm: include exported headers and link typekit and transport plugin to exported libraries
+* rtt_roscomm: export build dependency roscpp
+* Contributors: Johannes Meyer, Guillaume Walck
 
 2.8.3 (2016-07-20)
 ------------------
