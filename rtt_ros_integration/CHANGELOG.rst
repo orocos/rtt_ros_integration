@@ -2,6 +2,9 @@
 Orocos RTT/ROS Integration Changelog
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.4 (2016-11-26)
+------------------
+
 2.8.3 (2016-07-20)
 ------------------
 * Please check the changelogs of the individual packages, e.g.:
