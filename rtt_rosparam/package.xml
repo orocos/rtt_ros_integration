@@ -18,7 +18,6 @@
 
   <depend>rtt_ros</depend>
   <depend>roscpp</depend>
-  <build_depend>cmake_modules</build_depend>
   <build_depend>eigen</build_depend>
   <build_export_depend>eigen</build_export_depend>
 
