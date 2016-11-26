@@ -11,12 +11,18 @@ namespace rtt_rosservice {
   public:
     ROSService(RTT::TaskContext *owner) :
       RTT::ServiceRequester("rosservice",owner),
-      connect("connect")
+      connect("connect"),
+      disconnect("disconnect"),
+      disconnectAll("disconnectAll")
     {
       this->addOperationCaller(connect);
+      this->addOperationCaller(disconnect);
+      this->addOperationCaller(disconnectAll);
     }
 
     RTT::OperationCaller<bool(const std::string &, const std::string &, const std::string &)> connect;
+    RTT::OperationCaller<bool(const std::string &)> disconnect;
+    RTT::OperationCaller<void()> disconnectAll;
   };
 }
 
