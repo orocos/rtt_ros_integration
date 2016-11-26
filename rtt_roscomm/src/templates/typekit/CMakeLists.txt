@@ -206,22 +206,10 @@ include_directories(
 
 # Targets
 set(CMAKE_BUILD_TYPE MinSizeRel)
-orocos_typekit(rtt-${_package}-typekit ${rtt-${_package}-typekit_SOURCES})
-target_link_libraries(rtt-${_package}-typekit ${catkin_LIBRARIES} ${${_package}_LIBRARIES} ${USE_OROCOS_LIBRARIES})
-orocos_typekit(rtt-${_package}-ros-transport ${rtt-${_package}-ros-transport_SOURCES})
-target_link_libraries(rtt-${_package}-ros-transport ${catkin_LIBRARIES} ${${_package}_LIBRARIES} ${USE_OROCOS_LIBRARIES})
-
-# Build mqueue transport plugin
-if(ENABLE_MQ)
-  orocos_typekit(rtt-${_package}-ros-transport-mqueue ${rtt-${_package}-ros-transport-mqueue_SOURCES})
-  target_link_libraries(rtt-${_package}-ros-transport-mqueue ${catkin_LIBRARIES} ${${_package}_LIBRARIES} ${USE_OROCOS_LIBRARIES} ${OROCOS-RTT_MQUEUE_LIBRARIES})
-endif()
-
-# Build corba transport plugin
-if(ENABLE_CORBA)
-  orocos_typekit(rtt-${_package}-ros-transport-corba ${rtt-${_package}-ros-transport-corba_SOURCES})
-  target_link_libraries(rtt-${_package}-ros-transport-corba ${catkin_LIBRARIES} ${${_package}_LIBRARIES} ${USE_OROCOS_LIBRARIES} ${OROCOS-RTT_CORBA_LIBRARIES})
-endif()
+orocos_typekit(         rtt-${_package}-typekit ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_typekit.cpp ${ROSMSG_TYPEKIT_PLUGINS})
+orocos_typekit(         rtt-${_package}-ros-transport ${CMAKE_CURRENT_BINARY_DIR}/ros_${_package}_transport.cpp )
+target_link_libraries(  rtt-${_package}-typekit ${catkin_LIBRARIES} ${${_package}_LIBRARIES} ${USE_OROCOS_LIBRARIES})
+target_link_libraries(  rtt-${_package}-ros-transport ${catkin_LIBRARIES} ${${_package}_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 
 # Add an explicit dependency between the typekits and message files
 # TODO: Add deps for all msg dependencies
