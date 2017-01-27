@@ -5,6 +5,11 @@ find_package(catkin REQUIRED COMPONENTS rtt_roscomm)
 
 ros_generate_rtt_typekit(std_msgs)
 
+if(NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CMAKE_BUILD_TYPE MinSizeRel)
+endif()
+orocos_plugin(rtt-ros-primitives-transport src/ros_primitives_transport_plugin.cpp)
+
 orocos_generate_package(
   DEPENDS std_msgs
   DEPENDS_TARGETS rtt_roscomm
