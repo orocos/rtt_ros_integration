@@ -18,16 +18,32 @@
 #include <std_msgs/Time.h>
 #include <ros/time.h>
 
+#include <std_msgs/vector_multi_array_adapter.h>
+
 #include <rtt_roscomm/rtt_rostopic_ros_msg_transporter.hpp>
 #include <rtt_roscomm/rtt_rostopic.h>
 #include <rtt/types/TransportPlugin.hpp>
 #include <rtt/types/TypekitPlugin.hpp>
 #include <rtt/rt_string.hpp>
 
-
 // There are no message_traits for ros::Time and ros::Duration, so we define it here.
 STD_MSGS_DEFINE_BUILTIN_TRAITS(::ros::Duration, Duration, 0x3e286caf4241d664ULL, 0xe55f3ad380e2ae46ULL)
 STD_MSGS_DEFINE_BUILTIN_TRAITS(::ros::Time, Time, 0xcd7166c74c552c31ULL, 0x1fbcc2fe5a7bc289ULL)
+
+// Adapt std::vector<double> to std_msgs/Float64MultiArray
+namespace rtt_roscomm {
+
+  template <class ContainerAllocator>
+  struct RosMessageAdapter<std::vector<double, ContainerAllocator> >
+  {
+    typedef std::vector<double, ContainerAllocator> OrocosType;
+    typedef std_msgs::VectorMultiArrayAdapter<double, ContainerAllocator> RosType;
+    static RosType toRos(const OrocosType &t) { return RosType(t); }
+    static const OrocosType &fromRos(const RosType &t) { return *t; }
+  };
+
+} // namespace rtt_roscomm
+
 
 namespace rtt_std_msgs {
   using namespace RTT;
@@ -38,6 +54,7 @@ namespace rtt_std_msgs {
   {
     bool registerTransport(std::string name, types::TypeInfo* ti)
     {
+      if (name == "array") { return ti->addProtocol(ORO_ROS_PROTOCOL_ID, new RosMsgTransporter<std::vector<double> >());} else
       if (name == "bool") { return ti->addProtocol(ORO_ROS_PROTOCOL_ID, new RosMsgTransporter<bool>());} else
       if (name == "duration") { return ti->addProtocol(ORO_ROS_PROTOCOL_ID, new RosMsgTransporter<ros::Duration>());} else
       if (name == "float32") { return ti->addProtocol(ORO_ROS_PROTOCOL_ID, new RosMsgTransporter<float>());} else

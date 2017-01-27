@@ -79,6 +79,44 @@ TEST(TransportTest, OutOfBandTest)
                         topic) != subscribed_topics.end());
 }
 
+TEST(TransportTest, VectorTest)
+{
+  // Import plugins
+  ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_ros", "" ));
+  ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_rosnode", "" ));
+  ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_roscomm", "" ));
+  ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_std_msgs", "" ));
+
+  RTT::OutputPort<std::vector<double> > out("out");
+  RTT::InputPort<std::vector<double> > in("in");
+
+  // Create an out-of-band connection with ROS transport (a publisher/subscriber pair)
+  std::string topic = ros::names::resolve("~array_talker");
+  EXPECT_TRUE(out.connectTo(&in, rtt_roscomm::topicLatched(topic)));
+//  EXPECT_TRUE(out.createStream(rtt_roscomm::topicLatched(topic)));
+//  EXPECT_TRUE(in.createStream(rtt_roscomm::topic(topic)));
+
+  // publish and latch one sample
+  static const double sample_array[] = { 1., 2., 3., 4., 5. };
+  std::vector<double> sample(sample_array, sample_array + sizeof(sample_array)/sizeof(sample_array[0]));
+  out.write(sample);
+  usleep(1000000);
+
+  // read sample through input port
+  std::vector<double> received;
+  EXPECT_EQ(RTT::NewData, in.read(received) );
+  EXPECT_EQ(sample.size(), received.size());
+  if (sample.size() == received.size()) {
+    EXPECT_TRUE(std::equal(received.begin(), received.end(), sample.begin()));
+  }
+
+  // Close connection
+  out.disconnect();
+  in.disconnect();
+  EXPECT_FALSE(out.connected());
+  EXPECT_FALSE(in.connected());
+}
+
 static int callback_called = 0;
 bool callback(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
 {

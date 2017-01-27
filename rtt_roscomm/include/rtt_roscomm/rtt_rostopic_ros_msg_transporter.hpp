@@ -68,11 +68,27 @@
 namespace rtt_roscomm {
 
   /**
+   * An adapter that allows to overwrite the corresponding ROS type for a
+   * given Orocos type by specialization.
+   */
+  template <typename T>
+  struct RosMessageAdapter
+  {
+    typedef T OrocosType;
+    typedef T RosType;
+    static const RosType &toRos(const OrocosType &t) { return t; }
+    static const OrocosType &fromRos(const RosType &t) { return t; }
+  };
+
+  /**
    * A ChannelElement implementation to publish data over a ros topic
    */
   template<typename T>
   class RosPubChannelElement: public RTT::base::ChannelElement<T>, public RosPublisher
   {
+    typedef RosMessageAdapter<T> adapter;
+    typedef typename adapter::RosType RosType;
+
     char hostname[1024];
     std::string topicname;
     ros::NodeHandle ros_node;
@@ -122,9 +138,9 @@ namespace rtt_roscomm {
 
       // Handle private names
       if(topicname.length() > 1 && topicname.at(0) == '~') {
-        ros_pub = ros_node_private.advertise<T>(policy.name_id.substr(1), policy.size > 0 ? policy.size : 1, policy.init); // minimum 1
+        ros_pub = ros_node_private.advertise<RosType>(policy.name_id.substr(1), policy.size > 0 ? policy.size : 1, policy.init); // minimum 1
       } else {
-        ros_pub = ros_node.advertise<T>(policy.name_id, policy.size > 0 ? policy.size : 1, policy.init); // minimum 1
+        ros_pub = ros_node.advertise<RosType>(policy.name_id, policy.size > 0 ? policy.size : 1, policy.init); // minimum 1
       }
       act = RosPublishActivity::Instance();
       act->addPublisher( this );
@@ -190,7 +206,7 @@ namespace rtt_roscomm {
     bool write(typename RTT::base::ChannelElement<T>::param_t sample)
 #endif
     {
-      ros_pub.publish(sample);
+      ros_pub.publish(adapter::toRos(sample));
 #if RTT_VERSION_GTE(2,8,99)
       return RTT::WriteSuccess;
 #else
@@ -206,6 +222,9 @@ namespace rtt_roscomm {
   template<typename T>
   class RosSubChannelElement: public RTT::base::ChannelElement<T>
   {
+    typedef RosMessageAdapter<T> adapter;
+    typedef typename adapter::RosType RosType;
+
     std::string topicname;
     ros::NodeHandle ros_node;
     ros::NodeHandle ros_node_private;
@@ -253,10 +272,10 @@ namespace rtt_roscomm {
      * 
      * @param msg The received message
      */
-    void newData(const T& msg){
+    void newData(const RosType& msg){
       typename RTT::base::ChannelElement<T>::shared_ptr output = this->getOutput();
       if (output)
-          output->write(msg);
+          output->write(adapter::fromRos(msg));
     }
   };
 
