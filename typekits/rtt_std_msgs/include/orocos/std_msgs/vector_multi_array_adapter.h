@@ -46,6 +46,7 @@
 #include <std_msgs/UInt64MultiArray.h>
 #include <std_msgs/UInt8MultiArray.h>
 
+#include <ros/assert.h>
 #include <ros/message_traits.h>
 #include <ros/serialization.h>
 
@@ -88,6 +89,8 @@ private:
     { \
       static const char* value() \
       { \
+        ROS_STATIC_ASSERT(MD5Sum<std_msgs::msg>::static_value1 == static_md5sum1); \
+        ROS_STATIC_ASSERT(MD5Sum<std_msgs::msg>::static_value2 == static_md5sum2); \
         return MD5Sum<std_msgs::msg>::value(); \
       } \
       \
@@ -144,8 +147,6 @@ template <typename T, class ContainerAllocator>
 struct Serializer<std_msgs::VectorMultiArrayAdapter<T, ContainerAllocator> >
 {
   typedef std_msgs::VectorMultiArrayAdapter<T, ContainerAllocator> AdaptedType;
-  typedef typename AdaptedType::VectorType VectorType;
-  typedef T value_type;
 
   template<typename Stream>
   inline static void write(Stream& stream, const AdaptedType& v)
