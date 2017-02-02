@@ -93,8 +93,8 @@ class ParamTest : public ::testing::Test {
 
     // Load rosparam service and get pointers
     ASSERT_TRUE(tc->loadService("rosparam"));
-    ASSERT_TRUE(rosparam = tc->getProvider<ROSParam>("rosparam"));
-    ASSERT_TRUE(service = tc->provides()->getService("rosparam"));
+    ASSERT_TRUE((rosparam = tc->getProvider<ROSParam>("rosparam")).get());
+    ASSERT_TRUE((service = tc->provides()->getService("rosparam")).get());
   }
 
   virtual void TearDown() {
