@@ -86,7 +86,7 @@ namespace ros_integration {
     void loadStringTypes();
 
     std::string ROSPrimitivesTypekitPlugin::getName(){
-	    return std::string("ros-")+"primitives";
+        return "ros-primitives";
     }
  
     bool ROSPrimitivesTypekitPlugin::loadTypes() {
