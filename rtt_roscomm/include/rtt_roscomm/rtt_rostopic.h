@@ -37,13 +37,19 @@ namespace rtt_roscomm {
   static const int protocol_id = 3;
 
   /**
-   * Returns a ConnPolicy object for streaming to or from 
-   * the given ROS topic. No buffering is done.
+   * Returns a ConnPolicy object for streaming to or from
+   * the given ROS topic. No buffering is done within RTT.
    */
   RTT::ConnPolicy topic(const std::string& name);
 
   /**
-   * Returns a ConnPolicy object for streaming to or from 
+   * Returns a ConnPolicy object for latched streaming to the
+   * given ROS topic. No buffering is done within RTT.
+   */
+  RTT::ConnPolicy topicLatched(const std::string& name);
+
+  /**
+   * Returns a ConnPolicy object for streaming to or from
    * the given ROS topic. Also specifies the buffer size of
    * the connection to be created.
    */

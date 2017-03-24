@@ -3,21 +3,11 @@
  * this license, please see LICENSE.txt at the root of this repository. 
  */
 
-#include <string>
-#include <vector>
-#include <iterator>
-
 #include <rtt/os/startstop.h>
-
 #include <ocl/DeploymentComponent.hpp>
-#include <ocl/TaskBrowser.hpp>
-#include <ocl/LoggingService.hpp>
 #include <rtt/Logger.hpp>
 #include <rtt/deployment/ComponentLoader.hpp>
 #include <rtt/scripting/Scripting.hpp>
-
-#include <boost/assign/std/vector.hpp>
-using namespace boost::assign;
 
 #include <gtest/gtest.h>
 
@@ -33,7 +23,7 @@ TEST(BasicTest, Import)
 
 TEST(BasicTest, ImportTypekit) 
 {
-  // Import rtt_ros plugin
+  // Import rtt_std_msgs typekit
   EXPECT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_std_msgs", "" ));
   EXPECT_TRUE(scripting_service->eval("var ConnPolicy float_out = ros.topic(\"float_out\")"));
 }
