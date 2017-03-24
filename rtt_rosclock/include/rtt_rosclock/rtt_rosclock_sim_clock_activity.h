@@ -43,6 +43,7 @@
 #define __RTT_ROSCLOCK_RTT_ROSCLOCK_SIM_CLOCK_ACTIVITY_H
 
 #include <rtt/base/ActivityInterface.hpp>
+#include <rtt/base/RunnableInterface.hpp>
 
 #include <rtt/os/TimeService.hpp>
 #include <rtt/os/Mutex.hpp>
@@ -62,13 +63,14 @@ namespace rtt_rosclock {
         const std::string& name = "SimClockActivity");
 
     SimClockActivity(
-        RTT::Seconds period, 
+        RTT::Seconds period,
         RTT::base::RunnableInterface* r = 0,
         const std::string& name ="SimClockActivity");
 
     virtual ~SimClockActivity();
 
     virtual RTT::Seconds getPeriod() const;
+    virtual bool isPeriodic() const;
     virtual bool setPeriod(RTT::Seconds s);
 
     virtual unsigned getCpuAffinity() const;
@@ -78,6 +80,11 @@ namespace rtt_rosclock {
 
     virtual bool initialize();
     virtual void step();
+#if defined(RTT_VERSION_GTE)
+#if RTT_VERSION_GTE(2,9,0)
+    virtual void work(RTT::base::RunnableInterface::WorkReason);
+#endif
+#endif
     virtual void loop();
     virtual bool breakLoop();
     virtual void finalize();
@@ -86,11 +93,11 @@ namespace rtt_rosclock {
     virtual bool stop();
 
     virtual bool isRunning() const;
-    virtual bool isPeriodic() const;
     virtual bool isActive() const;
 
     virtual bool execute();
     virtual bool trigger();
+    virtual bool timeout();
 
     virtual RTT::os::TimeService::ticks getLastExecutionTicks() const;
 
@@ -103,7 +110,7 @@ namespace rtt_rosclock {
     //! True after start() has succeeded
     bool running_;
 
-    //! True if start() has been called 
+    //! True if start() has been called
     bool active_;
 
     //! The last time the activity was executed

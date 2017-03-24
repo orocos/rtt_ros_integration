@@ -88,6 +88,11 @@ RTT::Seconds SimClockActivity::getPeriod() const
     return manager_->getSimulationPeriod();
 }
 
+bool SimClockActivity::isPeriodic() const
+{
+  return true;
+}
+
 bool SimClockActivity::setPeriod(RTT::Seconds s)
 {
   period_ = s;
@@ -118,6 +123,14 @@ void SimClockActivity::step()
 {
 }
 
+#if defined(RTT_VERSION_GTE)
+#if RTT_VERSION_GTE(2,9,0)
+void SimClockActivity::work(RunnableInterface::WorkReason)
+{
+}
+#endif
+#endif
+
 void SimClockActivity::loop()
 {
   this->step();
@@ -127,7 +140,6 @@ bool SimClockActivity::breakLoop()
 {
   return false;
 }
-
 
 void SimClockActivity::finalize()
 {
@@ -172,11 +184,6 @@ bool SimClockActivity::isRunning() const
   return running_;
 }
 
-bool SimClockActivity::isPeriodic() const
-{
-  return true;
-}
-
 bool SimClockActivity::isActive() const
 {
   return active_;
@@ -187,10 +194,29 @@ bool SimClockActivity::trigger()
   return false;
 }
 
+bool SimClockActivity::timeout()
+{
+  return false;
+}
+
 bool SimClockActivity::execute()
 {
   if (!running_) return false;
-  if (runner) runner->step(); else this->step();
+  if (runner) {
+      runner->step();
+#if defined(RTT_VERSION_GTE)
+#if RTT_VERSION_GTE(2,9,0)
+      runner->work(RunnableInterface::TimeOut);
+#endif
+#endif
+  } else {
+      this->step();
+#if defined(RTT_VERSION_GTE)
+#if RTT_VERSION_GTE(2,9,0)
+      this->work(RunnableInterface::TimeOut);
+#endif
+#endif
+  }
   last_ = RTT::os::TimeService::Instance()->getTicks();
   return true;
 }
