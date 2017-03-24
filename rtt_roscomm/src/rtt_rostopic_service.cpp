@@ -1,6 +1,6 @@
 #include <rtt/RTT.hpp>
 #include <rtt/internal/GlobalService.hpp>
-#include <rtt_roscomm/rtt_rostopic.h> 
+#include <rtt_roscomm/rostopic.h>
 
 using namespace RTT;
 using namespace std;

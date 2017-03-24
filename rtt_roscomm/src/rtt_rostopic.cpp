@@ -1,5 +1,5 @@
 
-#include <rtt_roscomm/rtt_rostopic.h>
+#include <rtt_roscomm/rostopic.h>
 
 RTT::ConnPolicy rtt_roscomm::topic(const std::string& name) {
   RTT::ConnPolicy cp = RTT::ConnPolicy::data();

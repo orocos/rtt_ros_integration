@@ -103,7 +103,7 @@ stream("my_component.my_input", ros.comm.topic("my_ros_input"))
 You can also set up these connections in C++ code:
 ```cpp
 
-#include <rtt_roscomm/rtt_rostopic.h>
+#include <rtt_roscomm/rostopic.h>
 
 // ...
 

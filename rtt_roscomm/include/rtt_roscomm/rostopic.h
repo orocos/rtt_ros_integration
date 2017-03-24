@@ -25,12 +25,43 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef __RTT_ROSCOMM_RTT_ROSTOPIC_H
-#define __RTT_ROSCOMM_RTT_ROSTOPIC_H
+#ifndef __RTT_ROSCOMM_ROSTOPIC_H
+#define __RTT_ROSCOMM_ROSTOPIC_H
 
-#warning "Header <rtt_roscomm/rtt_rostopic.h> is deprecated. Please include <rtt_roscomm/rostopic.h> instead."
+#include <rtt/RTT.hpp>
 
-// include renamed header
-#include "rostopic.h"
+#define ORO_ROS_PROTOCOL_ID 3
 
-#endif // ifndef __RTT_ROSCOMM_RTT_ROSTOPIC_H
+namespace rtt_roscomm {
+  //! ROS topic protocol ID
+  static const int protocol_id = 3;
+
+  /**
+   * Returns a ConnPolicy object for streaming to or from
+   * the given ROS topic. No buffering is done within RTT.
+   */
+  RTT::ConnPolicy topic(const std::string& name);
+
+  /**
+   * Returns a ConnPolicy object for latched streaming to the
+   * given ROS topic. No buffering is done within RTT.
+   */
+  RTT::ConnPolicy topicLatched(const std::string& name);
+
+  /**
+   * Returns a ConnPolicy object for streaming to or from
+   * the given ROS topic. Also specifies the buffer size of
+   * the connection to be created.
+   */
+  RTT::ConnPolicy topicBuffer(const std::string& name, int size);
+
+  /**
+   * Returns a ConnPolicy object for streaming to or from
+   * the given ROS topic. Use this only for unbuffered
+   * publishing, where the publish() method is called
+   * in the thread of the writing TaskContext.
+   */
+  RTT::ConnPolicy topicUnbuffered(const std::string& name);
+}
+
+#endif // ifndef __RTT_ROSCOMM_ROSTOPIC_H
