@@ -12,7 +12,7 @@
 #include <rtt_actionlib/rtt_actionlib.h>
 
 #include <rtt_rosclock/rtt_rosclock.h>
-#include <rtt_roscomm/rtt_rostopic.h>
+#include <rtt_roscomm/rostopic.h>
 
 namespace rtt_actionlib {
 

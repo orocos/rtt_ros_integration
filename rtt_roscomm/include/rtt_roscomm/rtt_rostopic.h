@@ -28,6 +28,8 @@
 #ifndef __RTT_ROSCOMM_RTT_ROSTOPIC_H
 #define __RTT_ROSCOMM_RTT_ROSTOPIC_H
 
+#warning "Header <rtt_roscomm/rtt_rostopic.h> is deprecated. Please include <rtt_roscomm/rostopic.h> instead."
+
 // include renamed header
 #include "rostopic.h"
 
