@@ -7,7 +7,6 @@
 
 // Note: we need to put these up-front or we get gcc compiler warnings:
 // <<warning: type attributes ignored after type is already defined>>        
-template class RTT_EXPORT RTT::internal::DataSourceTypeInfo< @ROSMSGTYPE@ >;
 template class RTT_EXPORT RTT::internal::DataSource< @ROSMSGTYPE@ >;
 template class RTT_EXPORT RTT::internal::AssignableDataSource< @ROSMSGTYPE@ >;
 template class RTT_EXPORT RTT::internal::AssignCommand< @ROSMSGTYPE@ >;

@@ -3,12 +3,10 @@
 #ifndef __OROCOS_ROS_GENERATED_@ROSPACKAGE@_@ROSMSGNAME@_TYPES_HPP
 #define __OROCOS_ROS_GENERATED_@ROSPACKAGE@_@ROSMSGNAME@_TYPES_HPP
 
-// note: we preferably would include the message header instead of the boost stuff.
-#include <@ROSMSGBOOSTHEADER@>
+#include <@ROSMSGHEADER@>
 
 // All these classes were generated in the typekit library:
 #ifdef CORELIB_DATASOURCE_HPP
-    extern template class RTT::internal::DataSourceTypeInfo< @ROSMSGTYPE@ >;
     extern template class RTT::internal::DataSource< @ROSMSGTYPE@ >;
     extern template class RTT::internal::AssignableDataSource< @ROSMSGTYPE@ >;
     extern template class RTT::internal::AssignCommand< @ROSMSGTYPE@ >;

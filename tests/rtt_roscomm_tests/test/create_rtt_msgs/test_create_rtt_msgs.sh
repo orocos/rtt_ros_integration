@@ -22,6 +22,7 @@ cmake $TEMP_WS/src/rtt_my_msgs -DCATKIN_DEVEL_PREFIX=$TEMP_WS/devel -DCMAKE_INST
 make install
 
 # Run RTT and try to import the typekit
+. $TEMP_WS/install/setup.sh
 cd $TEMP_WS
 rosrun rtt_ros rttscript --check -l debug `dirname $0`/test_create_rtt_msgs.xml
 

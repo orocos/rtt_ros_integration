@@ -62,6 +62,14 @@ The task-scoped RTT service `rosservice` provides the following operations:
     (like `/some/ros/ns/my_service`)
   * `ROS_SERVICE_TYPE`: The full typename of the service (like
     `std_srvs/Empty`)
+* `rosservice.disconnect(ROS_SERVICE_NAME)`
+  * Disconnects an RTT operation or operation caller from an associated ROS
+    service server or client..
+  * `ROS_SERVICE_NAME`: The name of the service client/server in the ROS graph
+    (like `/some/ros/ns/my_service`)
+* `rosservice.disconnectAll()`
+  * Disconnects all RTT operations and operation callers from associated ROS
+    service servers or clients.
 
 The global RTT service `rosservice_registry` provides the following operations:
 * `rosservice_registry.registerServiceFactory(FACTORY)`: Register a ROS service

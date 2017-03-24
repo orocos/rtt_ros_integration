@@ -2,9 +2,8 @@
 Changelog for package rtt_dynamic_reconfigure_tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
-* tests: add USE_OROCOS_INCLUDE_DIRS explicitly and remove orocos_generate_package() calls for tests
+2.8.4 (2016-11-26)
+------------------
 
 2.8.3 (2016-07-20)
 ------------------

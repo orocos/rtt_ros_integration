@@ -12,29 +12,48 @@
 
 #include <ros/ros.h>
 
+#include <rtt_rosparam/rosparam.h>
+
+#ifndef ADD_ROSPARAM_OPERATION
+#define ADD_ROSPARAM_OPERATION(return_type_str, return_type, func) \
+  this->addOperation("get"#return_type_str, &ROSParamService::get##func< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam"); \
+  this->addOperation("set"#return_type_str, &ROSParamService::set##func< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam"); \
+  this->addOperation("get"#return_type_str"Relative", &ROSParamService::get##func< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam using the relative resolution policy : `relative/param`"); \
+  this->addOperation("set"#return_type_str"Relative", &ROSParamService::set##func< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam using the relative resolution policy : `relative/param`"); \
+  this->addOperation("get"#return_type_str"Absolute", &ROSParamService::get##func< return_type , ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the absolute resolution policy : `/global/param`"); \
+  this->addOperation("set"#return_type_str"Absolute", &ROSParamService::set##func< return_type , ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the absolute resolution policy : `/global/param`"); \
+  this->addOperation("get"#return_type_str"Private", &ROSParamService::get##func< return_type , PRIVATE >, this).doc("Get a " #return_type " from rosparam using the private resolution policy : `~private/param`"); \
+  this->addOperation("set"#return_type_str"Private", &ROSParamService::set##func< return_type , PRIVATE >, this).doc("Set a " #return_type " in rosparam using the private resolution policy : `~private/param`"); \
+  this->addOperation("get"#return_type_str"ComponentPrivate", &ROSParamService::get##func< return_type , COMPONENT_PRIVATE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `~component_name/param`"); \
+  this->addOperation("set"#return_type_str"ComponentPrivate", &ROSParamService::set##func< return_type , COMPONENT_PRIVATE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `~component_name/param`"); \
+  this->addOperation("get"#return_type_str"ComponentRelative", &ROSParamService::get##func< return_type , COMPONENT_RELATIVE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `component_name/param`"); \
+  this->addOperation("set"#return_type_str"ComponentRelative", &ROSParamService::set##func< return_type , COMPONENT_RELATIVE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `component_name/param`"); \
+  this->addOperation("get"#return_type_str"ComponentAbsolute", &ROSParamService::get##func< return_type , COMPONENT_ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `/component_name/param`"); \
+  this->addOperation("set"#return_type_str"ComponentAbsolute", &ROSParamService::set##func< return_type , COMPONENT_ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `/component_name/param`");
+#endif
+
+
 using namespace RTT;
 using namespace std;
+
+using namespace rtt_rosparam;
 
 class ROSParamService: public RTT::Service
 {
 public:
-
-  typedef enum  {
-    RELATIVE, //! Relative resolution:  "name" -> "name"
-    ABSOLUTE, //! Absolute resolution:  "name" -> "/name"
-    PRIVATE,  //! Private resolution:   "name" -> "~name"
-    COMPONENT //! Component resolution: "name" -> "~COMPONENT_NAME/name"
-  }ResolutionPolicy;
 
   ROSParamService(TaskContext* owner) :
     Service("rosparam", owner)
   {
     this->doc("RTT Service for synchronizing ROS parameters with the properties of a corresponding RTT component");
 
-    this->addConstant("RELATIVE",static_cast<int>(RELATIVE));
-    this->addConstant("ABSOLUTE",static_cast<int>(ABSOLUTE));
-    this->addConstant("PRIVATE",static_cast<int>(PRIVATE));
-    this->addConstant("COMPONENT",static_cast<int>(COMPONENT));
+    this->setValue(new Constant<int>("RELATIVE", static_cast<int>(RELATIVE)));
+    this->setValue(new Constant<int>("ABSOLUTE", static_cast<int>(ABSOLUTE)));
+    this->setValue(new Constant<int>("PRIVATE", static_cast<int>(PRIVATE)));
+    this->setValue(new Constant<int>("COMPONENT", static_cast<int>(COMPONENT)));
+    this->setValue(new Constant<int>("COMPONENT_PRIVATE", static_cast<int>(COMPONENT_PRIVATE)));
+    this->setValue(new Constant<int>("COMPONENT_RELATIVE", static_cast<int>(COMPONENT_RELATIVE)));
+    this->setValue(new Constant<int>("COMPONENT_ABSOLUTE", static_cast<int>(COMPONENT_ABSOLUTE)));
 
     this->addOperation("getAllRelative", &ROSParamService::getParamsRelative, this)
       .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the relative namespace.");
@@ -44,6 +63,10 @@ public:
       .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the node's private namespace.");
     this->addOperation("getAllComponentPrivate", &ROSParamService::getParamsComponentPrivate, this)
       .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the component's private namespace.");
+    this->addOperation("getAllComponentRelative", &ROSParamService::getParamsComponentRelative, this)
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the component's relative namespace.");
+    this->addOperation("getAllComponentAbsolute", &ROSParamService::getParamsComponentAbsolute, this)
+      .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the component's absolute namespace.");
     this->addOperation("getAll", &ROSParamService::getParamsComponentPrivate, this)
       .doc("Gets all properties of this component (and its sub-services) from the ROS param server in the component's private namespace. This is an alias for getAllComponentPrivate().");
 
@@ -55,101 +78,172 @@ public:
       .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the node's private namespace.");
     this->addOperation("setAllComponentPrivate", &ROSParamService::setParamsComponentPrivate, this)
       .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the component's private namespace.");
+    this->addOperation("setAllComponentRelative", &ROSParamService::setParamsComponentRelative, this)
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the component's relative namespace.");
+    this->addOperation("setAllComponentAbsolute", &ROSParamService::setParamsComponentAbsolute, this)
+      .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the component's absolute namespace.");
     this->addOperation("setAll", &ROSParamService::setParamsComponentPrivate, this)
       .doc("Stores all properties of this component (and its sub-services) on the ROS param server from the similarly-named property in the component's private namespace. This is an alias for setAllComponentPrivate().");
 
-    this->addOperation("get", &ROSParamService::get, this) 
+    this->addOperation("get", &ROSParamService::get, this)
       .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server based on the given resolution policy.")
       .arg("name", "Name of the property / service / parameter.")
       .arg("policy", "ROS parameter namespace resolution policy.");
-    this->addOperation("getParam", &ROSParamService::getParam, this) 
+    this->addOperation("getParam", &ROSParamService::getParam, this)
       .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server based on the given ROS parameter name.")
       .arg("param_name", "Name of the ROS parameter. Use '~' and '/' leaders for private or absolute resolution.")
       .arg("name", "Name of the RTT property or service.");
 
-    this->addOperation("getRelative", &ROSParamService::getParamRelative, this) 
+    this->addOperation("getRelative", &ROSParamService::getParamRelative, this)
       .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the relative namespace.")
       .arg("name", "Name of the property / service / parameter.");
-    this->addOperation("getAbsolute", &ROSParamService::getParamAbsolute, this) 
+    this->addOperation("getAbsolute", &ROSParamService::getParamAbsolute, this)
       .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the absolute namespace.")
       .arg("name", "Name of the property / service / parameter.");
-    this->addOperation("getPrivate", &ROSParamService::getParamPrivate, this) 
+    this->addOperation("getPrivate", &ROSParamService::getParamPrivate, this)
       .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the node's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
-    this->addOperation("getComponentPrivate", &ROSParamService::getParamComponentPrivate, this) 
+    this->addOperation("getComponentPrivate", &ROSParamService::getParamComponentPrivate, this)
       .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the component's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
+    this->addOperation("getComponentRelative", &ROSParamService::getParamComponentRelative, this)
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the component's relative namespace.")
+      .arg("name", "Name of the property / service / parameter.");
+    this->addOperation("getComponentAbsolute", &ROSParamService::getParamComponentAbsolute, this)
+      .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the component's absolute namespace.")
+      .arg("name", "Name of the property / service / parameter.");
 
-    this->addOperation("set", &ROSParamService::set, this) 
+    this->addOperation("set", &ROSParamService::set, this)
       .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the ROS parameter namespace based on the given resolution policy.")
       .arg("name", "Name of the property / service / parameter.")
       .arg("policy", "ROS parameter namespace resolution policy.");
-    this->addOperation("setParam", &ROSParamService::setParam, this) 
+    this->addOperation("setParam", &ROSParamService::setParam, this)
       .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the ROS parameter namespace based on the given ROS parameter name.")
       .arg("param_name", "Name of the ROS parameter. Use '~' and '/' leaders for private or absolute resolution.")
       .arg("name", "Name of the RTT property or service.");
 
-    this->addOperation("setRelative", &ROSParamService::setParamRelative, this) 
+    this->addOperation("setRelative", &ROSParamService::setParamRelative, this)
       .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the relative namespace.")
       .arg("name", "Name of the property / service / parameter.");
-    this->addOperation("setAbsolute", &ROSParamService::setParamAbsolute, this) 
+    this->addOperation("setAbsolute", &ROSParamService::setParamAbsolute, this)
       .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the absolute namespace.")
       .arg("name", "Name of the property / service / parameter.");
-    this->addOperation("setPrivate", &ROSParamService::setParamPrivate, this) 
+    this->addOperation("setPrivate", &ROSParamService::setParamPrivate, this)
       .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the node's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
-    this->addOperation("setComponentPrivate", &ROSParamService::setParamComponentPrivate, this) 
+    this->addOperation("setComponentPrivate", &ROSParamService::setParamComponentPrivate, this)
       .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the component's private namespace.")
       .arg("name", "Name of the property / service / parameter.");
-  
+    this->addOperation("setComponentRelative", &ROSParamService::setParamComponentRelative, this)
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the component's relative namespace.")
+      .arg("name", "Name of the property / service / parameter.");
+    this->addOperation("setComponentAbsolute", &ROSParamService::setParamComponentAbsolute, this)
+      .doc("Sets one parameter on the ROS param server from the similarly-named property of this component (or stores the properties of a named RTT sub-service) in the component's absolute namespace.")
+      .arg("name", "Name of the property / service / parameter.");
+
+    ADD_ROSPARAM_OPERATION(String, std::string, ParamImpl)
+    ADD_ROSPARAM_OPERATION(Double, double, ParamImpl)
+    ADD_ROSPARAM_OPERATION(Float, float, ParamImpl)
+    ADD_ROSPARAM_OPERATION(Int, int, ParamImpl)
+    ADD_ROSPARAM_OPERATION(Bool, bool, ParamImpl)
+
+    // Vector parameters
+    ADD_ROSPARAM_OPERATION(VectorOfString, std::vector<std::string>, ParamImpl)
+    ADD_ROSPARAM_OPERATION(VectorOfDouble, std::vector<double>, ParamImpl)
+    ADD_ROSPARAM_OPERATION(VectorOfFloat, std::vector<float>, ParamImpl)
+    ADD_ROSPARAM_OPERATION(VectorOfInt, std::vector<int>, ParamImpl)
+    ADD_ROSPARAM_OPERATION(VectorOfBool, std::vector<bool>, ParamImpl)
+
+    ADD_ROSPARAM_OPERATION(EigenVectorXd, double, EigenVectorParamImpl)
+    ADD_ROSPARAM_OPERATION(EigenVectorXf, float, EigenVectorParamImpl)
+
   }
+
 private:
+
+  template <typename T, ResolutionPolicy P> bool getParamImpl(const std::string& ros_param_name, T& value)
+  {
+    if (!ros::param::get(resolvedName(ros_param_name,P), value)) {
+      RTT::log(RTT::Debug) << "ROS Parameter \"" << ros_param_name << "\" not found on the parameter server!" << RTT::endlog();
+      return false;
+    }
+    return true;
+  }
+
+  template <typename T, ResolutionPolicy P> void setParamImpl(const std::string& ros_param_name, const T& value)
+  {
+    ros::param::set(resolvedName(ros_param_name,P), value);
+  }
+
+  template <typename T, ResolutionPolicy P> bool getEigenVectorParamImpl(const std::string& ros_param_name, Eigen::Matrix<T,Eigen::Dynamic,1>& eigen_vector)
+  {
+    std::vector<T> value;
+    if (!getParamImpl< std::vector<T> , P >(ros_param_name,value)) {
+      return false;
+    }
+    eigen_vector = Eigen::Matrix<T,Eigen::Dynamic,1>::Map(value.data(),value.size());
+    return true;
+  }
+
+  template <typename T, ResolutionPolicy P> void setEigenVectorParamImpl(const std::string& ros_param_name, const Eigen::Matrix<T,Eigen::Dynamic,1>& eigen_vector)
+  {
+    std::vector<T> value(eigen_vector.data(),eigen_vector.data() + eigen_vector.size() );
+    setParamImpl< std::vector<T> , P >(ros_param_name,value);
+  }
 
   //! Resolve a parameter name based on the given \ref ResolutionPolicy
   const std::string resolvedName(
-    const std::string &param_name, 
-    const ROSParamService::ResolutionPolicy policy);
+    const std::string &param_name,
+    const ResolutionPolicy policy);
 
   bool getParams(RTT::Service::shared_ptr service, const std::string& ns);
-  bool getParams(const ROSParamService::ResolutionPolicy policy);
+  bool getParams(const ResolutionPolicy policy);
   bool getParamsRelative() { return getParams(RELATIVE); }
   bool getParamsAbsolute() { return getParams(ABSOLUTE); }
   bool getParamsPrivate() { return getParams(PRIVATE); }
-  bool getParamsComponentPrivate() { return getParams(COMPONENT); }
+  bool getParamsComponentPrivate() { return getParams(COMPONENT_PRIVATE); }
+  bool getParamsComponentRelative() { return getParams(COMPONENT_RELATIVE); }
+  bool getParamsComponentAbsolute() { return getParams(COMPONENT_ABSOLUTE); }
 
   bool get(
-    const std::string &param_name, 
-    const unsigned int policy = (unsigned int)ROSParamService::COMPONENT);
+    const std::string &param_name,
+    const unsigned int policy = (unsigned int) COMPONENT_PRIVATE);
   bool getParam(
-    const std::string &ros_name, 
+    const std::string &ros_name,
     const std::string &rtt_name);
   bool getParamRelative(const std::string &name) { return get(name, RELATIVE); }
   bool getParamAbsolute(const std::string &name) { return get(name, ABSOLUTE); }
   bool getParamPrivate(const std::string &name) { return get(name, PRIVATE); }
-  bool getParamComponentPrivate(const std::string &name) { return get(name, COMPONENT); }
+  bool getParamComponentPrivate(const std::string &name) { return get(name, COMPONENT_PRIVATE); }
+  bool getParamComponentRelative(const std::string &name) { return get(name, COMPONENT_RELATIVE); }
+  bool getParamComponentAbsolute(const std::string &name) { return get(name, COMPONENT_ABSOLUTE); }
 
   bool setParams(RTT::Service::shared_ptr service, const std::string& ns);
-  bool setParams(const ROSParamService::ResolutionPolicy policy);
+  bool setParams(const ResolutionPolicy policy);
   bool setParamsRelative() { return setParams(RELATIVE); }
   bool setParamsAbsolute() { return setParams(ABSOLUTE); }
   bool setParamsPrivate() { return setParams(PRIVATE); }
-  bool setParamsComponentPrivate() { return setParams(COMPONENT); }
+  bool setParamsComponentPrivate() { return setParams(COMPONENT_PRIVATE); }
+  bool setParamsComponentRelative() { return setParams(COMPONENT_RELATIVE); }
+  bool setParamsComponentAbsolute() { return setParams(COMPONENT_ABSOLUTE); }
 
   bool set(
-    const std::string &param_name, 
-    const unsigned int policy = (unsigned int)ROSParamService::COMPONENT);
+    const std::string &param_name,
+    const unsigned int policy = (unsigned int) COMPONENT_PRIVATE);
   bool setParam(
-    const std::string &ros_name, 
+    const std::string &ros_name,
     const std::string &rtt_name);
   bool setParamRelative(const std::string &name) { return set(name, RELATIVE); }
   bool setParamAbsolute(const std::string &name) { return set(name, ABSOLUTE); }
   bool setParamPrivate(const std::string &name) { return set(name, PRIVATE); }
-  bool setParamComponentPrivate(const std::string &name) { return set(name, COMPONENT); }
+  bool setParamComponentPrivate(const std::string &name) { return set(name, COMPONENT_PRIVATE); }
+  bool setParamComponentRelative(const std::string &name) { return set(name, COMPONENT_RELATIVE); }
+  bool setParamComponentAbsolute(const std::string &name) { return set(name, COMPONENT_ABSOLUTE); }
 };
 
 const std::string ROSParamService::resolvedName(
-    const std::string &param_name, 
-    const ROSParamService::ResolutionPolicy policy)
+    const std::string &param_name,
+    const ResolutionPolicy policy)
 {
   std::string leader = "";
   std::string resolved_name = "";
@@ -159,17 +253,23 @@ const std::string ROSParamService::resolvedName(
   }
 
   switch(policy) {
-    case ROSParamService::RELATIVE:
+    case RELATIVE:
       resolved_name = param_name;
       break;
-    case ROSParamService::ABSOLUTE:
+    case ABSOLUTE:
       resolved_name = (leader == "/") ? param_name : std::string("/") + param_name;
       break;
-    case ROSParamService::PRIVATE:
+    case PRIVATE:
       resolved_name = (leader == "~") ? param_name : std::string("~") + param_name;
       break;
-    case ROSParamService::COMPONENT:
+    case COMPONENT_PRIVATE:
       resolved_name = std::string("~") + ros::names::append(this->getOwner()->getName(),param_name);
+      break;
+    case COMPONENT_RELATIVE:
+      resolved_name = ros::names::append(this->getOwner()->getName(),param_name);
+      break;
+    case COMPONENT_ABSOLUTE:
+      resolved_name = std::string("/") +ros::names::append(this->getOwner()->getName(),param_name);
       break;
   };
 
@@ -196,7 +296,7 @@ XmlRpc::XmlRpcValue rttPropertyToXmlParam(const std::vector<T> &vec);
 XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(RTT::base::PropertyBase *prop);
 
 template<class T>
-bool castable(const RTT::base::PropertyBase *prop) 
+bool castable(const RTT::base::PropertyBase *prop)
 {
   return dynamic_cast<const Property<T>*>(prop);
 }
@@ -301,14 +401,14 @@ XmlRpc::XmlRpcValue rttPropertyToXmlParam(const Eigen::VectorXf &vec)
 XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(RTT::base::PropertyBase *prop)
 {
   // Primitive parameters
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(std::string,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(double,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(float,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(int,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(unsigned int,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(char,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(unsigned char,prop);
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(bool,prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(std::string, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(double, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(float, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(int, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(unsigned int, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(char, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(unsigned char, prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(bool, prop);
 
   // Vector parameters
   RETURN_RTT_PROPERTY_CONTAINER_TO_XML_PARAM(std::vector<std::string>, std::string, prop);
@@ -324,7 +424,7 @@ XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(RTT::base::PropertyBase *prop)
   RETURN_RTT_PROPERTY_TO_XML_PARAM(Eigen::VectorXf, prop);
 
   // Struct parameters
-  RETURN_RTT_PROPERTY_TO_XML_PARAM(RTT::PropertyBag,prop);
+  RETURN_RTT_PROPERTY_TO_XML_PARAM(RTT::PropertyBag, prop);
 
   // Try to decompose property into a property bag
   RTT::PropertyBag bag;
@@ -337,7 +437,7 @@ XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(RTT::base::PropertyBase *prop)
 
 
 bool ROSParamService::set(
-    const std::string &param_name, 
+    const std::string &param_name,
     const unsigned int policy)
 {
   RTT::Logger::In in("ROSParamService::set");
@@ -363,7 +463,7 @@ bool ROSParamService::setParam(
     return true;
   }
 
-  // Try to find a sub-service named rtt_name 
+  // Try to find a sub-service named rtt_name
   RTT::Service::shared_ptr service = this->getOwner()->provides()->getService(rtt_name);
   if (service) {
     // Set all parameters of the sub-service
@@ -374,13 +474,13 @@ bool ROSParamService::setParam(
   return false;
 }
 
-bool ROSParamService::setParams(const ROSParamService::ResolutionPolicy policy)
+bool ROSParamService::setParams(const ResolutionPolicy policy)
 {
   return setParams(this->getOwner()->provides(), resolvedName(std::string(), policy));
 }
 
 bool ROSParamService::setParams(
-    RTT::Service::shared_ptr service, 
+    RTT::Service::shared_ptr service,
     const std::string& ns) {
   XmlRpc::XmlRpcValue xml_value;
   xml_value = rttPropertyToXmlParam(*(service->properties()));
@@ -412,7 +512,7 @@ bool xmlParamToProp(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<Eigen::V
 template <>
 bool xmlParamToProp(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<Eigen::VectorXf>* prop);
 //! Convert an XmlRpc structure value into an RTT PropertyBag property
-template <> 
+template <>
 bool xmlParamToProp<RTT::PropertyBag>(const XmlRpc::XmlRpcValue &xml_value, RTT::Property<RTT::PropertyBag>* prop);
 //! Convert an XmlRpc structure value into an abstract RTT PropertyBase
 bool xmlParamToProp( const XmlRpc::XmlRpcValue &xml_value, RTT::base::PropertyBase* prop_base);
@@ -473,7 +573,7 @@ bool xmlParamToProp(
     return false;
   }
 
-  // Make sure it's an array 
+  // Make sure it's an array
   if(xml_value.getType() != XmlRpc::XmlRpcValue::TypeArray) {
     return false;
   }
@@ -597,8 +697,10 @@ bool xmlParamToProp<RTT::PropertyBag>(
       ++it)
   {
     RTT::base::PropertyBase *sub_prop_base = prop->value().getProperty(it->first);
-    if(sub_prop_base) {
+    if (sub_prop_base) {
       success &= xmlParamToProp(it->second, sub_prop_base);
+    } else {
+      // create property based on XmlRpc type?
     }
   }
 
@@ -609,30 +711,32 @@ bool xmlParamToProp(
     const XmlRpc::XmlRpcValue &xml_value,
     RTT::base::PropertyBase* prop_base)
 {
-  bool array_ret = false;
-
-  // Switch based on the type of XmlRpcValue 
+  // Switch based on the type of XmlRpcValue
   switch(xml_value.getType()) {
     case XmlRpc::XmlRpcValue::TypeString:
-      return 
-        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::string>*>(prop_base)); 
+      return
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::string>*>(prop_base));
+
     case XmlRpc::XmlRpcValue::TypeDouble:
-      return 
+      return
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<double>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<float>*>(prop_base));
+
     case XmlRpc::XmlRpcValue::TypeInt:
-      return 
+      return
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<double>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<float>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<int>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<unsigned int>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<char>*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<unsigned char>*>(prop_base));
+
     case XmlRpc::XmlRpcValue::TypeBoolean:
-      return 
-        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<bool>*>(prop_base)); 
+      return
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<bool>*>(prop_base));
+
     case XmlRpc::XmlRpcValue::TypeArray:
-      array_ret =
+      if (
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<std::string> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<double> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<float> >*>(prop_base)) ||
@@ -641,35 +745,41 @@ bool xmlParamToProp(
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<char> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<unsigned char> >*>(prop_base)) ||
         xmlParamToProp(xml_value, dynamic_cast<RTT::Property<std::vector<bool> >*>(prop_base)) ||
-        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<Eigen::VectorXd >*>(prop_base));
-      // Return true if it gets parsed into an array structure, otherwise, try property bag decomposition
-      if(array_ret) {
-        return true;
-      }
-    case XmlRpc::XmlRpcValue::TypeStruct:
-      // Try to decompose the property in a property bag:
-      if(xmlParamToProp(xml_value, dynamic_cast<RTT::Property<RTT::PropertyBag>*>(prop_base))) {
-        return true;
-      }
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<Eigen::VectorXd >*>(prop_base)) ||
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<Eigen::VectorXf >*>(prop_base)) )
       {
-        RTT::Property<RTT::PropertyBag> bag(prop_base->getName());
-        if(RTT::types::propertyDecomposition(prop_base, bag.set()) && xmlParamToProp(xml_value, &bag)) {
-          return true;
-        } else {
-          RTT::log(RTT::Debug) << "Could not decompose property bag for property type \"" << prop_base->getName() << "\"" << RTT::endlog();
-          return false;
-        }
-
+        // Return true if it gets parsed into an array structure
+        return true;
       }
+      break;
+
+    case XmlRpc::XmlRpcValue::TypeStruct:
+      if (
+        xmlParamToProp(xml_value, dynamic_cast<RTT::Property<RTT::PropertyBag>*>(prop_base)) )
+      {
+        // Return true if it gets parsed into a PropertyBag structure
+        return true;
+      }
+      break;
   };
 
-  RTT::log(RTT::Debug) << "No appropriate conversion for property \"" << prop_base->getName() << "\"" << RTT::endlog();
+  // try property bag decomposition
+  {
+    RTT::Property<RTT::PropertyBag> bag(prop_base->getName());
+    if (RTT::types::propertyDecomposition(prop_base, bag.set()) && xmlParamToProp(xml_value, &bag)) {
+      return true;
+    } else {
+      RTT::log(RTT::Debug) << "Could not decompose property bag for property type \"" << prop_base->getName() << "\"" << RTT::endlog();
+      return false;
+    }
+  }
 
+  RTT::log(RTT::Debug) << "No appropriate conversion for property \"" << prop_base->getName() << "\"" << RTT::endlog();
   return false;
 }
 
 bool ROSParamService::get(
-    const std::string &param_name, 
+    const std::string &param_name,
     const unsigned int policy)
 {
   RTT::Logger::In in("ROSParamService::get");
@@ -724,13 +834,13 @@ bool ROSParamService::getParam(
 }
 
 
-bool ROSParamService::getParams(const ROSParamService::ResolutionPolicy policy)
+bool ROSParamService::getParams(const ResolutionPolicy policy)
 {
   return getParams(this->getOwner()->provides(), resolvedName(std::string(), policy));
 }
 
 bool ROSParamService::getParams(
-    RTT::Service::shared_ptr service, 
+    RTT::Service::shared_ptr service,
     const std::string& ns)
 {
   RTT::Logger::In in("ROSParamService::getParams");
