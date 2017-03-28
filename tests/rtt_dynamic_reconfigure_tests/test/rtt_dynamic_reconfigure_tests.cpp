@@ -138,6 +138,94 @@ TEST_F(DynamicReconfigureTest, MinMaxDefault)
     EXPECT_EQ(5.0,  *(dflt.getPropertyType<double>("non_existent")));
 }
 
+TEST_F(DynamicReconfigureTest, DefaultUpdateCallback)
+{
+  // load test_reconfigure service
+  ASSERT_TRUE(tc.loadService("reconfigure"));
+  ASSERT_TRUE(tc.provides()->hasService("reconfigure"));
+
+  // check that no user callback has been called during service construction
+  EXPECT_FALSE(tc.updatePropertiesCalled);
+  EXPECT_FALSE(tc.updatePropertiesConstCalled);
+  EXPECT_FALSE(tc.notifyPropertiesUpdateCalled);
+
+  // check actual callback
+  dynamic_reconfigure::Reconfigure reconfigure;
+  EXPECT_TRUE(tc.setConfigCallback("reconfigure", reconfigure.request, reconfigure.response));
+  EXPECT_FALSE(tc.updatePropertiesCalled);
+  EXPECT_FALSE(tc.updatePropertiesConstCalled);
+  EXPECT_FALSE(tc.notifyPropertiesUpdateCalled);
+}
+
+TEST_F(DynamicReconfigureTest, UpdatePropertiesCallback)
+{
+  // add updateProperties operation
+  tc.addOperation("updateProperties", &DynamicReconfigureTestComponent::updateProperties, &tc);
+
+  // load test_reconfigure service
+  ASSERT_TRUE(tc.loadService("reconfigure"));
+  ASSERT_TRUE(tc.provides()->hasService("reconfigure"));
+
+  // check that updateProperties callback has been called during service construction
+  EXPECT_TRUE(tc.updatePropertiesCalled);
+  EXPECT_FALSE(tc.updatePropertiesConstCalled);
+  EXPECT_FALSE(tc.notifyPropertiesUpdateCalled);
+  tc.updatePropertiesCalled = false;
+
+  // check actual callback
+  dynamic_reconfigure::Reconfigure reconfigure;
+  EXPECT_TRUE(tc.setConfigCallback("reconfigure", reconfigure.request, reconfigure.response));
+  EXPECT_TRUE(tc.updatePropertiesCalled);
+  EXPECT_FALSE(tc.updatePropertiesConstCalled);
+  EXPECT_FALSE(tc.notifyPropertiesUpdateCalled);
+}
+
+TEST_F(DynamicReconfigureTest, UpdatePropertiesConstCallback)
+{
+  // add updateProperties operation
+  tc.addOperation("updateProperties", &DynamicReconfigureTestComponent::updatePropertiesConst, &tc);
+
+  // load test_reconfigure service
+  ASSERT_TRUE(tc.loadService("reconfigure"));
+  ASSERT_TRUE(tc.provides()->hasService("reconfigure"));
+
+  // check that updatePropertiesConst callback has been called during service construction
+  EXPECT_FALSE(tc.updatePropertiesCalled);
+  EXPECT_TRUE(tc.updatePropertiesConstCalled);
+  EXPECT_FALSE(tc.notifyPropertiesUpdateCalled);
+  tc.updatePropertiesConstCalled = false;
+
+  // check actual callback
+  dynamic_reconfigure::Reconfigure reconfigure;
+  EXPECT_TRUE(tc.setConfigCallback("reconfigure", reconfigure.request, reconfigure.response));
+  EXPECT_FALSE(tc.updatePropertiesCalled);
+  EXPECT_TRUE(tc.updatePropertiesConstCalled);
+  EXPECT_FALSE(tc.notifyPropertiesUpdateCalled);
+}
+
+TEST_F(DynamicReconfigureTest, NotifyPropertiesUpdateCallback)
+{
+  // add updateProperties operation
+  tc.addOperation("notifyPropertiesUpdate", &DynamicReconfigureTestComponent::notifyPropertiesUpdate, &tc);
+
+  // load test_reconfigure service
+  ASSERT_TRUE(tc.loadService("reconfigure"));
+  ASSERT_TRUE(tc.provides()->hasService("reconfigure"));
+
+  // check that notifyPropertiesUpdate callback has been called during service construction
+  EXPECT_FALSE(tc.updatePropertiesCalled);
+  EXPECT_FALSE(tc.updatePropertiesConstCalled);
+  EXPECT_TRUE(tc.notifyPropertiesUpdateCalled);
+  tc.notifyPropertiesUpdateCalled = false;
+
+  // check actual callback
+  dynamic_reconfigure::Reconfigure reconfigure;
+  EXPECT_TRUE(tc.setConfigCallback("reconfigure", reconfigure.request, reconfigure.response));
+  EXPECT_FALSE(tc.updatePropertiesCalled);
+  EXPECT_FALSE(tc.updatePropertiesConstCalled);
+  EXPECT_TRUE(tc.notifyPropertiesUpdateCalled);
+}
+
 TEST_F(DynamicReconfigureTest, AutoConfig)
 {
     // load test_reconfigure service
