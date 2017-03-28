@@ -37,6 +37,7 @@
 #include <rtt/internal/DataSources.hpp>
 #include <rtt/types/PropertyComposition.hpp>
 
+#include <cassert>
 #include <climits>
 #include <cfloat>
 
@@ -101,10 +102,12 @@ public:
 };
 
 AutoConfig::AutoConfig()
+    : parent(), id(), state()
 {
 }
 
 AutoConfig::AutoConfig(const RTT::PropertyBag &bag)
+    : parent(), id(), state()
 {
     this->fromProperties(bag);
 }
@@ -220,7 +223,6 @@ bool AutoConfig::__fromMessage__(AutoConfig &config, Config &msg, const AutoConf
     // iterate over all properties in sample
     bool result = true;
     for(RTT::PropertyBag::const_iterator i = sample.begin(); i != sample.end(); ++i) {
-        RTT::base::PropertyBase *pb = config.getProperty((*i)->getName());
         std::string param_name = config.prefix_ + (*i)->getName();
 
         // For sub groups, add a sub config to *this and recurse...
@@ -230,14 +232,24 @@ bool AutoConfig::__fromMessage__(AutoConfig &config, Config &msg, const AutoConf
             AutoConfigDataSource *ds;
             if (sub) {
                 ds = AutoConfigDataSource::narrow(sub->getDataSource().get());
+                assert(ds->rvalue().getType() == sample_sub->getType());
             } else {
                 ds = new AutoConfigDataSource();
-                sub = new RTT::Property<RTT::PropertyBag>((*i)->getName(), (*i)->getDescription(), AutoConfigDataSource::shared_ptr(ds));
-                config.ownProperty(sub);
+                ds->set().setType(sample_sub->getType());
             }
 
-            if (ds && __fromMessage__(ds->set(), msg, *sample_sub))
+            if (ds && __fromMessage__(ds->set(), msg, *sample_sub)) {
+                if (!sub) {
+                    // new AutoConfigDataSource
+                    if (!ds->rvalue().empty()) {
+                        sub = new RTT::Property<RTT::PropertyBag>((*i)->getName(), (*i)->getDescription(), AutoConfigDataSource::shared_ptr(ds));
+                        config.ownProperty(sub);
+                    } else {
+                        delete ds;
+                    }
+                }
                 continue;
+            }
         }
 
         // search parameter in Config message
