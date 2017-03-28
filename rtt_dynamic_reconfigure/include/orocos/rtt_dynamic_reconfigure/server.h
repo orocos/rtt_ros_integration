@@ -129,7 +129,7 @@ struct dynamic_reconfigure_traits {
     /**
      * Convert an instance of ConfigType to a dynamic_reconfigure::Config message
      *
-     * \param config referencte to the ConfigType instance to be read
+     * \param config reference to the ConfigType instance to be read
      * \param message reference to the Config message to be filled
      * \param server pointer to the rtt_dynamic_reconfigure server instance (only used for AutoConfig)
      */
@@ -138,7 +138,7 @@ struct dynamic_reconfigure_traits {
     /**
      * Convert a dynamic_reconfigure::Config message to an instance of ConfigType
      *
-     * \param config referencte to the ConfigType instance to be filled
+     * \param config reference to the ConfigType instance to be filled
      * \param message reference to the Config message to be read
      * \param server pointer to the rtt_dynamic_reconfigure server instance (only used for AutoConfig)
      */
@@ -241,6 +241,13 @@ public:
     virtual ~Server() {
         shutdown();
     }
+
+    /**
+     * Get the current configuration parameters
+     *
+     * \return a const reference to the ConfigType instance holding the current values
+     */
+    const ConfigType &getConfig() const { return config_; }
 
     /**
      * Update the config from an instance of ConfigType
