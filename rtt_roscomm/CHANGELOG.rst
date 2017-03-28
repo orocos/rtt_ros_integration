@@ -2,6 +2,16 @@
 Changelog for package rtt_roscomm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.5 (2017-03-28)
+------------------
+* Merge pull request `#85 <https://github.com/orocos/rtt_ros_integration/issues/85>`_ from meyerj/ros-primitives-transport-indigo-devel
+  Added a ROS transport plugin for primitive types (indigo-devel)
+* rtt_roscomm: fix caller engine in RosServiceServerProxyBase to make sure that OwnThread operations are executed in the owner's thread
+* rtt_roscomm: added topicLatched() method to rtt_rostopic service
+* rtt_roscomm: only set CMAKE_BUILD_TYPE to MinSizeRel if either not set or if it was Release before
+  This enables debugging of ROS typekits.
+* Contributors: Johannes Meyer
+
 2.8.4 (2016-11-26)
 ------------------
 * Merge pull request `#79 <https://github.com/orocos/rtt_ros_integration/issues/79>`_ from meyerj/added-rtt-rosservice-operations
