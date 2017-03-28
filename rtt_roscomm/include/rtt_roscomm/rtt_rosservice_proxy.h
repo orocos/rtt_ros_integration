@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 
 #include <rtt/RTT.hpp>
+#include <rtt/internal/GlobalEngine.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 
 //! Abstract ROS Service Proxy
@@ -34,7 +35,7 @@ public:
     // Link the caller with the operation
     return proxy_operation_caller_->setImplementation(
         operation->getLocalOperation(),
-        owner->engine());
+        RTT::internal::GlobalEngine::Instance());
   }
 
 protected:

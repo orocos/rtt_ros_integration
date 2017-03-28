@@ -119,8 +119,8 @@ struct dynamic_reconfigure_traits<AutoConfig> {
     static const bool canRefresh = true;
     static void refreshDescription(const ServerType *server) { AutoConfig::__refreshDescription__(server); }
 
-    static void toMessage(AutoConfig &config, dynamic_reconfigure::Config &message, const ServerType *server) { config.__toMessage__(message); }
-    static void fromMessage(AutoConfig &config, dynamic_reconfigure::Config &message, const ServerType *server) { config.__fromMessage__(message, config); }
+    static void toMessage(AutoConfig &config, dynamic_reconfigure::Config &message, const ServerType *) { config.__toMessage__(message); }
+    static void fromMessage(AutoConfig &config, dynamic_reconfigure::Config &message, const ServerType *server) { config.__fromMessage__(message, server->getConfig()); }
     static void clamp(AutoConfig &config, const ServerType *server) { config.__clamp__(server); }
 
     static RTT::internal::AssignableDataSource<RTT::PropertyBag>::shared_ptr getDataSource(AutoConfig &config, const ServerType *) {
