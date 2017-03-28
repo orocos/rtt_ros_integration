@@ -2,6 +2,12 @@
 Changelog for package rtt_dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.5 (2017-03-28)
+------------------
+* Merge pull request `#86 <https://github.com/orocos/rtt_ros_integration/issues/86>`_ from orocos/rtt_dynamic_reconfigure-check-updated-properties
+  rtt_dynamic_reconfigure: report updated property values in the service response (indigo-devel)
+* Contributors: Johannes Meyer
+
 2.8.4 (2016-11-26)
 ------------------
 

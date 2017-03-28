@@ -2,6 +2,12 @@
 Changelog for package rtt_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.5 (2017-03-28)
+------------------
+* Merge pull request `#85 <https://github.com/orocos/rtt_ros_integration/issues/85>`_ from meyerj/ros-primitives-transport-indigo-devel
+  Added a ROS transport plugin for primitive types (indigo-devel)
+* Contributors: Johannes Meyer
+
 2.8.4 (2016-11-26)
 ------------------
 * rtt_ros: fixed comment in rtt_ros/scripts/deployer-corba
