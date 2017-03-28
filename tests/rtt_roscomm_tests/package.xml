@@ -16,6 +16,8 @@
   <build_depend>ocl</build_depend>
 
   <test_depend>rtt_rosnode</test_depend>
+  <!-- <test_depend>rtt_std_msgs</test_depend> -->
+  <test_depend>rtt_std_srvs</test_depend>
   <test_depend>rosbash</test_depend> <!-- required for rosrun command -->
   <test_depend>rostest</test_depend>
 
