@@ -84,9 +84,9 @@ configure_file(
 add_file_dependencies( ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp ${SRV_FILES})
 
 include_directories(
-  ${CATKIN_DEVEL_PREFIX}/include
   ${USE_OROCOS_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS})
+  ${catkin_INCLUDE_DIRS}
+  ${${_package}_INCLUDE_DIRS})
 
 # Targets
 set(CMAKE_BUILD_TYPE MinSizeRel)
