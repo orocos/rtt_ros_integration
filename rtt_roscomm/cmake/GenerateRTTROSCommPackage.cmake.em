@@ -5,6 +5,14 @@
 
 cmake_minimum_required(VERSION 2.8.3)
 
+@[if DEVELSPACE]@
+  set(rtt_roscomm_TEMPLATES_DIR @(PROJECT_SOURCE_DIR)/src/templates)
+  set(rtt_roscomm_SCRIPTS_DIR @(PROJECT_SOURCE_DIR)/scripts)
+@[else]@
+  set(rtt_roscomm_TEMPLATES_DIR ${rtt_roscomm_DIR}/../src/templates)
+  set(rtt_roscomm_SCRIPTS_DIR @(CMAKE_INSTALL_PREFIX)/@(CATKIN_PACKAGE_BIN_DESTINATION))
+@[end if]@
+
 macro(rtt_roscomm_destinations)
   if(ORO_USE_ROSBUILD)
     #message(STATUS "[ros_generate_rtt_typekit] Generating ROS typekit for ${PROJECT_NAME} with ROSBuild destinations.")
@@ -35,10 +43,10 @@ endmacro()
 
 macro(ros_generate_rtt_typekit package)
   set(_package ${package})
-  add_subdirectory(${rtt_roscomm_DIR}/../src/templates/typekit ${package}_typekit)
+  add_subdirectory(${rtt_roscomm_TEMPLATES_DIR}/typekit ${package}_typekit)
 endmacro(ros_generate_rtt_typekit)
 
 macro(ros_generate_rtt_service_proxies package)
   set(_package ${package})
-  add_subdirectory(${rtt_roscomm_DIR}/../src/templates/service ${package}_service_proxies)
+  add_subdirectory(${rtt_roscomm_TEMPLATES_DIR}/service ${package}_service_proxies)
 endmacro(ros_generate_rtt_service_proxies)
