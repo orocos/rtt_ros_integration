@@ -31,10 +31,6 @@ namespace KDL
           gs->provides("KDL")->addOperation("vectorKDLToMsg",&tf::vectorKDLToMsg);
           gs->provides("KDL")->addOperation("wrenchMsgToKDL",&tf::wrenchMsgToKDL);
           gs->provides("KDL")->addOperation("wrenchKDLToMsg",&tf::wrenchKDLToMsg);
-          gs->provides("KDL")->addOperation("TwistToMsg",&tf::TwistKDLToMsg);
-          gs->provides("KDL")->addOperation("MsgToTwist",&tf::TwistMsgToKDL);
-          gs->provides("KDL")->addOperation("FrameToMsg",&tf::PoseKDLToMsg);
-          gs->provides("KDL")->addOperation("MsgToFrame",&tf::PoseMsgToKDL);
           return true;
       }
   };
