@@ -83,7 +83,7 @@ if( "${MSG_FILES}" STREQUAL "" )
 endif()
 
 # Set the boost header generation script path
-set(CREATE_BOOST_HEADER_EXE_PATH ${rtt_roscomm_DIR}/create_boost_header.py)
+set(CREATE_BOOST_HEADER_EXE_PATH ${rtt_roscomm_SCRIPTS_DIR}/create_boost_header.py)
 
 # Store the ros package name
 set(ROSPACKAGE ${_package})
