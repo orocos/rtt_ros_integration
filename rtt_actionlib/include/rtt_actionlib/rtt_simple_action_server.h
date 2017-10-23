@@ -283,7 +283,7 @@ template <class ActionSpec> void RTTSimpleActionServer<ActionSpec>::cancelCallba
 		case actionlib_msgs::GoalStatus::RECALLING:
 			if (goal_active == gh) {
 				if (cancelGoalHook) cancelGoalHook();
-				cancelActive(Result(), "Active goal is canceled by client request.");
+				// cancelActive(Result(), "Active goal is canceled by client request.");
 			}
 			else if (goal_pending == gh) {
 				gh.setCanceled(Result(), "Pending goal is canceled by client request.");

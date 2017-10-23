@@ -148,7 +148,7 @@ It depends on EventPort callbacks so unable to function if component is not Runn
     After receiving new goal `newGoalHook` callback is called, also `isPending()` and `getPendingGoal()` methods can be used to poll pending goal.
 * Pending goal can be accepted (`acceptPending()`) or rejected (`rejectPending()`). If accepted pending goal preempts current active goal if it presents. So only one goal can be active at time.
 * State of active goal can be checked with `isActive()`, `getActiveGoal()` and `isPreemting()` calls.
-* If CancelRequest is received corresponding goal is canceled. Before active goal is canceled  `cancelGoalHook` is called. 
+* Cancel request causes pending goal to be canceled immediately. Active goal changes state to PREEMTING and `cancelGoalHook` is called. Preemting state can be checked by `isPreemting()` call.
 * State of active goal can be changed by `succeedActive()`, `cancelActive()`, `abortActive()` calls.
 
 ```cpp
@@ -173,12 +173,20 @@ class Component : public TaskContext
             }
         }
 
+        // active goal is being cancelled.
+        void cancelGoalHook() {
+            // cancel goal
+            action_server.cancelActive(result);
+        }
+
+
 	public:
         Component(std::string const& name) : 
             action_server(this->provides())
         {
             // action server hook registration
             action_server.setGoalHook(boost::bind(&AnimJointTrajectory::newGoalHook, this, _1));
+            action_server.setGoalHook(boost::bind(&AnimJointTrajectory::cancelGoalHook, this, _1));
         }
 
 		bool updateHook() {
@@ -194,20 +202,27 @@ class Component : public TaskContext
 };
 ```
 
-Alternatively presence of pending goal can be monitored in `updateHook()`:
+Alternatively goal state changes can be monitored in `updateHook()`:
 
 ```cpp
 		bool updateHook() {
             if (action_server.isPending()) {
                 if (! isOk(getPendingGoal())) rejectPending(Result());
                 else {
+                    Result active_goal_result;
                     // make preparation
-                    acceptPending(Result());
+                    goal = *getPendingGoal();
+                    acceptPending(active_goal_result);
                 }
 
             }
             if (action_server.isActive()) {
                 // pursue goal
+            }
+            else if (action_server.isPreemting()) {
+               Result active_goal_result;
+               // cancel goal
+               action_server.cancelActive(active_goal_result);
             }
         }
 ```
