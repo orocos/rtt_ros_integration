@@ -2,6 +2,15 @@
 Changelog for package rtt_dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.6 (2017-11-15)
+------------------
+* rtt_dynamic_reconfigure: fix a bug that duplicate ids when generating a parameter description from a property tree
+  The `id` field of each groups in a dynamic_reconfigure/ConfigDescription message must be unique and some groups
+  might reference another as their parent. Without this patch the ids were assigned locally and were only unique within
+  the same group, which confused rqt_reconfigure and the dynparam console client when they try to rebuild the tree
+  hierarchy in more complex cases.
+* Contributors: Johannes Meyer
+
 2.8.5 (2017-03-28)
 ------------------
 * Merge pull request `#86 <https://github.com/orocos/rtt_ros_integration/issues/86>`_ from orocos/rtt_dynamic_reconfigure-check-updated-properties

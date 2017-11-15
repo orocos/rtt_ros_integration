@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>rtt_ros_tests</name>
-  <version>2.8.5</version>
+  <version>2.8.6</version>
   <description>The rtt_ros_tests package</description>
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
 

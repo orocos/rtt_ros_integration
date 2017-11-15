@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>rtt_common_msgs</name>
-  <version>2.8.5</version>
+  <version>2.8.6</version>
   <description>The rtt_common_msgs package</description>
 
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
