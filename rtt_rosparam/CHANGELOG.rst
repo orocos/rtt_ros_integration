@@ -21,6 +21,9 @@ Changelog for package rtt_rosparam
 * cast enum to int to avoid warning
 * Contributors: Antoine Hoarau, Johannes Meyer
 
+2.8.6 (2017-11-15)
+------------------
+
 2.8.5 (2017-03-28)
 ------------------
 
