@@ -25,6 +25,12 @@ Changelog for package rtt_roscomm
 * rtt_roscomm: added support for updated dataflow semantics (RTT version >= 2.8.99)
 * Contributors: Antoine Hoarau, Guillaume Walck, Johannes Meyer
 
+2.8.6 (2017-11-15)
+------------------
+* rtt_roscomm: also set ${PROJECT_NAME}_EXPORTED_LIBRARIES in parent scope
+  Related to https://github.com/orocos-toolchain/rtt/pull/244.
+* Contributors: Johannes Meyer
+
 2.8.5 (2017-03-28)
 ------------------
 * Merge pull request `#85 <https://github.com/orocos/rtt_ros_integration/issues/85>`_ from meyerj/ros-primitives-transport-indigo-devel

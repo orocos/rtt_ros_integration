@@ -10,6 +10,9 @@ Changelog for package rtt_rosclock
   Signed-off-by: Johannes Meyer <johannes@intermodalics.eu>
 * Contributors: Antoine Hoarau, Johannes Meyer
 
+2.8.6 (2017-11-15)
+------------------
+
 2.8.5 (2017-03-28)
 ------------------
 

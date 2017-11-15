@@ -417,7 +417,7 @@ static bool buildParamDescription(const RTT::base::PropertyBase *pb, const std::
     return true;
 }
 
-static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBag &bag, ConfigDescription& config_description, AutoConfig& dflt, AutoConfig& min, AutoConfig& max, const std::string &prefix, const std::string &name, const std::string &type, int32_t parent, int32_t id)
+static void buildGroupDescription(RTT::TaskContext *owner, const RTT::PropertyBag &bag, ConfigDescription& config_description, AutoConfig& dflt, AutoConfig& min, AutoConfig& max, const std::string &prefix, const std::string &name, const std::string &type, int32_t parent, int32_t &id)
 {
     std::size_t group_index = config_description.groups.size();
     config_description.groups.push_back(Group());
@@ -508,7 +508,8 @@ void AutoConfig::buildCache(const ServerType *server, RTT::TaskContext *owner)
         CachePtr& cache = cache_[server];
         if (!cache) cache.reset(new Cache());
         cache->description_message_.reset(new ConfigDescription);
-        buildGroupDescription(owner, decomposed, *(cache->description_message_), cache->default_, cache->min_, cache->max_, "", "", "", 0, 0);
+        int32_t id = 0;
+        buildGroupDescription(owner, decomposed, *(cache->description_message_), cache->default_, cache->min_, cache->max_, "", "", "", 0, id);
     }
 }
 
