@@ -2,6 +2,12 @@
 Changelog for package rtt_rosclock
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.1 (2017-11-16)
+------------------
+* Merge pull request `#93 <https://github.com/orocos/rtt_ros_integration/issues/93>`_ from ahoarau/xenomai3-support
+  Xenomai 3 support
+* Contributors: Antoine Hoarau
+
 2.9.0 (2017-05-02)
 ------------------
 * fix xenomai rtt_now() fix PR`#41 <https://github.com/orocos/rtt_ros_integration/issues/41>`_

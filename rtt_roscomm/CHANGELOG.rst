@@ -2,6 +2,10 @@
 Changelog for package rtt_roscomm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.1 (2017-11-16)
+------------------
+* Merge with version 2.8.6
+
 2.9.0 (2017-05-02)
 ------------------
 * rtt_roscomm: find templates and create_boost_header.py script directly in the source-space

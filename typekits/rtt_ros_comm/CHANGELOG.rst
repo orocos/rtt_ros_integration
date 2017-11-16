@@ -2,6 +2,9 @@
 Changelog for package rtt_ros_comm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.1 (2017-11-16)
+------------------
+
 2.9.0 (2017-05-02)
 ------------------
 * Added individual changelogs and bumped versions to 2.9.0

@@ -2,6 +2,9 @@
 Changelog for package rtt_dynamic_reconfigure_tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.1 (2017-11-16)
+------------------
+
 2.9.0 (2017-05-02)
 ------------------
 * rtt_dynamic_reconfigure_tests: added tests for user callbacks

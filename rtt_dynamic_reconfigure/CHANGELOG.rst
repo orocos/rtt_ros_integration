@@ -2,6 +2,10 @@
 Changelog for package rtt_dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.1 (2017-11-16)
+------------------
+* Merge with version 2.8.6
+
 2.9.0 (2017-05-02)
 ------------------
 * rtt_dynamic_reconfigure: create a partially filled PropertyBag from a Config message that only has a subset of fields

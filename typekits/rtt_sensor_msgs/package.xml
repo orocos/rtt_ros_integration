@@ -1,6 +1,6 @@
 <package>
   <name>rtt_sensor_msgs</name>
-  <version>2.9.0</version>
+  <version>2.9.1</version>
   <description>
 
     Provides an rtt typekit for ROS sensor_msgs messages.

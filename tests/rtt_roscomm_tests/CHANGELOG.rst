@@ -2,6 +2,9 @@
 Changelog for package rtt_roscomm_tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.1 (2017-11-16)
+------------------
+
 2.9.0 (2017-05-02)
 ------------------
 * rtt_std_msgs: added a VectorMultiArrayAdapter class and added type transporter for arrays (std_msgs/Float64MultiArray)

@@ -2,6 +2,9 @@
 Changelog for package rtt_rosnode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.1 (2017-11-16)
+------------------
+
 2.9.0 (2017-05-02)
 ------------------
 * rtt_rosnode: fixed corruption of RTT's argv vector when loading the rosnode plugin (fix `#54 <https://github.com/orocos/rtt_ros_integration/issues/54>`_)

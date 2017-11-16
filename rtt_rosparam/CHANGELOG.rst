@@ -2,6 +2,9 @@
 Changelog for package rtt_rosparam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.1 (2017-11-16)
+------------------
+
 2.9.0 (2017-05-02)
 ------------------
 * rtt_rosparam: removed cmake_modules dependency and fixed export of eigen3 dependency
