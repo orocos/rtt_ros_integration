@@ -11,6 +11,8 @@ before_install:
   - git clone https://github.com/orocos/ros_ci_tools /tmp/ros_ci_tools && export PATH=/tmp/ros_ci_tools:$PATH
   - ros_ci_bootstrap
   - source /opt/ros/$ROS_DISTRO/setup.bash
+  # Clone https://github.com/orocos/rtt_common_msgs.git (default branch)
+  - git clone https://github.com/orocos/rtt_common_msgs.git
   # Create non-isolated workspace
   - mkdir -p ~/ws/src
   - pushd ~/ws/src
