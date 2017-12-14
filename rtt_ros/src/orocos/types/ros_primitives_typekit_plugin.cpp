@@ -172,7 +172,7 @@ namespace ros_integration {
         ti->type("time")->addConstructor( newConstructor ( &a_to_b<double,ros::Time>, true));
         return true; 
     }
-};
+}
 
 ORO_TYPEKIT_PLUGIN( ros_integration::ROSPrimitivesTypekitPlugin )
 
