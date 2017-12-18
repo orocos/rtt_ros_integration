@@ -635,16 +635,16 @@ private:
     {
         RTT::os::MutexLock lock(mutex_);
 
-        ConfigType new_config = config_;
-        traits::fromMessage(new_config, req.config, this);
-        traits::clamp(new_config, this);
-        uint32_t level = config_.__level__(new_config);
+        ConfigType msg_config;
+        traits::fromMessage(msg_config, req.config, this);
+        traits::clamp(msg_config, this);
+        uint32_t level = config_.__level__(msg_config);
 
         RTT::PropertyBag bag;
-        if (!updater()->propertiesFromConfig(new_config, level, bag)) return false;
+        if (!updater()->propertiesFromConfig(msg_config, level, bag)) return false;
         if (update_callback_.ready()) {
             if (!update_callback_(bag, level)) return false;
-            updater()->configFromProperties(new_config, bag);
+            updater()->configFromProperties(msg_config, bag);
         } else if (update_callback_const_.ready()) {
             if (!update_callback_const_(bag, level)) return false;
         } else {
@@ -652,15 +652,15 @@ private:
         }
         if (notify_callback_.ready()) notify_callback_(level);
 
-        updateConfigInternal(new_config);
-        new_config.__toMessage__(rsp.config);
+        updateConfigInternal(msg_config);
+        config_.__toMessage__(rsp.config);
         return true;
     }
 
     void updateConfigInternal(const ConfigType &config)
     {
         RTT::os::MutexLock lock(mutex_);
-        config_ = config;
+        RTT::updateProperties(config_, config);
         if (node_handle_)
             config_.__toServer__(*node_handle_);
         dynamic_reconfigure::Config msg;
