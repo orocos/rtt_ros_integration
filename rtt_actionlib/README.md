@@ -154,17 +154,17 @@ It depends on EventPort callbacks so unable to function if component is not Runn
 ```cpp
 class Component : public TaskContext
 {
-	protected:
-		// Goal, Feedback, Result typedefs
-		ACTION_DEFINITION(ActionSpec);	
+    protected:
+        // Goal, Feedback, Result typedefs
+        ACTION_DEFINITION(ActionSpec);    
 
-	protected:
-		OrocosSimpleActionServer<ActionSpec> action_server;
+    protected:
+        OrocosSimpleActionServer<ActionSpec> action_server;
         // Current goal cache
         Goal goal;
 
-		// new pending goal is received
-		void newGoalHook(const Goal& pending_goal) {
+        // new pending goal is received
+        void newGoalHook(const Goal& pending_goal) {
             // check if goal is valid
             if (!isOk(pending_goal)) action_server.rejectPending(result);
             else { 
@@ -180,24 +180,24 @@ class Component : public TaskContext
         }
 
 
-	public:
+    public:
         Component(std::string const& name) : 
             action_server(this->provides())
         {
             // action server hook registration
-            action_server.setGoalHook(boost::bind(&AnimJointTrajectory::newGoalHook, this, _1));
-            action_server.setGoalHook(boost::bind(&AnimJointTrajectory::cancelGoalHook, this, _1));
+            action_server.setGoalHook(boost::bind(&SomeComponent::newGoalHook, this, _1));
+            action_server.setCancelHook(boost::bind(&SomeComponent::cancelGoalHook, this));
         }
 
-		bool updateHook() {
+        bool updateHook() {
             if (action_server.isActive()) {
                 // pursue goal
             }
         }
 
-		void stopHook() {
+        void stopHook() {
             action_server.abortActive(result);
-            action_server.rejectPending(result);
+            action_server.rejectPending(Result());
         }
 };
 ```
@@ -205,7 +205,7 @@ class Component : public TaskContext
 Alternatively goal state changes can be monitored in `updateHook()`:
 
 ```cpp
-		bool updateHook() {
+        bool updateHook() {
             if (action_server.isPending()) {
                 if (! isOk(getPendingGoal())) rejectPending(Result());
                 else {
