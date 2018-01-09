@@ -1,5 +1,5 @@
-#ifndef  OROCOS_SIMPLE_ACTION_SERVER_HPP
-#define  OROCOS_SIMPLE_ACTION_SERVER_HPP
+#ifndef  RTT_SIMPLE_ACTION_SERVER_HPP
+#define  RTT_SIMPLE_ACTION_SERVER_HPP
 
 #include <stdexcept>
 #include <boost/bind.hpp>
@@ -96,7 +96,8 @@ template <class ActionSpec> class RTTSimpleActionServer
 		*/
 		boost::shared_ptr<const Goal> getActiveGoal() const {
 			if (isActive()) return goal_active.getGoal();
-			else return nullptr;
+			else return boost::shared_ptr<const Goal>(); // return NULL
+			// else nullptr;
 		}
 
 		/**
@@ -104,7 +105,8 @@ template <class ActionSpec> class RTTSimpleActionServer
 		 **/
 		boost::shared_ptr<const Goal> getPendingGoal() const {
 			if (isPending()) return goal_pending.getGoal();
-			else return nullptr;
+			else return boost::shared_ptr<const Goal>(); // return NULL
+			// else nullptr;
 		}
 
 		/**
@@ -297,4 +299,4 @@ template <class ActionSpec> void RTTSimpleActionServer<ActionSpec>::cancelCallba
 
 } // namespace rtt_actionlib
 
-#endif  /*SIMPLE_ACTION_SERVER_HPP*/
+#endif  /*RTT_SIMPLE_ACTION_SERVER_HPP*/
