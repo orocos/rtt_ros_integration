@@ -170,7 +170,7 @@ namespace rtt_roscomm {
     }
 
     virtual std::string getRemoteURI() const {
-        return ros_node.getNamespace() + topicname;
+        return ros_pub.getTopic();
     }
 
     /** 
@@ -288,7 +288,7 @@ namespace rtt_roscomm {
     }
 
     virtual std::string getRemoteURI() const {
-        return ros_node.getNamespace() + topicname;
+        return ros_sub.getTopic();
     }
 
     /**
