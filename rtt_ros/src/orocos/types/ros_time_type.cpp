@@ -36,46 +36,41 @@
 
 #include "ros_primitives_typekit_plugin.hpp"
 
+namespace boost {
+	namespace serialization {
+		template<class Archive>
+			void serialize( Archive & a, ros::Time & t, unsigned int) {
+				using boost::serialization::make_nvp;
+				a & make_nvp("sec", t.sec);
+				a & make_nvp("nsec", t.nsec);
+			}
+
+		template<class Archive>
+			void serialize( Archive & a, ros::Duration & t, unsigned int) {
+				using boost::serialization::make_nvp;
+				a & make_nvp("sec", t.sec);
+				a & make_nvp("nsec", t.nsec);
+			}
+	}
+}
+
+
 namespace ros_integration{
     using namespace RTT;
     using namespace RTT::types;
 
     // This class works around the ROS time representation.
-    class RosTimeTypeInfo : public types::PrimitiveTypeInfo<ros::Time,false>
+    class RosTimeTypeInfo : public types::StructTypeInfo<ros::Time>
     {
     public:
-        RosTimeTypeInfo() : types::PrimitiveTypeInfo<ros::Time,false>("time") {}
-
-        virtual std::ostream& write( std::ostream& os, base::DataSourceBase::shared_ptr in ) const {
-            internal::DataSource<ros::Time>::shared_ptr d = boost::dynamic_pointer_cast< internal::DataSource<ros::Time> >( in );
-            if ( d ) {
-                double tm = d->rvalue().sec + double(d->rvalue().nsec)/1000000000.0;
-                os << tm;
-            } else {
-                std::string output = std::string("(")+ in->getTypeName() +")";
-                os << output;
-            }
-            return os;
-        }
+        RosTimeTypeInfo() : types::StructTypeInfo<ros::Time>("time") {}
     };
 
     // This class works around the ROS time representation.
-    class RosDurationTypeInfo : public types::PrimitiveTypeInfo<ros::Duration,false>
+    class RosDurationTypeInfo : public types::StructTypeInfo<ros::Duration>
     {
     public:
-        RosDurationTypeInfo() : types::PrimitiveTypeInfo<ros::Duration,false>("duration") {}
-
-        virtual std::ostream& write( std::ostream& os, base::DataSourceBase::shared_ptr in ) const {
-            internal::DataSource<ros::Duration>::shared_ptr d = boost::dynamic_pointer_cast< internal::DataSource<ros::Duration> >( in );
-            if ( d ) {
-                double tm = d->rvalue().sec + double(d->rvalue().nsec)/1000000000.0;
-                os << tm;
-            } else {
-                std::string output = std::string("(")+ in->getTypeName() +")";
-                os << output;
-            }
-            return os;
-        }
+        RosDurationTypeInfo() : types::StructTypeInfo<ros::Duration>("duration") {}
     };
 
   void loadTimeTypes(){
