@@ -29,11 +29,22 @@
 #include <rtt/plugin/Plugin.hpp>
 #include <rtt/TaskContext.hpp>
 #include <rtt/Activity.hpp>
+#include <rtt/internal/GlobalService.hpp>
 #include <rtt/Logger.hpp>
 #include <rtt/os/startstop.h>
 #include <ros/ros.h>
 
 using namespace RTT;
+
+void loadROSService()
+{
+  RTT::Service::shared_ptr ros = RTT::internal::GlobalService::Instance()->provides("ros");
+
+  ros->addOperation("getNodeName", &ros::this_node::getName)
+	  .doc("Return full name of ROS node.");
+  ros->addOperation("getNamespace", &ros::this_node::getNamespace)
+	  .doc("Return ROS node namespace.");
+}
 
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
@@ -62,6 +73,9 @@ extern "C" {
         ros::shutdown();
         return true;
       }
+
+	  // Register new operations in global ros Service
+	  loadROSService();
     }
 
     // get number of spinners from parameter server, if available
