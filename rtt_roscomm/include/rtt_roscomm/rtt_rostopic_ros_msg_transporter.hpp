@@ -160,7 +160,19 @@ namespace rtt_roscomm {
     virtual bool inputReady() {
       return true;
     }
-    
+
+    virtual bool isRemoteElement() const {
+        return true;
+    }
+
+    virtual std::string getElementName() const {
+        return "RosPubChannelElement";
+    }
+
+    virtual std::string getRemoteURI() const {
+        return ros_pub.getTopic();
+    }
+
     /** 
      * Create a data sample, this could be used to allocate the necessary memory
      * 
@@ -265,6 +277,18 @@ namespace rtt_roscomm {
 
     virtual bool inputReady() {
       return true;
+    }
+
+    virtual bool isRemoteElement() const {
+        return true;
+    }
+
+    virtual std::string getElementName() const {
+        return "RosSubChannelElement";
+    }
+
+    virtual std::string getRemoteURI() const {
+        return ros_sub.getTopic();
     }
 
     /**
