@@ -78,9 +78,9 @@ template <class ActionSpec> class RTTSimpleActionServer
 		}
 
 		/**
-		* Check, if active goal is being preemted.
+		* Check, if active goal is being preempted.
 		*/
-		bool isPreemting() const {
+		bool isPreempting() const {
 			return goal_active.isValid() && goal_active.getGoalStatus().status == actionlib_msgs::GoalStatus::PREEMPTING;
 		}
 
