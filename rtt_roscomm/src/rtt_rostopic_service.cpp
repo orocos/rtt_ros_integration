@@ -16,6 +16,10 @@ void loadROSTopicService(){
       "Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last message is kept.").arg(
           "name", "The ros topic name");
 
+  roscomm->addOperation("topicLatched", &rtt_roscomm::topicLatched).doc(
+      "Creates a ConnPolicy for subscribing to or publishing a latched topic. No buffering is done, only the last message is kept.").arg(
+          "name", "The ros topic name");
+
   roscomm->addOperation("topicBuffer", &rtt_roscomm::topicBuffer).doc(
       "Creates a ConnPolicy for subscribing to or publishing a topic with a fixed-length message buffer.").arg(
           "name", "The ros topic name").arg(
@@ -30,6 +34,9 @@ void loadROSTopicService(){
 
   ros->addOperation("topic", &rtt_roscomm::topic).doc(
       "Creates a ConnPolicy for subscribing to or publishing a topic. No buffering is done, only the last message is kept.").arg(
+          "name", "The ros topic name");
+  ros->addOperation("topicLatched", &rtt_roscomm::topicLatched).doc(
+      "Creates a ConnPolicy for subscribing to or publishing a latched topic. No buffering is done, only the last message is kept.").arg(
           "name", "The ros topic name");
   ros->addOperation("topicBuffer", &rtt_roscomm::topicBuffer).doc(
       "Creates a ConnPolicy for subscribing to or publishing a topic with a fixed-length message buffer.").arg(
