@@ -45,8 +45,8 @@ install(
   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/orocos
 )
 
-# Install cmake macros
-install(PROGRAMS scripts/create_boost_header.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+# Install create_boost_header.py
+catkin_install_python(PROGRAMS scripts/create_boost_header.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 # Install template files
 install(DIRECTORY src/templates DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/src)
