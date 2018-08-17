@@ -22,7 +22,7 @@
 
 #include <rtt_ros/rtt_ros.h>
 
-void loadROSService(){
+static void loadROSService(){
   RTT::Service::shared_ptr ros = RTT::internal::GlobalService::Instance()->provides("ros");
 
   ros->doc("RTT service for loading RTT plugins ");
