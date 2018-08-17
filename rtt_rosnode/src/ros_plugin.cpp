@@ -36,7 +36,7 @@
 
 using namespace RTT;
 
-void loadROSService()
+static void loadROSService()
 {
   RTT::Service::shared_ptr ros = RTT::internal::GlobalService::Instance()->provides("ros");
 
