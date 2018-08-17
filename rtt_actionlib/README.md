@@ -159,7 +159,7 @@ class Component : public TaskContext
         ACTION_DEFINITION(ActionSpec);    
 
     protected:
-        OrocosSimpleActionServer<ActionSpec> action_server;
+        RTTSimpleActionServer<ActionSpec> action_server;
         // Current goal cache
         Goal goal;
 

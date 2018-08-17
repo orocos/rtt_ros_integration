@@ -20,7 +20,7 @@ template <class ActionSpec> class RTTSimpleActionServer
 		ACTION_DEFINITION(ActionSpec);	
 
 	protected:
-		rtt_actionlib::RTTActionServer<ActionSpec> action_server;
+		RTTActionServer<ActionSpec> action_server;
 		GoalHandle goal_active;
 		GoalHandle goal_pending;
 
