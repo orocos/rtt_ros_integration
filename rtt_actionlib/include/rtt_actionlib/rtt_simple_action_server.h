@@ -7,7 +7,7 @@
 
 #include <actionlib/server/action_server.h>
 #include <actionlib/action_definition.h>
-#include <orocos/rtt_actionlib/rtt_action_server.h>
+#include <rtt_actionlib/rtt_action_server.h>
 
 namespace rtt_actionlib {
 
