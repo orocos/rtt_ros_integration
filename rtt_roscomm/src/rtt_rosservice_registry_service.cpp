@@ -95,8 +95,9 @@ void ROSServiceRegistryService::listSrvs()
 std::map<std::string, boost::shared_ptr<ROSServiceProxyFactoryBase> > ROSServiceRegistryService::factories_;
 RTT::os::MutexRecursive ROSServiceRegistryService::factory_lock_;
 
-void loadROSServiceRegistryService()
+static void loadROSServiceRegistryService()
 {
+  // enforce instantiation of ROSServiceRegistryService singleton
   ROSServiceRegistryService::Instance();
 }
 
