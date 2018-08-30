@@ -39,6 +39,7 @@
  *  - Integrated with rtt_rosclock package
  *********************************************************************/
 
+#include <rtt_rosclock/rtt_rosclock_sim_clock_thread.h>
 #include <rtt_rosclock/rtt_rosclock_sim_clock_activity.h>
 #include <rtt_rosclock/rtt_rosclock_sim_clock_activity_manager.h>
 
@@ -111,7 +112,7 @@ bool SimClockActivity::setCpuAffinity(unsigned cpu)
 
 RTT::os::ThreadInterface* SimClockActivity::thread()
 {
-  return 0;
+  return SimClockThread::GetInstance().get();
 }
 
 bool SimClockActivity::initialize()
