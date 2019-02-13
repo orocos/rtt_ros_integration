@@ -77,9 +77,10 @@ extern "C" {
 	  // Register new operations in global ros Service
 	  loadROSService();
     }
-
+	  
+    // Defaults the number of threads to the number of CPUs available on the machine
+    int thread_count = 0;
     // get number of spinners from parameter server, if available
-    int thread_count = 1;
     ros::param::get("~spinner_threads", thread_count);
 
     // Create an asynchronous spinner to handle the default callback queue 
