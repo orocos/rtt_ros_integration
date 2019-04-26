@@ -54,7 +54,6 @@
 #include <geometry_msgs/TransformStamped.h>
 
 #include <algorithm>
-
 namespace
 {
   // local replacement for tf::resolve, which is not present in tf2.
@@ -121,6 +120,7 @@ namespace rtt_tf
     this->addProperty("buffer_size", prop_buffer_size);
     this->addProperty("tf_prefix", prop_tf_prefix);
     this->addEventPort("tf_in", port_tf_in);
+    this->addEventPort("tf_static_in", port_tf_static_in);
     this->addPort("tf_out", port_tf_out);
 
     this->addTFOperations(this->provides());
@@ -166,7 +166,6 @@ namespace rtt_tf
     }
     
     // no prefix to update in tf2::BufferCore (see #68)
-    // Update the tf::Transformer prefix
     //tf_prefix_ = prop_tf_prefix;
     
     // Connect to tf topic
@@ -174,7 +173,48 @@ namespace rtt_tf
     cp.transport = 3; //3=ROS
     cp.name_id = "/tf";
 
-    return (port_tf_in.createStream(cp) && port_tf_static_in.createStream(cp) && port_tf_out.createStream(cp));
+    // Connect to tf_static topic
+    ConnPolicy cp_static = ConnPolicy::buffer(prop_buffer_size);
+    cp.transport = 3;
+    cp.name_id = "/tf_static";
+
+    return (port_tf_static_in.createStream(cp_static) && port_tf_in.createStream(cp) && port_tf_out.createStream(cp));
+  }
+
+  void RTT_TF::internalUpdate(tf2_msgs::TFMessage& msg, RTT::InputPort<tf2_msgs::TFMessage>& port)
+  {
+    while (port.read(msg) == NewData) {
+      for (std::size_t i = 0; i < msg.transforms.size(); ++i) {
+        try {
+// tf2::BufferCore (see #68) has a non-defaulted authority argument,
+//  but there is no __connection_header to extract it from.
+// Workaround: use the same default value as tf::Transform did.
+#if ROS_VERSION_MINIMUM(1,11,0)
+          const std::string authority = "default_authority";
+          this->setTransform(msg.transforms[i], authority);
+#else
+          std::map<std::string, std::string>* msg_header_map =
+            msg.__connection_header.get();
+          std::string authority;
+          std::map<std::string, std::string>::iterator it =
+            msg_header_map->find("callerid");
+
+          if (it == msg_header_map->end()) {
+            log(Warning) << "Message received without callerid" << endlog();
+            authority = "no callerid";
+          } else {
+            authority = it->second;
+          }
+          this->setTransform(trans, authority);
+#endif
+        } catch (tf2::TransformException& ex) {
+          log(Error) << "Failure to set received transform from "
+            << msg.transforms[i].child_frame_id << " to "
+            << msg.transforms[i].header.frame_id
+            << " with error: " << ex.what() << endlog();
+        }
+      }
+    }
   }
 
   void RTT_TF::updateHook()
@@ -183,42 +223,15 @@ namespace rtt_tf
 #ifndef NDEBUG
     //log(Debug) << "In update" << endlog();
 #endif
-    try {
+    try
+    {
       tf2_msgs::TFMessage msg_in;
 
-      while (port_tf_in.read(msg_in) == NewData) {
-        for (unsigned int i = 0; i < msg_in.transforms.size(); i++) {
-          try {
-// tf2::BufferCore (see #68) has a non-defaulted authority argument,
-//  but there is no __connection_header to extract it from.
-// Workaround: use the same default value as tf::Transform did.
-#if ROS_VERSION_MINIMUM(1,11,0)
-            const std::string authority = "default_authority";
-            this->setTransform(msg_in.transforms[i], authority);
-#else
-            std::map<std::string, std::string>* msg_header_map =
-              msg_in.__connection_header.get();
-            std::string authority;
-            std::map<std::string, std::string>::iterator it =
-              msg_header_map->find("callerid");
-
-            if (it == msg_header_map->end()) {
-              log(Warning) << "Message received without callerid" << endlog();
-              authority = "no callerid";
-            } else {
-              authority = it->second;
-            }
-            this->setTransform(trans, authority);
-#endif
-          } catch (tf2::TransformException& ex) {
-            log(Error) << "Failure to set received transform from "
-              << msg_in.transforms[i].child_frame_id << " to "
-              << msg_in.transforms[i].header.frame_id
-              << " with error: " << ex.what() << endlog();
-          }
-        }
-      }
-    } catch (std::exception& ex) {
+      internalUpdate(msg_in, port_tf_in);
+      internalUpdate(msg_in, port_tf_static_in);
+    }
+    catch (std::exception& ex)
+    {
       log(Error) << ex.what() << endlog();
     }
   }
@@ -288,7 +301,7 @@ namespace rtt_tf
 
   void RTT_TF::broadcastTransforms(const std::vector<geometry_msgs::TransformStamped>& tform)
   {
-    // Populate the TF message
+    // Populate the TFMessage
     tf2_msgs::TFMessage msg_out;
 
     // copy and resolve names

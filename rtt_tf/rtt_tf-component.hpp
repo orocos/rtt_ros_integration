@@ -13,16 +13,20 @@ namespace rtt_tf
     static const int DEFAULT_BUFFER_SIZE = 100;
 
     double prop_cache_time;
-    int prop_buffer_size;
+    double prop_buffer_size;
     std::string prop_tf_prefix;
 
     RTT::InputPort<tf2_msgs::TFMessage> port_tf_in;
     RTT::InputPort<tf2_msgs::TFMessage> port_tf_static_in;
     RTT::OutputPort<tf2_msgs::TFMessage> port_tf_out;
 
+    void internalUpdate(
+        tf2_msgs::TFMessage& msg,
+        RTT::InputPort<tf2_msgs::TFMessage>& port);
+
     ros::Time getCommonTime(
-      const std::string& target,
-      const std::string& source) const;
+        const std::string& target,
+        const std::string& source) const;
 
     bool canTransform(
         const std::string& target,
