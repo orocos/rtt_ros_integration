@@ -49,16 +49,72 @@
 #include <rtt/Component.hpp>
 #include <ros/ros.h>
 
+#include <tf2/exceptions.h>
+
+#include <geometry_msgs/TransformStamped.h>
+
+#include <algorithm>
+
+namespace
+{
+  // local replacement for tf::resolve, which is not present in tf2.
+  // this helper method prepends the tf_prefix to the passed frame name for broadcasting from the component.
+  std::string prepend_prefix(const std::string& prefix, const std::string& frame_name)
+  {
+    if (!frame_name.empty() && frame_name[0] == '/')
+    {
+      if (frame_name.size() > 1)
+      {
+        return frame_name.substr(1);
+      }
+      return std::string("");
+    }
+
+    if (prefix.empty())
+    {
+      return frame_name;
+    }
+
+    std::string composite;
+    if (prefix[0] == '/' && prefix.size() > 1)
+    {
+      composite = prefix.substr(1) + "/";
+    }
+    else
+    {
+      composite = prefix + "/";
+    }
+    return composite + frame_name;
+  }
+}
+
 namespace rtt_tf
 {
+  // Functor for resolving the tf prefix when broadcasting multiple transforms.
+  class PrefixResolver
+  {
+    public:
+      PrefixResolver(const std::string& prefix) : prefix_(prefix) { }
+
+      geometry_msgs::TransformStamped operator()(const geometry_msgs::TransformStamped& elem)
+      {
+        geometry_msgs::TransformStamped result = elem;
+        result.header.frame_id = prepend_prefix(prefix_, result.header.frame_id);
+        result.child_frame_id = prepend_prefix(prefix_, result.child_frame_id);
+        return result;
+      }
+
+    private:
+      const std::string& prefix_;
+  };
+
 
   using namespace RTT;
-  using namespace tf;
 
   RTT_TF::RTT_TF(const std::string& name) :
-    TaskContext(name, PreOperational), 
-    tf::Transformer(true, ros::Duration(Transformer::DEFAULT_CACHE_TIME)),
-    prop_cache_time(Transformer::DEFAULT_CACHE_TIME),
+    TaskContext( name, PreOperational ),
+    tf2::BufferCore( ros::Duration(BufferCore::DEFAULT_CACHE_TIME) ),
+    prop_cache_time( BufferCore::DEFAULT_CACHE_TIME ),
     prop_buffer_size(DEFAULT_BUFFER_SIZE)
   {
     this->addProperty("cache_time", prop_cache_time);
@@ -109,15 +165,16 @@ namespace rtt_tf
       nh.getParam(tf_prefix_param_key, prop_tf_prefix);
     }
     
+    // no prefix to update in tf2::BufferCore (see #68)
     // Update the tf::Transformer prefix
-    tf_prefix_ = prop_tf_prefix;
+    //tf_prefix_ = prop_tf_prefix;
     
     // Connect to tf topic
     ConnPolicy cp = ConnPolicy::buffer(prop_buffer_size);
     cp.transport = 3; //3=ROS
     cp.name_id = "/tf";
 
-    return (port_tf_in.createStream(cp) && port_tf_out.createStream(cp));
+    return (port_tf_in.createStream(cp) && port_tf_static_in.createStream(cp) && port_tf_out.createStream(cp));
   }
 
   void RTT_TF::updateHook()
@@ -127,15 +184,17 @@ namespace rtt_tf
     //log(Debug) << "In update" << endlog();
 #endif
     try {
-      tf::tfMessage msg_in;
+      tf2_msgs::TFMessage msg_in;
 
       while (port_tf_in.read(msg_in) == NewData) {
         for (unsigned int i = 0; i < msg_in.transforms.size(); i++) {
-          StampedTransform trans;
-          transformStampedMsgToTF(msg_in.transforms[i], trans);
           try {
+// tf2::BufferCore (see #68) has a non-defaulted authority argument,
+//  but there is no __connection_header to extract it from.
+// Workaround: use the same default value as tf::Transform did.
 #if ROS_VERSION_MINIMUM(1,11,0)
-            this->setTransform(trans);
+            const std::string authority = "default_authority";
+            this->setTransform(msg_in.transforms[i], authority);
 #else
             std::map<std::string, std::string>* msg_header_map =
               msg_in.__connection_header.get();
@@ -151,7 +210,7 @@ namespace rtt_tf
             }
             this->setTransform(trans, authority);
 #endif
-          } catch (TransformException& ex) {
+          } catch (tf2::TransformException& ex) {
             log(Error) << "Failure to set received transform from "
               << msg_in.transforms[i].child_frame_id << " to "
               << msg_in.transforms[i].header.frame_id
@@ -164,70 +223,77 @@ namespace rtt_tf
     }
   }
 
+  bool RTT_TF::startHook()
+  {
+    return true;
+  }
+
+  void RTT_TF::stopHook()
+  {
+  }
+
+  void RTT_TF::cleanupHook()
+  {
+  }
+
+  ros::Time RTT_TF::getCommonTime(
+      const std::string& target,
+      const std::string& source) const
+  {
+    ros::Time common_time;
+
+    tf2::CompactFrameID target_id = _lookupFrameNumber(target);
+    tf2::CompactFrameID source_id = _lookupFrameNumber(source);
+
+    _getLatestCommonTime(source_id, target_id, common_time, NULL);
+
+    return common_time;
+  }
+
   geometry_msgs::TransformStamped RTT_TF::lookupTransform(
       const std::string& target,
-      const std::string& source)
+      const std::string& source) const
   {
-    tf::StampedTransform stamped_tf;
-    ros::Time common_time;
-    this->getLatestCommonTime(source, target, common_time,NULL);
-    static_cast<tf::Transformer*>(this)->lookupTransform(target, source, common_time, stamped_tf);
-    geometry_msgs::TransformStamped msg;
-    tf::transformStampedTFToMsg(stamped_tf,msg);
-    return msg;
+    return tf2::BufferCore::lookupTransform(target, source, getCommonTime(target, source));
   }
 
   bool RTT_TF::canTransform(
       const std::string& target,
-      const std::string& source)
+      const std::string& source) const
   {
-    tf::StampedTransform stamped_tf;
-    ros::Time common_time;
-    this->getLatestCommonTime(source, target, common_time,NULL);
-    return static_cast<tf::Transformer*>(this)->canTransform(target, source, common_time);
+    return tf2::BufferCore::canTransform(target, source, getCommonTime(target, source));
   }
 
   geometry_msgs::TransformStamped RTT_TF::lookupTransformAtTime(
       const std::string& target,
       const std::string& source,
-      const ros::Time& common_time)
+      const ros::Time& common_time) const
   {
-    tf::StampedTransform stamped_tf;
-    static_cast<tf::Transformer*>(this)->lookupTransform(target, source, common_time, stamped_tf);
-    geometry_msgs::TransformStamped msg;
-    tf::transformStampedTFToMsg(stamped_tf,msg);
-    return msg;
+    return tf2::BufferCore::lookupTransform(target, source, common_time);
   }
 
-  void RTT_TF::broadcastTransform(
-      const geometry_msgs::TransformStamped &tform)
+  void RTT_TF::broadcastTransform(const geometry_msgs::TransformStamped& tform)
   {
-    // Populate the TF message
-    tf::tfMessage msg_out;
+    // Populate the TFMessage
+    tf2_msgs::TFMessage msg_out;
     msg_out.transforms.push_back(tform);
 
     // Resolve names
-    msg_out.transforms.back().header.frame_id = tf::resolve(prop_tf_prefix, msg_out.transforms.back().header.frame_id);
-    msg_out.transforms.back().child_frame_id = tf::resolve(prop_tf_prefix, msg_out.transforms.back().child_frame_id);
+    geometry_msgs::TransformStamped& last_transform = msg_out.transforms.back();
+    last_transform.header.frame_id = prepend_prefix(prop_tf_prefix, last_transform.header.frame_id);
+    last_transform.child_frame_id = prepend_prefix(prop_tf_prefix, last_transform.child_frame_id);
 
     port_tf_out.write(msg_out);
   }
 
-  void RTT_TF::broadcastTransforms(
-      const std::vector<geometry_msgs::TransformStamped> &tform)
+  void RTT_TF::broadcastTransforms(const std::vector<geometry_msgs::TransformStamped>& tform)
   {
     // Populate the TF message
-    tf::tfMessage msg_out;
+    tf2_msgs::TFMessage msg_out;
 
-    // Resolve names
-    for(std::vector<geometry_msgs::TransformStamped>::const_iterator it = tform.begin();
-        it != tform.end();
-        ++it)
-    {
-      msg_out.transforms.push_back(*it);
-      msg_out.transforms.back().header.frame_id = tf::resolve(prop_tf_prefix, msg_out.transforms.back().header.frame_id);
-      msg_out.transforms.back().child_frame_id = tf::resolve(prop_tf_prefix, msg_out.transforms.back().child_frame_id);
-    }
+    // copy and resolve names
+    msg_out.transforms.reserve(tform.size());
+    std::transform(tform.begin(), tform.end(), msg_out.transforms.begin(), PrefixResolver(prop_tf_prefix));
 
     port_tf_out.write(msg_out);
   }
