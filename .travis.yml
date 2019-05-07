@@ -15,6 +15,12 @@ cache:
 git:
   quiet: true # optional, silences the cloning of the target repository
 
+# limit automatic builds to certain branches (and pull requests)
+branches:
+  only:
+  - master
+  - /^toolchain-[\d\.]+[\d]$/
+
 # configure the build environment(s)
 # https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#variables-you-can-configure
 env:
