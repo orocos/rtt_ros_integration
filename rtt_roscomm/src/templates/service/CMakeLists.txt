@@ -76,6 +76,14 @@ foreach( FILE ${SRV_FILES} )
 
 endforeach()
 
+# Include custom headers provided by the typekit package
+set(ROS_SRV_EXTRA_HEADERS)
+if(ros_generate_rtt_service_proxies_EXTRA_INCLUDES)
+  foreach( header ${ros_generate_rtt_service_proxies_EXTRA_INCLUDES} )
+    set(ROS_SRV_EXTRA_HEADERS "${ROS_SRV_EXTRA_HEADERS}#include <${header}>\n")
+  endforeach()
+endif()
+
 # Service proxy factories
 configure_file(
   rtt_rosservice_proxies.cpp.in
@@ -89,7 +97,9 @@ include_directories(
   ${${_package}_INCLUDE_DIRS})
 
 # Targets
-set(CMAKE_BUILD_TYPE MinSizeRel)
+if(NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CMAKE_BUILD_TYPE MinSizeRel)
+endif()
 orocos_service(         rtt_${ROSPACKAGE}_rosservice_proxies ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp)
 target_link_libraries(  rtt_${ROSPACKAGE}_rosservice_proxies ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 if(DEFINED ${_package}_EXPORTED_TARGETS)

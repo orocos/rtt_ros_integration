@@ -23,67 +23,149 @@ private:
 
 //! Abstract ROS Service Server Proxy
 class ROSServiceServerProxyBase : public ROSServiceProxyBase
-{ 
+{
 public:
   ROSServiceServerProxyBase(const std::string &service_name) :
-    ROSServiceProxyBase(service_name),
-    proxy_operation_caller_()
+    ROSServiceProxyBase(service_name)
   { }
-  
+
   //! Connect an RTT Operation to this ROS service server
-  bool connect(RTT::TaskContext *owner, RTT::OperationInterfacePart* operation) {
-    // Link the caller with the operation
-    return proxy_operation_caller_->setImplementation(
-        operation->getLocalOperation(),
-        RTT::internal::GlobalEngine::Instance());
-  }
+  virtual bool connect(RTT::TaskContext *owner, RTT::OperationInterfacePart* operation) = 0;
 
 protected:
   //! The underlying ROS service server
   ros::ServiceServer server_;
-  //! The underlying RTT operation caller
-  boost::shared_ptr<RTT::base::OperationCallerBaseInvoker> proxy_operation_caller_;
 };
 
 template<class ROS_SERVICE_T>
-class ROSServiceServerProxy : public ROSServiceServerProxyBase 
+class ROSServiceServerOperationCallerBase {
+public:
+  typedef boost::shared_ptr<ROSServiceServerOperationCallerBase<ROS_SERVICE_T> > Ptr;
+  virtual ~ROSServiceServerOperationCallerBase() {}
+  virtual bool call(typename ROS_SERVICE_T::Request& request, typename ROS_SERVICE_T::Response& response) const = 0;
+};
+
+template<class ROS_SERVICE_T, int variant = 0>
+struct ROSServiceServerOperationCallerWrapper;
+
+// Default implementation of an OperationCaller that fowards ROS service calls to Orocos operations
+// that have the default bool(Request&, Response&) signature. You can add more variants of this class
+// to add support for custom operation types.
+//
+// See package std_srvs for an example.
+//
+template<class ROS_SERVICE_T>
+struct ROSServiceServerOperationCallerWrapper<ROS_SERVICE_T,0> {
+  typedef bool Signature(typename ROS_SERVICE_T::Request&, typename ROS_SERVICE_T::Response&);
+  typedef RTT::OperationCaller<Signature> ProxyOperationCallerType;
+  template <typename Callable> static bool call(Callable& call, typename ROS_SERVICE_T::Request& request, typename ROS_SERVICE_T::Response& response) {
+    return call(request, response);
+  }
+};
+
+template<class ROS_SERVICE_T, int variant = 0>
+class ROSServiceServerOperationCaller : public ROSServiceServerOperationCallerBase<ROS_SERVICE_T> {
+public:
+  using typename ROSServiceServerOperationCallerBase<ROS_SERVICE_T>::Ptr;
+
+  //! The wrapper type for this variant
+  typedef ROSServiceServerOperationCallerWrapper<ROS_SERVICE_T, variant> Wrapper;
+
+  //! Default operation caller for a ROS service server proxy
+  typedef typename Wrapper::ProxyOperationCallerType ProxyOperationCallerType;
+  typedef boost::shared_ptr<ProxyOperationCallerType> ProxyOperationCallerTypePtr;
+
+  static Ptr connect(RTT::OperationInterfacePart* operation) {
+    ProxyOperationCallerTypePtr proxy_operation_caller
+        = boost::make_shared<ProxyOperationCallerType>(operation->getLocalOperation(), RTT::internal::GlobalEngine::Instance());
+    if (proxy_operation_caller->ready()) {
+      return Ptr(new ROSServiceServerOperationCaller<ROS_SERVICE_T, variant>(proxy_operation_caller));
+    }
+    return tryNextVariant(operation);
+  }
+
+  virtual bool call(typename ROS_SERVICE_T::Request& request, typename ROS_SERVICE_T::Response& response) const {
+    // Check if the operation caller is ready, and then call it.
+    if (!proxy_operation_caller_->ready()) return false;
+    return Wrapper::call(*proxy_operation_caller_, request, response);
+  }
+
+private:
+  template<typename Dummy>
+  struct Void {
+    typedef void type;
+  };
+
+  template<typename R = void, typename Enabled = void>
+  struct EnableIfHasNextVariant {};
+
+  template<typename R>
+  struct EnableIfHasNextVariant<R, typename Void<typename ROSServiceServerOperationCallerWrapper<ROS_SERVICE_T, variant + 1>::ProxyOperationCallerType>::type> {
+    typedef R type;
+  };
+
+  template<typename R = void, typename Enabled = void>
+  struct DisableIfHasNextVariant {
+    typedef R type;
+  };
+
+  template<typename R>
+  struct DisableIfHasNextVariant<R, typename EnableIfHasNextVariant<R>::type> {};
+
+  template<typename Dummy = int>
+  static typename EnableIfHasNextVariant<Ptr>::type tryNextVariant(RTT::OperationInterfacePart* operation) {
+    return ROSServiceServerOperationCaller<ROS_SERVICE_T, variant + 1>::connect(operation);
+  }
+
+  template<typename Dummy = void>
+  static typename DisableIfHasNextVariant<Ptr>::type tryNextVariant(RTT::OperationInterfacePart* operation) {
+    return Ptr();
+  }
+
+  ROSServiceServerOperationCaller(const boost::shared_ptr<ProxyOperationCallerType>& impl)
+      : proxy_operation_caller_(impl) {}
+
+  ProxyOperationCallerTypePtr proxy_operation_caller_;
+};
+
+template<class ROS_SERVICE_T>
+class ROSServiceServerProxy : public ROSServiceServerProxyBase
 {
 public:
-  //! Operation caller for a ROS service server proxy
-  typedef RTT::OperationCaller<bool(typename ROS_SERVICE_T::Request&, typename ROS_SERVICE_T::Response&)> ProxyOperationCallerType;
-
   /** \brief Construct a ROS service server and associate it with an Orocos
    * task's required interface and operation caller.
    */
   ROSServiceServerProxy(const std::string &service_name) :
     ROSServiceServerProxyBase(service_name)
   {
-    // Construct operation caller
-    proxy_operation_caller_.reset(new ProxyOperationCallerType("ROS_SERVICE_SERVER_PROXY"));
-
     // Construct the ROS service server
     ros::NodeHandle nh;
     server_ = nh.advertiseService(
-        service_name, 
-        &ROSServiceServerProxy<ROS_SERVICE_T>::ros_service_callback, 
+        service_name,
+        &ROSServiceServerProxy<ROS_SERVICE_T>::ros_service_callback,
         this);
   }
 
   ~ROSServiceServerProxy()
   {
     // Clean-up advertized ROS services
-    server_.shutdown();     
+    server_.shutdown();
+  }
+
+  virtual bool connect(RTT::TaskContext *, RTT::OperationInterfacePart* operation)
+  {
+    impl_ = ROSServiceServerOperationCaller<ROS_SERVICE_T>::connect(operation);
+    return (impl_.get() != 0);
   }
 
 private:
-  
   //! The callback called by the ROS service server when this service is invoked
   bool ros_service_callback(typename ROS_SERVICE_T::Request& request, typename ROS_SERVICE_T::Response& response) {
-    // Downcast the proxy operation caller
-    ProxyOperationCallerType &proxy_operation_caller = *dynamic_cast<ProxyOperationCallerType*>(proxy_operation_caller_.get());
-    // Check if the operation caller is ready, and then call it
-    return proxy_operation_caller_->ready() && proxy_operation_caller(request, response);
+    if (!impl_) return false;
+    return impl_->call(request, response);
   }
+
+  boost::shared_ptr<ROSServiceServerOperationCallerBase<ROS_SERVICE_T> > impl_;
 };
 
 
@@ -91,7 +173,7 @@ private:
 class ROSServiceClientProxyBase : public ROSServiceProxyBase
 {
 public:
-  ROSServiceClientProxyBase(const std::string &service_name) : 
+  ROSServiceClientProxyBase(const std::string &service_name) :
     ROSServiceProxyBase(service_name),
     proxy_operation_()
   { }
@@ -107,12 +189,12 @@ public:
 protected:
   //! The underlying ROS service client
   ros::ServiceClient client_;
-  //! The underlying RTT operation 
+  //! The underlying RTT operation
   boost::shared_ptr<RTT::base::OperationBase> proxy_operation_;
 };
 
 template<class ROS_SERVICE_T>
-class ROSServiceClientProxy : public ROSServiceClientProxyBase 
+class ROSServiceClientProxy : public ROSServiceClientProxyBase
 {
 public:
 
@@ -122,7 +204,7 @@ public:
   ROSServiceClientProxy(const std::string &service_name) :
     ROSServiceClientProxyBase(service_name)
   {
-    // Construct a new 
+    // Construct a new
     proxy_operation_.reset(new ProxyOperationType("ROS_SERVICE_CLIENT_PROXY"));
 
     // Construct the underlying service client
@@ -137,7 +219,7 @@ public:
   }
 
 private:
-  
+
   //! The callback for the RTT operation
   bool orocos_operation_callback(typename ROS_SERVICE_T::Request& request, typename ROS_SERVICE_T::Response& response) {
     // Make sure the ROS service client exists and then call it (blocking)
@@ -147,7 +229,7 @@ private:
 
 
 //! Abstract factory for ROS Service Proxy Factories
-class ROSServiceProxyFactoryBase 
+class ROSServiceProxyFactoryBase
 {
 public:
 
@@ -166,7 +248,7 @@ private:
 };
 
 template<class ROS_SERVICE_T>
-class ROSServiceProxyFactory : public ROSServiceProxyFactoryBase 
+class ROSServiceProxyFactory : public ROSServiceProxyFactoryBase
 {
 public:
 

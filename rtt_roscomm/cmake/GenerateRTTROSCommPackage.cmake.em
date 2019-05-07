@@ -42,11 +42,13 @@ macro(rtt_roscomm_debug)
 endmacro()
 
 macro(ros_generate_rtt_typekit package)
+  cmake_parse_arguments(ros_generate_rtt_typekit "" "" "EXTRA_INCLUDES" ${ARGN})
   set(_package ${package})
   add_subdirectory(${rtt_roscomm_TEMPLATES_DIR}/typekit ${package}_typekit)
 endmacro(ros_generate_rtt_typekit)
 
 macro(ros_generate_rtt_service_proxies package)
+  cmake_parse_arguments(ros_generate_rtt_service_proxies "" "" "EXTRA_INCLUDES" ${ARGN})
   set(_package ${package})
   add_subdirectory(${rtt_roscomm_TEMPLATES_DIR}/service ${package}_service_proxies)
 endmacro(ros_generate_rtt_service_proxies)
