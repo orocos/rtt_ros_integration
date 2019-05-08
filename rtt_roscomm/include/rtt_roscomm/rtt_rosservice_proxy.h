@@ -100,7 +100,8 @@ private:
   struct EnableIfHasNextVariant {};
 
   template<typename R>
-  struct EnableIfHasNextVariant<R, typename Void<typename ROSServiceServerOperationCallerWrapper<ROS_SERVICE_T, variant + 1>::ProxyOperationCallerType>::type> {
+  struct EnableIfHasNextVariant<R,
+      typename Void<typename ROSServiceServerOperationCallerWrapper<ROS_SERVICE_T, variant + 1>::ProxyOperationCallerType>::type> {
     typedef R type;
   };
 
@@ -112,13 +113,13 @@ private:
   template<typename R>
   struct DisableIfHasNextVariant<R, typename EnableIfHasNextVariant<R>::type> {};
 
-  template<typename Dummy = int>
-  static typename EnableIfHasNextVariant<Ptr>::type tryNextVariant(RTT::OperationInterfacePart* operation) {
+  template<typename Dummy>
+  static typename EnableIfHasNextVariant<Ptr>::type tryNextVariant(RTT::OperationInterfacePart* operation, Dummy* = 0) {
     return ROSServiceServerOperationCaller<ROS_SERVICE_T, variant + 1>::connect(operation);
   }
 
-  template<typename Dummy = void>
-  static typename DisableIfHasNextVariant<Ptr>::type tryNextVariant(RTT::OperationInterfacePart* operation) {
+  template<typename Dummy>
+  static typename DisableIfHasNextVariant<Ptr>::type tryNextVariant(RTT::OperationInterfacePart* operation, Dummy* = 0) {
     return Ptr();
   }
 
