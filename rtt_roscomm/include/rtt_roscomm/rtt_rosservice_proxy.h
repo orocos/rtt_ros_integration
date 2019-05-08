@@ -75,6 +75,21 @@ public:
   typedef typename Wrapper::ProxyOperationCallerType ProxyOperationCallerType;
   typedef boost::shared_ptr<ProxyOperationCallerType> ProxyOperationCallerTypePtr;
 
+  static Ptr connect(RTT::OperationInterfacePart* operation) {
+    ProxyOperationCallerTypePtr proxy_operation_caller
+        = boost::make_shared<ProxyOperationCallerType>(operation->getLocalOperation(), RTT::internal::GlobalEngine::Instance());
+    if (proxy_operation_caller->ready()) {
+      return Ptr(new ROSServiceServerOperationCaller<ROS_SERVICE_T, variant>(proxy_operation_caller));
+    }
+    return NextVariant<void>::connect(operation);
+  }
+
+  virtual bool call(typename ROS_SERVICE_T::Request& request, typename ROS_SERVICE_T::Response& response) const {
+    // Check if the operation caller is ready, and then call it.
+    if (!proxy_operation_caller_->ready()) return false;
+    return Wrapper::call(*proxy_operation_caller_, request, response);
+  }
+
 private:
   template<typename Dummy> struct Void { typedef void type; };
 
@@ -96,22 +111,6 @@ private:
       return ROSServiceServerOperationCaller<ROS_SERVICE_T, variant + 1>::connect(operation);
     }
   };
-
-public:
-  static Ptr connect(RTT::OperationInterfacePart* operation) {
-    ProxyOperationCallerTypePtr proxy_operation_caller
-        = boost::make_shared<ProxyOperationCallerType>(operation->getLocalOperation(), RTT::internal::GlobalEngine::Instance());
-    if (proxy_operation_caller->ready()) {
-      return Ptr(new ROSServiceServerOperationCaller<ROS_SERVICE_T, variant>(proxy_operation_caller));
-    }
-    return NextVariant<void>::connect(operation);
-  }
-
-  virtual bool call(typename ROS_SERVICE_T::Request& request, typename ROS_SERVICE_T::Response& response) const {
-    // Check if the operation caller is ready, and then call it.
-    if (!proxy_operation_caller_->ready()) return false;
-    return Wrapper::call(*proxy_operation_caller_, request, response);
-  }
 
   ROSServiceServerOperationCaller(const boost::shared_ptr<ProxyOperationCallerType>& impl)
       : proxy_operation_caller_(impl) {}
