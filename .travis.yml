@@ -1,33 +1,43 @@
-sudo: required
-dist: trusty
-language: generic
-compiler:
-  - gcc
-before_install:
-  # Define some config vars
-  - export ROS_DISTRO=indigo
-  - export CI_SOURCE_PATH=$(pwd)
-  # Bootstrap a minimal ROS installation
-  - git clone https://github.com/orocos/ros_ci_tools /tmp/ros_ci_tools && export PATH=/tmp/ros_ci_tools:$PATH
-  - ros_ci_bootstrap
-  - source /opt/ros/$ROS_DISTRO/setup.bash
-  # Create non-isolated workspace
-  - mkdir -p ~/ws/src
-  - pushd ~/ws/src
-  - ln -s $CI_SOURCE_PATH
-  - popd
-  - rosdep install -r --from-paths ~/ws/src --ignore-src --rosdistro $ROS_DISTRO -y > /dev/null
-  # Source the ROS setup script again due to eventually updated env-hooks
-  - source /opt/ros/$ROS_DISTRO/setup.bash
+# This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).
+# For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
 
+language: generic # optional, just removes the language badge
+
+services:
+  - docker
+
+# include the following block if the C/C++ build artifacts should get cached by Travis,
+# CCACHE_DIR needs to get set as well to actually fill the cache
+cache:
+  directories:
+    - $HOME/.ccache
+
+git:
+  quiet: true # optional, silences the cloning of the target repository
+
+# limit automatic builds to certain branches (and pull requests)
+branches:
+  only:
+  - master
+  - /^toolchain-[\d\.]+[\d]$/
+
+# configure the build environment(s)
+# https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#variables-you-can-configure
+env:
+  global: # global settings for all jobs
+    - ROS_REPO=ros
+    - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
+  matrix: # each line is a job
+    - ROS_DISTRO="kinetic"
+    #- ROS_DISTRO="melodic"
+
+# allow failures, e.g. for unsupported distros
+#matrix:
+#  allow_failures:
+#    - env: ROS_DISTRO="lunar" ROS_REPO=ros-shadow-fixed
+
+# clone and run industrial_ci
 install:
-  # build the normal catkin workspace
-  - pushd ~/ws
-  - catkin_make -j2
-
+  - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
 script:
-  # Run tests
-  - source devel/setup.bash
-  - catkin_make run_tests
-  - catkin_test_results
-  #- catkin_make install
+  - .industrial_ci/travis.sh
