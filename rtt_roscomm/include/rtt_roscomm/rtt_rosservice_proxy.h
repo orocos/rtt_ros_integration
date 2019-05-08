@@ -75,52 +75,42 @@ public:
   typedef typename Wrapper::ProxyOperationCallerType ProxyOperationCallerType;
   typedef boost::shared_ptr<ProxyOperationCallerType> ProxyOperationCallerTypePtr;
 
+private:
+  template<typename Dummy> struct Void { typedef void type; };
+
+  template<typename R = void, typename Enabled = void> struct EnableIfHasNextVariant { };
+
+  template<typename R> struct EnableIfHasNextVariant<R,
+      typename Void<typename ROSServiceServerOperationCallerWrapper<ROS_SERVICE_T, variant + 1>::ProxyOperationCallerType>::type> {
+    typedef R type;
+  };
+
+  template<typename R = void, typename Enabled = void>
+  struct NextVariant {
+    static Ptr connect(RTT::OperationInterfacePart*) { return Ptr(); }
+  };
+
+  template<typename R>
+  struct NextVariant<R, typename EnableIfHasNextVariant<R>::type> {
+    static Ptr connect(RTT::OperationInterfacePart* operation) {
+      return ROSServiceServerOperationCaller<ROS_SERVICE_T, variant + 1>::connect(operation);
+    }
+  };
+
+public:
   static Ptr connect(RTT::OperationInterfacePart* operation) {
     ProxyOperationCallerTypePtr proxy_operation_caller
         = boost::make_shared<ProxyOperationCallerType>(operation->getLocalOperation(), RTT::internal::GlobalEngine::Instance());
     if (proxy_operation_caller->ready()) {
       return Ptr(new ROSServiceServerOperationCaller<ROS_SERVICE_T, variant>(proxy_operation_caller));
     }
-    return tryNextVariant(operation);
+    return NextVariant<void>::connect(operation);
   }
 
   virtual bool call(typename ROS_SERVICE_T::Request& request, typename ROS_SERVICE_T::Response& response) const {
     // Check if the operation caller is ready, and then call it.
     if (!proxy_operation_caller_->ready()) return false;
     return Wrapper::call(*proxy_operation_caller_, request, response);
-  }
-
-private:
-  template<typename Dummy>
-  struct Void {
-    typedef void type;
-  };
-
-  template<typename R = void, typename Enabled = void>
-  struct EnableIfHasNextVariant {};
-
-  template<typename R>
-  struct EnableIfHasNextVariant<R,
-      typename Void<typename ROSServiceServerOperationCallerWrapper<ROS_SERVICE_T, variant + 1>::ProxyOperationCallerType>::type> {
-    typedef R type;
-  };
-
-  template<typename R = void, typename Enabled = void>
-  struct DisableIfHasNextVariant {
-    typedef R type;
-  };
-
-  template<typename R>
-  struct DisableIfHasNextVariant<R, typename EnableIfHasNextVariant<R>::type> {};
-
-  template<typename Dummy>
-  static typename EnableIfHasNextVariant<Ptr>::type tryNextVariant(RTT::OperationInterfacePart* operation, Dummy* = 0) {
-    return ROSServiceServerOperationCaller<ROS_SERVICE_T, variant + 1>::connect(operation);
-  }
-
-  template<typename Dummy>
-  static typename DisableIfHasNextVariant<Ptr>::type tryNextVariant(RTT::OperationInterfacePart* operation, Dummy* = 0) {
-    return Ptr();
   }
 
   ROSServiceServerOperationCaller(const boost::shared_ptr<ProxyOperationCallerType>& impl)
