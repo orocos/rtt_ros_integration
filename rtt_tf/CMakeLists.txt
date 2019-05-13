@@ -14,8 +14,8 @@ orocos_install_headers(include/rtt_tf/tf_interface.h)
 
 orocos_generate_package(
   INCLUDE_DIRS include
-  DEPENDS tf
-  DEPENDS_TARGETS rtt_roscomm rtt_geometry_msgs
+  DEPENDS tf tf2
+  DEPENDS_TARGETS rtt_roscomm rtt_geometry_msgs rtt_tf2_msgs
 )
 
 # Tests
