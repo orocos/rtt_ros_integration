@@ -88,7 +88,7 @@ namespace rtt_tf
   using namespace RTT;
 
   RTT_TF::RTT_TF(const std::string& name) :
-    TaskContext( name, PreOperational ),
+    TaskContext(name, PreOperational),
     tf2::BufferCore( ros::Duration(BufferCore::DEFAULT_CACHE_TIME) ),
     prop_cache_time( BufferCore::DEFAULT_CACHE_TIME ),
     prop_buffer_size(DEFAULT_BUFFER_SIZE)
@@ -158,10 +158,18 @@ namespace rtt_tf
 
     // Connect to tf_static topic
     ConnPolicy cp_static = ConnPolicy::buffer(prop_buffer_size);
-    cp.transport = 3;
+    cp.transport = 3; //3=ROS
     cp.name_id = "/tf_static";
 
-    return (port_tf_static_in.createStream(cp_static) && port_tf_in.createStream(cp) && port_tf_out.createStream(cp));
+    bool configured = port_tf_static_in.createStream(cp_static)
+                    && port_tf_in.createStream(cp)
+                    && port_tf_out.createStream(cp);
+
+    if (!configured) {
+      cleanupHook();
+    }
+
+    return configured;
   }
 
   void RTT_TF::internalUpdate(tf2_msgs::TFMessage& msg, RTT::InputPort<tf2_msgs::TFMessage>& port)
@@ -230,6 +238,9 @@ namespace rtt_tf
 
   void RTT_TF::cleanupHook()
   {
+    port_tf_in.disconnect();
+    port_tf_out.disconnect();
+    port_tf_static_in.disconnect();
   }
 
   ros::Time RTT_TF::getLatestCommonTime(
