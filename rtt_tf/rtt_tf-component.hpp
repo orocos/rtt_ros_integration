@@ -19,6 +19,7 @@ namespace rtt_tf
     RTT::InputPort<tf2_msgs::TFMessage> port_tf_in;
     RTT::InputPort<tf2_msgs::TFMessage> port_tf_static_in;
     RTT::OutputPort<tf2_msgs::TFMessage> port_tf_out;
+    RTT::OutputPort<tf2_msgs::TFMessage> port_tf_static_out;
 
     void internalUpdate(
         tf2_msgs::TFMessage& msg,
@@ -51,6 +52,12 @@ namespace rtt_tf
         const geometry_msgs::TransformStamped &tform);
 
     void broadcastTransforms(
+        const std::vector<geometry_msgs::TransformStamped> &tforms);
+
+    void broadcastStaticTransform(
+        const geometry_msgs::TransformStamped &tform);
+
+    void broadcastStaticTransforms(
         const std::vector<geometry_msgs::TransformStamped> &tforms);
 
     void addTFOperations(RTT::Service::shared_ptr service);

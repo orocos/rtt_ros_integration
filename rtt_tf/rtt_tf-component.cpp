@@ -122,7 +122,15 @@ namespace rtt_tf
       .arg("transform", "[geometry_msgs::TransformStamped]");
 
     service->addOperation("broadcastTransforms", &RTT_TF::broadcastTransforms, this, RTT::OwnThread)
-      .doc("Broadcast a stamped transform immediately.")
+      .doc("Broadcast stamped transforms immediately.")
+      .arg("transforms", "[std::vector<geometry_msgs::TransformStamped>]");
+
+    service->addOperation("broadcastStaticTransform", &RTT_TF::broadcastStaticTransform, this, RTT::OwnThread)
+      .doc("Broadcast a stamped transform as a static transform immediately.")
+      .arg("transform", "[geometry_msgs::TransformStamped]");
+
+    service->addOperation("broadcastStaticTransforms", &RTT_TF::broadcastStaticTransforms, this, RTT::OwnThread)
+      .doc("Broadcast stamped transforms as static transforms immediately.")
       .arg("transforms", "[std::vector<geometry_msgs::TransformStamped>]");
 
     service->addOperation("canTransform", &RTT_TF::canTransform, this)
@@ -160,7 +168,8 @@ namespace rtt_tf
 
     bool configured = port_tf_static_in.createStream(cp_static)
                     && port_tf_in.createStream(cp)
-                    && port_tf_out.createStream(cp);
+                    && port_tf_out.createStream(cp)
+                    && port_tf_static_out.createStream(cp_static);
 
     if (!configured) {
       cleanupHook();
@@ -212,6 +221,7 @@ namespace rtt_tf
     port_tf_in.disconnect();
     port_tf_out.disconnect();
     port_tf_static_in.disconnect();
+    port_tf_static_out.disconnect();
   }
 
   ros::Time RTT_TF::getLatestCommonTime(
@@ -269,6 +279,19 @@ namespace rtt_tf
   {
     tf2_msgs::TFMessage msg_out = transformsToMessage(tform, prop_tf_prefix);
     port_tf_out.write(msg_out);
+  }
+
+  void RTT_TF::broadcastStaticTransform(const geometry_msgs::TransformStamped& tform)
+  {
+    const std::vector<geometry_msgs::TransformStamped> tforms(1, tform);
+    tf2_msgs::TFMessage msg_out = transformsToMessage(tforms, prop_tf_prefix);
+    port_tf_static_out.write(msg_out);
+  }
+
+  void RTT_TF::broadcastStaticTransforms(const std::vector<geometry_msgs::TransformStamped>& tform)
+  {
+    tf2_msgs::TFMessage msg_out = transformsToMessage(tform, prop_tf_prefix);
+    port_tf_static_out.write(msg_out);
   }
 
 }//namespace
