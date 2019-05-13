@@ -31,9 +31,6 @@ and then connect it with whichever components you intend to have use it:
 
 ```cpp
 import("rtt_ros");
-import("rtt_std_msgs");
-import("rtt_geometry_msgs");
-import("rtt_tf2_msgs");
 
 // Import and load the TF component
 ros.import("rtt_tf");
