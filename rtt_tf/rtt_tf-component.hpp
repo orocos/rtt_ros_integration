@@ -22,7 +22,8 @@ namespace rtt_tf
 
     void internalUpdate(
         tf2_msgs::TFMessage& msg,
-        RTT::InputPort<tf2_msgs::TFMessage>& port);
+        RTT::InputPort<tf2_msgs::TFMessage>& port,
+        bool is_static);
 
     ros::Time getLatestCommonTime(
         const std::string& target,
@@ -59,11 +60,7 @@ namespace rtt_tf
 
     bool configureHook();
 
-    bool startHook();
-
     void updateHook();
-
-    void stopHook();
 
     void cleanupHook();
   };

@@ -148,9 +148,6 @@ namespace rtt_tf
       nh.getParam(tf_prefix_param_key, prop_tf_prefix);
     }
     
-    // no prefix to update in tf2::BufferCore (see #68)
-    //tf_prefix_ = prop_tf_prefix;
-    
     // Connect to tf topic
     ConnPolicy cp = ConnPolicy::buffer(prop_buffer_size);
     cp.transport = 3; //3=ROS
@@ -172,32 +169,16 @@ namespace rtt_tf
     return configured;
   }
 
-  void RTT_TF::internalUpdate(tf2_msgs::TFMessage& msg, RTT::InputPort<tf2_msgs::TFMessage>& port)
+  void RTT_TF::internalUpdate(tf2_msgs::TFMessage& msg, RTT::InputPort<tf2_msgs::TFMessage>& port, bool is_static)
   {
+    // tf2::BufferCore::setTransform (see #68) has a non-defaulted authority argument,
+    //  but there is no __connection_header to extract it from.
+    const std::string authority = "unknown_authority";
+
     while (port.read(msg) == NewData) {
       for (std::size_t i = 0; i < msg.transforms.size(); ++i) {
         try {
-// tf2::BufferCore (see #68) has a non-defaulted authority argument,
-//  but there is no __connection_header to extract it from.
-// Workaround: use the same default value as tf::Transform did.
-#if ROS_VERSION_MINIMUM(1,11,0)
-          const std::string authority = "default_authority";
-          this->setTransform(msg.transforms[i], authority);
-#else
-          std::map<std::string, std::string>* msg_header_map =
-            msg.__connection_header.get();
-          std::string authority;
-          std::map<std::string, std::string>::iterator it =
-            msg_header_map->find("callerid");
-
-          if (it == msg_header_map->end()) {
-            log(Warning) << "Message received without callerid" << endlog();
-            authority = "no callerid";
-          } else {
-            authority = it->second;
-          }
-          this->setTransform(trans, authority);
-#endif
+          this->setTransform(msg.transforms[i], authority, is_static);
         } catch (tf2::TransformException& ex) {
           log(Error) << "Failure to set received transform from "
             << msg.transforms[i].child_frame_id << " to "
@@ -217,23 +198,13 @@ namespace rtt_tf
     try
     {
       tf2_msgs::TFMessage msg_in;
-
-      internalUpdate(msg_in, port_tf_in);
-      internalUpdate(msg_in, port_tf_static_in);
+      internalUpdate(msg_in, port_tf_in, false);
+      internalUpdate(msg_in, port_tf_static_in, true);
     }
     catch (std::exception& ex)
     {
       log(Error) << ex.what() << endlog();
     }
-  }
-
-  bool RTT_TF::startHook()
-  {
-    return true;
-  }
-
-  void RTT_TF::stopHook()
-  {
   }
 
   void RTT_TF::cleanupHook()
