@@ -49,43 +49,12 @@
 #include <rtt/Component.hpp>
 #include <ros/ros.h>
 
+#include <tf/tf.h>
 #include <tf2/exceptions.h>
 
 #include <geometry_msgs/TransformStamped.h>
 
 #include <algorithm>
-namespace
-{
-  // local replacement for tf::resolve, which is not present in tf2.
-  // this helper method prepends the tf_prefix to the passed frame name for broadcasting from the component.
-  std::string prepend_prefix(const std::string& prefix, const std::string& frame_name)
-  {
-    if (!frame_name.empty() && frame_name[0] == '/')
-    {
-      if (frame_name.size() > 1)
-      {
-        return frame_name.substr(1);
-      }
-      return std::string("");
-    }
-
-    if (prefix.empty())
-    {
-      return frame_name;
-    }
-
-    std::string composite;
-    if (prefix[0] == '/' && prefix.size() > 1)
-    {
-      composite = prefix.substr(1) + "/";
-    }
-    else
-    {
-      composite = prefix + "/";
-    }
-    return composite + frame_name;
-  }
-}
 
 namespace rtt_tf
 {
@@ -98,8 +67,8 @@ namespace rtt_tf
       geometry_msgs::TransformStamped operator()(const geometry_msgs::TransformStamped& elem)
       {
         geometry_msgs::TransformStamped result = elem;
-        result.header.frame_id = prepend_prefix(prefix_, result.header.frame_id);
-        result.child_frame_id = prepend_prefix(prefix_, result.child_frame_id);
+        result.header.frame_id = tf::resolve(prefix_, result.header.frame_id);
+        result.child_frame_id = tf::resolve(prefix_, result.child_frame_id);
         return result;
       }
 
@@ -107,6 +76,14 @@ namespace rtt_tf
       const std::string& prefix_;
   };
 
+  tf2_msgs::TFMessage transformsToMessage(const std::vector<geometry_msgs::TransformStamped>& tforms, const std::string& prefix)
+  {
+    tf2_msgs::TFMessage msg;
+    // resolve names and copy transforms to message
+    msg.transforms.reserve(tforms.size());
+    std::transform(tforms.begin(), tforms.end(), msg.transforms.begin(), PrefixResolver(prefix));
+    return msg;
+  }
 
   using namespace RTT;
 
@@ -149,9 +126,15 @@ namespace rtt_tf
       .arg("transforms", "[std::vector<geometry_msgs::TransformStamped>]");
 
     service->addOperation("canTransform", &RTT_TF::canTransform, this)
-      .doc("Check if the transform from source to target can be resolved..")
+      .doc("Check if the transform from source to target can be resolved.")
       .arg("target", "Target frame")
       .arg("source", "Source frame");
+
+    service->addOperation("canTransformAtTime", &RTT_TF::canTransformAtTime, this)
+      .doc("Check if the transform from source to target can be resolved for a given common time.")
+      .arg("target", "Target frame")
+      .arg("source", "Source frame")
+      .arg("common_time", "[ros::Time] The common time for which the transform would resolve");
   }
 
   bool RTT_TF::configureHook()
@@ -249,7 +232,7 @@ namespace rtt_tf
   {
   }
 
-  ros::Time RTT_TF::getCommonTime(
+  ros::Time RTT_TF::getLatestCommonTime(
       const std::string& target,
       const std::string& source) const
   {
@@ -267,14 +250,22 @@ namespace rtt_tf
       const std::string& target,
       const std::string& source) const
   {
-    return tf2::BufferCore::lookupTransform(target, source, getCommonTime(target, source));
+    return tf2::BufferCore::lookupTransform(target, source, ros::Time());
   }
 
   bool RTT_TF::canTransform(
       const std::string& target,
       const std::string& source) const
   {
-    return tf2::BufferCore::canTransform(target, source, getCommonTime(target, source));
+    return tf2::BufferCore::canTransform(target, source, ros::Time());
+  }
+
+  bool RTT_TF::canTransformAtTime(
+      const std::string& target,
+      const std::string& source,
+      const ros::Time& common_time) const
+  {
+    return tf2::BufferCore::canTransform(target, source, common_time);
   }
 
   geometry_msgs::TransformStamped RTT_TF::lookupTransformAtTime(
@@ -287,27 +278,14 @@ namespace rtt_tf
 
   void RTT_TF::broadcastTransform(const geometry_msgs::TransformStamped& tform)
   {
-    // Populate the TFMessage
-    tf2_msgs::TFMessage msg_out;
-    msg_out.transforms.push_back(tform);
-
-    // Resolve names
-    geometry_msgs::TransformStamped& last_transform = msg_out.transforms.back();
-    last_transform.header.frame_id = prepend_prefix(prop_tf_prefix, last_transform.header.frame_id);
-    last_transform.child_frame_id = prepend_prefix(prop_tf_prefix, last_transform.child_frame_id);
-
+    const std::vector<geometry_msgs::TransformStamped> tforms(1, tform);
+    tf2_msgs::TFMessage msg_out = transformsToMessage(tforms, prop_tf_prefix);
     port_tf_out.write(msg_out);
   }
 
   void RTT_TF::broadcastTransforms(const std::vector<geometry_msgs::TransformStamped>& tform)
   {
-    // Populate the TFMessage
-    tf2_msgs::TFMessage msg_out;
-
-    // copy and resolve names
-    msg_out.transforms.reserve(tform.size());
-    std::transform(tform.begin(), tform.end(), msg_out.transforms.begin(), PrefixResolver(prop_tf_prefix));
-
+    tf2_msgs::TFMessage msg_out = transformsToMessage(tform, prop_tf_prefix);
     port_tf_out.write(msg_out);
   }
 

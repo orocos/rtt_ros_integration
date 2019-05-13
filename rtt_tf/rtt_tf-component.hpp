@@ -24,13 +24,18 @@ namespace rtt_tf
         tf2_msgs::TFMessage& msg,
         RTT::InputPort<tf2_msgs::TFMessage>& port);
 
-    ros::Time getCommonTime(
+    ros::Time getLatestCommonTime(
         const std::string& target,
         const std::string& source) const;
 
     bool canTransform(
         const std::string& target,
         const std::string& source) const;
+
+    bool canTransformAtTime(
+        const std::string& target,
+        const std::string& source,
+        const ros::Time& common_time) const;
 
     geometry_msgs::TransformStamped lookupTransform(
         const std::string& target,

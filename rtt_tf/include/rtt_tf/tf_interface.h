@@ -18,13 +18,15 @@ namespace rtt_tf {
       lookupTransformAtTime("lookupTransformAtTime"),
       broadcastTransform("broadcastTransform"),
       broadcastTransforms("broadcastTransforms"),
-      canTransform("canTransform")
+      canTransform("canTransform"),
+      canTransformAtTime("canTransformAtTime")
     {
       owner->requires("tf")->addOperationCaller(lookupTransform);
       owner->requires("tf")->addOperationCaller(lookupTransformAtTime);
       owner->requires("tf")->addOperationCaller(broadcastTransform);
       owner->requires("tf")->addOperationCaller(broadcastTransforms);
       owner->requires("tf")->addOperationCaller(canTransform);
+      owner->requires("tf")->addOperationCaller(canTransformAtTime);
     }
 
     //! Check if the operations are ready
@@ -34,7 +36,8 @@ namespace rtt_tf {
         lookupTransformAtTime.ready() &&
         broadcastTransform.ready() &&
         broadcastTransforms.ready() &&
-        canTransform.ready();
+        canTransform.ready() &&
+        canTransformAtTime.ready();
     }
 
     RTT::OperationCaller<geometry_msgs::TransformStamped(const std::string&, const std::string&)> lookupTransform;
@@ -42,6 +45,7 @@ namespace rtt_tf {
     RTT::OperationCaller<void(const geometry_msgs::TransformStamped&)> broadcastTransform;
     RTT::OperationCaller<void(const std::vector<geometry_msgs::TransformStamped>&)> broadcastTransforms;
     RTT::OperationCaller<bool(const std::string&, const std::string&)> canTransform;
+    RTT::OperationCaller<bool(const std::string&, const std::string&, const ros::Time&)> canTransformAtTime;
   };
 }
 
