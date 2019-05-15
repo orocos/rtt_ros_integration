@@ -2,6 +2,15 @@
 Changelog for package rtt_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.2 (2019-05-15)
+------------------
+* Merge pull request `#111 <https://github.com/orocos/rtt_ros_integration/issues/111>`_ from orocos/fix-110 into 2.9.2
+  * Declare loadROSService() methods as static to fix name clashes (fix `#110 <https://github.com/orocos/rtt_ros_integration/issues/110>`_)
+* Merge pull request `#99 <https://github.com/orocos/rtt_ros_integration/issues/99>`_ from disRecord/feat/ros-time-type-fix
+  * Fix ros::time and ros::duration typekit by replacing PrimitiveType with StructType.
+* rtt_ros: remove extra semicolon after namespace closing bracket
+* Contributors: Johannes Meyer, disRecord
+
 2.9.1 (2017-11-16)
 ------------------
 

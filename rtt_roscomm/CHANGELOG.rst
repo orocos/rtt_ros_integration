@@ -2,6 +2,16 @@
 Changelog for package rtt_roscomm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.2 (2019-05-15)
+------------------
+* Merge pull request `#111 <https://github.com/orocos/rtt_ros_integration/issues/111>`_ from orocos/fix-110 into 2.9.2
+  * Declare loadROSService() methods as static to fix name clashes (fix `#110 <https://github.com/orocos/rtt_ros_integration/issues/110>`_)
+* Merge pull request `#109 <https://github.com/orocos/rtt_ros_integration/issues/109>`_ from orocos/fix/rtt_roscomm-python-interpreter into 2.9.2
+  * rtt_roscomm: fix hard-coded path to python interpreter in shebang of create_boost_header.py
+* Merge pull request `#106 <https://github.com/orocos/rtt_ros_integration/issues/106>`_ from ahoarau/patch-2 into 2.9.2
+  * add topicLatched to scripting
+* Contributors: Antoine Hoarau, Johannes Meyer
+
 2.9.1 (2017-11-16)
 ------------------
 * Merge with version 2.8.6
