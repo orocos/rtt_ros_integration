@@ -2,6 +2,12 @@
 Changelog for package rtt_rosclock
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.2 (2019-05-15)
+------------------
+* Merge pull request `#112 <https://github.com/orocos/rtt_ros_integration/issues/112>`_ from honeybee-robotics-forks/fix-rtt-rosclock-thread-segfault into 2.9.2
+  * rtt_rosclock: fixing isSelf segfault when using simclock with ownthread operation caller
+* Contributors: Johannes Meyer, Jonathan Bohren
+
 2.9.1 (2017-11-16)
 ------------------
 * Merge pull request `#93 <https://github.com/orocos/rtt_ros_integration/issues/93>`_ from ahoarau/xenomai3-support

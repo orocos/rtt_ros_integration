@@ -2,6 +2,20 @@
 Changelog for package rtt_rosnode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.2 (2019-05-15)
+------------------
+* Merge pull request `#116 <https://github.com/orocos/rtt_ros_integration/issues/116>`_ from ahoarau/patch-3 into 2.9.2
+  Defaults the number of spinner threads
+* Defaults the number of spinner threads
+  To the number of CPUs available
+* Merge pull request `#111 <https://github.com/orocos/rtt_ros_integration/issues/111>`_ from orocos/fix-110 into 2.9.2
+  Declare loadROSService() methods as static to fix name clashes
+* Declare loadROSService() methods as static to fix name clashes (fix `#110 <https://github.com/orocos/rtt_ros_integration/issues/110>`_)
+* Merge pull request `#98 <https://github.com/orocos/rtt_ros_integration/issues/98>`_ from disRecord/feat/get-node-name
+  rtt_rosnode: Add getNodeName() and getNamespace() operations.
+* rtt_rosnode: Add getNodeName() and getNamespace() operations.
+* Contributors: Antoine Hoarau, Johannes Meyer, disRecord
+
 2.9.1 (2017-11-16)
 ------------------
 
