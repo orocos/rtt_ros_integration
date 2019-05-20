@@ -74,8 +74,8 @@ typedef void (NotifyCallbackSignature)(uint32_t level);
  */
 template <class ConfigType>
 struct Updater {
-    virtual bool propertiesFromConfig(ConfigType &config, uint32_t level, RTT::PropertyBag &) { return false; }
-    virtual bool configFromProperties(ConfigType &config, const RTT::PropertyBag &) { return false; }
+    virtual bool propertiesFromConfig(ConfigType &, uint32_t, RTT::PropertyBag &) { return false; }
+    virtual bool configFromProperties(ConfigType &, const RTT::PropertyBag &) { return false; }
 };
 
 template <class ConfigType>
