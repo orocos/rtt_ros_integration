@@ -3,7 +3,7 @@ project(rtt_rosclock)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros rospack rostime cmake_modules rosgraph_msgs)
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${Xenomai_POSIX_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 orocos_library(rtt_rosclock
   src/rtt_rosclock.cpp
@@ -19,10 +19,16 @@ target_link_libraries(sim_clock_activity_service
 
 # Link against Xenomai POSIX skin to get
 if(OROCOS_TARGET STREQUAL "xenomai")
-  list(APPEND CMAKE_MODULE_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/config)
-  find_package(XenomaiPosix REQUIRED)
-  add_definitions(-D__XENO__)
-  set_target_properties(rtt_rosclock PROPERTIES LINK_FLAGS "${XENOMAI_POSIX_LDFLAGS}")
+  set(CMAKE_MODULE_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/config)
+  find_package(Xenomai REQUIRED)
+  if(NOT XENOMAI_POSIX_FOUND)
+      message(FATAL_ERROR "Xenomai Posix skin is required for rtt_rosclock")
+  endif()
+  include_directories(${Xenomai_POSIX_INCLUDE_DIRS})
+  set_target_properties(rtt_rosclock PROPERTIES 
+    LINK_FLAGS ${XENOMAI_POSIX_LDFLAGS}
+    COMPILE_FLAGS ${XENOMAI_POSIX_CFLAGS}
+  )
   target_link_libraries(rtt_rosclock ${XENOMAI_POSIX_LIBRARIES})
 endif()
 
