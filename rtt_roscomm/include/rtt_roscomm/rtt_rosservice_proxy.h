@@ -7,6 +7,8 @@
 #include <rtt/internal/GlobalEngine.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 
+namespace rtt_roscomm {
+
 //! Abstract ROS Service Proxy
 class ROSServiceProxyBase
 {
@@ -252,5 +254,7 @@ public:
     return new ROSServiceServerProxy<ROS_SERVICE_T>(service_name);
   }
 };
+
+}  // namespace rtt_roscomm
 
 #endif // ifndef __RTT_ROSCOMM_RTT_ROSSERVICE_PROXY_H
