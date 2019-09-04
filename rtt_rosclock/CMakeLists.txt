@@ -27,7 +27,8 @@ if(OROCOS_TARGET STREQUAL "xenomai")
   include_directories(${Xenomai_POSIX_INCLUDE_DIRS})
   set_target_properties(rtt_rosclock PROPERTIES 
     LINK_FLAGS ${XENOMAI_POSIX_LDFLAGS}
-    COMPILE_FLAGS ${XENOMAI_POSIX_CFLAGS} __XENO__
+    COMPILE_FLAGS ${XENOMAI_POSIX_CFLAGS}
+    COMPILE_DEFINITIONS __XENO__
   )
   target_link_libraries(rtt_rosclock ${XENOMAI_POSIX_LIBRARIES})
 endif()
