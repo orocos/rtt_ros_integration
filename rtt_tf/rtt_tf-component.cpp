@@ -163,8 +163,8 @@ namespace rtt_tf
 
     // Connect to tf_static topic
     ConnPolicy cp_static = ConnPolicy::buffer(prop_buffer_size);
-    cp.transport = 3; //3=ROS
-    cp.name_id = "/tf_static";
+    cp_static.transport = 3; //3=ROS
+    cp_static.name_id = "/tf_static";
 
     bool configured = port_tf_static_in.createStream(cp_static)
                     && port_tf_in.createStream(cp)
