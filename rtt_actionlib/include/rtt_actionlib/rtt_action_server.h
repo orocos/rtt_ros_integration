@@ -70,6 +70,9 @@ namespace rtt_actionlib {
     //! Check if the server is ready to be started
     bool ready();
 
+    //! \brief Shutdown internal timer
+    void shutdown();
+
     //! \brief Set up status publishing timers
     virtual void initialize();
 
@@ -166,6 +169,12 @@ namespace rtt_actionlib {
     bool RTTActionServer<ActionSpec>::ready() 
     {
       return action_bridge_.allConnected();
+    }
+
+  template <class ActionSpec>
+    void RTTActionServer<ActionSpec>::shutdown()
+    {
+	status_timer_.killTimer(0);
     }
 
   template <class ActionSpec>
