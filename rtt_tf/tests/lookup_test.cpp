@@ -55,6 +55,13 @@ int ORO_main(int argc, char** argv) {
     // Create deployer
     OCL::DeploymentComponent deployer;
 
+    // initialize ROS and load typekits
+    deployer.import("rtt_rosnode");
+    deployer.import("rtt_std_msgs");
+    deployer.import("rtt_geometry_msgs");
+    deployer.import("rtt_tf2_msgs");
+
+    // import and load our component
     deployer.import("rtt_tf");
     deployer.loadComponent("tf","rtt_tf::RTT_TF");
 

@@ -6,8 +6,6 @@ else()
   #add_definitions( -DRTT_COMPONENT )
 endif()
 
-include(AddFileDependencies)
-
 # Configure source and destination paths of generated files
 rtt_roscomm_destinations()
 
@@ -89,8 +87,6 @@ configure_file(
   rtt_rosservice_proxies.cpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp @ONLY )
 
-add_file_dependencies( ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp ${SRV_FILES})
-
 include_directories(
   ${USE_OROCOS_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
@@ -105,7 +101,6 @@ target_link_libraries(  rtt_${ROSPACKAGE}_rosservice_proxies ${catkin_LIBRARIES}
 if(DEFINED ${_package}_EXPORTED_TARGETS)
   add_dependencies(       rtt_${ROSPACKAGE}_rosservice_proxies ${${_package}_EXPORTED_TARGETS})
 endif()
-add_file_dependencies(  ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp "${CMAKE_CURRENT_LIST_FILE}")
 
 get_directory_property(_additional_make_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
 list(APPEND _additional_make_clean_files "${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp")

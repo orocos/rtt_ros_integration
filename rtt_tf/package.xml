@@ -16,16 +16,21 @@
 
   <build_depend>rtt</build_depend>
   <build_depend>tf</build_depend>
+  <build_depend>tf2</build_depend>
   <build_depend>rtt_roscomm</build_depend>
   <build_depend>rtt_geometry_msgs</build_depend>
+  <build_depend>rtt_tf2_msgs</build_depend>
 
   <run_depend>rtt</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>tf2</run_depend>
   <run_depend>rtt_roscomm</run_depend>
   <run_depend>rtt_geometry_msgs</run_depend>
+  <run_depend>rtt_tf2_msgs</run_depend>
 
   <export>
     <rtt_ros>
+      <plugin_depend>rtt_tf2_msgs</plugin_depend>
       <plugin_depend>rtt_roscomm</plugin_depend>
       <plugin_depend>rtt_geometry_msgs</plugin_depend>
     </rtt_ros>
