@@ -126,8 +126,6 @@ namespace rtt_rosclock {
     //! Keep running the thread loop if this is set to true
     bool process_callbacks_;
 
-    //! ROS NodeHandle for communication
-    ros::NodeHandle nh_;
     //! ROS /clock topic subscriber
     ros::Subscriber clock_subscriber_;
     //! Custom callback queue used in this thread

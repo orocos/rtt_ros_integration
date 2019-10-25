@@ -220,6 +220,8 @@ bool SimClockThread::initialize()
   {
     case SIM_CLOCK_SOURCE_ROS_CLOCK_TOPIC:
       {
+        ros::NodeHandle nh;
+
         // Get /use_sim_time parameter from ROS
         bool use_sim_time = false;
         ros::param::get("/use_sim_time", use_sim_time);
@@ -239,7 +241,7 @@ bool SimClockThread::initialize()
         ros::SubscribeOptions ops = ros::SubscribeOptions::create<rosgraph_msgs::Clock>(
             "/clock", 1, boost::bind(&SimClockThread::clockMsgCallback, this, _1),
             ros::VoidConstPtr(), &callback_queue_);
-        clock_subscriber_ = nh_.subscribe(ops);
+        clock_subscriber_ = nh.subscribe(ops);
 
         // The loop needs to run in order to call the callback queue
         process_callbacks_ = true;
