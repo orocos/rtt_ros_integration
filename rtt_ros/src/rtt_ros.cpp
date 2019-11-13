@@ -62,7 +62,7 @@ bool rtt_ros::import(const std::string& package)
     dep_names.push(package);
     deps_to_import.push_back(package);
 
-    const xmlChar * rtt_plugin_depend_xpath = xmlCharStrdup("/package/export/rtt_ros/plugin_depend/text()");
+    xmlChar * rtt_plugin_depend_xpath = xmlCharStrdup("/package/export/rtt_ros/plugin_depend/text()");
 
     while(!dep_names.empty()) 
     {
@@ -126,7 +126,9 @@ bool rtt_ros::import(const std::string& package)
         for(int i=0; i < xpath_obj->nodesetval->nodeNr; i++) {
           if(xpath_obj->nodesetval->nodeTab[i]) {
             std::ostringstream oss;
-            oss << xmlNodeGetContent(xpath_obj->nodesetval->nodeTab[i]);
+            xmlChar * dep_str = xmlNodeGetContent(xpath_obj->nodesetval->nodeTab[i]);
+            oss << dep_str;
+            xmlFree(dep_str);
             RTT::log(RTT::Debug) << "Found dependency \""<< oss.str() << "\"" <<RTT::endlog();
             dep_names.push(oss.str());
 
@@ -141,6 +143,7 @@ bool rtt_ros::import(const std::string& package)
       xmlFreeDoc(package_doc);
       xmlCleanupParser();
     }
+    xmlFree(rtt_plugin_depend_xpath);
 
     // Build path list by prepending paths from search_paths list to the RTT component path in reverse order without duplicates
     std::set<std::string> search_paths_seen;
