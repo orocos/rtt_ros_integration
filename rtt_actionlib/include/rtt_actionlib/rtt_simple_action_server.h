@@ -58,10 +58,9 @@ template <class ActionSpec> class RTTSimpleActionServer
 
 
 		/**
-		* Start action server in given TskContext.
-		* @param publish_feedback if true publish feedback periodically
+		* Start action server in given TaskContext.
 		*/
-		bool start(bool publish_feedback = false);
+		bool start();
 
 		/**
 		* Stop action server.
@@ -174,11 +173,10 @@ template <class ActionSpec> class RTTSimpleActionServer
 		}
 };
 
-template <class ActionSpec> bool RTTSimpleActionServer<ActionSpec>::start(bool publish_feedback) 
+template <class ActionSpec> bool RTTSimpleActionServer<ActionSpec>::start()
 {
 	if (ready()) {
 		action_server.start();
-		if (publish_feedback) action_server.initialize();
 		return true;
 	}
 	else return false;
