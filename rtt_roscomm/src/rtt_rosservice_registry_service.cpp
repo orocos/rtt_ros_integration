@@ -6,6 +6,8 @@
 #include <rtt_roscomm/rtt_rosservice_registry_service.h>
 #include <rtt_roscomm/rtt_rosservice_proxy.h>
 
+namespace rtt_roscomm {
+
 ROSServiceRegistryServicePtr ROSServiceRegistryService::s_instance_;
 
 ROSServiceRegistryServicePtr ROSServiceRegistryService::Instance()
@@ -101,7 +103,10 @@ static void loadROSServiceRegistryService()
   ROSServiceRegistryService::Instance();
 }
 
+}  // namespace rtt_roscomm
+
 using namespace RTT;
+using namespace rtt_roscomm;
 extern "C" {
   bool loadRTTPlugin(RTT::TaskContext* c){
     if (c != 0) return false;

@@ -10,6 +10,8 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_void.hpp>
 
+namespace rtt_roscomm {
+
 //! Abstract ROS Service Proxy
 class ROSServiceProxyBase
 {
@@ -259,5 +261,7 @@ public:
     return new ROSServiceServerProxy<ROS_SERVICE_T>(service_name);
   }
 };
+
+}  // namespace rtt_roscomm
 
 #endif // ifndef __RTT_ROSCOMM_RTT_ROSSERVICE_PROXY_H
