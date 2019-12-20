@@ -233,7 +233,7 @@ class ROSServiceProxyFactoryBase
 public:
 
   ROSServiceProxyFactoryBase(const std::string &service_type) : service_type_(service_type) { }
-
+  virtual ~ROSServiceProxyFactoryBase() { }
   //! Get the ROS service type
   const std::string& getType() { return service_type_; }
 
