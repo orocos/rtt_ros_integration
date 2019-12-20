@@ -108,15 +108,15 @@ static void loadROSServiceRegistryService()
 using namespace RTT;
 using namespace rtt_roscomm;
 extern "C" {
-  bool loadRTTPlugin(RTT::TaskContext* c){
+  RTT_EXPORT bool loadRTTPlugin(RTT::TaskContext* c){
     if (c != 0) return false;
     loadROSServiceRegistryService();
     return true;
   }
-  std::string getRTTPluginName (){
+  RTT_EXPORT std::string getRTTPluginName (){
     return "rosservice_registry";
   }
-  std::string getRTTTargetName (){
+  RTT_EXPORT std::string getRTTTargetName (){
     return OROCOS_TARGET_NAME;
   }
 }

@@ -1,4 +1,5 @@
 #include <rtt/RTT.hpp>
+#include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/internal/GlobalService.hpp>
 
 #include <rtt_rosclock/rtt_rosclock.h>
@@ -56,15 +57,15 @@ void loadROSClockService(){
 
 using namespace RTT;
 extern "C" {
-  bool loadRTTPlugin(RTT::TaskContext* c){
+  RTT_EXPORT bool loadRTTPlugin(RTT::TaskContext* c){
     if (c != 0) return false;
     loadROSClockService();
     return true;
   }
-  std::string getRTTPluginName (){
+  RTT_EXPORT std::string getRTTPluginName (){
     return "rosclock";
   }
-  std::string getRTTTargetName (){
+  RTT_EXPORT std::string getRTTTargetName (){
     return OROCOS_TARGET_NAME;
   }
 }
