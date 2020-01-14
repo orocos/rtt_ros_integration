@@ -117,22 +117,22 @@ TEST(TransportTest, VectorTest)
   EXPECT_FALSE(in.connected());
 }
 
-static int callback_called = 0;
+static std::map<int,int> callback_called;
 bool callback0(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
 {
-  ++callback_called;
+  ++callback_called[0];
   return true;
 }
 
 bool callback1()
 {
-  ++callback_called;
+  ++callback_called[1];
   return true;
 }
 
 void callback2()
 {
-  ++callback_called;
+  ++callback_called[2];
 }
 
 TEST(TransportTest, ServiceServerTest)
@@ -180,14 +180,14 @@ TEST(TransportTest, ServiceServerTest)
   EXPECT_TRUE(service_caller2.ready());
 
   // Call the service
-  EXPECT_EQ(0, callback_called);
+  EXPECT_TRUE(callback_called.empty());
   std_srvs::Empty empty;
   EXPECT_TRUE(service_caller0(empty.request, empty.response));
-  EXPECT_EQ(1, callback_called);
+  EXPECT_EQ(1, callback_called[0]);
   EXPECT_TRUE(service_caller1(empty.request, empty.response));
-  EXPECT_EQ(2, callback_called);
+  EXPECT_EQ(1, callback_called[1]);
   EXPECT_TRUE(service_caller2(empty.request, empty.response));
-  EXPECT_EQ(3, callback_called);
+  EXPECT_EQ(1, callback_called[2]);
 
   // Disconnect the service
   EXPECT_TRUE(rosservice.lock()->disconnect(service + "0"));
