@@ -14,6 +14,8 @@
 //  - void setBool(bool) // response.success = true and response.message will be empty
 //
 
+namespace rtt_roscomm {
+
 template<> struct ROSServiceServerOperationCallerWrapper<std_srvs::SetBool,1> {
   typedef bool Signature(bool, std::string&);
   typedef RTT::OperationCaller<Signature> ProxyOperationCallerType;
@@ -51,5 +53,7 @@ template<> struct ROSServiceServerOperationCallerWrapper<std_srvs::SetBool,4> {
     return true;
   }
 };
+
+}  // namespace rtt_roscomm
 
 #endif  // RTT_STD_SRVS_SETBOOL_H

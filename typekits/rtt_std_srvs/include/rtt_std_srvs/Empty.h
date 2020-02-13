@@ -12,6 +12,8 @@
 //  - void empty()
 //
 
+namespace rtt_roscomm {
+
 template<> struct ROSServiceServerOperationCallerWrapper<std_srvs::Empty,1> {
   typedef bool Signature();
   typedef RTT::OperationCaller<Signature> ProxyOperationCallerType;
@@ -28,5 +30,7 @@ template<> struct ROSServiceServerOperationCallerWrapper<std_srvs::Empty,2> {
     return true;
   }
 };
+
+}  // namespace rtt_roscomm
 
 #endif  // RTT_STD_SRVS_EMPTY_H

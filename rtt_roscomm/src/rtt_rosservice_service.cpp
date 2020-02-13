@@ -9,6 +9,8 @@
 using namespace RTT;
 using namespace std;
 
+namespace rtt_roscomm {
+
 /**
  * The globally loadable ROS service.
  */
@@ -215,4 +217,6 @@ public:
   std::map<std::string, ROSServiceClientProxyBase*> client_proxies_;
 };
 
-ORO_SERVICE_NAMED_PLUGIN(ROSServiceService, "rosservice")
+}  // namespace rtt_roscomm
+
+ORO_SERVICE_NAMED_PLUGIN(rtt_roscomm::ROSServiceService, "rosservice")

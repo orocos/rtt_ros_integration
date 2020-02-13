@@ -12,6 +12,8 @@
 
 namespace rtt_@ROSPACKAGE@_ros_service_proxies { 
 
+  using namespace rtt_roscomm;
+
   bool registerROSServiceProxies() {
     // Get the ros service registry service
     ROSServiceRegistryServicePtr rosservice_registry = ROSServiceRegistryService::Instance();

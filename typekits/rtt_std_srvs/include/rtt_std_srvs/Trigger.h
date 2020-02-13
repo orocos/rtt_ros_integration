@@ -13,6 +13,8 @@
 //  - std::string trigger() // response.success = true
 //
 
+namespace rtt_roscomm {
+
 template<> struct ROSServiceServerOperationCallerWrapper<std_srvs::Trigger,1> {
   typedef bool Signature(std::string &message_out);
   typedef RTT::OperationCaller<Signature> ProxyOperationCallerType;
@@ -40,5 +42,7 @@ template<> struct ROSServiceServerOperationCallerWrapper<std_srvs::Trigger,3> {
     return true;
   }
 };
+
+}  // namespace rtt_roscomm
 
 #endif  // RTT_STD_SRVS_TRIGGER_H

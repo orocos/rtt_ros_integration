@@ -4,6 +4,8 @@
 #include <rtt/RTT.hpp>
 #include <boost/shared_ptr.hpp>
 
+namespace rtt_roscomm {
+
 class ROSServiceRegistryService;
 class ROSServiceProxyFactoryBase;
 typedef boost::shared_ptr<ROSServiceRegistryService> ROSServiceRegistryServicePtr;
@@ -41,5 +43,7 @@ private:
   //! The singleton instance
   static ROSServiceRegistryServicePtr s_instance_;
 };
+
+}  // namespace rtt_roscomm
 
 #endif // __RTT_ROSSERVICE_RTT_ROSSERVICE_REGISTRY_SERVICE_H
