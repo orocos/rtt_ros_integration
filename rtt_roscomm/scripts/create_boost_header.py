@@ -1,15 +1,14 @@
 #!/usr/bin/env python
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import sys
-
-import roslib
-
 import gencpp
 import genmsg
 
-from  roslib import packages,msgs
 import os
 
-from cStringIO import StringIO
+from io import StringIO
 
 import argparse
 
@@ -92,11 +91,11 @@ def generate_boost_serialization(package, msg_path, msg_type, boost_header_path)
     (output_dir,filename) = os.path.split(boost_header_path)
     try:
         os.makedirs(output_dir)
-    except OSError, e:
+    except OSError:
         pass
 
-    f = open(boost_header_path, 'w')
-    print >> f, s.getvalue()
+    with open(boost_header_path, mode='w') as f:
+        print(s.getvalue(), file=f)
 
     s.close()
 
@@ -115,7 +114,7 @@ def create_boost_headers(argv, stdout, stderr):
 if __name__ == "__main__":
     try:
         create_boost_headers(sys.argv, sys.stdout, sys.stderr)
-    except Exception, e:
+    except Exception as e:
         sys.stderr.write("Failed to generate boost headers: " + str(e))
         raise
         #sys.exit(1)
