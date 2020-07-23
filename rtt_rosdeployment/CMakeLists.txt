@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rtt_rosdeployment)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros rtt_ros_msgs) 
+find_package(catkin REQUIRED COMPONENTS roscpp rtt_ros rtt_ros_msgs ocl-deployment)
 
+message(STATUS "ocl-deployment package found at: ${ocl-deployment_INCLUDE_DIRS}")
 include_directories(${catkin_INCLUDE_DIRS})
 
 orocos_use_package(ocl-deployment)
