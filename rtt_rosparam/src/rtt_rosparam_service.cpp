@@ -18,6 +18,8 @@
 #define ADD_ROSPARAM_OPERATION(return_type_str, return_type, func) \
   this->addOperation("get"#return_type_str, &ROSParamService::get##func< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam"); \
   this->addOperation("set"#return_type_str, &ROSParamService::set##func< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam"); \
+  this->addOperation("getParam"#return_type_str, &ROSParamService::getDirect##func< return_type , RELATIVE >, this).doc("Get directly a " #return_type " from rosparam, without a property"); \
+  this->addOperation("setParam"#return_type_str, &ROSParamService::set##func< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam, alias of: set"#return_type_str); \
   this->addOperation("get"#return_type_str"Relative", &ROSParamService::get##func< return_type , RELATIVE >, this).doc("Get a " #return_type " from rosparam using the relative resolution policy : `relative/param`"); \
   this->addOperation("set"#return_type_str"Relative", &ROSParamService::set##func< return_type , RELATIVE >, this).doc("Set a " #return_type " in rosparam using the relative resolution policy : `relative/param`"); \
   this->addOperation("get"#return_type_str"Absolute", &ROSParamService::get##func< return_type , ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the absolute resolution policy : `/global/param`"); \
@@ -168,6 +170,26 @@ private:
       return false;
     }
     return true;
+  }
+
+  template <typename T, ResolutionPolicy P> T getDirectParamImpl(const std::string& ros_param_name)
+  {
+    T get_value;
+    if (!ros::param::get(resolvedName(ros_param_name,P), get_value)) {
+      RTT::log(RTT::Debug) << "ROS Parameter \"" << ros_param_name << "\" not found on the parameter server!" << RTT::endlog();
+      return T();
+    }
+    return get_value;
+  }
+  
+  template <typename T, ResolutionPolicy P> Eigen::Matrix<T,Eigen::Dynamic,1> getDirectEigenVectorParamImpl(const std::string& ros_param_name)
+  {
+    std::vector<T> value;
+    if (!getParamImpl< std::vector<T> , P >(ros_param_name,value)) {
+      return Eigen::Matrix<T,Eigen::Dynamic,1>();
+    }
+    Eigen::Matrix<T,Eigen::Dynamic,1> get_eigen_vector = Eigen::Matrix<T,Eigen::Dynamic,1>::Map(value.data(),value.size());
+    return get_eigen_vector;
   }
 
   template <typename T, ResolutionPolicy P> void setParamImpl(const std::string& ros_param_name, const T& value)
