@@ -12,6 +12,7 @@
 
 #include <ros/ros.h>
 
+#include <rtt_rosparam/RosParamDataSource.hpp>
 #include <rtt_rosparam/rosparam.h>
 
 #ifndef ADD_ROSPARAM_OPERATION
@@ -157,6 +158,10 @@ public:
     ADD_ROSPARAM_OPERATION(EigenVectorXd, double, EigenVectorParamImpl)
     ADD_ROSPARAM_OPERATION(EigenVectorXf, float, EigenVectorParamImpl)
 
+    this->addOperation("addRosParamPropertyBool", &ROSParamService::addRosParamProperty<bool>, this)
+      .doc("Adds a Property to the owner component that is linked to a ROS property of the same name")
+      .arg("name", "name of the ROS parameter, the property generated will use the same name");
+
   }
 
 private:
@@ -239,6 +244,28 @@ private:
   bool setParamComponentPrivate(const std::string &name) { return set(name, COMPONENT_PRIVATE); }
   bool setParamComponentRelative(const std::string &name) { return set(name, COMPONENT_RELATIVE); }
   bool setParamComponentAbsolute(const std::string &name) { return set(name, COMPONENT_ABSOLUTE); }
+
+  /**
+   * Adds a ROS parameter of any type as a property to this bag.
+   * A Property is created which causes contents of the
+   * property always to be in sync
+   * with the contents of the ROS parameter.
+   * @param name The name of this property
+   * @return the Property object by reference, which you can further query or document.
+   */
+  template<typename T>
+  Property<T>& addRosParamProperty( const std::string& name) {
+  typename internal::AssignableDataSource<T>::shared_ptr datasource( new RTT::rosparam::RosParamDataSource<T>(name) );
+    // if (this->getOwner() == nullptr) {
+    //   return nullptr;
+    // }
+    // if (this->getOwner()->properties() == nullptr) {
+    //   return nullptr;
+    // }
+    Property<T>* p = new Property<T>(name,"", datasource);
+    this->getOwner()->properties()->ownProperty( p );
+    return *p;
+  }
 };
 
 const std::string ROSParamService::resolvedName(
