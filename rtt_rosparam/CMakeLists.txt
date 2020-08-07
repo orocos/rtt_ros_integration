@@ -12,12 +12,12 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS})
 
-  # Add the data source header
-  orocos_library(ros_param_data_source src/RosParamDataSource.cpp)
-    target_link_libraries(ros_param_data_source
-    ${catkin_LIBRARIES}
-  )
-  
+# Add the data source header
+orocos_library(ros_param_data_source src/RosParamDataSource.cpp)
+  target_link_libraries(ros_param_data_source
+  ${catkin_LIBRARIES}
+)
+
   # build ROS param as a separate service
 orocos_service(rtt_rosparam src/rtt_rosparam_service.cpp)
 target_link_libraries(rtt_rosparam 

@@ -72,7 +72,7 @@ namespace RTT
      */
     std::string mparam_name_;
     bool muse_cached_;
-    // T mdummy_;
+    mutable typename internal::DataSource<T>::value_t mcached_data_;
 
   public:
     /**
@@ -89,16 +89,18 @@ namespace RTT
       T return_value;
       if (muse_cached_) {
         if (!ros::param::getCached(mparam_name_, return_value)) {
+          // std::cerr << "The parameter " << mparam_name_ << " cannot be fetched." << std::endl;
           throw(std::range_error("The parameter " + mparam_name_ + " cannot be fetched."));
           return T();
         }
       } else {
         if (!ros::param::get(mparam_name_, return_value)) {
+          // std::cerr << "The parameter " << mparam_name_ << " cannot be fetched." << std::endl;
           throw(std::range_error("The parameter " + mparam_name_ + " cannot be fetched."));
           return T();
         }
       }
-      return return_value;
+      return mcached_data_ = return_value;
     }
 
     typename internal::DataSource<T>::result_t value() const
@@ -107,105 +109,72 @@ namespace RTT
     }
 
     // There is not referred element, no allocation exists for this data source and it is not an alias.
+    // But it needs to return something, because otherwise the .write() calls that require a rvalue()
+    // would fail. So we use an internal cache
     typename internal::DataSource<T>::const_reference_t rvalue() const
     {
+      return mcached_data_;
     }
 
     void set( typename internal::AssignableDataSource<T>::param_t t );
 
     // There is not referred element, no allocation exists for this data source and it is not an alias.
-    typename internal::AssignableDataSource<T>::reference_t set() {}
+    typename internal::AssignableDataSource<T>::reference_t set()
+    {
+      return mcached_data_;
+    }
 
     virtual RosParamDataSource<T>* clone() const;
 
     virtual RosParamDataSource<T>* copy( std::map<const base::DataSourceBase*, base::DataSourceBase*>& alreadyCloned ) const;
 
-    // typename AssignableDataSource<T>::reference_t set()
-    // {
-    //   return *mptr;
-    // }
-
-    // typename AssignableDataSource<T>::const_reference_t rvalue() const
-    // {
-    //   return *mptr;
-    // }
-
-    // I think I don't need these ones:
-    // virtual ReferenceDataSource<T>* clone() const;
-    // virtual ReferenceDataSource<T>* copy( std::map<const base::DataSourceBase*, base::DataSourceBase*>& alreadyCloned ) const;
-    // virtual ConstantDataSource<T>* clone() const;
-    // virtual ConstantDataSource<T>* copy( std::map<const base::DataSourceBase*, base::DataSourceBase*>& alreadyCloned ) const;
   }; // class RosParamDataSource
 
 
-    ///////////////////////////// 
-    // !! Example to follow !! //
-    /////////////////////////////
-    
-    // /**
-    //  * A DataSource which is used to manipulate a reference to an
-    //  * external value.
-    //  * @param T The result data type of get().
-    //  */
-    // template<typename T>
-    // class ReferenceDataSource
-	  //   : public AssignableDataSource<T>, public Reference
-    // {
-    //     // a pointer to a value_t
-    //     T* mptr;
-    // public:
-    //     /**
-    //      * Use shared_ptr.
-    //      */
-    //     ~ReferenceDataSource();
-
-    //     typedef boost::intrusive_ptr<ReferenceDataSource<T> > shared_ptr;
-
-    //     ReferenceDataSource( typename AssignableDataSource<T>::reference_t ref );
-
-    //     void setReference(void* ref)
-    //     {
-    //         mptr = static_cast<T*>(ref);
-    //     }
-    //     bool setReference(base::DataSourceBase::shared_ptr dsb)
-    //     {
-    //         typename AssignableDataSource<T>::shared_ptr ads = boost::dynamic_pointer_cast<AssignableDataSource<T> >(dsb);
-    //         if (ads) {
-		//     ads->evaluate();
-		//     mptr = &ads->set();
-		//     return true;
-	  //   } else {
-		//     return false;
-	  //   }
-    //     }
-
-    //     typename DataSource<T>::result_t get() const
-		// {
-		// 	return *mptr;
-		// }
-
-    //     typename DataSource<T>::result_t value() const
-		// {
-		// 	return *mptr;
-		// }
-
-    //     void set( typename RTT::internal::AssignableDataSource<T>::param_t t );
-
-    //     typename RTT::internal::AssignableDataSource<T>::reference_t set()
-		// {
-		// 	return *mptr;
-		// }
-
-    //     typename RTT::internal::AssignableDataSource<T>::const_reference_t rvalue() const
-		// {
-		// 	return *mptr;
-		// }
-
-    //     virtual ReferenceDataSource<T>* clone() const;
-
-    //     virtual ReferenceDataSource<T>* copy( std::map<const base::DataSourceBase*, base::DataSourceBase*>& alreadyCloned ) const;
-    // };
-
+  // template<>
+  // internal::DataSource<std::string>::result_t RosParamDataSource<std::string>::get() const
+  // {
+  //   std::string return_value;
+  //   if (muse_cached_) {
+  //     if (!ros::param::getCached(mparam_name_, return_value)) {
+  //       throw(std::range_error("The parameter " + mparam_name_ + " cannot be fetched."));
+  //       return std::string();
+  //     }
+  //   } else {
+  //     if (!ros::param::get(mparam_name_, return_value)) {
+  //       throw(std::range_error("The parameter " + mparam_name_ + " cannot be fetched."));
+  //       return std::string();
+  //     }
+  //   }
+  //   base::DataSourceBase::shared_ptr mobj = this->clone();
+  //   if (nullptr == mobj) {
+  //     std::cerr << "Couldn't cast the ds ptr into a base::DataSourceBase::shared_ptr" << std::endl;
+  //   }
+  //   // From DataSource.cpp:48
+  //   // std::ostream mystream("stream");
+  //   // mobj->getTypeInfo()->write(std::cout, mobj);
+  //   std::cout << "DataSource typed: " << mobj->getTypeInfo()->getTypeIdName() << std::endl;
+  //   return return_value;
+  // }
+  
+  // template<>
+  // internal::DataSource<double>::result_t RosParamDataSource<double>::get() const
+  // {
+  //   double return_value;
+  //   std::cout << " It is a double ! " << std::endl;
+  //   if (muse_cached_) {
+  //     if (!ros::param::getCached(mparam_name_, return_value)) {
+  //       throw(std::range_error("The parameter " + mparam_name_ + " cannot be fetched."));
+  //       return 0.0;
+  //     }
+  //   } else {
+  //     if (!ros::param::get(mparam_name_, return_value)) {
+  //       throw(std::range_error("The parameter " + mparam_name_ + " cannot be fetched."));
+  //       return 0.0;
+  //     }
+  //   }
+  //   return return_value;
+  // }
 
   template<typename T>
   RosParamDataSource<T>::~RosParamDataSource() {}
@@ -213,7 +182,8 @@ namespace RTT
   template<typename T>
   RosParamDataSource<T>::RosParamDataSource( std::string param_name, bool use_cached)
       : mparam_name_(param_name),
-        muse_cached_(use_cached)
+        muse_cached_(use_cached),
+        mcached_data_(T())
   {
   }
   template<typename T>
@@ -244,9 +214,8 @@ namespace RTT
 // /*
 //  * Extern template declarations for core data source types
 //  * (instantiated in DataSources.cpp)
-//  */
-// RTT_EXT_IMPL template class RTT::rosparam::RosParamDataSource< bool >;
-// RTT_EXT_IMPL template class RTT::rosparam::RosParamDataSource< std::string >;
+// */
 RTT_EXT_IMPL template class RTT::rosparam::RosParamDataSource< bool >;
+RTT_EXT_IMPL template class RTT::rosparam::RosParamDataSource< std::string >;
 
 #endif // __RTT_ROSPARAM__ROSPARAMDATASOURCE_HPP

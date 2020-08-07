@@ -66,6 +66,7 @@ namespace RTT {
  * Explicit template instantiation for core data source types
  */
 template class RTT::rosparam::RosParamDataSource< bool >;
+template class RTT::rosparam::RosParamDataSource< std::string >;
 
 
 // A possible application: new addRosParamProperty()
