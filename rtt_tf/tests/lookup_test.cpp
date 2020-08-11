@@ -33,7 +33,7 @@ public:
   }
   virtual ~LookupComponent()  { }
   bool configureHook() { 
-    subscribe_transform_("/world","/rtt_tf_test");
+    subscribe_transform_("rel_rtt_tf_test","rtt_tf_test");
     return true;
   }
   bool startHook() {
@@ -75,6 +75,7 @@ int ORO_main(int argc, char** argv) {
     // Connect components and deployer
     deployer.connectPeers(&lookup);
     deployer.setActivity("lookup",0.02,0,ORO_SCHED_OTHER);
+    deployer.setActivity("tf",0.1,0,ORO_SCHED_OTHER);
 
     // Connect services between the tf component and the broadcaster
     lookup.connectServices(tf_component);

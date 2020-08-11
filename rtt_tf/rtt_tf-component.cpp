@@ -80,7 +80,7 @@ namespace rtt_tf
   {
     tf2_msgs::TFMessage msg;
     // resolve names and copy transforms to message
-    msg.transforms.reserve(tforms.size());
+    msg.transforms.resize(tforms.size());
     std::transform(tforms.begin(), tforms.end(), msg.transforms.begin(), PrefixResolver(prefix));
     return msg;
   }
@@ -349,13 +349,17 @@ namespace rtt_tf
 
 void RTT_TF::listTrackers()
 {
-  RTT::log(RTT::Info) << "Listing existing trackers" << RTT::endlog();
+  Logger::In(this->getName());
+  const RTT::Logger::LogLevel config_level = RTT::Logger::Instance()->getLogLevel();
+  RTT::Logger::Instance()->setLogLevel(RTT::Logger::LogLevel::Info);
+  RTT::log() << "Listing existing trackers" << RTT::endlog();
   RTT::log(RTT::Info) << "(Source) <-> (Target) : [PortName]" << RTT::endlog();
   RTT::log(RTT::Info) << "----------------------------------" << RTT::endlog();
   for (const auto& entry : ports_trackers) {
     RTT::log(RTT::Info) << entry.first.second << " <-> " << entry.first.first <<
       " : [" <<entry.second->getName() << "]" << RTT::endlog();
   }
+  RTT::Logger::Instance()->setLogLevel(config_level);
 }
 }//namespace
 
