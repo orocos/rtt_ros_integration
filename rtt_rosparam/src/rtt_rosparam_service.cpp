@@ -271,6 +271,19 @@ private:
     this->getOwner()->properties()->ownProperty( p );
     return *p;
   }
+
+  /**
+   * An interface ready version of the addRosParamProperty() member function.
+   * The main difference is that it returns the Property instead of a reference
+   * to the Property.
+   * @param name The name of this property
+   * @return the Value o the Property.
+   */
+  template<typename T, ResolutionPolicy P>
+  RTT::Property<T> addRosParamPropertyIface( const std::string& name) {
+    return addRosParamProperty<T, P>(name);;
+  }
+
 };
 
 const std::string ROSParamService::resolvedName(
