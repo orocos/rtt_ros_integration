@@ -53,6 +53,7 @@ policy (see below).
 ##### Operations for getting single properties
 
 * **getParam(ros_name, rtt_name)** Get the ROS param **ros_name** and store it in the RTT property **rtt_name**. Use leaders like `~` and `/` for private and absolute resolution.
+* `getParam_type_(name)` Gets the value of a ROS param named `name`. The value returned is the default constructor if no `name` parameter can be found. Use leaders like `~` and `/` for private and absolute resolution.
 * **get(name ,policy)** Attempt to get the property named **name** (or populates the properties of a named RTT sub-service)
   from the ROS parameter namespace specified by **policy**.
 * **getRelative(name)**
@@ -63,6 +64,7 @@ policy (see below).
 ##### Operations for setting single properties
 
 * **setParam(ros_name, rtt_name)** Set the ROS param **ros_name** from the value in the RTT property **rtt_name**. Use leaders like `~` and `/` for private and absolute resolution.
+* `setParam_type(name, value)` Sets the value of the ROS param `name` to `value`. Use leaders like `~` and `/` for private and absolute resolution.
 * **set(name, policy)** Attempt to set the property named **name** (or stores the properties of a named RTT sub-service)
   in the ROS parameter namespace specified by **policy**.
 * **setRelative(name)**
@@ -135,7 +137,7 @@ class MyComponent : public RTT::TaskContext {
         all_params_found &= rosparam->getAbsolute("robot_description");
 
         // Get the ROS parameter "~publish_period"
-        all_params_found &= rosparam->getPrivate("publish_priod");
+        all_params_found &= rosparam->getPrivate("publish_period");
       }
       
       return all_params_found;
