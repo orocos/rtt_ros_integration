@@ -15,6 +15,8 @@
 #define ADD_ROSPARAM_SERVICE_CONSTRUCTOR(return_type_str) \
   ,get##return_type_str("get"#return_type_str) \
   ,set##return_type_str("set"#return_type_str) \
+  ,getParam##return_type_str("getParam"#return_type_str) \
+  ,setParam##return_type_str("setParam"#return_type_str) \
   ,get##return_type_str##Relative ("get"#return_type_str"Relative") \
   ,set##return_type_str##Relative ("set"#return_type_str"Relative") \
   ,get##return_type_str##Absolute ("get"#return_type_str"Absolute") \
@@ -33,6 +35,8 @@
 #define ADD_ROSPARAM_OPERATION_CALLER(return_type_str) \
   this->addOperationCaller(get##return_type_str); \
   this->addOperationCaller(set##return_type_str); \
+  this->addOperationCaller(getParam##return_type_str); \
+  this->addOperationCaller(setParam##return_type_str); \
   this->addOperationCaller(get##return_type_str##Relative); \
   this->addOperationCaller(set##return_type_str##Relative); \
   this->addOperationCaller(get##return_type_str##Absolute); \
@@ -51,6 +55,8 @@
 #define DECLARE_ROSPARAM_OPERATION_CALLER(return_type_str, return_type) \
   RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str; \
   RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str; \
+  RTT::OperationCaller<return_type(const std::string &)> getParam##return_type_str; \
+  RTT::OperationCaller<void(const std::string &, const return_type &)>  setParam##return_type_str; \
   RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str##Relative; \
   RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str##Relative; \
   RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str##Absolute; \
