@@ -6,6 +6,8 @@
 #include <tf2/buffer_core.h>
 #include <tf2_ros/transform_listener.h>
 
+#include <boost/shared_ptr.hpp>
+
 namespace rtt_tf
 {
   // Inherit from TaskContext and Transformer, the second is required in order to use tf_prefix

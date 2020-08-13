@@ -47,6 +47,7 @@
 
 #include "rtt_tf-component.hpp"
 #include <rtt/Component.hpp>
+#include <rtt/Logger.hpp>
 #include <ros/ros.h>
 
 #include <tf/tf.h>
@@ -206,10 +207,16 @@ namespace rtt_tf
     }
     // Publish the geometry messages obtained from the lookupTransform on
     // tracked transformations
-    for (const auto& tracker : ports_trackers) {
-      auto msg = lookupTransform(tracker.first.first, tracker.first.second);
-      tracker.second->write(msg);
-    }
+    // Range for not supported in ISO C++ 11
+    // for (const auto& tracker : ports_trackers) {
+    //   auto msg = lookupTransform(tracker.first.first, tracker.first.second);
+    //   tracker.second->write(msg);
+    // }
+    for(std::map<std::pair<std::string, std::string>, OutputPortGeometryTransfromStampedPtr>::iterator
+      it_tracker = ports_trackers.begin(); it_tracker != ports_trackers.end(); ++it_tracker) {
+      geometry_msgs::TransformStamped msg = lookupTransform(it_tracker->first.first, it_tracker->first.second);
+      it_tracker->second->write(msg);
+     }
   }
 
   bool RTT_TF::startHook()
@@ -218,8 +225,8 @@ namespace rtt_tf
       RTT::log(RTT::Warning) << "The period of the component is 0 (zero), so no"
         " updates form TF will be published automatically" << RTT::endlog();
     }
-    buffer_core = boost::make_shared<tf2::BufferCore>();
-    transform_listener = boost::make_shared<tf2_ros::TransformListener>(*buffer_core);
+    buffer_core = BufferCorePtr(new tf2::BufferCore());
+    transform_listener = TransformListenerPtr(new tf2_ros::TransformListener(*buffer_core));
     return true;
   }
 
@@ -351,13 +358,19 @@ void RTT_TF::listTrackers()
 {
   Logger::In(this->getName());
   const RTT::Logger::LogLevel config_level = RTT::Logger::Instance()->getLogLevel();
-  RTT::Logger::Instance()->setLogLevel(RTT::Logger::LogLevel::Info);
+  RTT::Logger::Instance()->setLogLevel(RTT::Logger::Info);
   RTT::log() << "Listing existing trackers" << RTT::endlog();
   RTT::log(RTT::Info) << "(Source) <-> (Target) : [PortName]" << RTT::endlog();
   RTT::log(RTT::Info) << "----------------------------------" << RTT::endlog();
-  for (const auto& entry : ports_trackers) {
-    RTT::log(RTT::Info) << entry.first.second << " <-> " << entry.first.first <<
-      " : [" <<entry.second->getName() << "]" << RTT::endlog();
+  // ISO C++ doesnt allow the next for, so need to use iterator
+  // for (const auto& entry : ports_trackers) {
+  //   RTT::log(RTT::Info) << entry.first.second << " <-> " << entry.first.first <<
+  //     " : [" <<entry.second->getName() << "]" << RTT::endlog();
+  // }
+  for(std::map<std::pair<std::string, std::string>, OutputPortGeometryTransfromStampedPtr>::iterator
+    it = ports_trackers.begin(); it != ports_trackers.end(); ++it) {
+    RTT::log(RTT::Info) << it->first.second << " <-> " << it->first.first <<
+      " : [" << it->second->getName() << "]" << RTT::endlog();
   }
   RTT::Logger::Instance()->setLogLevel(config_level);
 }
