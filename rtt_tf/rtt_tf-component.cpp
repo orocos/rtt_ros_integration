@@ -207,7 +207,7 @@ namespace rtt_tf
     }
     // Publish the geometry messages obtained from the lookupTransform on
     // tracked transformations
-    // Range for not supported in ISO C++ 11
+    // Range for not supported in ISO pre-C++ 11
     // for (const auto& tracker : ports_trackers) {
     //   auto msg = lookupTransform(tracker.first.first, tracker.first.second);
     //   tracker.second->write(msg);
@@ -225,7 +225,7 @@ namespace rtt_tf
       RTT::log(RTT::Warning) << "The period of the component is 0 (zero), so no"
         " updates form TF will be published automatically" << RTT::endlog();
     }
-    buffer_core = BufferCorePtr(new tf2::BufferCore());
+    buffer_core.reset(new tf2::BufferCore());
     transform_listener = TransformListenerPtr(new tf2_ros::TransformListener(*buffer_core));
     return true;
   }
@@ -336,8 +336,8 @@ namespace rtt_tf
   {
     Logger::In(this->getName());
     const std::pair<std::string, std::string> transfrom_pair(target, source);
-    const std::string name_transform = source + std::string("_") + target;
-    const std::string name_port = std::string("tracker_tf_") + name_transform;
+    const std::string name_transform = source + "_" + target;
+    const std::string name_port = "tracker_tf_" + name_transform;
     if (ports_trackers.find(transfrom_pair) != ports_trackers.end()) {
       RTT::log(RTT::Warning) << "The transfrom from " << source << " to " << target <<
         " is already tracked." << RTT::endlog();
