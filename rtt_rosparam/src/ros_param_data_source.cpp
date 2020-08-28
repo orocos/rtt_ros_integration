@@ -1,11 +1,11 @@
 /***************************************************************************
-  tag: Sergio Portoles  Thu Aug 06 14:30:00 CEST 2020  RosParamDataSource.cpp
+  tag: Sergio Portoles  Thu Aug 06 14:30:00 CEST 2020  ros_param_data_source.cpp
 
-                        RosParamDataSource.cpp -  description
+                        ros_param_data_source.cpp -  description
                            -------------------
     begin                : Thu Aug 06 2020
-    copyright            : (C) 2020 Peter Soetens
-    email                : peter.soetens@fmtc.be
+    copyright            : (C) 2020 Intermodalics, BVBA
+    email                : orocos-dev@orocos.org
 
  ***************************************************************************
  *   This library is free software; you can redistribute it and/or         *
@@ -36,10 +36,9 @@
  ***************************************************************************/
 
 
-#include "rtt_rosparam/RosParamDataSource.hpp"
+#include "rtt_rosparam/ros_param_data_source.hpp"
 
-namespace RTT {
-  namespace rosparam { 
+namespace rtt_rosparam { 
 
   // /**
   //  * Specialisation for std::string to keep capacity when set( ... ) is called.
@@ -59,28 +58,29 @@ namespace RTT {
   // {
   // }
 
-  } // namespace rosparam
-} // namespace RTT
+} // namespace rtt_rosparam
 
 /*
  * Explicit template instantiation for core data source types
  */
-template class RTT::rosparam::RosParamDataSource< bool >;
-template class RTT::rosparam::RosParamDataSource< std::string >;
+template class rtt_rosparam::RosParamDataSource< bool >;
+template class rtt_rosparam::RosParamDataSource< std::string >;
 
 
 // A possible application: new addRosParamProperty()
 //
 // /**
-//  * Adds a ROS parameter of any type as a property to this bag.
-//  * A Property is created which causes contents of the
-//  * property always to be in sync
-//  * with the contents of the ROS parameter.
+//  * Adds a ROS parameter of types supported by ROS param as a property to this
+//  * bag.
+//  * A Property is created which causes contents of the property always to be
+//  * in sync with the contents of the ROS parameter.
+//  * Supported ROS parameter types:
+//  * bool, int, std::string, double, float and its respective vector types.
 //  * @param name The name of this property
 //  * @return the Property object by reference, which you can further query or document.
 //  */
 // template<class T>
-// Property<T>& addRosParamProperty( const std::string& name) {
+// Property<T>& rtt_rosparam::addRosParamProperty( const std::string& name) {
 //   typename internal::AssignableDataSource<T>::shared_ptr datasource( new RTT::rosparam::RosParamDataSource<T>(name) );
 //     Property<T>* p = new Property<T>(name,"", datasource);
 //     this->ownProperty( p );

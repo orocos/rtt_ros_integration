@@ -13,8 +13,8 @@ include_directories(
   ${EIGEN3_INCLUDE_DIRS})
 
 # Add the data source header
-orocos_library(ros_param_data_source src/RosParamDataSource.cpp)
-  target_link_libraries(ros_param_data_source
+orocos_library(ros_param_data_source src/ros_param_data_source.cpp)
+target_link_libraries(ros_param_data_source
   ${catkin_LIBRARIES}
 )
 
@@ -28,7 +28,7 @@ target_link_libraries(rtt_rosparam
 
 # Generate install targets and pkg-config files
 orocos_install_headers(include/rtt_rosparam/rosparam.h)
-orocos_install_headers(include/rtt_rosparam/RosParamDataSource.hpp)
+orocos_install_headers(include/rtt_rosparam/ros_param_data_source.hpp)
 
 orocos_generate_package(
   INCLUDE_DIRS include ${EIGEN3_INCLUDE_DIRS}
