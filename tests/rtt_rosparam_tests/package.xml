@@ -15,7 +15,9 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>rtt_rosparam</build_depend>
+
   <test_depend>rostest</test_depend>
   <test_depend>rtt_geometry_msgs</test_depend>
+  <test_depend>cmake_common_scripts</test_depend>
 
 </package>

@@ -20,5 +20,6 @@
   <test_depend>rtt_std_srvs</test_depend>
   <test_depend>rosbash</test_depend> <!-- required for rosrun command -->
   <test_depend>rostest</test_depend>
+  <test_depend>cmake_common_scripts</test_depend>
 
 </package>

@@ -23,6 +23,8 @@
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>rtt_rosnode</run_depend>
 
+  <test_depend>cmake_common_scripts</test_depend>
+  
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <rtt_ros>

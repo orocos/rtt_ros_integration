@@ -32,6 +32,8 @@
   <run_depend>roslib</run_depend>
   <run_depend>libxml2</run_depend>
 
+  <test_depend>cmake_common_scripts</test_depend>
+
   <!--<run_depend>rtt_rosnode</run_depend>-->
   <!--<run_depend>rtt_rospack</run_depend>-->
   <!--<run_depend>rtt_rosparam</run_depend>-->

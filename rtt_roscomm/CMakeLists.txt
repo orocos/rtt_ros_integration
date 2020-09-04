@@ -30,6 +30,16 @@ orocos_service(rtt_rosservice
   src/rtt_rosservice_service.cpp)
 target_link_libraries(rtt_rosservice rtt_rosservice_registry ${catkin_LIBRARIES})
 
+# Add information coverage when needed
+if(CATKIN_ENABLE_TESTING)
+  option(USE_CODE_COVERAGE "Enables information coverage for tests" OFF)
+  if (USE_CODE_COVERAGE)
+    find_package(cmake_common_scripts)
+    message(STATUS "Added information coverage in package: ${CMAKE_PROJECT_NAME}")
+    add_code_coverage()
+  endif()
+endif()
+
 # Generate install targets and pkg-config files
 orocos_generate_package(
   INCLUDE_DIRS include

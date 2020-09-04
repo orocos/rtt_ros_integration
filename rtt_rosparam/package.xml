@@ -21,6 +21,8 @@
   <build_depend>eigen</build_depend>
   <build_export_depend>eigen</build_export_depend>
 
+  <test_depend>cmake_common_scripts</test_depend>
+
   <export>
     <rtt_ros>
       <plugin_depend>rtt_rosnode</plugin_depend>

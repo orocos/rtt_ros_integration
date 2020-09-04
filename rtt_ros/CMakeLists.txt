@@ -44,6 +44,16 @@ orocos_typekit(rtt-ros-primitives-typekit
   src/orocos/types/ros_string_type.cpp)
 target_link_libraries(rtt-ros-primitives-typekit ${catkin_LIBRARIES})
 
+# Add information coverage when needed
+if(CATKIN_ENABLE_TESTING)
+  option(USE_CODE_COVERAGE "Enables information coverage for tests" OFF)
+  if (USE_CODE_COVERAGE)
+    find_package(cmake_common_scripts)
+    message(STATUS "Added information coverage in package: ${CMAKE_PROJECT_NAME}")
+    add_code_coverage()
+  endif()
+endif()
+
 orocos_generate_package(
   INCLUDE_DIRS include
   DEPENDS rostime

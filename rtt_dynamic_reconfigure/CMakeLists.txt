@@ -25,6 +25,16 @@ install(
   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
 )
 
+# Add information coverage when needed
+if(CATKIN_ENABLE_TESTING)
+  option(USE_CODE_COVERAGE "Enables information coverage for tests" OFF)
+  if (USE_CODE_COVERAGE)
+    find_package(cmake_common_scripts)
+    message(STATUS "Added information coverage in package: ${CMAKE_PROJECT_NAME}")
+    add_code_coverage()
+  endif()
+endif()
+
 orocos_generate_package(
   DEPENDS roscpp dynamic_reconfigure
   DEPENDS_TARGETS rtt_ros
