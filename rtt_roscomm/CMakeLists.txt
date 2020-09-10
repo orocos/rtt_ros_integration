@@ -17,6 +17,10 @@ orocos_library(rtt_rostopic
   src/rtt_rostopic.cpp)
 target_link_libraries(rtt_rostopic ${catkin_LIBRARIES})
 
+orocos_library(passthrough_callback_queue
+  src/passthrough_callback_queue.cpp)
+target_link_libraries(passthrough_callback_queue ${catkin_LIBRARIES})
+
 orocos_service(rtt_rostopic_service
   src/rtt_rostopic_service.cpp
   src/rtt_rostopic_ros_publish_activity.cpp)

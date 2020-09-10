@@ -56,6 +56,7 @@
 #include <rtt/internal/ConnFactory.hpp>
 #include <ros/ros.h>
 
+#include <rtt_roscomm/passthrough_callback_queue.hpp>
 #include <rtt_roscomm/rtt_rostopic_ros_publish_activity.hpp>
 
 #ifndef RTT_VERSION_GTE
@@ -241,6 +242,7 @@ namespace rtt_roscomm {
     ros::NodeHandle ros_node;
     ros::NodeHandle ros_node_private;
     ros::Subscriber ros_sub;
+    PassthroughCallbackQueue prassthrough_callback_queue;
     
   public:
     /** 
@@ -264,9 +266,9 @@ namespace rtt_roscomm {
         RTT::log(RTT::Debug)<<"Creating ROS subscriber for port "<<port->getName()<<" on topic "<<policy.name_id<<RTT::endlog();
       }
       if(topicname.length() > 1 && topicname.at(0) == '~') {
-        ros_sub = ros_node_private.subscribe(policy.name_id.substr(1), policy.size > 0 ? policy.size : 1, &RosSubChannelElement::newData, this); // minimum queue_size 1
+        ros_sub = subscribe(ros_node_private, &prassthrough_callback_queue, policy.name_id.substr(1), policy.size > 0 ? policy.size : 1, &RosSubChannelElement::newData, this); // minimum queue_size 1
       } else {
-        ros_sub = ros_node.subscribe(policy.name_id, policy.size > 0 ? policy.size : 1, &RosSubChannelElement::newData, this); // minimum queue_size 1
+        ros_sub = subscribe(ros_node, &prassthrough_callback_queue, policy.name_id, policy.size > 0 ? policy.size : 1, &RosSubChannelElement::newData, this); // minimum queue_size 1
       }
     }
 
@@ -350,6 +352,6 @@ namespace rtt_roscomm {
 
       return channel;
     }
-  };
-} 
+  }; // class RosMsgTransporter
+} // namespace rtt_roscomm
 #endif
