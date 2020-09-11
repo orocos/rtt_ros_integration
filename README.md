@@ -329,16 +329,14 @@ RTT components. See [rtt_actionlib](rtt_actionlib) for more information.
 
 ## Acknowledgement
 
-Many thanks to [all previous contributors](https://github.com/orocos/rtt_ros2_integration/graphs/contributors) to this repository.
-
-It is the successor of [rtt_ros_integration](https://github.com/orocos/rtt_ros_integration) for ROS 1, and many ideas
-and some code snippets have been taken from contributions made by the following people over the years:
+Many thanks to [all the contributors](https://github.com/orocos/rtt_ros_integration/graphs/contributors) to this repository.
 
 - Peter Soetens
 - Ruben Smits
 - Jonathan Bohren
 - Johannes Meyer
 - Antoine Hoarau
+- Steven Bellens
 - ...and [others](https://github.com/orocos/rtt_ros_integration/graphs/contributors).
 
 This work has been funded with support from
