@@ -5,10 +5,7 @@
   <description>This stack contains all software necessary to build systems using both Orocos and ROS infrastructures</description>
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
 
-  <license>GPL</license>
   <license>BSD</license>
-  <license>LGPL</license>
-  <license>GPL + runtime exception</license>
 
   <url type="website">http://ros.org/wiki/rtt_ros_integration</url>
   <url type="bugtracker">https://github.com/orocos/rtt_ros_integration/issues</url>

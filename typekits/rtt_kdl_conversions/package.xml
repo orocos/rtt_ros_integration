@@ -4,7 +4,7 @@
   <description>
     This package contains the components of the kdl_conversions package
   </description>
-  <license>GPL</license>
+  <license>BSD</license>
   <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
 
   <author>Ruben Smits</author>
