@@ -1,6 +1,4 @@
 /***************************************************************************
- *tag: Sergio Portoles  Thu Aug 06 09:10:00 CEST 2020  ros_param_data_source.hpp
- *
  *        This file is part of the OROCOS toolchain ROS project
  *
  *                  (C) 2020, Intermodalics BVBA
@@ -33,7 +31,6 @@
 #ifndef __RTT_ROSPARAM__ROS_PARAM_DATA_SOURCE_HPP
 #define __RTT_ROSPARAM__ROS_PARAM_DATA_SOURCE_HPP
 
-// #include "mystd.hpp"
 #include "rtt/internal/DataSource.hpp"
 #include "rtt/internal/DataSourceTypeInfo.hpp"
 #include "rtt/internal/Reference.hpp"

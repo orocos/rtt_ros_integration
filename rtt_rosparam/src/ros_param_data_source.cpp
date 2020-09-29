@@ -1,6 +1,4 @@
 /*
- *tag: Sergio Portoles  Thu Aug 06 14:30:00 CEST 2020  ros_param_data_source.cpp
- *
  *        This file is part of the OROCOS toolchain ROS project
  *
  *                  (C) 2020, Intermodalics BVBA
