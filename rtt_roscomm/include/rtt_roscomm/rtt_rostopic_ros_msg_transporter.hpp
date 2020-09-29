@@ -1,38 +1,34 @@
-/***************************************************************************
+/*
  * tag: Ruben Smits  Tue Nov 16 09:18:49 CET 2010  ros_msg_transporter.hpp
  *
- *                       ros_msg_transporter.hpp -  description
- *                          -------------------
- *   begin                : Tue November 16 2010
- *   copyright            : (C) 2010 Ruben Smits
+ *        This file is part of the OROCOS toolchain ROS project
  *
- * Copyright (c) 2010, Ruben Smits
+ *         (C) 2010 Ruben Smits, ruben.smits@mech.kuleuven.be
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- * 
- * 1. Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the author nor the names of its contributors may
+ *    be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors
- * may be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 
 #ifndef __RTT_ROSCOMM_ROS_MSG_TRANSPORTER_HPP_
 #define __RTT_ROSCOMM_ROS_MSG_TRANSPORTER_HPP_
@@ -89,14 +85,14 @@ namespace rtt_roscomm {
 
   public:
 
-    /** 
+    /**
      * Contructor of to create ROS publisher ChannelElement, it will
      * create a topic from the name given by the policy.name_id, if
      * this is empty a default is created as hostname/componentname/portname/pid
-     * 
+     *
      * @param port port for which we will create a the ROS publisher
      * @param policy connection policy containing the topic name and buffer size
-     * 
+     *
      * @return ChannelElement that will publish data to topics
      */
     RosPubChannelElement(RTT::base::PortInterface* port, const RTT::ConnPolicy& policy) :
@@ -140,9 +136,9 @@ namespace rtt_roscomm {
       act->removePublisher( this );
     }
 
-    /** 
+    /**
      * Function to see if the ChannelElement is ready to receive inputs
-     * 
+     *
      * @return always true in our case
      */
     virtual bool inputReady() {
@@ -161,11 +157,11 @@ namespace rtt_roscomm {
         return ros_pub.getTopic();
     }
 
-    /** 
+    /**
      * Create a data sample, this could be used to allocate the necessary memory
-     * 
-     * @param sample 
-     * 
+     *
+     * @param sample
+     *
      * @return always true/WriteSuccess
      */
 #if RTT_VERSION_GTE(2,8,99)
@@ -182,9 +178,9 @@ namespace rtt_roscomm {
     }
 #endif
 
-    /** 
+    /**
      * signal from the port that new data is availabe to publish
-     * 
+     *
      * @return true if publishing succeeded
      */
     bool signal(){
@@ -192,7 +188,7 @@ namespace rtt_roscomm {
       //RTT::log(RTT::Debug) << "Requesting publish" << RTT::endlog();
       return act->trigger();
     }
-    
+
     void publish(){
       // this read should always succeed since signal() means 'data available in a data element'.
       typename RTT::base::ChannelElement<T>::shared_ptr input = this->getInput();
@@ -213,7 +209,7 @@ namespace rtt_roscomm {
       return true;
 #endif
     }
-    
+
   };
 
   /**
@@ -229,15 +225,15 @@ namespace rtt_roscomm {
     ros::NodeHandle ros_node;
     ros::NodeHandle ros_node_private;
     ros::Subscriber ros_sub;
-    
+
   public:
-    /** 
+    /**
      * Contructor of to create ROS subscriber ChannelElement, it will
      * subscribe to a topic with the name given by the policy.name_id
-     * 
+     *
      * @param port port for which we will create a the ROS publisher
      * @param policy connection policy containing the topic name and buffer size
-     * 
+     *
      * @return ChannelElement that will publish data to topics
      */
     RosSubChannelElement(RTT::base::PortInterface* port, const RTT::ConnPolicy& policy) :
@@ -281,7 +277,7 @@ namespace rtt_roscomm {
 
     /**
      * Callback function for the ROS subscriber, it will trigger the ChannelElement's signal function
-     * 
+     *
      * @param msg The received message
      */
     void newData(const RosType& msg){
@@ -339,5 +335,5 @@ namespace rtt_roscomm {
       return channel;
     }
   };
-} 
+}
 #endif
