@@ -1,40 +1,34 @@
 /***************************************************************************
-  tag: Sergio Portoles  Thu Aug 06 09:10:00 CEST 2020  ros_param_data_source.hpp
-
-                        ros_param_data_source.hpp -  description
-                           -------------------
-    begin                : Thu Aug 06 2020
-    copyright            : (C) 2020 Intermodalics, BVBA
-    email                : orocos-dev@orocos.org
-
- ***************************************************************************
- *   This library is free software; you can redistribute it and/or         *
- *   modify it under the terms of the GNU General Public                   *
- *   License as published by the Free Software Foundation;                 *
- *   version 2 of the License.                                             *
- *                                                                         *
- *   As a special exception, you may use this file as part of a free       *
- *   software library without restriction.  Specifically, if other files   *
- *   instantiate templates or use macros or inline functions from this     *
- *   file, or you compile this file and link it with other files to        *
- *   produce an executable, this file does not by itself cause the         *
- *   resulting executable to be covered by the GNU General Public          *
- *   License.  This exception does not however invalidate any other        *
- *   reasons why the executable file might be covered by the GNU General   *
- *   Public License.                                                       *
- *                                                                         *
- *   This library is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
- *   Lesser General Public License for more details.                       *
- *                                                                         *
- *   You should have received a copy of the GNU General Public             *
- *   License along with this library; if not, write to the Free Software   *
- *   Foundation, Inc., 59 Temple Place,                                    *
- *   Suite 330, Boston, MA  02111-1307  USA                                *
- *                                                                         *
- ***************************************************************************/
-
+ *tag: Sergio Portoles  Thu Aug 06 09:10:00 CEST 2020  ros_param_data_source.hpp
+ *
+ *        This file is part of the OROCOS toolchain ROS project
+ *
+ *                  (C) 2020, Intermodalics BVBA
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the author nor the names of its contributors may
+ *    be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 
 #ifndef __RTT_ROSPARAM__ROS_PARAM_DATA_SOURCE_HPP
 #define __RTT_ROSPARAM__ROS_PARAM_DATA_SOURCE_HPP
@@ -52,7 +46,7 @@
 #include <exception>
 
 using namespace RTT;
-  
+
 namespace rtt_rosparam {
 
 /**
@@ -86,7 +80,7 @@ public:
   {
   }
 
-  RosParamDataSource(std::string param_name_id)     
+  RosParamDataSource(std::string param_name_id)
       : mparam_name_(param_name_id),
         mcached_data_()
   {
