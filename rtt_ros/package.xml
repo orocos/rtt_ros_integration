@@ -7,7 +7,7 @@
     as well as several wrapper scripts to enable roslaunching of orocos
     programs.
   </description>
-  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <maintainer email="orocos-dev@orocos.org">Orocos Developers</maintainer>
 
   <license>BSD</license>
 
