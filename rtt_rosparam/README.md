@@ -42,7 +42,7 @@ policy (see below).
 ##### Operations for setting all properties
 * `setAll()` or `setAllComponentPrivate()` Stores all properties of this component (and its sub-services)
   on the ROS parameter server from the similarly-named property in the **COMPONENT**'s private namespace.
-* `setAllRelative()`` Stores all properties of this component (and its sub-services)
+* `setAllRelative()` Stores all properties of this component (and its sub-services)
   on the ROS parameter server from the similarly-named property in the relative namespace.
 * `setAllAbsolute()` Stores all properties of this component (and its sub-services)
   on the ROS parameter server from the similarly-named property in the absolute namespace.
@@ -72,13 +72,13 @@ policy (see below).
 
 ##### Operations to create properties linked to a ROS param
 
-The following operations of the `rosparam` service can be used to create Properties
+The following operations of the `rosparam` service can be used to create properties
 in the owner component that link to ROS parameters. When the properties are
 `evaluate()`-d through `get()` or `set()`, the ROS parameter server is queried.
 
 **IMPORTANT** Setting or getting the value of a ROS parameter through a
-Property is a non real-time safe operation and therefore it shouldn't be used
-in the `updateHook()` of a real-time periodic component.
+property is a non real-time safe operation and therefore it shouldn't be used
+from within a real-time component.
 
 * `addRosParamProperty_type_(name)` Adds a property of type `_type_` with name `name` to the owning task context which is linked to the ROS parameter with the same name in a `Relative` namespace resolution context.
 * `addRosParamProperty_type_Relative(name)` Adds a property of type `_type_` with name `name` to the owning task context which is linked to the ROS parameter with the same name in a `Relative` namespace resolution context.

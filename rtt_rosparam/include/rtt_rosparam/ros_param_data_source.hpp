@@ -34,6 +34,7 @@
 #include "rtt/internal/DataSource.hpp"
 #include "rtt/internal/DataSourceTypeInfo.hpp"
 #include "rtt/internal/Reference.hpp"
+#include "rtt/Logger.hpp"
 
 #include "ros/ros.h"
 #include "ros/param.h"
@@ -68,9 +69,7 @@ class RosParamDataSource
   mutable typename internal::DataSource<T>::value_t mcached_data_;
 
 public:
-  /**
-   * Use shared_ptr.
-   */
+
   typedef boost::intrusive_ptr< RosParamDataSource<T> > shared_ptr;
 
   ~RosParamDataSource()
@@ -90,12 +89,10 @@ public:
 
   bool evaluate() const
   {
-    T return_value;
-    if (!ros::param::getCached(mparam_name_, return_value)) {
-      throw std::out_of_range("The parameter " + mparam_name_ + " cannot be fetched.");
+    if (!ros::param::getCached(mparam_name_, mcached_data_)) {
+      RTT::log(RTT::Error) << "The value of parameter " + mparam_name_ + " could not be fetched." << RTT::endlog();
       return false;
     }
-    mcached_data_ = return_value;
     return true;
   }
 
@@ -115,13 +112,20 @@ public:
   void set( typename internal::AssignableDataSource<T>::param_t t )
   {
     set() = t;
-    ros::param::set(mparam_name_, t);
+    updated();
   }
 
-  // There is not referred element, no allocation exists for this data source and it is not an alias.
+  // There is not referred element, no allocation exists for this data source
+  // and it is not an alias.
+  // After working with the reference, if something was assigned, the data
+  // source may need a call to updated() after set()
   typename internal::AssignableDataSource<T>::reference_t set()
   {
     return mcached_data_;
+  }
+
+  void updated() {
+    ros::param::set(mparam_name_, mcached_data_);
   }
 
   virtual RosParamDataSource<T>* clone() const
