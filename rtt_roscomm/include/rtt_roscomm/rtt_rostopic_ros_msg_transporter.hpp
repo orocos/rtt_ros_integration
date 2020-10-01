@@ -56,6 +56,7 @@
 #include <rtt/internal/ConnFactory.hpp>
 #include <ros/ros.h>
 
+#include <rtt_roscomm/passthrough_callback_queue.hpp>
 #include <rtt_roscomm/rtt_rostopic_ros_publish_activity.hpp>
 
 #ifndef RTT_VERSION_GTE
@@ -147,8 +148,6 @@ namespace rtt_roscomm {
     }
 
     ~RosPubChannelElement() {
-      RTT::Logger::In in(topicname);
-//      RTT::log(RTT::Debug) << "Destroying RosPubChannelElement" << RTT::endlog();
       act->removePublisher( this );
     }
 
@@ -240,6 +239,7 @@ namespace rtt_roscomm {
     std::string topicname;
     ros::NodeHandle ros_node;
     ros::NodeHandle ros_node_private;
+    PassthroughCallbackQueue passthrough_callback_queue;
     ros::Subscriber ros_sub;
     
   public:
@@ -256,7 +256,14 @@ namespace rtt_roscomm {
       ros_node(),
       ros_node_private("~")
     {
-      topicname=policy.name_id;
+      topicname = policy.name_id;
+      ros::SubscribeOptions ops;
+      ops.template initByFullCallbackType<const RosType&>(
+          topicname,
+          1u,  // Always 1, since data can be buffered in RTT buffer
+          boost::bind(&RosSubChannelElement::newData, this, _1));
+      ops.callback_queue = &passthrough_callback_queue;
+
       RTT::Logger::In in(topicname);
       if (port->getInterface() && port->getInterface()->getOwner()) {
         RTT::log(RTT::Debug)<<"Creating ROS subscriber for port "<<port->getInterface()->getOwner()->getName()<<"."<<port->getName()<<" on topic "<<policy.name_id<<RTT::endlog();
@@ -264,15 +271,15 @@ namespace rtt_roscomm {
         RTT::log(RTT::Debug)<<"Creating ROS subscriber for port "<<port->getName()<<" on topic "<<policy.name_id<<RTT::endlog();
       }
       if(topicname.length() > 1 && topicname.at(0) == '~') {
-        ros_sub = ros_node_private.subscribe(policy.name_id.substr(1), policy.size > 0 ? policy.size : 1, &RosSubChannelElement::newData, this); // minimum queue_size 1
+        ops.topic = ops.topic.substr(1);
+        ros_sub = ros_node_private.subscribe(ops);
       } else {
-        ros_sub = ros_node.subscribe(policy.name_id, policy.size > 0 ? policy.size : 1, &RosSubChannelElement::newData, this); // minimum queue_size 1
+        ros_sub = ros_node.subscribe(ops);
       }
     }
 
     ~RosSubChannelElement() {
-      RTT::Logger::In in(topicname);
-//      RTT::log(RTT::Debug)<<"Destroying RosSubChannelElement"<<RTT::endlog();
+      ros_sub.shutdown();
     }
 
     virtual bool inputReady() {
@@ -350,6 +357,6 @@ namespace rtt_roscomm {
 
       return channel;
     }
-  };
-} 
+  }; // class RosMsgTransporter
+} // namespace rtt_roscomm
 #endif
