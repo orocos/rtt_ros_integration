@@ -1,7 +1,5 @@
-/***************************************************************************
- *        This file is part of the OROCOS toolchain ROS project
- *
- *                  (C) 2020, Intermodalics BVBA
+/*
+ * (C) 2020, Intermodalics BVBA
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -11,37 +9,31 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the author nor the names of its contributors may
- *    be used to endorse or promote products derived from this software
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef __RTT_ROSPARAM__ROS_PARAM_DATA_SOURCE_HPP
 #define __RTT_ROSPARAM__ROS_PARAM_DATA_SOURCE_HPP
 
 #include "rtt/internal/DataSource.hpp"
-#include "rtt/internal/DataSourceTypeInfo.hpp"
-#include "rtt/internal/Reference.hpp"
 #include "rtt/Logger.hpp"
 
-#include "ros/ros.h"
 #include "ros/param.h"
-#include "ros/names.h"
-
-#include <boost/function.hpp>
-#include <exception>
 
 using namespace RTT;
 
@@ -82,7 +74,8 @@ public:
   {
   }
 
-  typename internal::DataSource<T>::result_t get() const {
+  typename internal::DataSource<T>::result_t get() const
+  {
     (void) evaluate();
     return value();
   }
@@ -115,8 +108,7 @@ public:
     updated();
   }
 
-  // There is not referred element, no allocation exists for this data source
-  // and it is not an alias.
+  // The referenced element is a cache, since the source of the data is external.
   // After working with the reference, if something was assigned, the data
   // source may need a call to updated() after set()
   typename internal::AssignableDataSource<T>::reference_t set()
@@ -124,7 +116,8 @@ public:
     return mcached_data_;
   }
 
-  void updated() {
+  void updated()
+  {
     ros::param::set(mparam_name_, mcached_data_);
   }
 

@@ -251,8 +251,8 @@ private:
   /**
    * Adds a ROS parameter of supported types by ROS param as a property to this
    * bag.
-   * The new property mirror the value of the respective ROS parameter of the
-   * name.
+   * The new property mirrors the value of the respective ROS parameter of the
+   * same name.
    * Setting the value of the property sets the ROS parameter, and evaluating it
    * loads the current value from the ROS parameter server.
    * @param name The name of the ROS parameter and the property to be added.
