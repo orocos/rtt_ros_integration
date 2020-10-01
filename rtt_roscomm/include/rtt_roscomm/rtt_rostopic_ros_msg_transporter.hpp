@@ -260,7 +260,7 @@ namespace rtt_roscomm {
       ros::SubscribeOptions ops;
       ops.template initByFullCallbackType<const RosType&>(
           topicname,
-          policy.size > 0 ? policy.size : 1,  // minimum queue_size 1
+          1u,  // Always 1, since data can be buffered in RTT buffer
           boost::bind(&RosSubChannelElement::newData, this, _1));
       ops.callback_queue = &passthrough_callback_queue;
 
