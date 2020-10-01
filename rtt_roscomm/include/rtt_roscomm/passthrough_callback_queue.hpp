@@ -43,15 +43,11 @@ class PassthroughCallbackQueue: public ros::CallbackQueueInterface
      * Implementation of ros::CallbackQueueInterface::addCallback()
      * 
      * This method is executing the callback received instead of adding
-     * it to a queue. In this way, the queue is bypassed and immediately
-     * executed.
+     * it to a queue. In this way, the queue is bypassed and the callback is
+     * immediately executed.
      * 
      * @param callback callback to execute, instead of queueing
-     * @param owner_id Owner of the callback, in other implementations it might
-     *                 be used to remove the callback. In this implementation
-     *                 it has no effect.
-     * 
-     * @return void
+     * @param owner_id Not used
      */
     virtual void addCallback(
         const ros::CallbackInterfacePtr &callback,
@@ -63,8 +59,6 @@ class PassthroughCallbackQueue: public ros::CallbackQueueInterface
      * No-op
      * 
      * @param owner_id Not used.
-     * 
-     * @return void
      */
     virtual void removeByID(uint64_t owner_id) {}
 
