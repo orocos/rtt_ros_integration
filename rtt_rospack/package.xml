@@ -3,7 +3,7 @@
   <name>rtt_rospack</name>
   <version>2.9.2</version>
   <description>rtt_rospack provides an RTT plugin to use rospack to find packages in your ROS_PACKAGE_PATH</description>
-  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <maintainer email="orocos-dev@orocos.org">Orocos Developers</maintainer>
 
   <license>BSD</license>
 

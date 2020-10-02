@@ -5,7 +5,7 @@
   <description>
     This package provides an RTT plugin to add a ROS node to the RTT process.
   </description>
-  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <maintainer email="orocos-dev@orocos.org">Orocos Developers</maintainer>
 
   <license>BSD</license>
 
