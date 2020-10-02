@@ -22,53 +22,71 @@ policy (see below).
 
 #### Constants (name resolution policies):
 
-* ***RELATIVE***   Relative resolution:  "name" -> "name"
-* ***ABSOLUTE***   Absolute resolution:  "name" -> "/name"
-* ***PRIVATE***    Private resolution:   "name" -> "~name"
-* ***COMPONENT***  Component resolution: "name" -> "~COMPONENT\_NAME/name"
+* ***`RELATIVE`***   Relative resolution:  `"name"` -> `"name"`
+* ***`ABSOLUTE`***   Absolute resolution:  `"name"` -> `"/name"`
+* ***`PRIVATE`***    Private resolution:   `"name"` -> `"~name"`
+* ***`COMPONENT`***  Component resolution: `"name"` -> `"~COMPONENT_NAME/name"`
 
 #### Operations (getting/setting params)
 
 ##### Operations for getting all properties
-* **getAll()** or **getAllComponentPrivate()** Attempt to get all properties of this component (and its sub-services)
+* `getAll()` or `getAllComponentPrivate()` Attempt to get all properties of this component (and its sub-services)
   from the ROS parameter server in the **COMPONENT** namespace.
-* **getAllRelative()** Attempt to get all properties of this component (and its sub-services)
+* `getAllRelative()` Attempt to get all properties of this component (and its sub-services)
   from the ROS parameter server in the relative namespace.
-* **getAllAbsolute()** Attempt to get all properties of this component (and its sub-services)
+* `getAllAbsolute()` Attempt to get all properties of this component (and its sub-services)
   from the ROS parameter server in the absolute namespace.
-* **getAllPrivate()** Attempt to get all properties of this component (and its sub-services)
+* `getAllPrivate()` Attempt to get all properties of this component (and its sub-services)
   from the ROS parameter server in the node's private namespace.
 
 ##### Operations for setting all properties
-* **setAll()** or **setAllComponentPrivate()** Stores all properties of this component (and its sub-services)
+* `setAll()` or `setAllComponentPrivate()` Stores all properties of this component (and its sub-services)
   on the ROS parameter server from the similarly-named property in the **COMPONENT**'s private namespace.
-* **setAllRelative()** Stores all properties of this component (and its sub-services)
+* `setAllRelative()` Stores all properties of this component (and its sub-services)
   on the ROS parameter server from the similarly-named property in the relative namespace.
-* **setAllAbsolute()** Stores all properties of this component (and its sub-services)
+* `setAllAbsolute()` Stores all properties of this component (and its sub-services)
   on the ROS parameter server from the similarly-named property in the absolute namespace.
-* **setAllPrivate()** Stores all properties of this component (and its sub-services)
+* `setAllPrivate()` Stores all properties of this component (and its sub-services)
   on the ROS parameter server from the similarly-named property in the node's private namespace.
 
 
 ##### Operations for getting single properties
 
-* **getParam(ros_name, rtt_name)** Get the ROS param **ros_name** and store it in the RTT property **rtt_name**. Use leaders like `~` and `/` for private and absolute resolution.
-* **get(name ,policy)** Attempt to get the property named **name** (or populates the properties of a named RTT sub-service)
-  from the ROS parameter namespace specified by **policy**.
-* **getRelative(name)**
-* **getAbsolute(name)**
-* **getPrivate(name)**
-* **getComponentPrivate(name)**
+* `getParam(ros_name, rtt_name)` Get the ROS param `ros_name` and store it in the RTT property `rtt_name`. Use leaders like `~` and `/` for private and absolute resolution.
+* `get(name ,policy)` Attempt to get the property named `name` (or populates the properties of a named RTT sub-service)
+  from the ROS parameter namespace specified by `policy`.
+* `getRelative(name)`
+* `getAbsolute(name)`
+* `getPrivate(name)`
+* `getComponentPrivate(name)`
 
 ##### Operations for setting single properties
 
-* **setParam(ros_name, rtt_name)** Set the ROS param **ros_name** from the value in the RTT property **rtt_name**. Use leaders like `~` and `/` for private and absolute resolution.
-* **set(name, policy)** Attempt to set the property named **name** (or stores the properties of a named RTT sub-service)
-  in the ROS parameter namespace specified by **policy**.
-* **setRelative(name)**
-* **setAbsolute(name)**
-* **setPrivate(name)**
-* **setComponentPrivate(name)**
+* `setParam(ros_name, rtt_name)` Set the ROS param `ros_name` from the value in the RTT property `rtt_name`*. Use leaders like `~` and `/` for private and absolute resolution.
+* `set(name, policy)` Attempt to set the property named `name` (or stores the properties of a named RTT sub-service)
+  in the ROS parameter namespace specified by `policy`.
+* `setRelative(name)`
+* `setAbsolute(name)`
+* `setPrivate(name)`
+* `setComponentPrivate(name)`
+
+##### Operations to create properties linked to a ROS param
+
+The following operations of the `rosparam` service can be used to create properties
+in the owner component that link to ROS parameters. When the properties are
+`evaluate()`-d through `get()` or `set()`, the ROS parameter server is queried.
+
+**IMPORTANT** Setting or getting the value of a ROS parameter through a
+property is a non real-time safe operation and therefore it shouldn't be used
+from within a real-time component.
+
+* `addRosParamProperty_type_(name)` Adds a property of type `_type_` with name `name` to the owning task context which is linked to the ROS parameter with the same name in a `Relative` namespace resolution context.
+* `addRosParamProperty_type_Relative(name)` Adds a property of type `_type_` with name `name` to the owning task context which is linked to the ROS parameter with the same name in a `Relative` namespace resolution context.
+* `addRosParamProperty_type_Absolute(name)` Adds a property of type `_type_` with name `name` to the owning task context which is linked to the ROS parameter with the same name in a `Absolute` namespace resolution context.
+* `addRosParamProperty_type_Private(name)` Adds a property of type `_type_` with name `name` to the owning task context which is linked to the ROS parameter with the same name in a `Private` namespace resolution context.
+* `addRosParamProperty_type_ComponentPrivate(name)` Adds a property of type `_type_` with name `name` to the owning task context which is linked to the ROS parameter with the same name in a `ComponentPrivate` namespace resolution context.
+* `addRosParamProperty_type_ComponentAbsolute(name)` Adds a property of type `_type_` with name `name` to the owning task context which is linked to the ROS parameter with the same name in a `ComponentAbsolute` namespace resolution context.
+* `addRosParamProperty_type_ComponentRelative(name)` Adds a property of type `_type_` with name `name` to the owning task context which is linked to the ROS parameter with the same name in a `ComponentRelative` namespace resolution context.
 
 ### Scripting Interface
 
@@ -90,6 +108,16 @@ my_component.rosparam.getAll()
 my_component.rosparam.getAbsolute("robot_description")
 // Alternatively:
 my_component.rosparam.get("robot_description",my_component.rosparam.ABSOLUTE)
+
+// Create a property linked to a ROS parameter
+my_component.rosparam.addRosParamPropertyDouble("parameter_double")
+my_component.rosparam.addRosParamPropertyStringAbsolute("robot_name")
+
+// Change ROS parameter through Property
+my_component.parameter_double = 3.1
+my_component.parameter_double = other_component.other_double
+var double my_double
+my_component.parameter_double = my_double
 ```
 
 ### C++ Interface
@@ -97,9 +125,9 @@ my_component.rosparam.get("robot_description",my_component.rosparam.ABSOLUTE)
 If your component is designed to be used with ROS parameters, you can also
 easily access the rosparam service from C++ using an RTT ServiceRequester.
 
-For example, a simple component which gets the "robot\_description" ROS param
-from the global namespace ("/robot\_description") and the "publish\_period" ROS
-param from the node's private namespace ("~publish\_period") would look something
+For example, a simple component which gets the `"robot_description"` ROS param
+from the global namespace (`"/robot_description"`) and the `"publish_period"` ROS
+param from the node's private namespace (`"~publish_period"`) would look something
 like the following:
 
 ```cpp
@@ -118,6 +146,13 @@ class MyComponent : public RTT::TaskContext {
       // Add some properties
       this->addProperty("robot_description",robot_description_);
       this->addProperty("publish_period",publish_period_);
+      // Get the rosparam service requester
+      boost::shared_ptr<rtt_rosparam::ROSParam> rosparam =
+          this->getProvider<rtt_rosparam::ROSParam>("rosparam");
+      if(rosparam) {
+        // Add some more properties linked to ROS parameters
+        rosparam->addRosParamPropertyDouble("parameter_double");
+      }
     }
 
     // ... 
@@ -136,6 +171,9 @@ class MyComponent : public RTT::TaskContext {
 
         // Get the ROS parameter "~publish_period"
         all_params_found &= rosparam->getPrivate("publish_priod");
+
+        // Evaluate parameter (updates from)
+        this->getProperty("parameter_double")->value();
       }
       
       return all_params_found;
