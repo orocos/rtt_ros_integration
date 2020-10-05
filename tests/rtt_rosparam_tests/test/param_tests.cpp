@@ -642,55 +642,47 @@ TEST_F(ParamTest, SetValueOnParameterServer)
   compareValues(props, params, "set[Type]ComponentPrivate()", /* only_ros_types = */ true);
 }
 
-TEST_F(ParamTest, DirectAccessParameters)
-{
-  // initialize properties to some values
-  props.initialize();
-
-  // Read in ROS parameters directly (return value is the value)
-  rosparam->setParamBool("bool_parameter", props.bool_);
-  EXPECT_EQ(rosparam->getParamBool("bool_parameter"), props.bool_);
-  rosparam->setParamDouble("double_parameter", props.double_);
-  EXPECT_EQ(rosparam->getParamDouble("double_parameter"), props.double_);
-  rosparam->setParamFloat("float_parameter", props.float_);
-  EXPECT_EQ(rosparam->getParamFloat("float_parameter"), props.float_);
-  rosparam->setParamInt("int_parameter", props.int_);
-  EXPECT_EQ(rosparam->getParamInt("int_parameter"), props.int_);
-  rosparam->setParamString("string_parameter", props.string_);
-  EXPECT_EQ(rosparam->getParamString("string_parameter"), props.string_);
-}
-
 TEST_F(ParamTest, AddRosParamDataSources)
 {
   // initialize properties to some values
   props.initialize();
 
   // Read in parameters through data source
-  rosparam->setParamBool("bool_parameter", props.bool_);
+  ros::param::set("bool_parameter", props.bool_);
   EXPECT_EQ(rosparam->addRosParamPropertyBool("bool_parameter").value(), props.bool_);
-  rosparam->setParamDouble("double_parameter", props.double_);
+  ros::param::set("double_parameter", props.double_);
   EXPECT_EQ(rosparam->addRosParamPropertyDouble("double_parameter").value(), props.double_);
-  rosparam->setParamFloat("float_parameter", props.float_);
+  ros::param::set("float_parameter", props.float_);
   EXPECT_EQ(rosparam->addRosParamPropertyFloat("float_parameter").value(), props.float_);
-  rosparam->setParamInt("int_parameter", props.int_);
+  ros::param::set("int_parameter", props.int_);
   EXPECT_EQ(rosparam->addRosParamPropertyInt("int_parameter").value(), props.int_);
-  rosparam->setParamString("string_parameter", props.string_);
+  ros::param::set("string_parameter", props.string_);
   EXPECT_EQ(rosparam->addRosParamPropertyString("string_parameter").value(), props.string_);
 
   // change the props values to an alternative configuration
   props.initialize_alternative();
 
   // Write out paramters through data source
+  bool in_bool;
+  double in_double;
+  float in_float;
+  int in_int;
+  std::string in_string;
   dynamic_cast<RTT::Property<bool>*>(tc->getProperty("bool_parameter"))->set(props.bool_);
-  EXPECT_EQ(rosparam->getParamBool("bool_parameter"), props.bool_);
+  ros::param::get("bool_parameter", in_bool);
+  EXPECT_EQ(in_bool, props.bool_);
   dynamic_cast<RTT::Property<double>*>(tc->getProperty("double_parameter"))->set(props.double_);
-  EXPECT_EQ(rosparam->getParamDouble("double_parameter"), props.double_);
+  ros::param::get("double_parameter", in_double);
+  EXPECT_EQ(in_double, props.double_);
   dynamic_cast<RTT::Property<float>*>(tc->getProperty("float_parameter"))->set(props.float_);
-  EXPECT_EQ(rosparam->getParamFloat("float_parameter"), props.float_);
+  ros::param::get("float_parameter", in_float);
+  EXPECT_EQ(in_float, props.float_);
   dynamic_cast<RTT::Property<int>*>(tc->getProperty("int_parameter"))->set(props.int_);
-  EXPECT_EQ(rosparam->getParamInt("int_parameter"), props.int_);
+  ros::param::get("int_parameter", in_int);
+  EXPECT_EQ(in_int, props.int_);
   dynamic_cast<RTT::Property<std::string>*>(tc->getProperty("string_parameter"))->set(props.string_);
-  EXPECT_EQ(rosparam->getParamString("string_parameter"), props.string_);
+  ros::param::get("string_parameter", in_string);
+  EXPECT_EQ(in_string, props.string_);
 }
 
 TEST_F(ParamTest, GetValueFromParameterServer)
