@@ -1,13 +1,13 @@
 RTT TF
 ======
 
-This package provides an Orocos RTT component for utilizing the TF rigid body
-transform library from within Orocos. This component provides a "tf" service
+This package provides an Orocos RTT component for utilizing the [TF2 rigid body
+transform library](http://wiki.ros.org/tf2) from within Orocos. This component provides a "tf" service
 with operations for requesting and broadcasting sing and batch transforms.
 
 ### Usage
 
-In general, a given process only needs a single TF component. This component
+In general, a given process only needs a single TF2 component. This component
 provides the following operations both on its bare interface and also on the
 provided "tf" RTT service.
 
@@ -47,7 +47,7 @@ connectServices("my_component","tf");
 
 The [rtt\_tf/tf\_interface.h](include/rtt_tf/tf_interface.h) header includes the
 `rtt_tf::TFInterface` class which adds a required service to a given RTT
-component. This can be used for more easily connecting with the TF component.
+component. This can be used for more easily connecting with the TF2 component.
 
 It can be used to create the RTT service requester "tf" like so:
 

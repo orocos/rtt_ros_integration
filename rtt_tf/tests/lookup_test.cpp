@@ -15,20 +15,25 @@ public:
     <geometry_msgs::TransformStamped(const std::string &, const std::string &, const ros::Time &)> lookup_;
   RTT::OperationCaller
     <geometry_msgs::TransformStamped(const std::string &, const std::string &)> lookup_now_;
+  RTT::OperationCaller
+    <bool(const std::string &, const std::string &)> subscribe_transform_;
   geometry_msgs::TransformStamped tform_, tform_now_;
 
   LookupComponent(const std::string &name) :
     RTT::TaskContext(name, RTT::TaskContext::PreOperational)
     ,lookup_("lookupTransformAtTime")
     ,lookup_now_("lookupTransform")
+    ,subscribe_transform_("subscribeTransform")
   {
     this->addProperty("tform",tform_);
     this->addProperty("tform_now",tform_now_);
     this->requires("tf")->addOperationCaller(lookup_);
     this->requires("tf")->addOperationCaller(lookup_now_);
+    this->requires("tf")->addOperationCaller(subscribe_transform_);
   }
   virtual ~LookupComponent()  { }
   bool configureHook() { 
+    subscribe_transform_("rel_rtt_tf_test","rtt_tf_test");
     return true;
   }
   bool startHook() {
@@ -55,6 +60,13 @@ int ORO_main(int argc, char** argv) {
     // Create deployer
     OCL::DeploymentComponent deployer;
 
+    // initialize ROS and load typekits
+    deployer.import("rtt_rosnode");
+    deployer.import("rtt_std_msgs");
+    deployer.import("rtt_geometry_msgs");
+    deployer.import("rtt_tf2_msgs");
+
+    // import and load our component
     deployer.import("rtt_tf");
     deployer.loadComponent("tf","rtt_tf::RTT_TF");
 
@@ -63,6 +75,7 @@ int ORO_main(int argc, char** argv) {
     // Connect components and deployer
     deployer.connectPeers(&lookup);
     deployer.setActivity("lookup",0.02,0,ORO_SCHED_OTHER);
+    deployer.setActivity("tf",0.1,0,ORO_SCHED_OTHER);
 
     // Connect services between the tf component and the broadcaster
     lookup.connectServices(tf_component);

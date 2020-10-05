@@ -326,3 +326,40 @@ respectively. See [rtt_roscomm](rtt_roscomm) for more information.
 The `rtt_actionlib` package provides a C++ API and an RTT service for
 implementing [actionlib](http://www.ros.org/wiki/actionlib) actions with Orocos
 RTT components. See [rtt_actionlib](rtt_actionlib) for more information.
+
+## Acknowledgement
+
+Many thanks to [all the contributors](https://github.com/orocos/rtt_ros_integration/graphs/contributors) to this repository.
+
+- Peter Soetens
+- Ruben Smits
+- Jonathan Bohren
+- Johannes Meyer
+- Antoine Hoarau
+- Steven Bellens
+- ...and [others](https://github.com/orocos/rtt_ros_integration/graphs/contributors).
+
+This work has been funded with support from
+
+<a href="https://www.houstonmechatronics.com/">
+  <img src="https://s27934.pcdn.co/wp-content/uploads/2020/03/HMI_LOGO_OLD_Black_01-1.png"
+       alt="Houston Mechatronics Logo" height="60">
+
+  Houston Mechatronics
+</a>
+
+and
+
+<a href="http://rosin-project.eu">
+  <img src="http://rosin-project.eu/wp-content/uploads/rosin_ack_logo_wide.png" 
+       alt="rosin_logo" height="60" >
+</a>
+
+Supported by ROSIN - ROS-Industrial Quality-Assured Robot Software Components.  
+More information: <a href="http://rosin-project.eu">rosin-project.eu</a>
+
+<img src="http://rosin-project.eu/wp-content/uploads/rosin_eu_flag.jpg" 
+     alt="eu_flag" height="45" align="left" >  
+
+This project has received funding from the European Union’s Horizon 2020  
+research and innovation programme under grant agreement no. 732287.

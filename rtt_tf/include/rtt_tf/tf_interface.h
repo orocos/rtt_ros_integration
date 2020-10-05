@@ -18,13 +18,19 @@ namespace rtt_tf {
       lookupTransformAtTime("lookupTransformAtTime"),
       broadcastTransform("broadcastTransform"),
       broadcastTransforms("broadcastTransforms"),
-      canTransform("canTransform")
+      broadcastStaticTransform("broadcastStaticTransform"),
+      broadcastStaticTransforms("broadcastStaticTransforms"),
+      canTransform("canTransform"),
+      canTransformAtTime("canTransformAtTime")
     {
       owner->requires("tf")->addOperationCaller(lookupTransform);
       owner->requires("tf")->addOperationCaller(lookupTransformAtTime);
       owner->requires("tf")->addOperationCaller(broadcastTransform);
       owner->requires("tf")->addOperationCaller(broadcastTransforms);
+      owner->requires("tf")->addOperationCaller(broadcastStaticTransform);
+      owner->requires("tf")->addOperationCaller(broadcastStaticTransforms);
       owner->requires("tf")->addOperationCaller(canTransform);
+      owner->requires("tf")->addOperationCaller(canTransformAtTime);
     }
 
     //! Check if the operations are ready
@@ -34,14 +40,20 @@ namespace rtt_tf {
         lookupTransformAtTime.ready() &&
         broadcastTransform.ready() &&
         broadcastTransforms.ready() &&
-        canTransform.ready();
+        broadcastStaticTransform.ready() &&
+        broadcastStaticTransforms.ready() &&
+        canTransform.ready() &&
+        canTransformAtTime.ready();
     }
 
     RTT::OperationCaller<geometry_msgs::TransformStamped(const std::string&, const std::string&)> lookupTransform;
     RTT::OperationCaller<geometry_msgs::TransformStamped(const std::string&, const std::string&, const ros::Time&)> lookupTransformAtTime;
     RTT::OperationCaller<void(const geometry_msgs::TransformStamped&)> broadcastTransform;
     RTT::OperationCaller<void(const std::vector<geometry_msgs::TransformStamped>&)> broadcastTransforms;
+    RTT::OperationCaller<void(const geometry_msgs::TransformStamped&)> broadcastStaticTransform;
+    RTT::OperationCaller<void(const std::vector<geometry_msgs::TransformStamped>&)> broadcastStaticTransforms;
     RTT::OperationCaller<bool(const std::string&, const std::string&)> canTransform;
+    RTT::OperationCaller<bool(const std::string&, const std::string&, const ros::Time&)> canTransformAtTime;
   };
 }
 

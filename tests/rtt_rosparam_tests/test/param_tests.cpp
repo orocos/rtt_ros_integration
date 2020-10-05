@@ -80,10 +80,10 @@ class ParamTest : public ::testing::Test {
     tc->addProperty("vchar", props.v_char_);
     tc->addProperty("vuchar", props.v_uchar_);
     tc->addProperty("vbool", props.v_bool_);
-
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
     tc->addProperty("eigenvectordouble", props.eigenvector_double_);
     tc->addProperty("eigenvectorfloat", props.eigenvector_float_);
-
+#endif
     // Struct parameters
     tc->addProperty("bag", props.bag_);
     tc->addProperty("vector3", props.vector3_);
@@ -122,9 +122,10 @@ class ParamTest : public ::testing::Test {
     std::vector<char> v_char_;
     std::vector<unsigned char> v_uchar_;
     std::vector<bool> v_bool_;
-
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
     Eigen::VectorXd eigenvector_double_;
     Eigen::VectorXf eigenvector_float_;
+#endif
 
     // Struct parameters
     RTT::PropertyBag bag_;
@@ -155,8 +156,10 @@ class ParamTest : public ::testing::Test {
       v_uchar_.push_back(uchar_);
       v_bool_.push_back(bool_);
 
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
       eigenvector_double_ = Eigen::Vector3d(5.0, 6.0, 7.0);
       eigenvector_float_ = Eigen::Vector3f(8.0f, 9.0f, 10.0f);
+#endif
 
       // Struct parameters
       bag_.clear();
@@ -187,8 +190,10 @@ class ParamTest : public ::testing::Test {
       v_uchar_.clear();
       v_bool_.clear();
 
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
       eigenvector_double_.setZero(0);
       eigenvector_float_.setZero(0);
+#endif
 
       bag_.clear();
       bag_.ownProperty(new RTT::Property<std::string>("string", "", std::string()));
@@ -230,12 +235,14 @@ class ParamTest : public ::testing::Test {
     }
     EXPECT_TRUE(ros::param::get(prefix + "vbool", data.v_bool_));
 
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
     std::vector<double> v_temp_double;
     EXPECT_TRUE(ros::param::get(prefix + "eigenvectordouble", v_temp_double));
     data.eigenvector_double_ = Eigen::Map<Eigen::VectorXd>(v_temp_double.data(), v_temp_double.size());
     std::vector<float> v_temp_float;
     EXPECT_TRUE(ros::param::get(prefix + "eigenvectorfloat", v_temp_float));
     data.eigenvector_float_ = Eigen::Map<Eigen::VectorXf>(v_temp_float.data(), v_temp_float.size());
+#endif
 
     if (!only_ros_types) {
       data.bag_.clear();
@@ -286,10 +293,12 @@ class ParamTest : public ::testing::Test {
     ros::param::set(prefix + "vuchar", vtemp);
     ros::param::set(prefix + "vbool", data.v_bool_);
 
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
     std::vector<double> v_temp_double(data.eigenvector_double_.data(), data.eigenvector_double_.data() + data.eigenvector_double_.size());
     ros::param::set(prefix + "eigenvectordouble", v_temp_double);
     std::vector<float> v_temp_float(data.eigenvector_float_.data(), data.eigenvector_float_.data() + data.eigenvector_float_.size());
     ros::param::set(prefix + "eigenvectorfloat", v_temp_float);
+#endif
 
     XmlRpc::XmlRpcValue bag_xmlrpc;
     (void) bag_xmlrpc.begin(); // force struct type
@@ -341,8 +350,10 @@ class ParamTest : public ::testing::Test {
     }
     EXPECT_EQ(expected.v_bool_, actual.v_bool_) << "bool vectors do not match in " << test_name;
 
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
     EXPECT_EQ(expected.eigenvector_double_, actual.eigenvector_double_) << "Eigen::VectorXd values do not match in " << test_name;
     EXPECT_EQ(expected.eigenvector_float_, actual.eigenvector_float_) << "Eigen::VectorXf values do not match in " << test_name;
+#endif
     if (!only_ros_types) {
       EXPECT_EQ(expected.bag_, actual.bag_) << "PropertyBag contents do not match in " << test_name;
       EXPECT_EQ(expected.vector3_.x, actual.vector3_.x) << "geometry_msgs/Vector3 values do not match in " << test_name;
@@ -587,8 +598,10 @@ TEST_F(ParamTest, SetValueOnParameterServer)
   rosparam->setVectorOfFloatComponentPrivate("vfloat", props.v_float_);
   rosparam->setVectorOfIntComponentPrivate("vint", props.v_int_);
   rosparam->setVectorOfBoolComponentPrivate("vbool", props.v_bool_);
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
   rosparam->setEigenVectorXdComponentPrivate("eigenvectordouble", props.eigenvector_double_);
   rosparam->setEigenVectorXfComponentPrivate("eigenvectorfloat", props.eigenvector_float_);
+#endif
   getParameters("~" + tc->getName() + "/", params, /* only_ros_types = */ true);
   compareValues(props, params, "set[Type]ComponentPrivate()", /* only_ros_types = */ true);
 }
@@ -611,8 +624,10 @@ TEST_F(ParamTest, GetValueFromParameterServer)
   EXPECT_TRUE(rosparam->getVectorOfFloatComponentPrivate("vfloat", props.v_float_));
   EXPECT_TRUE(rosparam->getVectorOfIntComponentPrivate("vint", props.v_int_));
   EXPECT_TRUE(rosparam->getVectorOfBoolComponentPrivate("vbool", props.v_bool_));
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
   EXPECT_TRUE(rosparam->getEigenVectorXdComponentPrivate("eigenvectordouble", props.eigenvector_double_));
   EXPECT_TRUE(rosparam->getEigenVectorXfComponentPrivate("eigenvectorfloat", props.eigenvector_float_));
+#endif
   compareValues(params, props, "get[Type]ComponentPrivate()", /* only_ros_types = */ true);
 }
 

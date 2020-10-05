@@ -6,8 +6,6 @@ else()
   #add_definitions( -DRTT_COMPONENT )
 endif()
 
-include(AddFileDependencies)
-
 # Configure source and destination paths of generated files
 rtt_roscomm_destinations()
 
@@ -76,12 +74,18 @@ foreach( FILE ${SRV_FILES} )
 
 endforeach()
 
+# Include custom headers provided by the typekit package
+set(ROS_SRV_EXTRA_HEADERS)
+if(ros_generate_rtt_service_proxies_EXTRA_INCLUDES)
+  foreach( header ${ros_generate_rtt_service_proxies_EXTRA_INCLUDES} )
+    set(ROS_SRV_EXTRA_HEADERS "${ROS_SRV_EXTRA_HEADERS}#include <${header}>\n")
+  endforeach()
+endif()
+
 # Service proxy factories
 configure_file(
   rtt_rosservice_proxies.cpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp @ONLY )
-
-add_file_dependencies( ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp ${SRV_FILES})
 
 include_directories(
   ${USE_OROCOS_INCLUDE_DIRS}
@@ -89,13 +93,14 @@ include_directories(
   ${${_package}_INCLUDE_DIRS})
 
 # Targets
-set(CMAKE_BUILD_TYPE MinSizeRel)
+if(NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CMAKE_BUILD_TYPE MinSizeRel)
+endif()
 orocos_service(         rtt_${ROSPACKAGE}_rosservice_proxies ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp)
 target_link_libraries(  rtt_${ROSPACKAGE}_rosservice_proxies ${catkin_LIBRARIES} ${USE_OROCOS_LIBRARIES})
 if(DEFINED ${_package}_EXPORTED_TARGETS)
   add_dependencies(       rtt_${ROSPACKAGE}_rosservice_proxies ${${_package}_EXPORTED_TARGETS})
 endif()
-add_file_dependencies(  ${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp "${CMAKE_CURRENT_LIST_FILE}")
 
 get_directory_property(_additional_make_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
 list(APPEND _additional_make_clean_files "${CMAKE_CURRENT_BINARY_DIR}/rtt_rosservice_proxies.cpp")

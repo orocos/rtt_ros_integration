@@ -1,3 +1,7 @@
+import("rtt_rosnode")
+import("rtt_std_msgs")
+import("rtt_geometry_msgs")
+import("rtt_tf2_msgs")
 import("rtt_tf")
 loadComponent("tf","rtt_tf::RTT_TF")
 tf.configure()

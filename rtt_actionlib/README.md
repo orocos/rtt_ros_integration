@@ -138,6 +138,95 @@ some_component_name.actionlib.connectSub(
 
 ```
 
+### RTTSimpleActionServer 
+
+`RTTSimpleActionServer` is simple version of action server which able to pursue only one goal at one time.
+It depends on EventPort callbacks so unable to function if component is not Running or callbacks behavior is changed by redefining `dataOnPortHook()`.
+
+`RTTSimpleActionServer` implements following goal policy:
+* New goals gets PENDING status and stored in buffer. It cancels old pending goal if it presents.
+    After receiving new goal `newGoalHook` callback is called, also `isPending()` and `getPendingGoal()` methods can be used to poll pending goal.
+* Pending goal can be accepted (`acceptPending()`) or rejected (`rejectPending()`). If accepted pending goal preempts current active goal if it presents. So only one goal can be active at time.
+* State of active goal can be checked with `isActive()`, `getActiveGoal()` and `isPreemting()` calls.
+* Cancel request causes pending goal to be canceled immediately. Active goal changes state to PREEMTING and `cancelGoalHook` is called. Preemting state can be checked by `isPreemting()` call.
+* State of active goal can be changed by `succeedActive()`, `cancelActive()`, `abortActive()` calls.
+
+```cpp
+class Component : public TaskContext
+{
+    protected:
+        // Goal, Feedback, Result typedefs
+        ACTION_DEFINITION(ActionSpec);    
+
+    protected:
+        RTTSimpleActionServer<ActionSpec> action_server;
+        // Current goal cache
+        Goal goal;
+
+        // new pending goal is received
+        void newGoalHook(const Goal& pending_goal) {
+            // check if goal is valid
+            if (!isOk(pending_goal)) action_server.rejectPending(result);
+            else { 
+                goal = pending_goal;
+                action_server.acceptPending(result);
+            }
+        }
+
+        // active goal is being cancelled.
+        void cancelGoalHook() {
+            // cancel goal
+            action_server.cancelActive(result);
+        }
+
+
+    public:
+        Component(std::string const& name) : 
+            action_server(this->provides())
+        {
+            // action server hook registration
+            action_server.setGoalHook(boost::bind(&SomeComponent::newGoalHook, this, _1));
+            action_server.setCancelHook(boost::bind(&SomeComponent::cancelGoalHook, this));
+        }
+
+        bool updateHook() {
+            if (action_server.isActive()) {
+                // pursue goal
+            }
+        }
+
+        void stopHook() {
+            action_server.abortActive(result);
+            action_server.rejectPending(Result());
+        }
+};
+```
+
+Alternatively goal state changes can be monitored in `updateHook()`:
+
+```cpp
+        bool updateHook() {
+            if (action_server.isPending()) {
+                if (! isOk(getPendingGoal())) rejectPending(Result());
+                else {
+                    Result active_goal_result;
+                    // make preparation
+                    goal = *getPendingGoal();
+                    acceptPending(active_goal_result);
+                }
+
+            }
+            if (action_server.isActive()) {
+                // pursue goal
+            }
+            else if (action_server.isPreemting()) {
+               Result active_goal_result;
+               // cancel goal
+               action_server.cancelActive(active_goal_result);
+            }
+        }
+```
+
 Future Work
 -----------
 
@@ -145,7 +234,6 @@ Future Work
   given RTT operations so that any RTT component with operations with the right
   types can be bound to an actionlib service
 * Add action client support.
-* Add a "simple" mode which implememnts a policy like SimpleActionServer
 
 
 

@@ -26,7 +26,14 @@
   ,get##return_type_str##ComponentRelative ("get"#return_type_str"ComponentRelative") \
   ,set##return_type_str##ComponentRelative ("set"#return_type_str"ComponentRelative") \
   ,get##return_type_str##ComponentAbsolute ("get"#return_type_str"ComponentAbsolute") \
-  ,set##return_type_str##ComponentAbsolute ("set"#return_type_str"ComponentAbsolute")
+  ,set##return_type_str##ComponentAbsolute ("set"#return_type_str"ComponentAbsolute") \
+  ,addRosParamProperty##return_type_str ("addRosParamProperty"#return_type_str) \
+  ,addRosParamProperty##return_type_str##Relative ("addRosParamProperty"#return_type_str"Relative") \
+  ,addRosParamProperty##return_type_str##Absolute ("addRosParamProperty"#return_type_str"Absolute") \
+  ,addRosParamProperty##return_type_str##Private ("addRosParamProperty"#return_type_str"Private") \
+  ,addRosParamProperty##return_type_str##ComponentPrivate ("addRosParamProperty"#return_type_str"ComponentPrivate") \
+  ,addRosParamProperty##return_type_str##ComponentRelative ("addRosParamProperty"#return_type_str"ComponentRelative") \
+  ,addRosParamProperty##return_type_str##ComponentAbsolute ("addRosParamProperty"#return_type_str"ComponentAbsolute")
 #endif
 
 #ifndef ADD_ROSPARAM_OPERATION_CALLER
@@ -44,7 +51,14 @@
   this->addOperationCaller(get##return_type_str##ComponentRelative); \
   this->addOperationCaller(set##return_type_str##ComponentRelative); \
   this->addOperationCaller(get##return_type_str##ComponentAbsolute); \
-  this->addOperationCaller(set##return_type_str##ComponentAbsolute);
+  this->addOperationCaller(set##return_type_str##ComponentAbsolute); \
+  this->addOperationCaller(addRosParamProperty##return_type_str); \
+  this->addOperationCaller(addRosParamProperty##return_type_str##Relative); \
+  this->addOperationCaller(addRosParamProperty##return_type_str##Absolute); \
+  this->addOperationCaller(addRosParamProperty##return_type_str##Private); \
+  this->addOperationCaller(addRosParamProperty##return_type_str##ComponentPrivate); \
+  this->addOperationCaller(addRosParamProperty##return_type_str##ComponentRelative); \
+  this->addOperationCaller(addRosParamProperty##return_type_str##ComponentAbsolute);
 #endif
 
 #ifndef DECLARE_ROSPARAM_OPERATION_CALLER
@@ -62,7 +76,14 @@
   RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str##ComponentRelative; \
   RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str##ComponentRelative; \
   RTT::OperationCaller<bool(const std::string &, return_type &)>        get##return_type_str##ComponentAbsolute; \
-  RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str##ComponentAbsolute;
+  RTT::OperationCaller<void(const std::string &, const return_type &)>  set##return_type_str##ComponentAbsolute; \
+  RTT::OperationCaller<RTT::Property<return_type>&(const std::string &)> addRosParamProperty##return_type_str; \
+  RTT::OperationCaller<RTT::Property<return_type>&(const std::string &)> addRosParamProperty##return_type_str##Relative; \
+  RTT::OperationCaller<RTT::Property<return_type>&(const std::string &)> addRosParamProperty##return_type_str##Absolute; \
+  RTT::OperationCaller<RTT::Property<return_type>&(const std::string &)> addRosParamProperty##return_type_str##Private; \
+  RTT::OperationCaller<RTT::Property<return_type>&(const std::string &)> addRosParamProperty##return_type_str##ComponentPrivate; \
+  RTT::OperationCaller<RTT::Property<return_type>&(const std::string &)> addRosParamProperty##return_type_str##ComponentRelative; \
+  RTT::OperationCaller<RTT::Property<return_type>&(const std::string &)> addRosParamProperty##return_type_str##ComponentAbsolute;
 #endif
 
 namespace rtt_rosparam {

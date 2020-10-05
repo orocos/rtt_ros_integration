@@ -46,8 +46,8 @@ public:
     tform_.header.frame_id = "/world";
     tform_.header.stamp = ros::Time(((double)RTT::os::TimeService::Instance()->getNSecs())*1E-9);
     tform_.child_frame_id = "rel_rtt_tf_test";
-    tform_.transform.translation.x = cos(t);
-    tform_.transform.translation.y = sin(t);
+    tform_.transform.translation.x = sin(t);
+    tform_.transform.translation.y = cos(t);
     broadcaster_(tform_);
   }
   void stopHook() { }
@@ -63,6 +63,13 @@ int ORO_main(int argc, char** argv) {
     // Create deployer
     OCL::DeploymentComponent deployer;
 
+    // initialize ROS and load typekits
+    deployer.import("rtt_rosnode");
+    deployer.import("rtt_std_msgs");
+    deployer.import("rtt_geometry_msgs");
+    deployer.import("rtt_tf2_msgs");
+
+    // import and load our component
     deployer.import("rtt_tf");
     deployer.loadComponent("tf","rtt_tf::RTT_TF");
 
@@ -71,6 +78,7 @@ int ORO_main(int argc, char** argv) {
     // Connect components and deployer
     deployer.connectPeers(&bcaster);
     deployer.setActivity("bcaster",0.02,0,ORO_SCHED_OTHER);
+    // deployer.setActivity("tf",0.1,0,ORO_SCHED_OTHER);
 
     // Connect services between the tf component and the broadcaster
     bcaster.connectServices(tf_component);

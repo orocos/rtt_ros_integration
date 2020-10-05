@@ -117,11 +117,22 @@ TEST(TransportTest, VectorTest)
   EXPECT_FALSE(in.connected());
 }
 
-static int callback_called = 0;
-bool callback(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
+static std::map<int,int> callback_called;
+bool callback0(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
 {
-  ++callback_called;
+  ++callback_called[0];
   return true;
+}
+
+bool callback1()
+{
+  ++callback_called[1];
+  return true;
+}
+
+void callback2()
+{
+  ++callback_called[2];
 }
 
 TEST(TransportTest, ServiceServerTest)
@@ -135,7 +146,9 @@ TEST(TransportTest, ServiceServerTest)
 
   // Create a TaskContext
   RTT::TaskContext *tc = new RTT::TaskContext("TaskContext");
-  tc->addOperation("empty", &callback);
+  tc->addOperation("empty0", &callback0);
+  tc->addOperation("empty1", &callback1);
+  tc->addOperation("empty2", &callback2);
 
   // Load the rosservice service
   boost::weak_ptr<rtt_rosservice::ROSService> rosservice;
@@ -143,25 +156,43 @@ TEST(TransportTest, ServiceServerTest)
   ASSERT_FALSE(rosservice.expired());
 
   // Create a service server
-  EXPECT_TRUE(rosservice.lock()->connect("empty", service, "std_srvs/Empty"));
+  EXPECT_TRUE(rosservice.lock()->connect("empty0", service + "0", "std_srvs/Empty"));
+  EXPECT_TRUE(rosservice.lock()->connect("empty1", service + "1", "std_srvs/Empty"));
+  EXPECT_TRUE(rosservice.lock()->connect("empty2", service + "2", "std_srvs/Empty"));
 
   // Check that the service server has been successfully registered:
-  EXPECT_TRUE(ros::ServiceManager::instance()->lookupServicePublication(service).get());
+  EXPECT_TRUE(ros::ServiceManager::instance()->lookupServicePublication(service + "0").get());
+  EXPECT_TRUE(ros::ServiceManager::instance()->lookupServicePublication(service + "1").get());
+  EXPECT_TRUE(ros::ServiceManager::instance()->lookupServicePublication(service + "2").get());
 
   // Create a service client
-  RTT::OperationCaller<bool(std_srvs::Empty::Request&, std_srvs::Empty::Response&)> service_caller("empty");
-  tc->requires()->addOperationCaller(service_caller);
-  EXPECT_TRUE(rosservice.lock()->connect("empty", service, "std_srvs/Empty"));
-  EXPECT_TRUE(service_caller.ready());
+  RTT::OperationCaller<bool(std_srvs::Empty::Request&, std_srvs::Empty::Response&)> service_caller0("empty0");
+  RTT::OperationCaller<bool(std_srvs::Empty::Request&, std_srvs::Empty::Response&)> service_caller1("empty1");
+  RTT::OperationCaller<bool(std_srvs::Empty::Request&, std_srvs::Empty::Response&)> service_caller2("empty2");
+  tc->requires()->addOperationCaller(service_caller0);
+  tc->requires()->addOperationCaller(service_caller1);
+  tc->requires()->addOperationCaller(service_caller2);
+  EXPECT_TRUE(rosservice.lock()->connect("empty0", service + "0", "std_srvs/Empty"));
+  EXPECT_TRUE(service_caller0.ready());
+  EXPECT_TRUE(rosservice.lock()->connect("empty1", service + "1", "std_srvs/Empty"));
+  EXPECT_TRUE(service_caller1.ready());
+  EXPECT_TRUE(rosservice.lock()->connect("empty2", service + "2", "std_srvs/Empty"));
+  EXPECT_TRUE(service_caller2.ready());
 
   // Call the service
-  EXPECT_EQ(0, callback_called);
+  EXPECT_TRUE(callback_called.empty());
   std_srvs::Empty empty;
-  EXPECT_TRUE(service_caller(empty.request, empty.response));
-  EXPECT_EQ(1, callback_called);
+  EXPECT_TRUE(service_caller0(empty.request, empty.response));
+  EXPECT_EQ(1, callback_called[0]);
+  EXPECT_TRUE(service_caller1(empty.request, empty.response));
+  EXPECT_EQ(1, callback_called[1]);
+  EXPECT_TRUE(service_caller2(empty.request, empty.response));
+  EXPECT_EQ(1, callback_called[2]);
 
   // Disconnect the service
-  EXPECT_TRUE(rosservice.lock()->disconnect(service));
+  EXPECT_TRUE(rosservice.lock()->disconnect(service + "0"));
+  EXPECT_TRUE(rosservice.lock()->disconnect(service + "1"));
+  EXPECT_TRUE(rosservice.lock()->disconnect(service + "2"));
 
   // Check that the service server has been destroyed
   EXPECT_FALSE(ros::ServiceManager::instance()->lookupServicePublication(service));
