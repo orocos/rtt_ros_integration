@@ -30,7 +30,11 @@
   this->addOperation("get"#return_type_str"ComponentRelative", &ROSParamService::get##func< return_type , COMPONENT_RELATIVE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `component_name/param`"); \
   this->addOperation("set"#return_type_str"ComponentRelative", &ROSParamService::set##func< return_type , COMPONENT_RELATIVE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `component_name/param`"); \
   this->addOperation("get"#return_type_str"ComponentAbsolute", &ROSParamService::get##func< return_type , COMPONENT_ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `/component_name/param`"); \
-  this->addOperation("set"#return_type_str"ComponentAbsolute", &ROSParamService::set##func< return_type , COMPONENT_ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `/component_name/param`"); \
+  this->addOperation("set"#return_type_str"ComponentAbsolute", &ROSParamService::set##func< return_type , COMPONENT_ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `/component_name/param`");
+#endif
+
+#ifndef ADD_ROSPARAM_PROPERTY_OPERATION
+#define ADD_ROSPARAM_PROPERTY_OPERATION(return_type_str, return_type, func) \
   this->addOperation("addRosParamProperty"#return_type_str, &ROSParamService::addRosParamProperty<return_type, RELATIVE>, this).doc("Adds a Property to the owner component that is linked to a ROS property of the same name").arg("name", "name of the ROS parameter, the property generated will use the same name"); \
   this->addOperation("addRosParamProperty"#return_type_str"Relative", &ROSParamService::addRosParamProperty<return_type, RELATIVE>, this).doc("Adds a Property to the owner component that is linked to a ROS property of the same name").arg("name", "name of the ROS parameter, the property generated will use the same name"); \
   this->addOperation("addRosParamProperty"#return_type_str"Absolute", &ROSParamService::addRosParamProperty<return_type, ABSOLUTE>, this).doc("Adds a Property to the owner component that is linked to a ROS property of the same name").arg("name", "name of the ROS parameter, the property generated will use the same name"); \
@@ -154,6 +158,11 @@ public:
     ADD_ROSPARAM_OPERATION(Float, float, ParamImpl)
     ADD_ROSPARAM_OPERATION(Int, int, ParamImpl)
     ADD_ROSPARAM_OPERATION(Bool, bool, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(String, std::string, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(Double, double, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(Float, float, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(Int, int, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(Bool, bool, ParamImpl)
 
     // Vector parameters
     ADD_ROSPARAM_OPERATION(VectorOfString, std::vector<std::string>, ParamImpl)
@@ -161,6 +170,11 @@ public:
     ADD_ROSPARAM_OPERATION(VectorOfFloat, std::vector<float>, ParamImpl)
     ADD_ROSPARAM_OPERATION(VectorOfInt, std::vector<int>, ParamImpl)
     ADD_ROSPARAM_OPERATION(VectorOfBool, std::vector<bool>, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(VectorOfString, std::vector<std::string>, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(VectorOfDouble, std::vector<double>, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(VectorOfFloat, std::vector<float>, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(VectorOfInt, std::vector<int>, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(VectorOfBool, std::vector<bool>, ParamImpl)
 
     ADD_ROSPARAM_OPERATION(EigenVectorXd, double, EigenVectorParamImpl)
     ADD_ROSPARAM_OPERATION(EigenVectorXf, float, EigenVectorParamImpl)
