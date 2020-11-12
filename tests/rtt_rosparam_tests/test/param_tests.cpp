@@ -171,6 +171,42 @@ class ParamTest : public ::testing::Test {
       vector3_.z = 22.0;
     }
 
+    void initialize_alternative() {
+      // Primitive parameters
+      string_ = "barfoo";
+      double_ = 6.8;
+      float_ = 8.4f;
+      int_ = -42;
+      uint_ = 17u;
+      char_ = 'p';
+      uchar_ = 58u;
+      bool_ = false;
+
+      // Vector parameters
+      v_string_.push_back(string_);
+      v_double_.push_back(double_);
+      v_float_.push_back(float_);
+      v_int_.push_back(int_);
+      v_uint_.push_back(uint_);
+      v_char_.push_back(char_);
+      v_uchar_.push_back(uchar_);
+      v_bool_.push_back(bool_);
+
+#ifdef RTT_ROSPARAM_EIGEN_SUPPORT
+      eigenvector_double_ = Eigen::Vector3d(9.6, 3.4, 2.5);
+      eigenvector_float_ = Eigen::Vector3f(2.3f, 7.6f, 5.2f);
+#endif
+
+      // Struct parameters
+      bag_.clear();
+      bag_.ownProperty(new RTT::Property<std::string>("string", "", "yet another alternative value"));
+      bag_.ownProperty(new RTT::Property<int>("int", "", 30));
+
+      vector3_.x = 24.4;
+      vector3_.y = 25.5;
+      vector3_.z = 26.6;
+    }
+
     void reset() {
       string_.clear();
       double_ = 0.0;
@@ -604,6 +640,49 @@ TEST_F(ParamTest, SetValueOnParameterServer)
 #endif
   getParameters("~" + tc->getName() + "/", params, /* only_ros_types = */ true);
   compareValues(props, params, "set[Type]ComponentPrivate()", /* only_ros_types = */ true);
+}
+
+TEST_F(ParamTest, AddRosParamDataSources)
+{
+  // initialize properties to some values
+  props.initialize();
+
+  // Read in parameters through data source
+  ros::param::set("bool_parameter", props.bool_);
+  EXPECT_EQ(rosparam->addRosParamPropertyBool("bool_parameter").value(), props.bool_);
+  ros::param::set("double_parameter", props.double_);
+  EXPECT_EQ(rosparam->addRosParamPropertyDouble("double_parameter").value(), props.double_);
+  ros::param::set("float_parameter", props.float_);
+  EXPECT_EQ(rosparam->addRosParamPropertyFloat("float_parameter").value(), props.float_);
+  ros::param::set("int_parameter", props.int_);
+  EXPECT_EQ(rosparam->addRosParamPropertyInt("int_parameter").value(), props.int_);
+  ros::param::set("string_parameter", props.string_);
+  EXPECT_EQ(rosparam->addRosParamPropertyString("string_parameter").value(), props.string_);
+
+  // change the props values to an alternative configuration
+  props.initialize_alternative();
+
+  // Write out paramters through data source
+  bool in_bool;
+  double in_double;
+  float in_float;
+  int in_int;
+  std::string in_string;
+  tc->properties()->getPropertyType<bool>("bool_parameter")->set(props.bool_);
+  ros::param::get("bool_parameter", in_bool);
+  EXPECT_EQ(in_bool, props.bool_);
+  tc->properties()->getPropertyType<double>("double_parameter")->set(props.double_);
+  ros::param::get("double_parameter", in_double);
+  EXPECT_EQ(in_double, props.double_);
+  tc->properties()->getPropertyType<float>("float_parameter")->set(props.float_);
+  ros::param::get("float_parameter", in_float);
+  EXPECT_EQ(in_float, props.float_);
+  tc->properties()->getPropertyType<int>("int_parameter")->set(props.int_);
+  ros::param::get("int_parameter", in_int);
+  EXPECT_EQ(in_int, props.int_);
+  tc->properties()->getPropertyType<std::string>("string_parameter")->set(props.string_);
+  ros::param::get("string_parameter", in_string);
+  EXPECT_EQ(in_string, props.string_);
 }
 
 TEST_F(ParamTest, GetValueFromParameterServer)
