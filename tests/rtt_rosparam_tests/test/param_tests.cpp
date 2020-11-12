@@ -668,19 +668,19 @@ TEST_F(ParamTest, AddRosParamDataSources)
   float in_float;
   int in_int;
   std::string in_string;
-  dynamic_cast<RTT::Property<bool>*>(tc->getProperty("bool_parameter"))->set(props.bool_);
+  tc->properties()->getPropertyType<bool>("bool_parameter")->set(props.bool_);
   ros::param::get("bool_parameter", in_bool);
   EXPECT_EQ(in_bool, props.bool_);
-  dynamic_cast<RTT::Property<double>*>(tc->getProperty("double_parameter"))->set(props.double_);
+  tc->properties()->getPropertyType<double>("double_parameter")->set(props.double_);
   ros::param::get("double_parameter", in_double);
   EXPECT_EQ(in_double, props.double_);
-  dynamic_cast<RTT::Property<float>*>(tc->getProperty("float_parameter"))->set(props.float_);
+  tc->properties()->getPropertyType<float>("float_parameter")->set(props.float_);
   ros::param::get("float_parameter", in_float);
   EXPECT_EQ(in_float, props.float_);
-  dynamic_cast<RTT::Property<int>*>(tc->getProperty("int_parameter"))->set(props.int_);
+  tc->properties()->getPropertyType<int>("int_parameter")->set(props.int_);
   ros::param::get("int_parameter", in_int);
   EXPECT_EQ(in_int, props.int_);
-  dynamic_cast<RTT::Property<std::string>*>(tc->getProperty("string_parameter"))->set(props.string_);
+  tc->properties()->getPropertyType<std::string>("string_parameter")->set(props.string_);
   ros::param::get("string_parameter", in_string);
   EXPECT_EQ(in_string, props.string_);
 }
