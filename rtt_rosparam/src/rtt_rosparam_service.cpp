@@ -1,8 +1,10 @@
 #include <rtt/RTT.hpp>
 #include <rtt/Property.hpp>
+#include <rtt/internal/DataSource.hpp>
 #include <rtt/plugin/ServicePlugin.hpp>
 #include <rtt/types/PropertyDecomposition.hpp>
 
+#include <boost/lexical_cast.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
@@ -432,6 +434,28 @@ XmlRpc::XmlRpcValue rttPropertyToXmlParam(const Eigen::VectorXf &vec)
   return xml_array;
 }
 
+// We assume that a property with an unassignable "size" int member is a sequence.
+// This is taken from RTT::types::propertyDecomposition
+bool propertyIsSequence(RTT::base::PropertyBase *prop) {
+  RTT::base::DataSourceBase::shared_ptr dsb = prop->getDataSource();
+  RTT::internal::DataSource<int>::shared_ptr size = RTT::internal::DataSource<int>::narrow(dsb->getMember("size").get());
+
+  return size && !size->isAssignable();
+}
+
+XmlRpc::XmlRpcValue rttPropertySequenceToXmlParam(RTT::base::PropertyBase *prop, const RTT::PropertyBag &bag) {
+  RTT::internal::DataSource<int>::shared_ptr size = RTT::internal::DataSource<int>::narrow(prop->getDataSource()->getMember("size").get());
+
+  XmlRpc::XmlRpcValue xml_array;
+  xml_array.setSize(size->get());
+
+  for (int i=0; i<size->get(); i++) {
+    RTT::base::PropertyBase *subProp = bag.getProperty("Element" + boost::lexical_cast<std::string>(i));
+    xml_array[i] = rttPropertyBaseToXmlParam(subProp);
+  }
+
+  return xml_array;
+}
 
 // These just save typing
 #define RETURN_RTT_PROPERTY_TO_XML_PARAM(type,prop)\
@@ -471,7 +495,11 @@ XmlRpc::XmlRpcValue rttPropertyBaseToXmlParam(RTT::base::PropertyBase *prop)
   // Try to decompose property into a property bag
   RTT::PropertyBag bag;
   if (RTT::types::propertyDecomposition(prop, bag)) {
-    return rttPropertyToXmlParam(bag);
+    if (propertyIsSequence(prop)) {
+      return rttPropertySequenceToXmlParam(prop, bag);
+    } else {
+      return rttPropertyToXmlParam(bag);
+    }
   }
 
   return XmlRpc::XmlRpcValue();
@@ -715,21 +743,10 @@ bool xmlParamToProp(
   return result;
 }
 
-template <>
-bool xmlParamToProp<RTT::PropertyBag>(
+bool xmlParamStructToProp(
     const XmlRpc::XmlRpcValue &xml_value,
     RTT::Property<RTT::PropertyBag>* prop)
 {
-  // Check if the property value is the requested type T
-  if(!prop) {
-    return false;
-  }
-
-  // Make sure it's a struct
-  if(xml_value.getType() != XmlRpc::XmlRpcValue::TypeStruct) {
-    return false;
-  }
-
   // Copy the properties
   bool success = true;
   // We need to copy the struct because XmlRpc++ doesn't have const operations for this
@@ -747,6 +764,44 @@ bool xmlParamToProp<RTT::PropertyBag>(
   }
 
   return success;
+}
+
+bool xmlParamArrayToProp(
+    const XmlRpc::XmlRpcValue &xml_value,
+    RTT::Property<RTT::PropertyBag>* prop)
+{
+  bool success = true;
+
+  for (int idx = 0; idx < xml_value.size(); ++idx) {
+    base::PropertyBase* sub_prop_base = prop->set().getProperty("Element" + boost::lexical_cast<std::string>(idx));
+    if (sub_prop_base) {
+      success &= xmlParamToProp(xml_value[idx], sub_prop_base);
+    } else {
+      // ??
+    }
+  }
+
+  return success;
+}
+
+template <>
+bool xmlParamToProp<RTT::PropertyBag>(
+    const XmlRpc::XmlRpcValue &xml_value,
+    RTT::Property<RTT::PropertyBag>* prop)
+{
+  // Check if the property value is the requested type T
+  if(!prop) {
+    return false;
+  }
+
+  // Make sure it's a struct
+  if(xml_value.getType() == XmlRpc::XmlRpcValue::TypeStruct) {
+    return xmlParamStructToProp(xml_value, prop);
+  } else if (xml_value.getType() == XmlRpc::XmlRpcValue::TypeArray) {
+    return xmlParamArrayToProp(xml_value, prop);
+  } else {
+    return false;
+  }
 }
 
 bool xmlParamToProp(
@@ -807,6 +862,13 @@ bool xmlParamToProp(
 
   // try property bag decomposition
   {
+    if (xml_value.getType() == XmlRpc::XmlRpcValue::TypeArray
+        && !prop_base->getTypeInfo()->resize(prop_base->getDataSource(), xml_value.size())) {
+      RTT::log(RTT::Debug) << "Could not resize property of type \""
+                           << prop_base->getName() << "\"" << RTT::endlog();
+      return false;
+    }
+
     RTT::Property<RTT::PropertyBag> bag(prop_base->getName());
     if (RTT::types::propertyDecomposition(prop_base, bag.set()) && xmlParamToProp(xml_value, &bag)) {
       return true;
