@@ -2,8 +2,8 @@
 Changelog for package rtt_shape_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.10.0 (2021-01-04)
+-------------------
 * Merge remote-tracking branch 'origin/toolchain-2.9' into toolchain-2.10
 * Merge pull request `#154 <https://github.com/orocos/rtt_ros_integration/issues/154>`_ from orocos/feature/add-licenses
   add LICENSE files to rtt_ros_integration packages

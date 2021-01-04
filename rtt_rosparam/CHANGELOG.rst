@@ -2,8 +2,8 @@
 Changelog for package rtt_rosparam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.10.0 (2021-01-04)
+-------------------
 * Merge remote-tracking branch 'origin/toolchain-2.9' into toolchain-2.10
 * Merge pull request `#157 <https://github.com/orocos/rtt_ros_integration/issues/157>`_ from orocos/feature/rosparam-unitests
   rtt_rosparam_tests: add unit tests for the new DataSource feature

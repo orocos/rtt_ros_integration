@@ -2,8 +2,8 @@
 Changelog for package rtt_tf2_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.10.0 (2021-01-04)
+-------------------
 * Bump version to 2.10.0
 * Merge remote-tracking branch 'origin/toolchain-2.9' into toolchain-2.10
 * Merge pull request `#154 <https://github.com/orocos/rtt_ros_integration/issues/154>`_ from orocos/feature/add-licenses
