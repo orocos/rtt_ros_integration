@@ -3,7 +3,7 @@
   <name>rtt_actionlib</name>
   <version>2.9.2</version>
   <description>The rtt_actionlib package</description>
-  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <maintainer email="orocos-dev@orocos.org">Orocos Developers</maintainer>
 
   <license>BSD</license>
 

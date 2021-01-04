@@ -17,7 +17,7 @@
     typekit.
 
   </description>
-  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <maintainer email="orocos-dev@orocos.org">Orocos Developers</maintainer>
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>

@@ -12,6 +12,7 @@
 
 #include <ros/ros.h>
 
+#include <rtt_rosparam/ros_param_data_source.hpp>
 #include <rtt_rosparam/rosparam.h>
 
 #ifndef ADD_ROSPARAM_OPERATION
@@ -30,6 +31,17 @@
   this->addOperation("set"#return_type_str"ComponentRelative", &ROSParamService::set##func< return_type , COMPONENT_RELATIVE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `component_name/param`"); \
   this->addOperation("get"#return_type_str"ComponentAbsolute", &ROSParamService::get##func< return_type , COMPONENT_ABSOLUTE >, this).doc("Get a " #return_type " from rosparam using the following resolution policy : `/component_name/param`"); \
   this->addOperation("set"#return_type_str"ComponentAbsolute", &ROSParamService::set##func< return_type , COMPONENT_ABSOLUTE >, this).doc("Set a " #return_type " in rosparam using the following resolution policy : `/component_name/param`");
+#endif
+
+#ifndef ADD_ROSPARAM_PROPERTY_OPERATION
+#define ADD_ROSPARAM_PROPERTY_OPERATION(return_type_str, return_type, func) \
+  this->addOperation("addRosParamProperty"#return_type_str, &ROSParamService::addRosParamProperty<return_type, RELATIVE>, this).doc("Adds a Property to the owner component that is linked to a ROS property of the same name").arg("name", "name of the ROS parameter, the property generated will use the same name"); \
+  this->addOperation("addRosParamProperty"#return_type_str"Relative", &ROSParamService::addRosParamProperty<return_type, RELATIVE>, this).doc("Adds a Property to the owner component that is linked to a ROS property of the same name").arg("name", "name of the ROS parameter, the property generated will use the same name"); \
+  this->addOperation("addRosParamProperty"#return_type_str"Absolute", &ROSParamService::addRosParamProperty<return_type, ABSOLUTE>, this).doc("Adds a Property to the owner component that is linked to a ROS property of the same name").arg("name", "name of the ROS parameter, the property generated will use the same name"); \
+  this->addOperation("addRosParamProperty"#return_type_str"Private", &ROSParamService::addRosParamProperty<return_type, PRIVATE>, this).doc("Adds a Property to the owner component that is linked to a ROS property of the same name").arg("name", "name of the ROS parameter, the property generated will use the same name"); \
+  this->addOperation("addRosParamProperty"#return_type_str"ComponentPrivate", &ROSParamService::addRosParamProperty<return_type, COMPONENT_PRIVATE>, this).doc("Adds a Property to the owner component that is linked to a ROS property of the same name").arg("name", "name of the ROS parameter, the property generated will use the same name"); \
+  this->addOperation("addRosParamProperty"#return_type_str"ComponentRelative", &ROSParamService::addRosParamProperty<return_type, COMPONENT_RELATIVE>, this).doc("Adds a Property to the owner component that is linked to a ROS property of the same name").arg("name", "name of the ROS parameter, the property generated will use the same name"); \
+  this->addOperation("addRosParamProperty"#return_type_str"ComponentAbsolute", &ROSParamService::addRosParamProperty<return_type, COMPONENT_ABSOLUTE>, this).doc("Adds a Property to the owner component that is linked to a ROS property of the same name").arg("name", "name of the ROS parameter, the property generated will use the same name");
 #endif
 
 
@@ -146,6 +158,11 @@ public:
     ADD_ROSPARAM_OPERATION(Float, float, ParamImpl)
     ADD_ROSPARAM_OPERATION(Int, int, ParamImpl)
     ADD_ROSPARAM_OPERATION(Bool, bool, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(String, std::string, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(Double, double, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(Float, float, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(Int, int, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(Bool, bool, ParamImpl)
 
     // Vector parameters
     ADD_ROSPARAM_OPERATION(VectorOfString, std::vector<std::string>, ParamImpl)
@@ -153,6 +170,11 @@ public:
     ADD_ROSPARAM_OPERATION(VectorOfFloat, std::vector<float>, ParamImpl)
     ADD_ROSPARAM_OPERATION(VectorOfInt, std::vector<int>, ParamImpl)
     ADD_ROSPARAM_OPERATION(VectorOfBool, std::vector<bool>, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(VectorOfString, std::vector<std::string>, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(VectorOfDouble, std::vector<double>, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(VectorOfFloat, std::vector<float>, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(VectorOfInt, std::vector<int>, ParamImpl)
+    ADD_ROSPARAM_PROPERTY_OPERATION(VectorOfBool, std::vector<bool>, ParamImpl)
 
     ADD_ROSPARAM_OPERATION(EigenVectorXd, double, EigenVectorParamImpl)
     ADD_ROSPARAM_OPERATION(EigenVectorXf, float, EigenVectorParamImpl)
@@ -239,7 +261,27 @@ private:
   bool setParamComponentPrivate(const std::string &name) { return set(name, COMPONENT_PRIVATE); }
   bool setParamComponentRelative(const std::string &name) { return set(name, COMPONENT_RELATIVE); }
   bool setParamComponentAbsolute(const std::string &name) { return set(name, COMPONENT_ABSOLUTE); }
-};
+
+  /**
+   * Adds a ROS parameter of supported types by ROS param as a property to this
+   * bag.
+   * The new property mirrors the value of the respective ROS parameter of the
+   * same name.
+   * Setting the value of the property sets the ROS parameter, and evaluating it
+   * loads the current value from the ROS parameter server.
+   * @param name The name of the ROS parameter and the property to be added.
+   * @return the Property object by reference, which you can further query or document.
+   */
+  template<typename T, ResolutionPolicy P>
+  Property<T>& addRosParamProperty( const std::string& name) {
+    const std::string resolved_name = resolvedName(name,P);
+    typename internal::AssignableDataSource<T>::shared_ptr datasource( new rtt_rosparam::RosParamDataSource<T>(resolved_name) );
+    Property<T>* p = new Property<T>(name, "Property generated by rosparam attached to parameter: " + resolved_name, datasource);
+    this->getOwner()->properties()->ownProperty( p );
+    return *p;
+  }
+
+}; // class ROSParamService
 
 const std::string ROSParamService::resolvedName(
     const std::string &param_name,

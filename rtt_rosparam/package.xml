@@ -5,7 +5,7 @@
   <description>
     This package provides an RTT service and service-requester for associating RTT component properties with ROS parameters
   </description>
-  <maintainer email="orocos-dev@lists.mech.kuleuven.be">Orocos Developers</maintainer>
+  <maintainer email="orocos-dev@orocos.org">Orocos Developers</maintainer>
 
   <license>BSD</license>
 
