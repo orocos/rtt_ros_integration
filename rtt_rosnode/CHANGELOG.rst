@@ -2,6 +2,31 @@
 Changelog for package rtt_rosnode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/toolchain-2.9' into toolchain-2.10
+* Merge pull request `#154 <https://github.com/orocos/rtt_ros_integration/issues/154>`_ from orocos/feature/add-licenses
+  add LICENSE files to rtt_ros_integration packages
+* update e-mail of Orocos Developers in package.xml files
+* licenses: update text and make it match to current BSD-3
+  New update on the files with licenses headers.
+* fix licenses format in source files
+  This patch applies a general homogeneous format for the licenses
+  accross the packages.
+* homogenize licenses to BSD
+  The patch reorganizes all the licesnes to match to BSD and a
+  single LICENSE file is placed in the root of the repository.
+* add LICENSE files to rtt_ros_integration packages
+* Merge tag '2.9.2' into toolchain-2.9
+* Merge pull request `#116 <https://github.com/orocos/rtt_ros_integration/issues/116>`_ from ahoarau/patch-3
+  Defaults the number of spinner threads
+* Defaults the number of spinner threads
+  To the number of CPUs available
+* Merge pull request `#111 <https://github.com/orocos/rtt_ros_integration/issues/111>`_ from orocos/fix-110
+  Declare loadROSService() methods as static to fix name clashes
+* Declare loadROSService() methods as static to fix name clashes (fix `#110 <https://github.com/orocos/rtt_ros_integration/issues/110>`_)
+* Contributors: Antoine Hoarau, Johannes Meyer, Sergio Portoles, Sergio Portoles Diez, SergioPD
+
 2.9.2 (2019-05-15)
 ------------------
 * Merge pull request `#116 <https://github.com/orocos/rtt_ros_integration/issues/116>`_ from ahoarau/patch-3 into 2.9.2

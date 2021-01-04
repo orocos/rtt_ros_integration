@@ -2,6 +2,39 @@
 Changelog for package rtt_roscomm_tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/toolchain-2.9' into toolchain-2.10
+* Merge pull request `#154 <https://github.com/orocos/rtt_ros_integration/issues/154>`_ from orocos/feature/add-licenses
+  add LICENSE files to rtt_ros_integration packages
+* update e-mail of Orocos Developers in package.xml files
+* Merge remote-tracking branch 'origin/toolchain-2.9' into toolchain-2.10
+* Merge pull request `#142 <https://github.com/orocos/rtt_ros_integration/issues/142>`_ from orocos/test-callback-signature-in-rtt_roscomm_tests-transport_tests
+  rtt_roscomm_tests: check exact callback signature in transport_tests.cpp
+* rtt_roscomm_tests: check exact callback signature in transport_tests.cpp
+* Merge tag '2.9.2' into toolchain-2.9
+* Merge pull request `#123 <https://github.com/orocos/rtt_ros_integration/issues/123>`_ from orocos/rtt_std_srvs-for-standard-operations
+  Add wrappers for common operation signatures to rtt_std_srvs
+* rtt_roscomm/rtt_std_srvs: add wrappers for common operation signatures to rtt_std_srvs (fix `#101 <https://github.com/orocos/rtt_ros_integration/issues/101>`_)
+  With this patch it is possible to create ROS service servers for some common operation signatures out of the box,
+  without the need to write custom wrappers or to add extra operations with the ROS specific callback signature.
+  Supported service types and associated signatures:
+  std_srvs/Empty:
+  - bool empty()                     // The service call fails if empty() returns false!
+  // Use std_srvs/Trigger if the result should be returned as the response.
+  - void empty()
+  std_srvs/SetBool:
+  - bool setBool(bool, std::string &message_out)
+  - bool setBool(bool)               // response.message will be empty
+  - std::string setBool(bool)        // response.success = true
+  - void setBool(bool)               // response.success = true and response.message will be empty
+  std_srvs/Trigger:
+  - bool trigger(std::string &message_out)
+  - bool trigger()                   // response.message will be empty
+  - std::string trigger()            // response.success = true
+  The approach can be easily extended to other ROS service types.
+* Contributors: Francisco Almeida, Johannes Meyer, Sergio Portoles Diez, SergioPD
+
 2.9.2 (2019-05-15)
 ------------------
 

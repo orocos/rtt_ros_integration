@@ -2,6 +2,37 @@
 Changelog for package rtt_ros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/toolchain-2.9' into toolchain-2.10
+* Merge pull request `#154 <https://github.com/orocos/rtt_ros_integration/issues/154>`_ from orocos/feature/add-licenses
+  add LICENSE files to rtt_ros_integration packages
+* update e-mail of Orocos Developers in package.xml files
+* licenses: update text and make it match to current BSD-3
+  New update on the files with licenses headers.
+* fix licenses format in source files
+  This patch applies a general homogeneous format for the licenses
+  accross the packages.
+* rtt_ros: fix license headers in types
+  This patch improves the layout of the BSD-3 clause licenses
+  in the package rtt_ros.
+* homogenize licenses to BSD ctd.
+  The patch reorganizes all the licesnes to match to BSD and a
+  single LICENSE file is placed in the root of the repository.
+* homogenize licenses to BSD
+  The patch reorganizes all the licesnes to match to BSD and a
+  single LICENSE file is placed in the root of the repository.
+* add LICENSE files to rtt_ros_integration packages
+* Merge pull request `#139 <https://github.com/orocos/rtt_ros_integration/issues/139>`_ from achim-k/toolchain-2.9
+  rtt_ros: Fix memory leak when parsing package xml file.
+* rtt_ros: Fix memory leak when parsing package xml file.
+* Merge tag '2.9.2' into toolchain-2.9
+* Merge pull request `#111 <https://github.com/orocos/rtt_ros_integration/issues/111>`_ from orocos/fix-110
+  Declare loadROSService() methods as static to fix name clashes
+* Declare loadROSService() methods as static to fix name clashes (fix `#110 <https://github.com/orocos/rtt_ros_integration/issues/110>`_)
+* rtt_ros: remove extra semicolon after namespace closing bracket
+* Contributors: Hans-Joachim Krauch, Johannes Meyer, Sergio Portoles, Sergio Portoles Diez, SergioPD
+
 2.9.2 (2019-05-15)
 ------------------
 * Merge pull request `#111 <https://github.com/orocos/rtt_ros_integration/issues/111>`_ from orocos/fix-110 into 2.9.2
