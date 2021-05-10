@@ -1,8 +1,15 @@
+#include <utility>
+#include <vector>
+
 #include <rtt/os/startstop.h>
 #include <rtt/Logger.hpp>
 #include <rtt/TaskContext.hpp>
 #include <rtt/deployment/ComponentLoader.hpp>
 #include <rtt/plugin/PluginLoader.hpp>
+#include <rtt/types/StructTypeInfo.hpp>
+#include <rtt/types/SequenceTypeInfo.hpp>
+
+#include <boost/serialization/serialization.hpp>
 
 #include <rtt_rosparam/rosparam.h>
 
@@ -52,8 +59,47 @@ namespace RTT {
   }
 }
 
+namespace boost {
+namespace serialization {
+template<class Archive>
+void serialize(Archive & a, std::pair<std::string, int> &pair, unsigned int) {
+  using boost::serialization::make_nvp;
+  a & make_nvp("first", pair.first);
+  a & make_nvp("second", pair.second);
+}
+}
+}
+
+// Typekit for the custom types.
+namespace {
+
+typedef std::pair<std::string, int> StringIntPair;
+
+class StringIntPairTypeInfo : public RTT::types::StructTypeInfo<StringIntPair> {
+public:
+  StringIntPairTypeInfo()
+      : RTT::types::StructTypeInfo<StringIntPair>("StringIntPair")
+  {}
+};
+
+class StringIntPairVecTypeInfo : public RTT::types::SequenceTypeInfo<std::vector<StringIntPair> > {
+public:
+  StringIntPairVecTypeInfo()
+      : RTT::types::SequenceTypeInfo<std::vector<StringIntPair> >("StringIntPairVec")
+  {}
+};
+
+}
+
 class ParamTest : public ::testing::Test {
- protected:
+public:
+  static void SetUpTestCase()
+  {
+    RTT::types::Types()->addType(new StringIntPairTypeInfo);
+    RTT::types::Types()->addType(new StringIntPairVecTypeInfo);
+  }
+
+protected:
   virtual void SetUp() {
     // Import packages
     ASSERT_TRUE(RTT::ComponentLoader::Instance()->import("rtt_rosparam", "" ));
@@ -87,6 +133,8 @@ class ParamTest : public ::testing::Test {
     // Struct parameters
     tc->addProperty("bag", props.bag_);
     tc->addProperty("vector3", props.vector3_);
+    tc->addProperty("pair", props.pair_);
+    tc->addProperty("pair_vector", props.pair_vector_);
 
     // Delete parameters that might be left from previous executions
     deleteParameters();
@@ -130,6 +178,8 @@ class ParamTest : public ::testing::Test {
     // Struct parameters
     RTT::PropertyBag bag_;
     geometry_msgs::Vector3 vector3_;
+    StringIntPair pair_;
+    std::vector<StringIntPair> pair_vector_;
 
     Values() {
       reset();
@@ -169,6 +219,12 @@ class ParamTest : public ::testing::Test {
       vector3_.x = 20.0;
       vector3_.y = 21.0;
       vector3_.z = 22.0;
+
+      pair_ = std::make_pair("abc", 6);
+
+      pair_vector_.clear();
+      pair_vector_.push_back(std::make_pair("one", 1));
+      pair_vector_.push_back(std::make_pair("two", 2));
     }
 
     void initialize_alternative() {
@@ -236,6 +292,9 @@ class ParamTest : public ::testing::Test {
       bag_.ownProperty(new RTT::Property<int>("int", "", 0));
 
       vector3_= geometry_msgs::Vector3();
+
+      pair_ = std::make_pair("", 0);
+      pair_vector_.clear();
     }
   } props, params;
 
@@ -302,6 +361,40 @@ class ParamTest : public ::testing::Test {
       EXPECT_TRUE(ros::param::get(prefix + "vector3/x", data.vector3_.x));
       EXPECT_TRUE(ros::param::get(prefix + "vector3/y", data.vector3_.y));
       EXPECT_TRUE(ros::param::get(prefix + "vector3/z", data.vector3_.z));
+
+      EXPECT_TRUE(ros::param::get(prefix + "pair/first", data.pair_.first));
+      EXPECT_TRUE(ros::param::get(prefix + "pair/second", data.pair_.second));
+
+      XmlRpc::XmlRpcValue vec_xmlrpc;
+      EXPECT_TRUE(ros::param::get(prefix + "pair_vector", vec_xmlrpc));
+      EXPECT_EQ(vec_xmlrpc.getType(), XmlRpc::XmlRpcValue::TypeArray);
+      if (vec_xmlrpc.getType() == XmlRpc::XmlRpcValue::TypeArray)
+      {
+        data.pair_vector_.clear();
+
+        for (int i = 0; i < vec_xmlrpc.size(); ++i)
+        {
+          XmlRpc::XmlRpcValue const &pair_xml = vec_xmlrpc[i];
+
+          EXPECT_EQ(pair_xml.getType(), XmlRpc::XmlRpcValue::TypeStruct);
+          if (pair_xml.getType(), XmlRpc::XmlRpcValue::TypeStruct)
+          {
+            bool hasFirst = pair_xml.hasMember("first"),
+                 hasSecond = pair_xml.hasMember("second");
+            EXPECT_TRUE(hasFirst);
+            EXPECT_TRUE(hasSecond);
+
+            if (hasFirst && hasSecond)
+            {
+              StringIntPair pair;
+              pair.first = static_cast<std::string>(pair_xml["first"]);
+              pair.second = pair_xml["second"];
+
+              data.pair_vector_.push_back(pair);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -347,6 +440,24 @@ class ParamTest : public ::testing::Test {
     ros::param::set(prefix + "vector3/x", data.vector3_.x);
     ros::param::set(prefix + "vector3/y", data.vector3_.y);
     ros::param::set(prefix + "vector3/z", data.vector3_.z);
+
+    ros::param::set(prefix + "pair/first", data.pair_.first);
+    ros::param::set(prefix + "pair/second", data.pair_.second);
+
+    {
+      XmlRpc::XmlRpcValue vec_xmlrpc;
+
+      int idx = 0;
+      for (std::vector<StringIntPair>::const_iterator pairIt = data.pair_vector_.begin(); pairIt != data.pair_vector_.end(); ++pairIt)
+      {
+        XmlRpc::XmlRpcValue pair_xmlrpc;
+        pair_xmlrpc["first"] = XmlRpc::XmlRpcValue(pairIt->first);
+        pair_xmlrpc["second"] = XmlRpc::XmlRpcValue(pairIt->second);
+        vec_xmlrpc[idx++] = pair_xmlrpc;
+      }
+
+      ros::param::set(prefix + "pair_vector", vec_xmlrpc);
+    }
   }
 
   void deleteParameters() {
@@ -395,6 +506,9 @@ class ParamTest : public ::testing::Test {
       EXPECT_EQ(expected.vector3_.x, actual.vector3_.x) << "geometry_msgs/Vector3 values do not match in " << test_name;
       EXPECT_EQ(expected.vector3_.y, actual.vector3_.y) << "geometry_msgs/Vector3 values do not match in " << test_name;
       EXPECT_EQ(expected.vector3_.z, actual.vector3_.z) << "geometry_msgs/Vector3 values do not match in " << test_name;
+
+      EXPECT_EQ(expected.pair_, actual.pair_) << "std::pair<std::string, int> values does not match in " << test_name;
+      EXPECT_EQ(expected.pair_vector_, actual.pair_vector_) << "std::vector<std::pair<std::string, int>> values does not match in " << test_name;
     }
   }
 
