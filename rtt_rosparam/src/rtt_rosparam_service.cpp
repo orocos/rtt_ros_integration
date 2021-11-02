@@ -107,6 +107,9 @@ public:
       .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server based on the given ROS parameter name.")
       .arg("param_name", "Name of the ROS parameter. Use '~' and '/' leaders for private or absolute resolution.")
       .arg("name", "Name of the RTT property or service.");
+    this->addOperation("getParams", static_cast<bool(ROSParamService::*)(const std::string&)>(&ROSParamService::getParams), this)
+      .doc("Populates the properties of this component from the ROS param server based on the given ROS parameter name.")
+      .arg("param_name", "Name of the ROS parameter. Use '~' and '/' leaders for private or absolute resolution.");
 
     this->addOperation("getRelative", &ROSParamService::getParamRelative, this)
       .doc("Gets one property of this component (or populates the properties of a named RTT sub-service) from the ROS param server in the relative namespace.")
@@ -220,6 +223,7 @@ private:
     const std::string &param_name,
     const ResolutionPolicy policy);
 
+  bool getParams(const std::string& ns);
   bool getParams(RTT::Service::shared_ptr service, const std::string& ns);
   bool getParams(const ResolutionPolicy policy);
   bool getParamsRelative() { return getParams(RELATIVE); }
@@ -941,6 +945,10 @@ bool ROSParamService::getParam(
 bool ROSParamService::getParams(const ResolutionPolicy policy)
 {
   return getParams(this->getOwner()->provides(), resolvedName(std::string(), policy));
+}
+
+bool ROSParamService::getParams(const std::string& ns) {
+    return getParams(this->getOwner()->provides(), ns);
 }
 
 bool ROSParamService::getParams(
