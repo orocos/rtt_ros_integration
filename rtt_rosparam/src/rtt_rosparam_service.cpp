@@ -108,7 +108,7 @@ public:
       .arg("param_name", "Name of the ROS parameter. Use '~' and '/' leaders for private or absolute resolution.")
       .arg("name", "Name of the RTT property or service.");
     this->addOperation("getParams", static_cast<bool(ROSParamService::*)(const std::string&)>(&ROSParamService::getParams), this)
-      .doc("Populates the properties of this component from the ROS param server based on the given ROS parameter name.")
+      .doc("Populates the properties of this component from the ROS param server based on the given ROS parameter namespace.")
       .arg("param_name", "Name of the ROS parameter. Use '~' and '/' leaders for private or absolute resolution.");
 
     this->addOperation("getRelative", &ROSParamService::getParamRelative, this)
