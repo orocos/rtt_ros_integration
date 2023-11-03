@@ -45,14 +45,16 @@ binds the goal and cancel callbacks to RTT event ports.
 
 ### Calling Actions from Orocos
 
-TBD
+The RTTActionClient is implemented as a mirror of RTTActionServer. The main
+function is sendGoal, which allow to send a new goal and subscribe for
+transition and feebacks.
 
 Usage
 -----
 
 First the appropriate RTT ports need to be created in a given service (or
 subservice) of a TaskContext. These can be easily creted by delegating to an
-RTTActionServer. The RTTActionServer will create the necessary RTT ports and
+RTTActionServer or RTTActionClient. It will create the necessary RTT ports and
 bind them to the user-supplied callbacks. For example, to add an actionlib
 interface to a given compnent, you could do something similar to the following:
 
@@ -233,9 +235,3 @@ Future Work
 * Add operation to actionlib service which connects goal/cancel callbacks to
   given RTT operations so that any RTT component with operations with the right
   types can be bound to an actionlib service
-* Add action client support.
-
-
-
-
-
